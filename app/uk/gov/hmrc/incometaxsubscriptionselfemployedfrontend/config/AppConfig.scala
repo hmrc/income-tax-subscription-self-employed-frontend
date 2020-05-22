@@ -34,4 +34,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   val reportAProblemPartialUrl: String = s"$contactBaseUrl/contact/problem_reports_ajax?service=$serviceIdentifier"
   val reportAProblemNonJSUrl: String   = s"$contactBaseUrl/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
+  // protected microservice
+  protected lazy val protectedMicroServiceUrl: String = servicesConfig.baseUrl("income-tax-subscription")
+  lazy val selfEmployedUrl = s"$protectedMicroServiceUrl/income-tax-subscription/self-employments/id"
+  lazy val allSelfEmployedUrl = s"$protectedMicroServiceUrl/income-tax-subscription/self-employments/all"
 }
