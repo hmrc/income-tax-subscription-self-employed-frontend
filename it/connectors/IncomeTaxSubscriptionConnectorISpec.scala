@@ -3,16 +3,15 @@ package connectors
 
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
+import play.api.libs.json.{JsObject, Json, OFormat}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.{GetAllSelfEmploymentConnectionFailure, GetAllSelfEmploymentConnectionSuccess, GetAllSelfEmploymentDataModel}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{GetSelfEmploymentsData, GetSelfEmploymentsEmpty, InvalidJson, UnexpectedStatusFailure}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.{PostSelfEmploymentsSuccessResponse, UnexpectedStatusFailure}
-import play.api.libs.json.{JsObject, JsValue, Json, OFormat}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.{GetAllSelfEmploymentConnectionFailure, GetAllSelfEmploymentDataModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetAllSelfEmploymentsHttpParser, GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.GetAllSelfEmploymentModel
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
 
 
 
@@ -28,15 +27,14 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
   }
 
   "GetSelfEmployments" should {
-    "Return GetSelfEmploymentsData" in {
-      val successfulResponseBody: JsObject = Json.obj("body" -> "Test Body"
-      )
+    "Return Some DummyModel" in {
+      val successfulResponseBody: JsObject = Json.obj("body" -> "Test Body")
 
       stubGetSelfEmployments(id)(OK, successfulResponseBody)
 
       val res = connector.getSelfEmployments[DummyModel](id)
 
-      await(res) mustBe Right(GetSelfEmploymentsData(DummyModel(body = "Test Body")))
+      await(res) mustBe Right(Some(DummyModel(body = "Test Body")))
     }
 
     "Return InvalidJson" in {
@@ -47,12 +45,12 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
       await(res) mustBe Left(GetSelfEmploymentsHttpParser.InvalidJson)
     }
 
-    "Return GetSelfEmploymentsEmpty" in {
+    "Return None" in {
       stubGetSelfEmployments(id)(NO_CONTENT, Json.obj())
 
       val res = connector.getSelfEmployments[DummyModel](id)
 
-      await(res) mustBe Right(GetSelfEmploymentsEmpty)
+      await(res) mustBe Right(None)
 
     }
     "Return UnexpectedStatusFailure" in {
@@ -74,7 +72,7 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
 
       val res = connector.getAllSelfEmployments
 
-      await(res) mustBe Right(GetAllSelfEmploymentDataModel(GetAllSelfEmploymentModel(businessName = "Business Name", address = "Address")))
+      await(res) mustBe Right(Some(GetAllSelfEmploymentDataModel(GetAllSelfEmploymentModel(businessName = "Business Name", address = "Address"))))
     }
 
     "Return InvalidJson" in {
@@ -85,12 +83,12 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
       await(res) mustBe Left(GetAllSelfEmploymentsHttpParser.InvalidJson)
     }
 
-    "Return GetAllSelfEmploymentConnectionSuccess" in {
+    "Return None" in {
       stubGetAllSelfEmployments(NO_CONTENT, Json.obj())
 
       val res = connector.getAllSelfEmployments
 
-      await(res) mustBe Right(GetAllSelfEmploymentConnectionSuccess)
+      await(res) mustBe Right(None)
     }
 
     "Return GetAllSelfEmploymentConnectionFailure" in {

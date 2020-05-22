@@ -19,29 +19,27 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppar
 import play.api.http.Status._
 import play.api.libs.json.{JsSuccess, Reads}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.InvalidJson
 
 
 object GetSelfEmploymentsHttpParser {
 
-  type GetSelfEmploymentsResponse[T] = Either[GetSelfEmploymentsFailure, GetSelfEmploymentsSuccess[T]]
+  type GetSelfEmploymentsResponse[T] = Either[GetSelfEmploymentsFailure, Option[T]]
 
   implicit def getSelfEmploymentsHttpReads[T](implicit reads: Reads[T]): HttpReads[GetSelfEmploymentsResponse[T]] =
     new HttpReads[GetSelfEmploymentsResponse[T]] {
       override def read(method: String, url: String, response: HttpResponse): GetSelfEmploymentsResponse[T] = {
         response.status match {
           case OK => response.json.validate[T] match {
-            case JsSuccess(value, _) => Right(GetSelfEmploymentsData(value))
+            case JsSuccess(value, _) => Right(Some(value))
             case _ => Left(InvalidJson)
           }
-          case NO_CONTENT => Right(GetSelfEmploymentsEmpty)
+          case NO_CONTENT => Right(None)
           case status => Left(UnexpectedStatusFailure(status))
         }
       }
     }
-  sealed trait GetSelfEmploymentsSuccess[+T]
-  case class GetSelfEmploymentsData[+T](model: T) extends GetSelfEmploymentsSuccess[T]
-  case object GetSelfEmploymentsEmpty extends GetSelfEmploymentsSuccess[Nothing]
+
+
 
   sealed trait GetSelfEmploymentsFailure
   case object InvalidJson extends GetSelfEmploymentsFailure

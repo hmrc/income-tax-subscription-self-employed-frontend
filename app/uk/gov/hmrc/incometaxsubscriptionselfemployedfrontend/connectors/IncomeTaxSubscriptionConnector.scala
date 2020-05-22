@@ -20,10 +20,10 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsObject, Json, OWrites, Reads}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.GetAllSelfEmploymentResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsResponse
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +33,7 @@ class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
                                               (implicit ec: ExecutionContext) {
 
   def selfEmployedURL(id: String): String = {
-    appConfig.selfEmployedUrl + IncomeTaxSubscriptionConnector.selfEmploymentsUri(id)
+    appConfig.selfEmployedUrl + s"/$id"
   }
 
   def getAllSelfEmployments()(implicit hc:HeaderCarrier): Future[GetAllSelfEmploymentResponse] = {
@@ -48,10 +48,6 @@ class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
     http.GET[GetSelfEmploymentsResponse[T]](selfEmployedURL(id))
   }
 
-}
-
-object IncomeTaxSubscriptionConnector{
-  def selfEmploymentsUri(id: String): String = s"/$id"
 }
 
 

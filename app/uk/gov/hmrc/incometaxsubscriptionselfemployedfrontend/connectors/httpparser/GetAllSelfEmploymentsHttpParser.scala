@@ -22,23 +22,22 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.GetAllSelfEmploymentModel
 object GetAllSelfEmploymentsHttpParser {
 
-  type GetAllSelfEmploymentResponse = Either[GetAllSelfEmploymentFailure, GetAllSelfEmploymentSuccess]
+  type GetAllSelfEmploymentResponse = Either[GetAllSelfEmploymentFailure, Option[GetAllSelfEmploymentDataModel]]
 
   implicit object GetAllSelfEmploymentHttpReads extends HttpReads[GetAllSelfEmploymentResponse] {
     override def read(method: String, url: String, response: HttpResponse): GetAllSelfEmploymentResponse =
       response.status match {
         case OK =>  response.json.validate[GetAllSelfEmploymentModel] match {
-          case JsSuccess(model,_) => Right(GetAllSelfEmploymentDataModel(model))
+          case JsSuccess(model,_) => Right(Some(GetAllSelfEmploymentDataModel(model)))
           case _ => Left(InvalidJson)
         }
-        case NO_CONTENT => Right(GetAllSelfEmploymentConnectionSuccess)
+        case NO_CONTENT => Right(None)
         case status => Left(GetAllSelfEmploymentConnectionFailure(status))
       }
   }
 
-  sealed trait GetAllSelfEmploymentSuccess
-  case object GetAllSelfEmploymentConnectionSuccess extends GetAllSelfEmploymentSuccess
-  case class GetAllSelfEmploymentDataModel(model:  GetAllSelfEmploymentModel) extends GetAllSelfEmploymentSuccess
+
+  case class GetAllSelfEmploymentDataModel(model:  GetAllSelfEmploymentModel)
 
 
   sealed trait GetAllSelfEmploymentFailure
