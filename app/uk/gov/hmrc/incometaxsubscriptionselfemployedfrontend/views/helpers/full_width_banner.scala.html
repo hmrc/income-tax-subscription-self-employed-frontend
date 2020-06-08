@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.config
+@(fullWidthBannerContent: Option[Html])(implicit messages: Messages)
 
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-
-
-trait MockConfig extends AppConfig{
-
-}
+<div id="ur-panel" class="banner-panel banner-panel--show">
+  <section class="centered-content visible banner-panel__container" aria-hidden="false">
+    @fullWidthBannerContent
+  </section>
+</div>
 

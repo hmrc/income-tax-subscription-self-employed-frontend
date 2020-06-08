@@ -17,12 +17,11 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.i18n.MessagesApi
 import play.api.mvc.Request
 import play.twirl.api.Html
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.error_template
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.error_template
 
 @Singleton
 class ErrorHandler @Inject()(val messagesApi: MessagesApi, implicit val appConfig: AppConfig) extends FrontendErrorHandler {

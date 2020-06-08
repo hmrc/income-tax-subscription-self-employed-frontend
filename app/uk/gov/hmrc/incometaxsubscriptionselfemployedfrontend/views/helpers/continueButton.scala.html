@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utilities
+@(alternativeText: Option[String] = None)(implicit messages: Messages)
 
-import java.time.LocalDate
+<button formnovalidate class="button" type="submit" id="continue-button">@alternativeText.fold(Messages("base.continue"))(x => x)</button>
 
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.GetAllSelfEmploymentModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.Implicits
-
-object TestModels extends Implicits {
-
-
-  val testGetAllSelfEmploymentModelJsValue: JsValue = Json.obj("BusinessName" -> "", "Address" -> "" )
-  val testGetAllSelfEmploymentModel  = GetAllSelfEmploymentModel("","")
-
-}

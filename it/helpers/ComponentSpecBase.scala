@@ -1,20 +1,22 @@
 
 package helpers
 
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen}
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import org.scalatestplus.play.{PlaySpec, PortNumber}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Writes
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 
 
-trait ComponentSpecBase extends PlaySpec with CustomMatchers
-  with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach {
+trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
+  with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen {
 
 
-  def app: Application = new GuiceApplicationBuilder()
+  override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
     .configure(config)
     .build
@@ -24,6 +26,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers
   val mockHost: String = WiremockHelper.wiremockHost
   val mockPort: String = WiremockHelper.wiremockPort.toString
   val mockUrl: String = s"http://$mockHost:$mockPort"
+
 
   def config: Map[String, String] = Map(
     "auditing.enabled" -> "false",
@@ -56,25 +59,39 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers
     await(buildClient(uri).get)
   }
 
-  def post[T](uri: String)(body: T)(implicit writes: Writes[T], ws: WSClient, portNumber: PortNumber): WSResponse = {
+  def post[T](uri: String)(body: Map[String, Seq[String]]): WSResponse = {
     await(
       buildClient(uri)
-        .withHttpHeaders("Content-Type" -> "application/json")
-        .post(writes.writes(body).toString())
+        .withHttpHeaders("Csrf-Token" -> "nocheck")
+        .post(body)
     )
   }
 
-  def put[T](uri: String)(body: T)(implicit writes: Writes[T], ws: WSClient, portNumber: PortNumber): WSResponse = {
-    await(
-      buildClient(uri)
-        .withHttpHeaders("Content-Type" -> "application/json")
-        .put(writes.writes(body).toString())
-    )
-  }
 
-  val baseUrl: String = "/income-tax-subscription-self-employments"
+  val baseUrl: String = "/report-quarterly/income-and-expenses/sign-up/self-employments"
+
+  def signOut: WSResponse = get("/logout")
 
   private def buildClient(path: String)(implicit ws: WSClient, portNumber: PortNumber): WSRequest =
     ws.url(s"http://localhost:${portNumber.value}$baseUrl$path").withFollowRedirects(false)
 
+
+  def getBusinessStartDate(): WSResponse = get("/details/business-start-date")
+
+
+  def submitBusinessStartDate(request: Option[BusinessStartDate]): WSResponse = {
+    val uri = "/details/business-start-date"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          BusinessStartDateForm.businessStartDateForm("error").fill(model).data.map {
+            case (k, v) =>
+              (k, Seq(v))
+          }
+      )
+    )
+  }
+
+
 }
+

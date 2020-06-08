@@ -2,11 +2,8 @@
 package connectors.stubs
 
 
-import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import helpers.servicemocks.WireMockMethods
-import helpers.IntegrationTestConstants._
-import play.api.libs.json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
+import play.api.libs.json.{JsValue, Json}
 
 object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
 
@@ -29,12 +26,12 @@ object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
     ) thenReturn(responseStatus, responseBody)
   }
 
-  def stubSaveSelfEmployments(id: String)(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
+  def stubSaveSelfEmployments(id: String, body: JsValue = Json.obj())(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
     when (
       method = POST,
       uri = selfEmploymentsUri(id),
-      body = responseBody
-    ) thenReturn (responseStatus)
+      body = body
+    ) thenReturn (responseStatus, responseBody)
   }
 
 

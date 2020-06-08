@@ -1,0 +1,27 @@
+## Base ##
+base.service_name                                               = Use software to send Income Tax updates
+base.back                                                       = Back
+base.continue                                                   = Continue
+base.sign-out                                                   = Sign out
+base.day                                                        = Day
+base.month                                                      = Month
+base.year                                                       = Year
+base.error_heading                                              = There’s a problem
+base.userResearch.title                                         = Help to improve our service
+base.userResearch.link                                          = Answer some questions about yourself to join the research panel
+base.title.error                                                = Error: {0}
+
+# Business start date
+business.start_date.title                                       = When did your business start trading?
+business.start_date.heading                                     = When did your business start trading?
+business.start_date.exampleStartDate                            = For example, 1 4 2018
+
+# Date errors
+error.date.empty                                                = Enter the date your business started trading
+error.day.empty                                                 = The date must include a day
+error.month.empty                                               = The date must include a month
+error.year.empty                                                = The date must include a year
+error.day.month.empty                                           = The date must include a day and a month
+error.day.year.empty                                            = The date must include a day and a year
+error.month.year.empty                                          = The date must include a month and a year
+error.business_accounting_period.minStartDate                   = The date your business started trading must be the same as or before {0}

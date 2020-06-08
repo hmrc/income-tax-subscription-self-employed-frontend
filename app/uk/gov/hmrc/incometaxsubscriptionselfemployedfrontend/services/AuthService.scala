@@ -14,25 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
 import javax.inject.{Inject, Singleton}
-
-import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.hello_world
-
-import scala.concurrent.Future
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 
 @Singleton
-class HelloWorldController @Inject()(appConfig: AppConfig, mcc: MessagesControllerComponents)
-    extends FrontendController(mcc) {
-
-  implicit val config: AppConfig = appConfig
-
-  val helloWorld: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(hello_world()))
-  }
-
-}
+class AuthService @Inject()(val authConnector: AuthConnector) extends AuthorisedFunctions

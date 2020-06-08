@@ -17,25 +17,43 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.i18n.Lang
+import play.api.mvc.Call
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+class AppConfig @Inject()(servicesConfig: ServicesConfig) {
+
+  private val assetsUrl = servicesConfig.getString("assets.url")
   private val contactBaseUrl = servicesConfig.baseUrl("contact-frontend")
 
-  private val assetsUrl         = config.get[String]("assets.url")
-  private val serviceIdentifier = "MyService"
-
-  val assetsPrefix: String   = assetsUrl + config.get[String]("assets.version")
-  val analyticsToken: String = config.get[String](s"google-analytics.token")
-  val analyticsHost: String  = config.get[String](s"google-analytics.host")
-
-  val reportAProblemPartialUrl: String = s"$contactBaseUrl/contact/problem_reports_ajax?service=$serviceIdentifier"
-  val reportAProblemNonJSUrl: String   = s"$contactBaseUrl/contact/problem_reports_nonjs?service=$serviceIdentifier"
-
-  // protected microservice
+  protected lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
   protected lazy val protectedMicroServiceUrl: String = servicesConfig.baseUrl("income-tax-subscription")
+
   lazy val selfEmployedUrl = s"$protectedMicroServiceUrl/income-tax-subscription/self-employments/id"
   lazy val allSelfEmployedUrl = s"$protectedMicroServiceUrl/income-tax-subscription/self-employments/all"
+  lazy val incomeTaxSubscriptionFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-frontend.url")
+  lazy val feedbackUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/feedback"
+  lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
+
+  val contactFormServiceIdentifier = "MTDIT"
+  val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")
+  val analyticsToken: String = servicesConfig.getString(s"google-analytics.token")
+  val analyticsHost: String = servicesConfig.getString(s"google-analytics.host")
+  val reportAProblemPartialUrl: String = s"$contactBaseUrl/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  val reportAProblemNonJSUrl: String = s"$contactBaseUrl/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+
+  def ggSignOutUrl(redirectionUrl: String = incomeTaxSubscriptionFrontendBaseUrl): String = s"$ggUrl/gg/sign-out?continue=$redirectionUrl"
+
+  def languageMap: Map[String, Lang] = Map(
+    "english" -> Lang("en"),
+    "cymraeg" -> Lang("cy"))
+
+  def betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier"
+
+  def betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
+
+  def routeToSwitchLanguage(language: String): Call = {
+    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.routes.LanguageSwitchController.switchToLanguage(language)
+  }
 }

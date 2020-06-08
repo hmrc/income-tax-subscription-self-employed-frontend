@@ -14,9 +14,15 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(panelTitle: String,
+        linkText: String,
+        linkUrl: String
+)(implicit messages: Messages)
 
-@main_template(title = "Hello from income-tax-subscription-self-employed-frontend", bodyClasses = None) {
-    <h1>Hello from income-tax-subscription-self-employed-frontend !</h1>
-}
+<div class="banner-panel__title">@panelTitle</div>
+<a class = "banner-panel__line" href="@linkUrl"
+data-sso="false"
+data-journey-click="link-click:UR-banner:clicked"
+target="_blank"
+>@linkText</a>
+
