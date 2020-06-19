@@ -19,7 +19,8 @@ object AppDependencies {
     "com.typesafe.play"       %% "play-test"                % current                 % "test, it",
     "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test, it",
     "org.scalatestplus.play"  %% "scalatestplus-play"       % "3.1.2"                 % "test, it",
-    "com.github.tomakehurst"  %  "wiremock-jre8"            % "2.23.2"                % "it"
+    "com.github.tomakehurst"  %  "wiremock-jre8"            % "2.23.2"                % "it",
+    "uk.gov.hmrc"             %% "service-integration-test" % "0.12.0-play-26"        % "test, it"
   )
 
 }
