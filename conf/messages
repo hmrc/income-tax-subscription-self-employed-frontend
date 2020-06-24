@@ -25,3 +25,13 @@ error.day.month.empty                                           = The date must 
 error.day.year.empty                                            = The date must include a day and a year
 error.month.year.empty                                          = The date must include a month and a year
 error.business_accounting_period.minStartDate                   = The date your business started trading must be the same as or before {0}
+
+# Business Name
+business.name.title                                             = What is the name of your business?
+business.name.heading                                           = What is the name of your business?
+business.name.line_1                                            = This is the business name you used to register for Self Assessment. If your business does not have a name, enter your own full name.
+
+# Business Name errors
+error.business_name.empty                                       = Enter your name or the name of your business
+error.business_name.max_length                                  = Business name must be 160 characters or fewer
+error.business_name.invalid_character                           = Business name cannot include !, " ", * or ?

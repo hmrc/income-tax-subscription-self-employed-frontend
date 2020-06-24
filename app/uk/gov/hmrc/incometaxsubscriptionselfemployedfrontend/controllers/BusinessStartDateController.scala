@@ -71,8 +71,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           Future.successful(BadRequest(view(formWithErrors))),
         businessStartDateData =>
           incomeTaxSubscriptionConnector.saveSelfEmployments(BusinessStartDateController.businessStartDateKey, businessStartDateData) map (_ =>
-            Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show())
-            )
+            Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show()))
       )
     }
   }

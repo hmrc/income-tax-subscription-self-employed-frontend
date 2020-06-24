@@ -65,7 +65,7 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
 
   "GetAllSelfEmployments" should {
     "Return GetAllSelfEmploymentDataModel" in {
-      val model = GetAllSelfEmploymentModel(businessStartDate = testValidBusinessStartDateModel,businessName = "Business Name")
+      val model = GetAllSelfEmploymentModel(businessStartDate = testValidBusinessStartDateModel,businessName = testBusinessNameModel)
       val successfulResponseBody: JsObject = Json.toJsObject(model)
 
       stubGetAllSelfEmployments(OK, successfulResponseBody)
@@ -73,7 +73,7 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
       val res = connector.getAllSelfEmployments
 
       await(res) mustBe Right(Some(GetAllSelfEmploymentDataModel(GetAllSelfEmploymentModel(
-        businessStartDate = testValidBusinessStartDateModel,businessName = "Business Name"))))
+        businessStartDate = testValidBusinessStartDateModel,businessName = testBusinessNameModel))))
     }
 
     "Return InvalidJson" in {

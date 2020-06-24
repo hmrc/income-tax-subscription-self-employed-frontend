@@ -88,7 +88,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
         )
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show().url)
+        redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show().url)
       }
     }
     "return 400, SEE_OTHER)" when {

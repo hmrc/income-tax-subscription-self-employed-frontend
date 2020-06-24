@@ -55,18 +55,17 @@
     }
 }
 
-@govuk_wrapper(
-    appConfig = appConfig,
-    title = prefixedTitle,
-    mainClass = mainClass,
-    bodyClasses = bodyClasses,
-    sidebar = sidebar,
-    contentHeader = contentHeader,
-    mainContent = layouts.article(mainContent),
-    serviceInfoContent = serviceInfoContent,
-    scriptElem = Some(defaultScriptElem),
-    headStyle = Some(headStyle),
-    showSignOutLink = showSignOutLink,
-    overrideSignOutCall = overrideSignOutCall
+    @govuk_wrapper(
+        appConfig = appConfig,
+        title = prefixedTitle,
+        mainClass = mainClass,
+        bodyClasses = bodyClasses,
+        sidebar = sidebar,
+        contentHeader = contentHeader,
+        mainContent = layouts.article(mainContent),
+        serviceInfoContent = serviceInfoContent,
+        scriptElem = Some(defaultScriptElem),
+        headStyle = Some(headStyle),
+        showSignOutLink = showSignOutLink,
+        overrideSignOutCall = overrideSignOutCall
 )
-

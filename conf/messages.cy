@@ -25,3 +25,13 @@ error.day.month.empty                                           = Mae’n rhaid 
 error.day.year.empty                                            = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
 error.month.year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
 error.business_accounting_period.minStartDate                   = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+
+# Business Name
+business.name.title                                             = Beth yw enw’ch busnes?
+business.name.heading                                           = Beth yw enw’ch busnes?
+business.name.line_1                                            = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar eich busnes, nodwch eich enw llawn eich hun.
+
+# Business Name errors
+error.business_name.empty                                       = Nodwch eich enw neu enw’ch busnes
+error.business_name.max_length                                  = Mae’n rhaid i enw’r busnes fod yn 160 o gymeriadau neu lai
+error.business_name.invalid_character                           = Ni all enw’r busnes gynnwys !, “ “ , * na ?
