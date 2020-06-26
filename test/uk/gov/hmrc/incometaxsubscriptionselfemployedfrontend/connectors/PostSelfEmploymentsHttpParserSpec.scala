@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.connectors
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
 import org.scalatest.EitherValues
 import play.api.libs.json.Json
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utilities.UnitTestTrait
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
-class PostSelfEmploymentsHttpParserSpec extends UnitTestTrait with EitherValues{
+class PostSelfEmploymentsHttpParserSpec extends UnitTestTrait with EitherValues {
 
   val testHttpVerb = "POST"
   val testUri = "/"
@@ -31,14 +31,14 @@ class PostSelfEmploymentsHttpParserSpec extends UnitTestTrait with EitherValues{
   "PostSelfEmploymentHttpReads" when {
     "read" should {
       "parse a correctly formatted OK response as a PostSelfEmploymentsSuccessResponse" in {
-        val httpResponse = HttpResponse(OK, Json.obj())
+        val httpResponse = HttpResponse(OK, Some(Json.obj()))
 
         val res = postSelfEmploymentsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
         res mustBe Right(PostSelfEmploymentsSuccessResponse)
       }
       "parse any other http status as a UnexpectedStatusFailure" in {
-        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR, Json.obj())
+        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR)
 
         val res = postSelfEmploymentsHttpReads.read(testHttpVerb, testUri, httpResponse)
 

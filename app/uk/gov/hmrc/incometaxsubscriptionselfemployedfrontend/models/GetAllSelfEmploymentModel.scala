@@ -16,20 +16,23 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import play.api.libs.json.{JsResult, JsValue, Json, OFormat, Reads, Writes}
+
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController
 
-case class GetAllSelfEmploymentModel(businessName: String,
-                                     address: String
-                                     ) {
-}
+case class GetAllSelfEmploymentModel(businessStartDate: BusinessStartDate, businessName: String)
+
 
 object GetAllSelfEmploymentModel {
   implicit val reads: Reads[GetAllSelfEmploymentModel] = (
-    (__ \ "BusinessName").read[String] and
-      (__ \ "Address").read[String]
-    )(GetAllSelfEmploymentModel.apply _)
+    (__ \ BusinessStartDateController.businessStartDateKey).read[BusinessStartDate] and
+      (__ \ "BusinessName").read[String]
+    ) (GetAllSelfEmploymentModel.apply _)
 
+  implicit val writes: OWrites[GetAllSelfEmploymentModel] = (
+    (__ \ BusinessStartDateController.businessStartDateKey).write[BusinessStartDate] and
+      (__ \ "BusinessName").write[String]
+    ) (unlift(GetAllSelfEmploymentModel.unapply))
 }
 

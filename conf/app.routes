@@ -1,4 +1,9 @@
-# microservice specific routes
+# Assets
+GET         /assets/*file                       controllers.Assets.at(path="/public", file)
 
-GET        /hello-world             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.HelloWorldController.helloWorld
+GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.show
+POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.submit
 
+GET         /language/:lang                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.LanguageSwitchController.switchToLanguage(lang: String)
+
+GET         /logout                             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut

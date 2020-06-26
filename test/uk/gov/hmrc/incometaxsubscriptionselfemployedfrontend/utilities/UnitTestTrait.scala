@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utilities
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -26,27 +26,23 @@ import play.api.test.FakeRequest
 import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.config.MockConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.Implicits
+import uk.gov.hmrc.play.language.LanguageUtils
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-trait UnitTestTrait extends PlaySpec with GuiceOneServerPerSuite with Implicits with I18nSupport{
+trait UnitTestTrait extends PlaySpec with GuiceOneServerPerSuite with I18nSupport {
 
   implicit val executionContext: ExecutionContextExecutor = scala.concurrent.ExecutionContext.Implicits.global
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  implicit def futureWrapperUtil[T](value: T): Future[T] = Future.successful(value)
-
-  implicit def futureWrapperUtil[T](err: Throwable): Future[T] = Future.failed(err)
-
-  implicit def futureOptionWrapperUtil[T](value: T): Future[Option[T]] = Future.successful(value)
-
   implicit class HtmlFormatUtil(html: Html) {
     def doc: Document = Jsoup.parse(html.body)
   }
 
+  implicit val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+
+  val mockLanguageUtils: LanguageUtils = app.injector.instanceOf[LanguageUtils]
 
   implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
