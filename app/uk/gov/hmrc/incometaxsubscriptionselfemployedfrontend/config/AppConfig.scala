@@ -25,7 +25,6 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 class AppConfig @Inject()(servicesConfig: ServicesConfig) {
 
   private val assetsUrl = servicesConfig.getString("assets.url")
-  private val contactBaseUrl = servicesConfig.baseUrl("contact-frontend")
 
   protected lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
   protected lazy val protectedMicroServiceUrl: String = servicesConfig.baseUrl("income-tax-subscription")
@@ -40,8 +39,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")
   val analyticsToken: String = servicesConfig.getString(s"google-analytics.token")
   val analyticsHost: String = servicesConfig.getString(s"google-analytics.host")
-  val reportAProblemPartialUrl: String = s"$contactBaseUrl/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  val reportAProblemNonJSUrl: String = s"$contactBaseUrl/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  val reportAProblemNonJSUrl: String = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
 
   def ggSignOutUrl(redirectionUrl: String = incomeTaxSubscriptionFrontendBaseUrl): String = s"$ggUrl/gg/sign-out?continue=$redirectionUrl"
 
