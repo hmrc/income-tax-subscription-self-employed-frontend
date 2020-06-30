@@ -42,4 +42,3 @@ object SignOutController {
   def signOut: Call = routes.SignOutController.signOut()
 
 }
-

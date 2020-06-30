@@ -25,6 +25,13 @@
         formHint: Option[Seq[String]] = None
 )(implicit messages: Messages)
 
+@errors = @{
+field.errors
+}
+
+@errMsg(err: FormError) = {
+    <span class="error-notification" role="tooltip">@{Messages(s"${err.message}",err.args:_*)}</span>
+}
 
 @hintText(hint: String) = {
     <span class="form-hint">
@@ -35,8 +42,7 @@
     @hasError = @{parentForm.errors(field.name).nonEmpty}
 
     @errorNotification = @{
-        if(hasError)
-        <span class="error-notification" role="tooltip" id="error-message-@field.name">{Messages(s"${parentForm.error(field.name).get.message}")}</span>
+        errors.map(errMsg)
     }
 
 <div class="form-group form-field@divClass.map(cls => s" $cls")@if(hasError) { form-field--error}">

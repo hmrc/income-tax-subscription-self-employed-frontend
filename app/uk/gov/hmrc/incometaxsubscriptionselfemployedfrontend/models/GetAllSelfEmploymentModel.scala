@@ -19,20 +19,20 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.{BusinessNameController, BusinessStartDateController}
 
-case class GetAllSelfEmploymentModel(businessStartDate: BusinessStartDate, businessName: String)
+case class GetAllSelfEmploymentModel(businessStartDate: BusinessStartDate, businessName: BusinessNameModel)
 
 
 object GetAllSelfEmploymentModel {
   implicit val reads: Reads[GetAllSelfEmploymentModel] = (
     (__ \ BusinessStartDateController.businessStartDateKey).read[BusinessStartDate] and
-      (__ \ "BusinessName").read[String]
+      (__ \ BusinessNameController.businessNameKey).read[BusinessNameModel]
     ) (GetAllSelfEmploymentModel.apply _)
 
   implicit val writes: OWrites[GetAllSelfEmploymentModel] = (
     (__ \ BusinessStartDateController.businessStartDateKey).write[BusinessStartDate] and
-      (__ \ "BusinessName").write[String]
+      (__ \ BusinessNameController.businessNameKey).write[BusinessNameModel]
     ) (unlift(GetAllSelfEmploymentModel.unapply))
 }
 

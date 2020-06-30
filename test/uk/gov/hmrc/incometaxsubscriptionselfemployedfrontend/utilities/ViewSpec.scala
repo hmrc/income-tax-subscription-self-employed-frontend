@@ -20,6 +20,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalatest.{Assertion, MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -83,6 +84,12 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
       element.select(s"label[for=$name]").text() mustBe label
     }
 
+    def listErrorMessages(errors: List[String]): Assertion = {
+      errors.zipWithIndex.map {
+        case (error, index) => element.select(s"span.error-notification:nth-child(${index + 1})").text mustBe error
+      } forall (_ == succeed) mustBe true
+    }
+
     def mustHaveDateField(id: String, legend: String, exampleDate: String, error: Option[String] = None): Assertion = {
       val ele = element.getElementById(id)
       ele.select("span.form-label-bold").text() mustBe legend
@@ -108,7 +115,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
       getErrorSummary.select("ul > li").text mustBe errors.mkString(" ")
     }
 
-  }
+    }
 
 }
 

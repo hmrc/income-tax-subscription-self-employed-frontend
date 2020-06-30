@@ -1,15 +1,16 @@
 
 package helpers
 
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen}
-import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import org.scalatestplus.play.{PlaySpec, PortNumber}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen, Matchers}
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.{BusinessNameForm, BusinessStartDateForm}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessStartDate}
+import uk.gov.hmrc.play
 
 
 trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
@@ -92,6 +93,17 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getBusinessName(): WSResponse = get("/details/business-name")
+
+  def submitBusinessName(request: Option[BusinessNameModel]): WSResponse = {
+    val uri = "/details/business-name"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          BusinessNameForm.businessNameValidationForm.fill(model).data.map { case (k, v) => (k, Seq(v)) }
+      )
+    )
+  }
 
 }
 

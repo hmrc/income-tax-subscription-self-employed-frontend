@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import java.time.LocalDate
+import play.api.libs.json.{Json, OFormat}
 
-import play.api.i18n.Messages
-import uk.gov.hmrc.play.language.LanguageUtils
+case class BusinessNameModel(businessName: String)
 
-trait ImplicitDateFormatter {
-
-  val languageUtils: LanguageUtils
-
-  implicit class longDate(date: LocalDate)(implicit messages: Messages) {
-
-    def toLongDate: String = {
-      languageUtils.Dates.formatDate(org.joda.time.LocalDate.parse(date.toString))(messages)
-    }
-
-  }
+object BusinessNameModel {
+  implicit val format: OFormat[BusinessNameModel] = Json.format[BusinessNameModel]
 
 }
