@@ -3,9 +3,8 @@ package helpers
 
 import java.time.LocalDate
 
-import helpers.IntegrationTestConstants.baseURI
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, BusinessStartDate, BusinessNameModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 
 object IntegrationTestConstants {
@@ -15,6 +14,7 @@ object IntegrationTestConstants {
   val baseURI = "/report-quarterly/income-and-expenses/sign-up/self-employments"
   val BusinessStartDateUri = s"$baseURI/details/business-start-date"
   val BusinessNameUri = s"$baseURI/details/business-name"
+  val BusinessTradeNameUri = s"$baseURI/details/business-trade"
 
   object Auth {
     def idsResponseJson(internalId: String, externalId: String): JsValue = Json.parse(
@@ -33,4 +33,8 @@ object IntegrationTestConstants {
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
 
+  val testValidBusinessTradeName: String = "Plumbing"
+  val testInvalidBusinessTradeName: String = "!()+{}?^~"
+  val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
+  val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
 }

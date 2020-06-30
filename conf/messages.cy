@@ -35,3 +35,15 @@ business.name.line_1                                            = Dyma enw’r b
 error.business_name.empty                                       = Nodwch eich enw neu enw’ch busnes
 error.business_name.max_length                                  = Mae’n rhaid i enw’r busnes fod yn 160 o gymeriadau neu lai
 error.business_name.invalid_character                           = Ni all enw’r busnes gynnwys !, “ “ , * na ?
+
+# Business trade name
+business.trade_name.title                                       = Beth yw masnach eich busnes?
+business.trade_name.heading                                     = Beth yw masnach eich busnes?
+business.trade_name.hint                                        = Er enghraifft: plymio, gwaith trydanol, ymgynghori
+
+# Business trade name errors
+error.business_trade_name.empty                                 = Nodwch fasnach eich busnes
+error.business_trade_name.maxLength                             = Mae’n rhaid i fasnach y busnes fod yn 160 o gymeriadau neu lai
+error.business_trade_name.duplicate                             = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
+error.business_trade_name.invalid                               = Mae’n rhaid i fasnach y busnes gynnwys y llythrennau a i z, cysylltnodau, bylchau a chollnodau yn unig
+

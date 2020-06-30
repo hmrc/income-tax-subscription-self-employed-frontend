@@ -8,10 +8,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.{BusinessNameForm, BusinessStartDateForm}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessStartDate}
-import uk.gov.hmrc.play
-
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
   with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen {
@@ -105,5 +103,19 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getBusinessTradeName(): WSResponse = get("/details/business-trade")
+
+  def submitBusinessTradeName(request: Option[BusinessTradeNameModel]): WSResponse = {
+    val uri = "/details/business-trade"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          BusinessTradeNameForm.businessTradeNameValidationForm.fill(model).data.map {
+            case (k, v) =>
+              (k, Seq(v))
+          }
+      )
+    )
+  }
 }
 

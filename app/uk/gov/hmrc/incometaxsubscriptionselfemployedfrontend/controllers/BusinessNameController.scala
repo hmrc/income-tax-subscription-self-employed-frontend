@@ -63,7 +63,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents, income
           Future.successful(BadRequest(view(formWithErrors))),
         businessNameData =>
           incomeTaxSubscriptionConnector.saveSelfEmployments[BusinessNameModel](BusinessNameController.businessNameKey,businessNameData) map (_ =>
-            Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show()))
+            Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show()))
       )
     }}
 
