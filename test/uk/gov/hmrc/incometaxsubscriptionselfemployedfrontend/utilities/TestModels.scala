@@ -26,13 +26,19 @@ object TestModels {
   val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
   val testBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel("Business")
+  val testValidBusinessTradeName: String = "Plumbing"
+  val testInvalidBusinessTradeName: String = "!()+{}?^~"
+  val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
+  val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
 
   val testGetAllSelfEmploymentModel: GetAllSelfEmploymentModel = GetAllSelfEmploymentModel(
     businessStartDate = testBusinessStartDateModel,
-    businessName = testBusinessNameModel
+    businessName = testBusinessNameModel,
+    businessTradeName = testValidBusinessTradeNameModel
   )
   val testGetAllSelfEmploymentModelJsValue: JsValue = Json.toJsObject(testGetAllSelfEmploymentModel)
 
   val mockBusinessNameModel = BusinessNameModel("ITSA me, Mario")
+
 
 }

@@ -7,6 +7,9 @@ POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptio
 GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show
 POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit
 
+GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show
+POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit
+
 GET         /language/:lang                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.LanguageSwitchController.switchToLanguage(lang: String)
 
 GET         /logout                             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut

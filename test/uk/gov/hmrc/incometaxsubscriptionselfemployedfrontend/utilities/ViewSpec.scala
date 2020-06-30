@@ -104,6 +104,9 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
       }.getOrElse(succeed)
     }
 
+    def mustHavePara(paragraph: String): Assertion = {
+      element.getElementsByTag("p").text() must include(paragraph)
+    }
 
     def mustHaveErrorSummary(errors: List[String]): Assertion = {
       getErrorSummary.attr("class") mustBe "flash error-summary error-summary--show"
