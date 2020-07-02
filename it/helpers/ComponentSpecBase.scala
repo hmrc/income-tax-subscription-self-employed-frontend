@@ -4,8 +4,10 @@ package helpers
 import org.scalatestplus.play.{PlaySpec, PortNumber}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms._
@@ -26,6 +28,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   val mockPort: String = WiremockHelper.wiremockPort.toString
   val mockUrl: String = s"http://$mockHost:$mockPort"
 
+  implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   def config: Map[String, String] = Map(
     "auditing.enabled" -> "false",
@@ -117,5 +120,24 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
       )
     )
   }
+
+  def getBusinessAccountingMethod(): WSResponse = get("/details/business-accounting-method")
+
+  def submitBusinessAccountingMethod(request: Option[AccountingMethodModel]): WSResponse = {
+    val uri = "/details/business-accounting-method"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          BusinessAccountingMethodForm.businessAccountingMethodForm.fill(model).data.map {
+            case (k, v) =>
+              (k, Seq(v))
+          }
+      )
+    )
+  }
+
+  def removeHtmlMarkup(stringWithMarkup: String): String =
+    stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim
+
 }
 

@@ -15,6 +15,7 @@ object IntegrationTestConstants {
   val BusinessStartDateUri = s"$baseURI/details/business-start-date"
   val BusinessNameUri = s"$baseURI/details/business-name"
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
+  val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
 
   object Auth {
     def idsResponseJson(internalId: String, externalId: String): JsValue = Json.parse(
@@ -37,4 +38,6 @@ object IntegrationTestConstants {
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
   val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
+
+  val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
 }
