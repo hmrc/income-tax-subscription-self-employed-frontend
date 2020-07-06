@@ -49,7 +49,7 @@ error.business_trade_name.invalid                               = Business trade
 
 #Business accounting method errors
 error.business_accounting_method.invalid                        = Select how you record your income and expenses for your self-employed business
-error.business_accounting-method.empty                          = Select how you record your income and expenses for your self-employed business
+error.business_accounting_method.empty                          = Select how you record your income and expenses for your self-employed business
 
 # Business Accounting Method page
 business.accounting_method.title                                = How do you record your income and expenses for your self-employed business?
