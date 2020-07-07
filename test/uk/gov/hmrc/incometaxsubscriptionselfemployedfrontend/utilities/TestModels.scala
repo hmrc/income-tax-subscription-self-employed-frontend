@@ -30,11 +30,13 @@ object TestModels {
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
   val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
+  val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
 
   val testGetAllSelfEmploymentModel: GetAllSelfEmploymentModel = GetAllSelfEmploymentModel(
     businessStartDate = testBusinessStartDateModel,
     businessName = testBusinessNameModel,
-    businessTradeName = testValidBusinessTradeNameModel
+    businessTradeName = testValidBusinessTradeNameModel,
+    businessAccountingMethod = testAccountingMethodModel
   )
   val testGetAllSelfEmploymentModelJsValue: JsValue = Json.toJsObject(testGetAllSelfEmploymentModel)
 

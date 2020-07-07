@@ -47,8 +47,8 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       }
     }
 
-    "Connector returns a previously filled in Business Start Date" should {
-      "show the current date of commencement page with date values entered" in {
+    "Connector returns a previously filled in Business Trade Name" should {
+      "show the current business trade name page with name values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSelfEmployments(BusinessTradeNameController.businessTradeNameKey)(OK, Json.toJson(testValidBusinessTradeNameModel))
@@ -80,7 +80,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
       res must have(
         httpStatus(SEE_OTHER),
-        redirectURI(BusinessTradeNameUri)
+        redirectURI(BusinessAccountingMethodUri)
       )
     }
 

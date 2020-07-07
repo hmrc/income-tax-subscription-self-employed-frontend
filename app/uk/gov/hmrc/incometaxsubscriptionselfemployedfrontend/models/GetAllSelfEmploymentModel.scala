@@ -23,7 +23,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers._
 
 case class GetAllSelfEmploymentModel(businessStartDate: BusinessStartDate,
                                      businessName: BusinessNameModel,
-                                     businessTradeName: BusinessTradeNameModel
+                                     businessTradeName: BusinessTradeNameModel,
+                                     businessAccountingMethod: AccountingMethodModel
                                     )
 
 
@@ -31,13 +32,15 @@ object GetAllSelfEmploymentModel {
   implicit val reads: Reads[GetAllSelfEmploymentModel] = (
     (__ \ BusinessStartDateController.businessStartDateKey).read[BusinessStartDate] and
       (__ \ BusinessNameController.businessNameKey).read[BusinessNameModel] and
-      (__ \ BusinessTradeNameController.businessTradeNameKey).read[BusinessTradeNameModel]
+      (__ \ BusinessTradeNameController.businessTradeNameKey).read[BusinessTradeNameModel] and
+      (__ \ BusinessAccountingMethodController.businessAccountingMethodKey).read[AccountingMethodModel]
     ) (GetAllSelfEmploymentModel.apply _)
 
   implicit val writes: OWrites[GetAllSelfEmploymentModel] = (
     (__ \ BusinessStartDateController.businessStartDateKey).write[BusinessStartDate] and
       (__ \ BusinessNameController.businessNameKey).write[BusinessNameModel] and
-      (__ \ BusinessTradeNameController.businessTradeNameKey).write[BusinessTradeNameModel]
+      (__ \ BusinessTradeNameController.businessTradeNameKey).write[BusinessTradeNameModel] and
+      (__ \ BusinessAccountingMethodController.businessAccountingMethodKey).write[AccountingMethodModel]
     ) (unlift(GetAllSelfEmploymentModel.unapply))
 }
 
