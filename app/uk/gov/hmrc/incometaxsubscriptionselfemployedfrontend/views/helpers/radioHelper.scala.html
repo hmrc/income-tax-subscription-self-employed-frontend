@@ -62,7 +62,7 @@
 
     @if(hasError){
     <span class="error-notification" role="tooltip" id="error-message-@field.name">
-        @Messages(s"${parentForm.error(field.name).get.message}")
+        @messages(s"${parentForm.error(field.name).get.message}")
     </span>
     }
     <fieldset @fieldSetClassValue>
