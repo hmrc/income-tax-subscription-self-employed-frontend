@@ -34,8 +34,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   with MockIncomeTaxSubscriptionConnector {
   override val controllerName: String = "BusinessNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessNameController$.show(),
-    "submit" -> TestBusinessNameController$.submit()
+    "show" -> TestBusinessNameController$.show(false),
+    "submit" -> TestBusinessNameController$.submit(false)
   )
 
   object TestBusinessNameController$ extends BusinessNameController(
@@ -55,7 +55,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessNameController.businessNameKey)(
           Right(Some(BusinessNameModel("Business")))
         )
-        val result = TestBusinessNameController$.show()(FakeRequest())
+        val result = TestBusinessNameController$.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -64,42 +64,67 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessNameController.businessNameKey)(
           Right(Some(BusinessNameModel("")))
         )
-        val result = TestBusinessNameController$.show()(FakeRequest())
+        val result = TestBusinessNameController$.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
-      "Throw an internal exception error" when {
-        "the connector returns an error" in {
-          mockAuthSuccess()
-          mockGetSelfEmployments(BusinessNameController.businessNameKey)(
-            Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-          )
-          intercept[InternalServerException](await(TestBusinessNameController$.show()(FakeRequest())))
-        }
+    }
+    "Throw an internal exception error" when {
+      "the connector returns an error" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments(BusinessNameController.businessNameKey)(
+          Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+        intercept[InternalServerException](await(TestBusinessNameController$.show(false)(FakeRequest())))
       }
+
     }
   }
 
   "submit" should {
     "return 303, SEE_OTHER" when {
-      "the connector has data to save" in {
+      "the connector has data to save and not in edit mode" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessNameController.businessNameKey, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessNameController$.submit()(FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+        val result = TestBusinessNameController$.submit(false)(FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show().url)
 
       }
 
-      "return a 400, BAD_REQUEST" when {
-        "the connector has no data to save" in {
-          mockAuthSuccess()
-          mockSaveSelfEmployments(BusinessNameController.businessNameKey, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestBusinessNameController$.submit()(FakeRequest())
-          status(result) mustBe BAD_REQUEST
-          contentType(result) mustBe Some("text/html")
-        }
+      "the connector has data to save and is in edit mode" in {
+        mockAuthSuccess()
+        mockSaveSelfEmployments(BusinessNameController.businessNameKey, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessNameController$.submit(true)(FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+
+      }
+    }
+
+    "return a 400, BAD_REQUEST" when {
+      "the connector has no data to save" in {
+        mockAuthSuccess()
+        mockSaveSelfEmployments(BusinessNameController.businessNameKey, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessNameController$.submit(false)(FakeRequest())
+        status(result) mustBe BAD_REQUEST
+        contentType(result) mustBe Some("text/html")
+      }
+    }
+
+  }
+
+  "The back url" when {
+    "in edit mode" should {
+      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
+        TestBusinessNameController$.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      }
+    }
+    "not in edit mode" should {
+      s"redirect to ${routes.BusinessStartDateController.show().url}" in {
+        TestBusinessNameController$.backUrl(isEditMode = false) mustBe routes.BusinessStartDateController.show().url
       }
     }
   }

@@ -35,6 +35,7 @@ class BusinessNameViewSpec extends ViewSpec {
     val title = "What is the name of your business?"
     val heading = title
     val continue = "Continue"
+    val update = "Update"
     val backLink = "Back"
     val line1 = "This is the business name you used to register for Self Assessment. If your business does not have a name, enter your own full name."
     val emptyError = "Enter your name or the name of your business"
@@ -46,10 +47,11 @@ class BusinessNameViewSpec extends ViewSpec {
   val testError: FormError = FormError("businessName", "testError")
   val testError2: FormError = FormError("businessName", "testError2")
 
-  class Setup(businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm) {
+  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm) {
     val page: HtmlFormat.Appendable = business_name(
       businessNameForm,
       testCall,
+      isEditMode = isEditMode,
       testBackUrl
     )(FakeRequest(), implicitly, appConfig)
 
@@ -57,44 +59,48 @@ class BusinessNameViewSpec extends ViewSpec {
   }
 
   "Business Name Page" must {
-    "have a title" in new Setup {
+    "have a title" in new Setup() {
       document.title mustBe BusinessNameMessages.title
     }
-    "have a heading" in new Setup {
+    "have a heading" in new Setup() {
       document.getH1Element.text mustBe BusinessNameMessages.heading
 
     }
 
-    "have a paragraph" in new Setup {
+    "have a paragraph" in new Setup() {
       document.select("article p").text mustBe BusinessNameMessages.line1
 
     }
 
 
-    "have a Form" in new Setup {
+    "have a Form" in new Setup() {
       document.getForm.attr("method") mustBe testCall.method
       document.getForm.attr("action") mustBe testCall.url
     }
 
-    "have a continue button" in new Setup {
+    "have a continue button when not in edit mode" in new Setup() {
       document.getSubmitButton.text mustBe BusinessNameMessages.continue
+    }
+
+    "have update button when in edit mode" in new Setup(true) {
+      document.getSubmitButton.text mustBe BusinessNameMessages.update
     }
 
   }
 
-  "have a backlink" in new Setup {
+  "have a backlink" in new Setup() {
     document.getBackLink.text mustBe BusinessNameMessages.backLink
     document.getBackLink.attr("href") mustBe testBackUrl
 
   }
 
-  "must display form error on page" in new Setup(BusinessNameForm.businessNameValidationForm.withError(testError)) {
+  "must display form error on page" in new Setup(false, BusinessNameForm.businessNameValidationForm.withError(testError)) {
     document.mustHaveErrorSummary(List[String](testError.message))
     document.listErrorMessages(List[String](testError.message))
 
   }
 
-  "must display multiple form errors on page" in new Setup(BusinessNameForm.businessNameValidationForm.withError(testError).withError(testError2)) {
+  "must display multiple form errors on page" in new Setup(false, BusinessNameForm.businessNameValidationForm.withError(testError).withError(testError2)) {
     document.mustHaveErrorSummary(List[String](testError.message, testError2.message))
     document.listErrorMessages(List[String](testError.message, testError2.message))
   }

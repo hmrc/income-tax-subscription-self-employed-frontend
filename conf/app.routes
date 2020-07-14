@@ -4,8 +4,8 @@ GET         /assets/*file                       controllers.Assets.at(path="/pub
 GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.show
 POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.submit
 
-GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show
-POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit
+GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show(isEditMode: Boolean ?= false)
+POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit(isEditMode: Boolean ?= false)
 
 GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show(isEditMode: Boolean ?= false)
 POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit(isEditMode: Boolean ?= false)

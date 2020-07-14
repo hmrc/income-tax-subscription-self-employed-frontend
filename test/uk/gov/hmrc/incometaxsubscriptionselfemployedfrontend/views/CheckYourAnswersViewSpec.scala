@@ -101,7 +101,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
         "has a change link" in new Setup {
           val changeLink: Element = document.getSummaryList.getSummaryListRow(2).getSummaryListActions.selectFirst("a")
           changeLink.text mustBe CheckYourAnswersMessages.change
-          changeLink.attr("href") mustBe routes.BusinessNameController.show(/*isEditMode = true*/).url
+          changeLink.attr("href") mustBe routes.BusinessNameController.show(isEditMode = true).url
         }
       }
 

@@ -96,8 +96,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getBusinessName(): WSResponse = get("/details/business-name")
 
-  def submitBusinessName(request: Option[BusinessNameModel]): WSResponse = {
-    val uri = "/details/business-name"
+  def submitBusinessName(inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {
+    val uri = s"/details/business-name?isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
