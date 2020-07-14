@@ -10,6 +10,7 @@ base.error_heading                                              = Mae problem we
 base.userResearch.title                                         = Helpu i wella ein gwasanaeth
 base.userResearch.link                                          = Atebwch ychydig o gwestiynau am eich hunan er mwyn ymuno â’r panel ymchwil
 base.title.error                                                = Error: {0}
+base.change                                                     = Newid
 
 # Business start date
 business.start_date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
@@ -60,3 +61,11 @@ business.accounting_method.accordion.bullet_1                   = mis Mai 2017, 
 business.accounting_method.accordion.bullet_2                   = mis Mawrth 2017, rydych yn defnyddio ‘cyfrifyddu safonol’
 business.accounting_method.cash                                 = <span class="heading-small">Cyfrifyddu arian parod</span><br>Rydych yn cofnodi naill ai ar y dyddiad yr ydych yn cael taliad gan eich tenantiaid i mewn i’ch cyfrif banc, neu ar y dyddiad yr ydych yn talu bil, er enghraifft ar gyfer atgyweirio a chynnal a chadw. Mae’r rhan fwyaf o fusnesau bach yn defnyddio’r dull hwn.
 business.accounting_method.accruals                             = <span class="heading-small">Cyfrifyddu safonol</span><br>Rydych yn cofnodi ar y dyddiad yr ydych yn anfon anfoneb at eich tenantiaid, neu’n gofyn am daliad ganddynt, hyd yn oed os nad ydych yn cael nac yn talu unrhyw arian. Rydych yn cofnodi ar y dyddiad yr ydych yn cael anfoneb ar gyfer atgyweirio neu gynnal a chadw. Mae hwn hefyd yn cael ei alw yn ‘cyfrifyddu croniadau’ neu ‘cyfrifyddu traddodiadol’.
+
+# Check your answers
+check_your_answers.title                                        = Gwiriwch eich atebion
+check_your_answers.heading                                      = Gwiriwch eich atebion
+check_your_answers.sub_heading                                  = Busnes 1
+check_your_answers.trading_start_date                           = Dyddiad dechrau masnachu’r busnes
+check_your_answers.business_name                                = Enw’r busnes
+check_your_answers.business_trade                               = Masnach y busnes

@@ -30,7 +30,7 @@ field.errors
 }
 
 @errMsg(err: FormError) = {
-    <span class="error-notification" role="tooltip">@{Messages(s"${err.message}",err.args:_*)}</span>
+    <span class="error-notification" role="tooltip">@{messages(s"${err.message}",err.args:_*)}</span>
 }
 
 @hintText(hint: String) = {

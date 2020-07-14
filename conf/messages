@@ -10,6 +10,7 @@ base.error_heading                                              = There’s a pr
 base.userResearch.title                                         = Help to improve our service
 base.userResearch.link                                          = Answer some questions about yourself to join the research panel
 base.title.error                                                = Error: {0}
+base.change                                                     = Change
 
 # Business start date
 business.start_date.title                                       = When did your business start trading?
@@ -60,3 +61,11 @@ business.accounting_method.accordion.bullet_1                   = May 2017, you 
 business.accounting_method.accordion.bullet_2                   = March 2017, you use ‘standard accounting’
 business.accounting_method.cash                                 = <span class="heading-small">Cash accounting</span><br>You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method.
 business.accounting_method.accruals                             = <span class="heading-small">Standard accounting</span><br>You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
+
+# Check your answers
+check_your_answers.title                                        = Check your answers
+check_your_answers.heading                                      = Check your answers
+check_your_answers.sub_heading                                  = Business 1
+check_your_answers.trading_start_date                           = Trading start date of business
+check_your_answers.business_name                                = Business name
+check_your_answers.business_trade                               = Business trade

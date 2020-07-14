@@ -36,33 +36,40 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
   implicit lazy val mockMessages: Messages = messagesApi.preferred(FakeRequest())
 
   val testBackUrl = "/test-back-url"
-  val testCall = Call("POST", "/test-url")
+  val testCall: Call = Call("POST", "/test-url")
 
-  implicit class ElementTest(element: Element) {
+  implicit class CustomSelectors(element: Element) {
 
-    val content: Element = element.getElementsByTag("article").head
+    def selectFirst(selector: String): Element = {
+      element.select(selector).headOption match {
+        case Some(element) => element
+        case None => fail(s"No elements returned for selector: $selector")
+      }
+    }
 
-    val getParagraphs: Elements = element.getElementsByTag("p")
+    def content: Element = element.getElementsByTag("article").head
 
-    val getBulletPoints: Elements = element.getElementsByTag("li")
+    def getParagraphs: Elements = element.getElementsByTag("p")
 
-    val getH1Element: Elements = element.getElementsByTag("h1")
+    def getBulletPoints: Elements = element.getElementsByTag("li")
 
-    val getH2Elements: Elements = element.getElementsByTag("h2")
+    def getH1Element: Elements = element.getElementsByTag("h1")
 
-    val getFormElements: Elements = element.getElementsByClass("form-field-group")
+    def getH2Elements: Elements = element.getElementsByTag("h2")
 
-    val getErrorSummaryMessage: Elements = element.select("#error-summary-display ul")
+    def getFormElements: Elements = element.getElementsByClass("form-field-group")
 
-    val getErrorSummary: Elements = element.select("#error-summary-display")
+    def getErrorSummaryMessage: Elements = element.select("#error-summary-display ul")
 
-    val getSubmitButton: Elements = element.select("button[type=submit]")
+    def getErrorSummary: Elements = element.select("#error-summary-display")
 
-    val getHintText: String = element.select(s"""[class=form-hint]""").text()
+    def getSubmitButton: Elements = element.select("button[type=submit]")
 
-    val getForm: Elements = element.select("form")
+    def getHintText: String = element.select(s"""[class=form-hint]""").text()
 
-    val getBackLink: Elements = element.select(s"a[class=back-link]")
+    def getForm: Elements = element.select("form")
+
+    def getBackLink: Elements = element.select(s"a[class=back-link]")
 
     def getParagraphNth(index: Int = 0): String = {
       element.select("p").get(index).text()
@@ -79,6 +86,23 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
     def getTextFieldInput(id: String): Elements = element.select(s"""input[id=$id]""")
 
     def getFieldErrorMessage(id: String): Elements = element.select(s"""a[id=$id-error-summary]""")
+
+    //Check your answers selectors
+    def getSummaryList: Element = element.selectFirst("dl.govuk-summary-list")
+
+    def getSummaryListRow(nth: Int): Element = {
+      element.selectFirst(s"div.govuk-summary-list__row:nth-of-type($nth)")
+    }
+
+    def getSummaryListKey: Element = element.selectFirst("dt.govuk-summary-list__key")
+
+    def getSummaryListValue: Element = element.selectFirst("dd.govuk-summary-list__value")
+
+    def getSummaryListActions: Element = element.selectFirst("dd.govuk-summary-list__actions")
+
+  }
+
+  implicit class ElementTests(element: Element) {
 
     def mustHaveTextField(name: String, label: String): Assertion = {
       val eles = element.select(s"input[name=$name]")
@@ -114,14 +138,15 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
     }
 
     def mustHaveErrorSummary(errors: List[String]): Assertion = {
-      getErrorSummary.attr("class") mustBe "flash error-summary error-summary--show"
-      getErrorSummary.attr("role") mustBe "alert"
-      getErrorSummary.attr("aria-labelledby") mustBe "error-summary-heading"
-      getErrorSummary.attr("tabindex") mustBe "-1"
-      getErrorSummary.select("h2").attr("id") mustBe "error-summary-heading"
-      getErrorSummary.select("h2").text mustBe "There’s a problem"
-      getErrorSummary.select("ul > li").text mustBe errors.mkString(" ")
+      element.getErrorSummary.attr("class") mustBe "flash error-summary error-summary--show"
+      element.getErrorSummary.attr("role") mustBe "alert"
+      element.getErrorSummary.attr("aria-labelledby") mustBe "error-summary-heading"
+      element.getErrorSummary.attr("tabindex") mustBe "-1"
+      element.getErrorSummary.select("h2").attr("id") mustBe "error-summary-heading"
+      element.getErrorSummary.select("h2").text mustBe "There’s a problem"
+      element.getErrorSummary.select("ul > li").text mustBe errors.mkString(" ")
     }
+
 
   }
 

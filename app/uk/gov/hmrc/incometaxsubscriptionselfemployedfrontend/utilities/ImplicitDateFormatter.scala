@@ -18,8 +18,13 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 
 import java.time.LocalDate
 
+import javax.inject.{Inject, Singleton}
 import play.api.i18n.Messages
 import uk.gov.hmrc.play.language.LanguageUtils
+
+
+@Singleton
+class ImplicitDateFormatterImpl @Inject()(val languageUtils: LanguageUtils) extends ImplicitDateFormatter
 
 trait ImplicitDateFormatter {
 
