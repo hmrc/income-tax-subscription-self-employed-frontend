@@ -49,7 +49,6 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
       backUrl = backUrl()
     )
 
-
   def show(): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       incomeTaxSubscriptionConnector.getSelfEmployments[AccountingMethodModel](BusinessAccountingMethodController.businessAccountingMethodKey).map {
@@ -62,7 +61,6 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
       }
     }
   }
-
 
   def submit(): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
@@ -78,7 +76,7 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
   }
 
   def backUrl(): String =
-    routes.BusinessTradeNameController.show().url
+    routes.BusinessListCYAController.show().url
 }
 
 object BusinessAccountingMethodController {

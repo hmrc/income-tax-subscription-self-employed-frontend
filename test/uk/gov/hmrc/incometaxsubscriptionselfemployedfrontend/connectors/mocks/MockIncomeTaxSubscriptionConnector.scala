@@ -22,9 +22,9 @@ import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{GetSelfEmploymentsFailure, GetSelfEmploymentsResponse}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.{PostSelfEmploymentsFailure, PostSelfEmploymentsResponse, PostSelfEmploymentsSuccess}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.GetAllSelfEmploymentResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
 import scala.concurrent.Future
@@ -50,5 +50,10 @@ trait MockIncomeTaxSubscriptionConnector extends UnitTestTrait with MockitoSugar
     when(mockIncomeTaxSubscriptionConnector.saveSelfEmployments[T](
       ArgumentMatchers.eq(id), ArgumentMatchers.eq(value)
     )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
+  }
+
+  def mockGetAllSelfEmployments()
+                               (response: GetAllSelfEmploymentResponse): OngoingStubbing[Future[GetAllSelfEmploymentResponse]] = {
+    when(mockIncomeTaxSubscriptionConnector.getAllSelfEmployments()(ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 }

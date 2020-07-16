@@ -18,14 +18,13 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.check_your_answers
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
 class CheckYourAnswersViewSpec extends ViewSpec {
 
@@ -45,8 +44,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
   val getAllSelfEmploymentModel: GetAllSelfEmploymentModel = GetAllSelfEmploymentModel(
     businessStartDate = BusinessStartDate(DateModel("1", "1", "2018")),
     businessName = BusinessNameModel("ABC Limited"),
-    businessTradeName = BusinessTradeNameModel("Plumbing"),
-    businessAccountingMethod = AccountingMethodModel(Cash)
+    businessTradeName = BusinessTradeNameModel("Plumbing")
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -63,7 +61,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
   }
 
   "Check Your Answers" must {
-    
+
     "have a title" in new Setup {
       document.title mustBe CheckYourAnswersMessages.title
     }
