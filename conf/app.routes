@@ -15,7 +15,7 @@ POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptio
 GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.show
 POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.submit
 
-GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.show(id: String)
+GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.show
 
 GET        /language/:lang                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.LanguageSwitchController.switchToLanguage(lang: String)
 

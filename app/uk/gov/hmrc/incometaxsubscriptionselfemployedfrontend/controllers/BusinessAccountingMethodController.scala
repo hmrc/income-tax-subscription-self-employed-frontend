@@ -22,9 +22,10 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{GetSelfEmploymentsFailure, InvalidJson, UnexpectedStatusFailure}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
@@ -51,7 +52,7 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
 
   def show(): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      incomeTaxSubscriptionConnector.getSelfEmployments[AccountingMethodModel](BusinessAccountingMethodController.businessAccountingMethodKey).map {
+      incomeTaxSubscriptionConnector.getSelfEmployments[AccountingMethodModel](businessAccountingMethodKey).map {
         case Right(accountingMethod) =>
           Ok(view(businessAccountingMethodForm.fill(accountingMethod)))
         case Left(UnexpectedStatusFailure(_@status)) =>
@@ -68,7 +69,7 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors))),
         businessAccountingMethod =>
-          incomeTaxSubscriptionConnector.saveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey, businessAccountingMethod) map (_ =>
+          incomeTaxSubscriptionConnector.saveSelfEmployments(businessAccountingMethodKey, businessAccountingMethod) map (_ =>
             Redirect(routes.BusinessAccountingMethodController.show())
             )
       )
@@ -76,9 +77,5 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
   }
 
   def backUrl(): String =
-    routes.BusinessListCYAController.show("fakeId" /*TODO To be Removed when no longer used in CYA url */).url
-}
-
-object BusinessAccountingMethodController {
-  val businessAccountingMethodKey: String = "BusinessAccountingMethod"
+    routes.BusinessListCYAController.show().url
 }

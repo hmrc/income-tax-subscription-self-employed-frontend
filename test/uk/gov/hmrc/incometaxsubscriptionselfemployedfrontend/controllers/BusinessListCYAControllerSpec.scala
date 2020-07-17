@@ -16,23 +16,26 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
+
+import scala.concurrent.Future
 
 class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTaxSubscriptionConnector {
 
   implicit val mockImplicitDateFormatter: ImplicitDateFormatterImpl = new ImplicitDateFormatterImpl(mockLanguageUtils)
+
   val id: String = "testId"
 
   override val controllerName: String = "BusinessListCYAController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessListCYAController.show(id)
+    "show" -> TestBusinessListCYAController.show()
   )
 
   object TestBusinessListCYAController extends BusinessListCYAController(
@@ -41,57 +44,93 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
     mockMessagesControllerComponents
   )
 
-  ".show" should {
+  val businessData: SelfEmploymentData = SelfEmploymentData(
+    id = id,
+    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2017"))),
+    businessName = Some(BusinessNameModel("ABC Limited")),
+    businessTradeName = Some(BusinessTradeNameModel("Plumbing"))
+  )
+
+  "show" should {
 
     "return OK (200)" when {
       "the connector returns successful json" in {
         mockAuthSuccess()
-        mockGetAllSelfEmployments()(Right(Some(GetAllSelfEmploymentDataModel(testGetAllSelfEmploymentModel))))
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(Some(Seq(
+          businessData
+        ))))
 
-        val result = TestBusinessListCYAController.show(id)(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
-      }
-
-      "the connector returns an invalid Json" in {
-        mockAuthSuccess()
-        mockGetAllSelfEmployments()(Left(InvalidJson))
-
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show(id)(FakeRequest())))
-        response.message mustBe ("[BusinessListCYAController][show] - Invalid Json")
       }
     }
 
     "return (303) redirect to business start date page" when {
-      "the connector returns no data" in {
+      "no businesses are returned" in {
         mockAuthSuccess()
-        mockGetAllSelfEmployments()(Right(None))
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(None))
 
-        val result = TestBusinessListCYAController.show(id)(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+      }
+      "no complete businesses are returned" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(Some(Seq(
+          businessData.copy(businessName = None)
+        ))))
+
+        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
+        status(result) mustBe 303
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
       }
     }
 
     "throw an internal server error" when {
       "there is an unexpected status failure" in {
         mockAuthSuccess()
-        mockGetAllSelfEmployments()(Left(GetAllSelfEmploymentConnectionFailure(INTERNAL_SERVER_ERROR)))
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show(id)(FakeRequest())))
-        response.message mustBe "[BusinessListCYAController][show] - GetAllSelfEmploymentConnectionFailure status: 500"
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        response.message mustBe "[BusinessListCYAController][show] - getSelfEmployments connection failure, status: 500"
+      }
+
+      "the connector returns an invalid Json" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(InvalidJson))
+
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        response.message mustBe ("[BusinessListCYAController][show] - Invalid Json")
       }
     }
 
   }
 
   "the back url" should {
-    "return a url for the business trade name page" in {
-      mockAuthSuccess()
+    "return the business trade name url with the id of the completed business" when {
+      "there is a single business" in {
+        val businesses: Seq[SelfEmploymentData] = Seq(businessData)
+        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessData.id).url
+      }
+      "there are multiple businesses" in {
+        val businessOne: SelfEmploymentData = businessData.copy(id = "testIdOne")
+        val businessTwo: SelfEmploymentData = businessData.copy(id = "testIdTwo")
+        val businesses: Seq[SelfEmploymentData] = Seq(businessOne, businessTwo)
 
-      TestBusinessListCYAController.backUrl(id) mustBe routes.BusinessTradeNameController.show(id).url
+        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessTwo.id).url
+      }
+      "there are unfinished businesses" in {
+        val businessOne: SelfEmploymentData = businessData.copy(id = "testIdOne")
+        val businessTwo: SelfEmploymentData = businessData.copy(id = "testIdTwo", businessTradeName = None)
+        val businesses: Seq[SelfEmploymentData] = Seq(businessOne, businessTwo)
+
+        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessOne.id).url
+      }
+
     }
   }
+
   authorisationTests()
 
 }

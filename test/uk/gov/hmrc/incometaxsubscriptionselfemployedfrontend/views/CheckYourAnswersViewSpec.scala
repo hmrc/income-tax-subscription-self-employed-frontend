@@ -31,6 +31,9 @@ class CheckYourAnswersViewSpec extends ViewSpec {
   object CheckYourAnswersMessages {
     val title = "Check your answers"
     val heading: String = title
+
+    def subHeading(businessNumber: Int): String = s"Business $businessNumber"
+
     val continue = "Continue"
     val backLink = "Back"
     val change = "Change"
@@ -41,22 +44,22 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
   val backUrl: String = testBackUrl
   val action: Call = testCall
-  val getAllSelfEmploymentModel: GetAllSelfEmploymentModel = GetAllSelfEmploymentModel(
-    businessStartDate = BusinessStartDate(DateModel("1", "1", "2018")),
-    businessName = BusinessNameModel("ABC Limited"),
-    businessTradeName = BusinessTradeNameModel("Plumbing")
+
+  def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
+    id = id,
+    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
+    businessName = Some(BusinessNameModel(s"ABC Limited $id")),
+    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing $id"))
   )
-  val id: String = "testId"
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
 
-  trait Setup {
+  class Setup(businesses: Seq[SelfEmploymentData] = Seq(selfEmploymentData("1"))) {
     val page: HtmlFormat.Appendable = check_your_answers(
-      getAllSelfEmploymentModel,
+      businesses,
       testCall,
       testBackUrl,
-      implicitDateFormatter,
-      id
+      implicitDateFormatter
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
@@ -77,47 +80,152 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       document.getForm.attr("action") mustBe testCall.url
     }
 
-    "have a check your answers table" which {
+    "display a single business check your answers" which {
 
-      "has a row for the trading start date" which {
-        "has a label to identify it" in new Setup {
-          document.getSummaryList.getSummaryListRow(1).getSummaryListKey.text mustBe CheckYourAnswersMessages.tradingStartDate
-        }
-        "has a answer the user gave" in new Setup {
-          document.getSummaryList.getSummaryListRow(1).getSummaryListValue.text mustBe "1 January 2018"
-        }
-        "has a change link" in new Setup {
-          val changeLink: Element = document.getSummaryList.getSummaryListRow(1).getSummaryListActions.selectFirst("a")
-          changeLink.text mustBe CheckYourAnswersMessages.change
-          changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id, isEditMode = true).url
-        }
+      "has a heading indicating the number of the business" in new Setup {
+        document.getH2Element().text mustBe CheckYourAnswersMessages.subHeading(1)
       }
 
-      "has a row for the business name" which {
-        "has a label to identify it" in new Setup {
-          document.getSummaryList.getSummaryListRow(2).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessName
+      "has a check your answers table" which {
+        "has a row for the trading start date" which {
+          "has a label to identify it" in new Setup {
+            document.getSummaryList().getSummaryListRow(1).getSummaryListKey.text mustBe CheckYourAnswersMessages.tradingStartDate
+          }
+          "has a answer the user gave" in new Setup {
+            document.getSummaryList().getSummaryListRow(1).getSummaryListValue.text mustBe "1 January 2018"
+          }
+          "has a change link" in new Setup {
+            val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectFirst("a")
+            changeLink.text mustBe CheckYourAnswersMessages.change
+            changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "1", isEditMode = true).url
+          }
         }
-        "has a answer the user gave" in new Setup {
-          document.getSummaryList.getSummaryListRow(2).getSummaryListValue.text mustBe "ABC Limited"
+
+        "has a row for the business name" which {
+          "has a label to identify it" in new Setup {
+            document.getSummaryList().getSummaryListRow(2).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessName
+          }
+          "has a answer the user gave" in new Setup {
+            document.getSummaryList().getSummaryListRow(2).getSummaryListValue.text mustBe "ABC Limited 1"
+          }
+          "has a change link" in new Setup {
+            val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectFirst("a")
+            changeLink.text mustBe CheckYourAnswersMessages.change
+            changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "1", isEditMode = true).url
+          }
         }
-        "has a change link" in new Setup {
-          val changeLink: Element = document.getSummaryList.getSummaryListRow(2).getSummaryListActions.selectFirst("a")
-          changeLink.text mustBe CheckYourAnswersMessages.change
-          changeLink.attr("href") mustBe routes.BusinessNameController.show(id, isEditMode = true).url
+
+        "has a row for the business trade" which {
+          "has a label to identify it" in new Setup {
+            document.getSummaryList().getSummaryListRow(3).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessTrade
+          }
+          "has a answer the user gave" in new Setup {
+            document.getSummaryList().getSummaryListRow(3).getSummaryListValue.text mustBe "Plumbing 1"
+          }
+          "has a change link" in new Setup {
+            val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectFirst("a")
+            changeLink.text mustBe CheckYourAnswersMessages.change
+            changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1", isEditMode = true).url
+          }
         }
       }
+    }
 
-      "has a row for the business trade" which {
-        "has a label to identify it" in new Setup {
-          document.getSummaryList.getSummaryListRow(3).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessTrade
+    "display multiple businesses when passed into the view" which {
+      "for the first business" should {
+        "have a heading indicating it's the first business" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+          document.getH2Element().text mustBe CheckYourAnswersMessages.subHeading(1)
         }
-        "has a answer the user gave" in new Setup {
-          document.getSummaryList.getSummaryListRow(3).getSummaryListValue.text mustBe "Plumbing"
+        "have a check your answers table" which {
+          "has a row for the trading start date" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(1).getSummaryListKey.text mustBe CheckYourAnswersMessages.tradingStartDate
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(1).getSummaryListValue.text mustBe "1 January 2018"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "1", isEditMode = true).url
+            }
+          }
+
+          "has a row for the business name" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(2).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessName
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(2).getSummaryListValue.text mustBe "ABC Limited 1"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "1", isEditMode = true).url
+            }
+          }
+
+          "has a row for the business trade" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(3).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessTrade
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(3).getSummaryListValue.text mustBe "Plumbing 1"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1", isEditMode = true).url
+            }
+          }
         }
-        "has a change link" in new Setup {
-          val changeLink: Element = document.getSummaryList.getSummaryListRow(3).getSummaryListActions.selectFirst("a")
-          changeLink.text mustBe CheckYourAnswersMessages.change
-          changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id, isEditMode = true).url
+      }
+      "for the second business" should {
+        "have a heading indicating it's the second business" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+          document.getH2Element(nth = 2).text mustBe CheckYourAnswersMessages.subHeading(2)
+        }
+        "have a check your answers table" which {
+          "has a row for the trading start date" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(1).getSummaryListKey.text mustBe CheckYourAnswersMessages.tradingStartDate
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(1).getSummaryListValue.text mustBe "1 January 2018"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList(2).getSummaryListRow(1).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "2", isEditMode = true).url
+            }
+          }
+
+          "has a row for the business name" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(2).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessName
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(2).getSummaryListValue.text mustBe "ABC Limited 2"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList(2).getSummaryListRow(2).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "2", isEditMode = true).url
+            }
+          }
+
+          "has a row for the business trade" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(3).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessTrade
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(3).getSummaryListValue.text mustBe "Plumbing 2"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList(2).getSummaryListRow(3).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "2", isEditMode = true).url
+            }
+          }
         }
       }
     }

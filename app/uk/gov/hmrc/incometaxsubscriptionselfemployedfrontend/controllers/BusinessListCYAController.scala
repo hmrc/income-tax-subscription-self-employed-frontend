@@ -21,10 +21,11 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.{GetAllSelfEmploymentConnectionFailure, InvalidJson}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.GetAllSelfEmploymentModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SelfEmploymentData
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.check_your_answers
@@ -39,24 +40,27 @@ class BusinessListCYAController @Inject()(authService: AuthService,
                                          (implicit val ec: ExecutionContext, val appConfig: AppConfig, dateFormatter: ImplicitDateFormatterImpl)
   extends FrontendController(mcc) with I18nSupport {
 
-  def backUrl(id: String): String =
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id).url
+  def backUrl(businesses: Seq[SelfEmploymentData]): String = {
+    val lastCompleteBusinessId: String = businesses.filter(_.isComplete).last.id
+    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(lastCompleteBusinessId).url
+  }
 
-  def view(model: GetAllSelfEmploymentModel, id: String)(implicit request: Request[AnyContent]): Html =
+  def view(businesses: Seq[SelfEmploymentData])(implicit request: Request[AnyContent]): Html = {
     check_your_answers(
-      answers = model,
+      answers = businesses,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.show(),
-      backUrl = backUrl(id),
-      implicitDateFormatter = dateFormatter,
-      id)
+      backUrl = backUrl(businesses),
+      implicitDateFormatter = dateFormatter
+    )
+  }
 
-  def show(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def show: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      incomeTaxSubscriptionConnector.getAllSelfEmployments().map {
-        case Right(Some(dataModel)) => Ok(view(dataModel.model, id))
-        case Right(None) => Redirect(routes.BusinessStartDateController.show(id))
-        case Left(GetAllSelfEmploymentConnectionFailure(_@status)) =>
-          throw new InternalServerException(s"[BusinessListCYAController][show] - GetAllSelfEmploymentConnectionFailure status: $status")
+      incomeTaxSubscriptionConnector.getSelfEmployments[Seq[SelfEmploymentData]](businessesKey).map {
+        case Right(Some(businesses)) if businesses.exists(_.isComplete) => Ok(view(businesses.filter(_.isComplete)))
+        case Right(_) => Redirect(routes.InitialiseController.initialise())
+        case Left(UnexpectedStatusFailure(status)) =>
+          throw new InternalServerException(s"[BusinessListCYAController][show] - getSelfEmployments connection failure, status: $status")
         case Left(InvalidJson) =>
           throw new InternalServerException("[BusinessListCYAController][show] - Invalid Json")
       }

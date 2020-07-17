@@ -17,10 +17,9 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsObject, Json, OWrites, Reads}
+import play.api.libs.json.{JsValue, Json, Reads, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.GetAllSelfEmploymentResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsResponse
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -36,12 +35,8 @@ class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
     appConfig.selfEmployedUrl + s"/$id"
   }
 
-  def getAllSelfEmployments()(implicit hc:HeaderCarrier): Future[GetAllSelfEmploymentResponse] = {
-    http.GET[GetAllSelfEmploymentResponse](appConfig.allSelfEmployedUrl)
-  }
-
-  def saveSelfEmployments[T](id: String, data: T)(implicit hc:HeaderCarrier, writes: OWrites[T]): Future[PostSelfEmploymentsResponse] = {
-    http.POST[JsObject,PostSelfEmploymentsResponse](selfEmployedURL(id),Json.toJsObject(data))
+  def saveSelfEmployments[T](id: String, data: T)(implicit hc: HeaderCarrier, writes: Writes[T]): Future[PostSelfEmploymentsResponse] = {
+    http.POST[JsValue, PostSelfEmploymentsResponse](selfEmployedURL(id), Json.toJson(data))
   }
 
   def getSelfEmployments[T](id: String)(implicit hc: HeaderCarrier, reads: Reads[T]): Future[GetSelfEmploymentsResponse[T]] = {
