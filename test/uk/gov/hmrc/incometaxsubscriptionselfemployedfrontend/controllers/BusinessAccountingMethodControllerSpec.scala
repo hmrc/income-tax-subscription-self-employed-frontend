@@ -114,7 +114,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   "The back url" should {
     "return a url for the business trade name page" in {
       mockAuthSuccess()
-      TestBusinessAccountingMethodController$.backUrl() mustBe routes.BusinessTradeNameController.show().url
+      TestBusinessAccountingMethodController$.backUrl() mustBe routes.BusinessListCYAController.show().url
     }
   }
   authorisationTests()

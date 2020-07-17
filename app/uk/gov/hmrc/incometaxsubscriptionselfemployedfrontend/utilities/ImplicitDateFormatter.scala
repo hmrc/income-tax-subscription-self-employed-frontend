@@ -30,7 +30,7 @@ trait ImplicitDateFormatter {
 
   val languageUtils: LanguageUtils
 
-  implicit class longDate(date: LocalDate)(implicit messages: Messages) {
+  implicit class LongDate(date: LocalDate)(implicit messages: Messages) {
 
     def toLongDate: String = {
       languageUtils.Dates.formatDate(org.joda.time.LocalDate.parse(date.toString))(messages)

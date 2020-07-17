@@ -37,7 +37,7 @@
 }
 
 @tradingStartDate = @{
-    import implicitDateFormatter.longDate
+    import implicitDateFormatter.LongDate
     val question: String = messages("check_your_answers.trading_start_date")
     val answer: String = answers.businessStartDate.startDate.toLocalDate.toLongDate
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(/*isEditMode = true*/).url

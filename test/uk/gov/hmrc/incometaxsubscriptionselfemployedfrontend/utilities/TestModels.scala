@@ -35,8 +35,7 @@ object TestModels {
   val testGetAllSelfEmploymentModel: GetAllSelfEmploymentModel = GetAllSelfEmploymentModel(
     businessStartDate = testBusinessStartDateModel,
     businessName = testBusinessNameModel,
-    businessTradeName = testValidBusinessTradeNameModel,
-    businessAccountingMethod = testAccountingMethodModel
+    businessTradeName = testValidBusinessTradeNameModel
   )
   val testGetAllSelfEmploymentModelJsValue: JsValue = Json.toJsObject(testGetAllSelfEmploymentModel)
 
