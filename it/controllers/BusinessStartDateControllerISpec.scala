@@ -26,6 +26,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.Busines
 
 class BusinessStartDateControllerISpec extends ComponentSpecBase {
 
+  val businessId:String = "testId"
+
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-start-date" when {
 
@@ -36,7 +38,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(NO_CONTENT)
 
         When("GET /business/start-date is called")
-        val res = getBusinessStartDate()
+        val res = getBusinessStartDate(businessId)
 
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
@@ -53,7 +55,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(OK, Json.toJson(testBusinessStartDateModel))
 
         When("GET /business/start-date is called")
-        val res = getBusinessStartDate()
+        val res = getBusinessStartDate(businessId)
 
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
@@ -74,7 +76,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testValidBusinessStartDateModel))(OK)
 
         When("POST /business/start-date is called")
-        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel))
+        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
 
 
         Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
@@ -90,7 +92,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testBusinessStartDateModel))(OK)
 
         When("POST /business/start-date is called")
-        val res = submitBusinessStartDate(Some(testBusinessStartDateModel))
+        val res = submitBusinessStartDate(Some(testBusinessStartDateModel), businessId)
 
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
@@ -108,7 +110,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testValidBusinessStartDateModel))(OK)
 
         When("POST /business/start-date is called")
-        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), true)
+        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId,true)
 
 
         Then("Should return a SEE_OTHER with a redirect location of check your answers")

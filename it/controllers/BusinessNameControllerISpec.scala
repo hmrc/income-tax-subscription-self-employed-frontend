@@ -11,6 +11,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.Busines
 
 class BusinessNameControllerISpec extends ComponentSpecBase {
 
+  val businessId: String = "testId"
+
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-name" when {
 
     "the Connector is empty" should {
@@ -20,7 +22,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments(BusinessNameController.businessNameKey)(NO_CONTENT)
 
         When("GET /details/business-name is called")
-        val res = getBusinessName()
+        val res = getBusinessName(businessId)
 
         Then("should return an OK with the BusinessNamePage")
         res must have(
@@ -36,7 +38,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments(BusinessNameController.businessNameKey)(OK, Json.toJson(testBusinessNameModel))
 
         When("GET /details/business-name is called")
-        val res = getBusinessName()
+        val res = getBusinessName(businessId)
 
         Then("should return an OK with the BusinessNamePage")
         res must have(
@@ -62,7 +64,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testBusinessNameModel))(CREATED)
 
         When("Post /details/business-name is called")
-        val res = submitBusinessName(inEditMode = false, Some(testBusinessNameModel))
+        val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
 
         Then("should return a SEE_OTHER")
         res must have(
@@ -76,7 +78,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testEmptyBusinessNameModel))(OK)
 
         When("POST /details/business-name")
-        val res = submitBusinessName(inEditMode = false, Some(testEmptyBusinessNameModel))
+        val res = submitBusinessName(businessId, inEditMode = false, Some(testEmptyBusinessNameModel))
 
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
@@ -93,7 +95,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testBusinessNameModel))(CREATED)
 
         When("Post /details/business-name is called")
-        val res = submitBusinessName(inEditMode = true, Some(testBusinessNameModel))
+        val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
 
         Then("should return a SEE_OTHER")
         res must have(

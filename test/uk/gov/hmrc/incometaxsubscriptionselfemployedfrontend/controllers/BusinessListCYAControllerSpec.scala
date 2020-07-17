@@ -28,9 +28,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTaxSubscriptionConnector {
 
   implicit val mockImplicitDateFormatter: ImplicitDateFormatterImpl = new ImplicitDateFormatterImpl(mockLanguageUtils)
+  val id: String = "testId"
+
   override val controllerName: String = "BusinessListCYAController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessListCYAController.show()
+    "show" -> TestBusinessListCYAController.show(id)
   )
 
   object TestBusinessListCYAController extends BusinessListCYAController(
@@ -46,7 +48,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetAllSelfEmployments()(Right(Some(GetAllSelfEmploymentDataModel(testGetAllSelfEmploymentModel))))
 
-        val result = TestBusinessListCYAController.show()(FakeRequest())
+        val result = TestBusinessListCYAController.show(id)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -55,7 +57,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetAllSelfEmployments()(Left(InvalidJson))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show(id)(FakeRequest())))
         response.message mustBe ("[BusinessListCYAController][show] - Invalid Json")
       }
     }
@@ -65,9 +67,9 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetAllSelfEmployments()(Right(None))
 
-        val result = TestBusinessListCYAController.show()(FakeRequest())
+        val result = TestBusinessListCYAController.show(id)(FakeRequest())
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
       }
     }
 
@@ -76,7 +78,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetAllSelfEmployments()(Left(GetAllSelfEmploymentConnectionFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show(id)(FakeRequest())))
         response.message mustBe "[BusinessListCYAController][show] - GetAllSelfEmploymentConnectionFailure status: 500"
       }
     }
@@ -87,7 +89,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
     "return a url for the business trade name page" in {
       mockAuthSuccess()
 
-      TestBusinessListCYAController.backUrl() mustBe routes.BusinessTradeNameController.show().url
+      TestBusinessListCYAController.backUrl(id) mustBe routes.BusinessTradeNameController.show(id).url
     }
   }
   authorisationTests()

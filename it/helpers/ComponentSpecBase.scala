@@ -78,11 +78,11 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     ws.url(s"http://localhost:${portNumber.value}$baseUrl$path").withFollowRedirects(false)
 
 
-  def getBusinessStartDate(): WSResponse = get("/details/business-start-date")
+  def getBusinessStartDate(id: String): WSResponse = get("/details/business-start-date?id=$id")
 
 
-  def submitBusinessStartDate(request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/details/business-start-date?isEditMode=$inEditMode"
+  def submitBusinessStartDate(request: Option[BusinessStartDate], id: String, inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -94,10 +94,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getBusinessName(): WSResponse = get("/details/business-name")
+  def getBusinessName(id: String): WSResponse = get(s"/details/business-name?id=$id")
 
-  def submitBusinessName(inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {
-    val uri = s"/details/business-name?isEditMode=$inEditMode"
+  def submitBusinessName(id: String, inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {
+    val uri = s"/details/business-name?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -106,10 +106,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getBusinessTradeName(): WSResponse = get("/details/business-trade")
+  def getBusinessTradeName(id: String): WSResponse = get(s"/details/business-trade?id=$id")
 
-  def submitBusinessTradeName(inEditMode: Boolean, request: Option[BusinessTradeNameModel]): WSResponse = {
-    val uri = s"/details/business-trade?editMode=$inEditMode"
+  def submitBusinessTradeName(id: String, inEditMode: Boolean, request: Option[BusinessTradeNameModel]): WSResponse = {
+    val uri = s"/details/business-trade?id=$id&editMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>

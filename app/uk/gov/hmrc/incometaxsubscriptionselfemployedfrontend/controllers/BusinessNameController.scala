@@ -40,46 +40,46 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents, income
     def fill(data: Option[T]): Form[T] = data.fold(form)(form.fill)
   }
 
-  def view(businessNameForm: Form[BusinessNameModel], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_name(
       businessNameForm = businessNameForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.submit(isEditMode = isEditMode),
+      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
-      backUrl = backUrl(isEditMode)
+      backUrl = backUrl(id, isEditMode)
     )
 
-  def show(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       incomeTaxSubscriptionConnector.getSelfEmployments[BusinessNameModel](BusinessNameController.businessNameKey).map {
         case Right(businessNameData) =>
-          Ok(view(businessNameValidationForm.fill(businessNameData), isEditMode = isEditMode))
+          Ok(view(businessNameValidationForm.fill(businessNameData), id, isEditMode = isEditMode))
         case error => throw new InternalServerException(error.toString)
       }
     }
   }
 
-  def submit(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       businessNameValidationForm.bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, isEditMode = isEditMode))),
+          Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
         businessNameData =>
           incomeTaxSubscriptionConnector.saveSelfEmployments[BusinessNameModel](BusinessNameController.businessNameKey, businessNameData) map (_ =>
             if (isEditMode) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show(id))
             } else {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id))
             }
       )
       )
     }
   }
 
-  def backUrl(isEditMode: Boolean): String =
+  def backUrl(id: String, isEditMode: Boolean): String =
     if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show(id).url
     } else {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id).url
     }
 }
 

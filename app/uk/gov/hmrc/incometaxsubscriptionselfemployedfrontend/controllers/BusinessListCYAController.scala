@@ -39,21 +39,22 @@ class BusinessListCYAController @Inject()(authService: AuthService,
                                          (implicit val ec: ExecutionContext, val appConfig: AppConfig, dateFormatter: ImplicitDateFormatterImpl)
   extends FrontendController(mcc) with I18nSupport {
 
-  def backUrl(): String =
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show().url
+  def backUrl(id: String): String =
+    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id).url
 
-  def view(model: GetAllSelfEmploymentModel)(implicit request: Request[AnyContent]): Html =
+  def view(model: GetAllSelfEmploymentModel, id: String)(implicit request: Request[AnyContent]): Html =
     check_your_answers(
       answers = model,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.show(),
-      backUrl = backUrl(),
-      implicitDateFormatter = dateFormatter)
+      backUrl = backUrl(id),
+      implicitDateFormatter = dateFormatter,
+      id)
 
-  def show(): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       incomeTaxSubscriptionConnector.getAllSelfEmployments().map {
-        case Right(Some(dataModel)) => Ok(view(dataModel.model))
-        case Right(None) => Redirect(routes.BusinessStartDateController.show())
+        case Right(Some(dataModel)) => Ok(view(dataModel.model, id))
+        case Right(None) => Redirect(routes.BusinessStartDateController.show(id))
         case Left(GetAllSelfEmploymentConnectionFailure(_@status)) =>
           throw new InternalServerException(s"[BusinessListCYAController][show] - GetAllSelfEmploymentConnectionFailure status: $status")
         case Left(InvalidJson) =>
