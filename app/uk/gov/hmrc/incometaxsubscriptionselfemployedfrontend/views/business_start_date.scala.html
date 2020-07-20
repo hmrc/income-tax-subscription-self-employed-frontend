@@ -23,7 +23,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.main_template
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
 
-@(businessStartDateForm: Form[BusinessStartDate], postAction: Call, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessStartDateForm: Form[BusinessStartDate], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = messages("business.start_date.title"), form = Some(businessStartDateForm)) {
 
@@ -41,6 +41,10 @@
             hintText = Some(messages("business.start_date.exampleStartDate"))
         )
 
-        @continueButton()
+        @if(isEditMode) {
+            @continueButton(Some(messages("base.update")))
+        } else {
+            @continueButton()
+        }
     }
 }

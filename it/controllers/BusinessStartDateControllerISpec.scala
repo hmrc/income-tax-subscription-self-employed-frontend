@@ -67,38 +67,57 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-start-date" when {
-    "the form data is valid and connector stores it successfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testValidBusinessStartDateModel))(OK)
+    "not in edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testValidBusinessStartDateModel))(OK)
 
-      When("POST /business/start-date is called")
-      val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel))
+        When("POST /business/start-date is called")
+        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel))
 
 
-      Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
-      res must have(
-        httpStatus(SEE_OTHER),
-        redirectURI(BusinessNameUri)
-      )
+        Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(BusinessNameUri)
+        )
+      }
+
+      "the form data is invalid and connector stores it unsuccessful" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testBusinessStartDateModel))(OK)
+
+        When("POST /business/start-date is called")
+        val res = submitBusinessStartDate(Some(testBusinessStartDateModel))
+
+
+        Then("Should return a BAD_REQUEST and THE FORM With errors")
+        res must have(
+          httpStatus(BAD_REQUEST),
+          pageTitle("Error: When did your business start trading?")
+        )
+      }
     }
 
-    "the form data is invalid and connector stores it unsuccessfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testBusinessStartDateModel))(OK)
+    "in edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, Json.toJson(testValidBusinessStartDateModel))(OK)
 
-      When("POST /business/start-date is called")
-      val res = submitBusinessStartDate(Some(testBusinessStartDateModel))
+        When("POST /business/start-date is called")
+        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), true)
 
 
-      Then("Should return a BAD_REQUEST and THE FORM With errors")
-      res must have(
-        httpStatus(BAD_REQUEST),
-        pageTitle("Error: When did your business start trading?")
-      )
+        Then("Should return a SEE_OTHER with a redirect location of check your answers")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(BusinessListCYAUri)
+        )
+      }
     }
-
   }
 }
 

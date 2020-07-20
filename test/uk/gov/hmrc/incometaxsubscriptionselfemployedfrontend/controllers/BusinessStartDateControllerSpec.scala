@@ -27,15 +27,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStart
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testBusinessStartDateModel
 
-import scala.concurrent.Future
-
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockIncomeTaxSubscriptionConnector {
 
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessStartBusinessStartDateController$.show(),
-    "submit" -> TestBusinessStartBusinessStartDateController$.submit()
+    "show" -> TestBusinessStartBusinessStartDateController$.show(isEditMode = false),
+    "submit" -> TestBusinessStartBusinessStartDateController$.submit(isEditMode = false)
   )
 
   object TestBusinessStartBusinessStartDateController$ extends BusinessStartDateController(
@@ -56,14 +54,14 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(
           Right(Some(BusinessStartDate(DateModel("01", "01", "2000"))))
         )
-        val result = TestBusinessStartBusinessStartDateController$.show()(FakeRequest())
+        val result = TestBusinessStartBusinessStartDateController$.show(isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Right(None))
-        val result = TestBusinessStartBusinessStartDateController$.show()(FakeRequest())
+        val result = TestBusinessStartBusinessStartDateController$.show(isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -72,32 +70,66 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "the connector returns an error" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestBusinessStartBusinessStartDateController$.show()(FakeRequest())))
+        intercept[InternalServerException](await(TestBusinessStartBusinessStartDateController$.show(false)(FakeRequest())))
       }
     }
 
   }
 
   "Submit" should {
-
-    "return 303, SEE_OTHER)" when {
-      "the user submits valid data" in {
-        mockAuthSuccess()
-        mockSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessStartBusinessStartDateController$.submit()(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
-        )
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show().url)
+    "when it is not in edit mode" should {
+      "return 303, SEE_OTHER)" when {
+        "the user submits valid data" in {
+          mockAuthSuccess()
+          mockSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          val result = TestBusinessStartBusinessStartDateController$.submit(isEditMode = false)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show().url)
+        }
+      }
+    }
+    "when it is in edit mode" should {
+      "return 303, SEE_OTHER)" when {
+        "the user submits valid data" in {
+          mockAuthSuccess()
+          mockSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          val result = TestBusinessStartBusinessStartDateController$.submit(isEditMode = true)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url)
+        }
       }
     }
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessStartBusinessStartDateController$.submit()(FakeRequest())
+        val result = TestBusinessStartBusinessStartDateController$.submit(false)(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
+      }
+    }
+  }
+
+  "The back url" when {
+    "not in edit mode" when {
+      s"point to what-year-to-sign-up page" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Right(None))
+        TestBusinessStartBusinessStartDateController$.backUrl(isEditMode = false) contains
+          "/report-quarterly/income-and-expenses/sign-up/business/what-year-to-sign-up"
+
+      }
+    }
+    "in edit mode" when {
+      s"point to what-year-to-sign-up page" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Right(None))
+        TestBusinessStartBusinessStartDateController$.backUrl(isEditMode = true) mustBe
+          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
       }
     }
   }
