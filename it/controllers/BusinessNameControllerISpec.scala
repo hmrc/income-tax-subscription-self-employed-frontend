@@ -55,34 +55,52 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
 
   }
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-name" when {
-    "the form data is valid and is stored successfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testBusinessNameModel))(CREATED)
+    "not in edit mode" when {
+      "the form data is valid and is stored successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testBusinessNameModel))(CREATED)
 
-      When("Post /details/business-name is called")
-      val res = submitBusinessName(Some(testBusinessNameModel))
+        When("Post /details/business-name is called")
+        val res = submitBusinessName(inEditMode = false, Some(testBusinessNameModel))
 
-      Then("should return a SEE_OTHER")
-      res must have(
-        httpStatus(SEE_OTHER)
-      )
+        Then("should return a SEE_OTHER")
+        res must have(
+          httpStatus(SEE_OTHER)
+        )
+      }
+
+      "the form data is invalid and connector stores it unsuccessfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testEmptyBusinessNameModel))(OK)
+
+        When("POST /details/business-name")
+        val res = submitBusinessName(inEditMode = false, Some(testEmptyBusinessNameModel))
+
+
+        Then("Should return a BAD_REQUEST and THE FORM With errors")
+        res must have(
+          httpStatus(BAD_REQUEST),
+          pageTitle("Error: What is the name of your business?")
+        )
+      }
     }
+    "in edit mode" when {
+      "the form data is valid and is stored successfully and redirected to Check Your Answers" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testBusinessNameModel))(CREATED)
 
-    "the form data is invalid and connector stores it unsuccessfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessNameController.businessNameKey, Json.toJson(testEmptyBusinessNameModel))(OK)
+        When("Post /details/business-name is called")
+        val res = submitBusinessName(inEditMode = true, Some(testBusinessNameModel))
 
-      When("POST /details/business-name")
-      val res = submitBusinessName(Some(testEmptyBusinessNameModel))
-
-
-      Then("Should return a BAD_REQUEST and THE FORM With errors")
-      res must have(
-        httpStatus(BAD_REQUEST),
-        pageTitle("Error: What is the name of your business?")
-      )
+        Then("should return a SEE_OTHER")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(BusinessListCYAUri)
+        )
+      }
     }
   }
 }
