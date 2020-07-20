@@ -68,37 +68,76 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
-    "the form data is valid and connector stores it successfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testValidBusinessTradeNameModel))(OK)
+    "not in edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testValidBusinessTradeNameModel))(OK)
 
-      When("POST /details/business-trade is called")
-      val res = submitBusinessTradeName(Some(testValidBusinessTradeNameModel))
+        When("POST /details/business-trade is called")
+        val res = submitBusinessTradeName(inEditMode = false, Some(testValidBusinessTradeNameModel))
 
 
-      Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
-      res must have(
-        httpStatus(SEE_OTHER),
-        redirectURI(BusinessListCYAUri)
-      )
+        Then("Should return a SEE_OTHER")
+        res must have(
+          httpStatus(SEE_OTHER)
+        )
+      }
+
+      "the form data is invalid and connector stores it unsuccessfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testInvalidBusinessTradeNameModel))(OK)
+
+        When("POST /details/business-trade is called")
+        val res = submitBusinessTradeName(inEditMode = false, Some(testInvalidBusinessTradeNameModel))
+
+
+        Then("Should return a BAD_REQUEST and THE FORM With errors")
+        res must have(
+          httpStatus(BAD_REQUEST),
+          pageTitle("Error: What is the trade of your business?")
+        )
+      }
+
     }
 
-    "the form data is invalid and connector stores it unsuccessfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testInvalidBusinessTradeNameModel))(OK)
+    "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
+      "in edit mode" when {
+        "the form data is valid and connector stores it successfully" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testValidBusinessTradeNameModel))(OK)
 
-      When("POST /details/business-trade is called")
-      val res = submitBusinessTradeName(Some(testInvalidBusinessTradeNameModel))
+          When("POST /details/business-trade is called")
+          val res = submitBusinessTradeName(inEditMode = true, Some(testValidBusinessTradeNameModel))
 
 
-      Then("Should return a BAD_REQUEST and THE FORM With errors")
-      res must have(
-        httpStatus(BAD_REQUEST),
-        pageTitle("Error: What is the trade of your business?")
-      )
+          Then(s"Should return a $SEE_OTHER with a redirect location of check your answers")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessListCYAUri)
+
+          )
+        }
+
+        "the form data is invalid and connector stores it unsuccessfully" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testInvalidBusinessTradeNameModel))(OK)
+
+          When("POST /details/business-trade is called")
+          val res = submitBusinessTradeName(inEditMode = true, Some(testInvalidBusinessTradeNameModel))
+
+
+          Then("Should return a BAD_REQUEST and THE FORM With errors")
+          res must have(
+            httpStatus(BAD_REQUEST),
+            pageTitle("Error: What is the trade of your business?")
+          )
+        }
+
+      }
     }
-
   }
 }

@@ -7,8 +7,8 @@ POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptio
 GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show
 POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit
 
-GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show
-POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit
+GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show(isEditMode: Boolean ?= false)
+POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit(isEditMode: Boolean ?= false)
 
 GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.show
 POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.submit
