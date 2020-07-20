@@ -35,6 +35,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val exampleStartDate = "For example, 1 4 2018"
     val continue = "Continue"
     val backLink = "Back"
+    val update = "Update"
   }
 
   val backUrl: String = testBackUrl
@@ -42,10 +43,12 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val taxYearEnd: Int = 2020
   val testError: FormError = FormError("startDate", "testError")
 
-  class Setup(businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm("testMessage")) {
+  class Setup(isEditMode: Boolean = false,
+              businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm("testMessage")) {
     val page: HtmlFormat.Appendable = business_start_date(
       businessStartDateForm,
       testCall,
+      isEditMode,
       testBackUrl
     )(FakeRequest(), implicitly, appConfig)
 
@@ -54,6 +57,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
 
   "Business Start Date" must {
+
     "have a title" in new Setup {
       document.title mustBe BusinessStartDateMessages.title
     }
@@ -67,18 +71,20 @@ class BusinessStartDateViewSpec extends ViewSpec {
     "have a fieldset with dateInputs" in new Setup {
       document.mustHaveDateField("startDate", "", BusinessStartDateMessages.exampleStartDate)
     }
-    "have a continue button" in new Setup {
+    "have a continue button when not in edit mode" in new Setup {
       document.getSubmitButton.text mustBe BusinessStartDateMessages.continue
+    }
+    "have update button when in edit mode" in new Setup(true) {
+      document.getSubmitButton.text mustBe BusinessStartDateMessages.update
     }
     "have a backlink " in new Setup {
       document.getBackLink.text mustBe BusinessStartDateMessages.backLink
       document.getBackLink.attr("href") mustBe testBackUrl
     }
-    "must display form error on page" in new Setup(BusinessStartDateForm.businessStartDateForm("testMessage").withError(testError)) {
+    "must display form error on page" in new Setup(false, BusinessStartDateForm.businessStartDateForm("testMessage").withError(testError)) {
       document.mustHaveErrorSummary(List[String](testError.message))
       document.mustHaveDateField("startDate", "", BusinessStartDateMessages.exampleStartDate, Some(testError.message))
     }
 
   }
-
 }

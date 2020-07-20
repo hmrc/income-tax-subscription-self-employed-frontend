@@ -2,6 +2,7 @@
 base.service_name                                               = Use software to send Income Tax updates
 base.back                                                       = Back
 base.continue                                                   = Continue
+base.update                                                     = Update
 base.sign-out                                                   = Sign out
 base.day                                                        = Day
 base.month                                                      = Month

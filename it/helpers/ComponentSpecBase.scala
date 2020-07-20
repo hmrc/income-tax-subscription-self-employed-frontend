@@ -81,8 +81,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getBusinessStartDate(): WSResponse = get("/details/business-start-date")
 
 
-  def submitBusinessStartDate(request: Option[BusinessStartDate]): WSResponse = {
-    val uri = "/details/business-start-date"
+  def submitBusinessStartDate(request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/details/business-start-date?isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
