@@ -26,6 +26,7 @@ error.day.month.empty                                           = Mae’n rhaid 
 error.day.year.empty                                            = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
 error.month.year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
 error.business_accounting_period.minStartDate                   = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+error.property_accounting_period.minStartDate                   = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
 
 # Business Name
 business.name.title                                             = Beth yw enw’ch busnes?

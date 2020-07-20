@@ -26,6 +26,7 @@ error.day.month.empty                                           = The date must 
 error.day.year.empty                                            = The date must include a day and a year
 error.month.year.empty                                          = The date must include a month and a year
 error.business_accounting_period.minStartDate                   = The date your business started trading must be the same as or before {0}
+error.property_accounting_period.minStartDate                   = The date your UK property business started trading must be the same as or before {0}
 
 # Business Name
 business.name.title                                             = What is the name of your business?

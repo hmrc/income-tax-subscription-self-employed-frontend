@@ -24,6 +24,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 object TestModels {
 
   val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
+  val testPropertyCommencementDateModel: PropertyCommencementDateModel = PropertyCommencementDateModel(testValidStartDate)
   val testBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel("Business")
   val testValidBusinessTradeName: String = "Plumbing"
