@@ -32,8 +32,8 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessTradeNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessTradeNameController$.show(),
-    "submit" -> TestBusinessTradeNameController$.submit()
+    "show" -> TestBusinessTradeNameController$.show(isEditMode = false),
+    "submit" -> TestBusinessTradeNameController$.submit(isEditMode = false)
   )
 
   object TestBusinessTradeNameController$ extends BusinessTradeNameController(
@@ -54,14 +54,14 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessTradeNameController.businessTradeNameKey)(
           Right(Some(testValidBusinessTradeNameModel))
         )
-        val result = TestBusinessTradeNameController$.show()(FakeRequest())
+        val result = TestBusinessTradeNameController$.show(isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessTradeNameController.businessTradeNameKey)(Right(None))
-        val result = TestBusinessTradeNameController$.show()(FakeRequest())
+        val result = TestBusinessTradeNameController$.show(isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -70,19 +70,19 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       "the connector returns an error" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessTradeNameController.businessTradeNameKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestBusinessTradeNameController$.show()(FakeRequest())))
+        intercept[InternalServerException](await(TestBusinessTradeNameController$.show(isEditMode = false)(FakeRequest())))
       }
     }
 
   }
 
-  "Submit" should {
+  "Submit - it is not in edit mode" should {
 
     "return 303, SEE_OTHER)" when {
       "the user submits valid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessTradeNameController$.submit()(
+        val result = TestBusinessTradeNameController$.submit(isEditMode = false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
         status(result) mustBe SEE_OTHER
@@ -93,9 +93,37 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       "the user submits invalid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, testInvalidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessTradeNameController$.submit()(FakeRequest())
+        val result = TestBusinessTradeNameController$.submit(isEditMode = false)(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
+      }
+    }
+  }
+
+  "Submit - it is in edit mode" should {
+
+    s"return a redirect status (SEE_OTHER - 303) to '${uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url}" when {
+      "the user submits valid data" in {
+        mockAuthSuccess()
+        mockSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessTradeNameController$.submit(isEditMode = true)(
+          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url)
+      }
+    }
+  }
+
+  "The back url" when {
+    "in edit mode" should {
+      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
+        TestBusinessTradeNameController$.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      }
+    }
+    "not in edit mode" should {
+      s"redirect to ${routes.BusinessNameController.show().url}" in {
+        TestBusinessTradeNameController$.backUrl(isEditMode = false) mustBe routes.BusinessNameController.show().url
       }
     }
   }

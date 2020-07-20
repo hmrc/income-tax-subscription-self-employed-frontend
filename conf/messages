@@ -11,6 +11,7 @@ base.userResearch.title                                         = Help to improv
 base.userResearch.link                                          = Answer some questions about yourself to join the research panel
 base.title.error                                                = Error: {0}
 base.change                                                     = Change
+base.update                                                     = Update
 
 # Business start date
 business.start_date.title                                       = When did your business start trading?

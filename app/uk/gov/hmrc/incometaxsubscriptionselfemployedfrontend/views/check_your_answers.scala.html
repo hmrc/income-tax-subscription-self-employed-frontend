@@ -54,7 +54,7 @@
 @businessTrade = @{
     val question: String = messages("check_your_answers.business_trade")
     val answer: String = answers.businessTradeName.businessTradeName
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(/*isEditMode = true*/).url
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(isEditMode = true).url
     summaryRow(question, answer, Some(changeUrl))
 }
 

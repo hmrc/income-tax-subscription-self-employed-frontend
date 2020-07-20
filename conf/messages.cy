@@ -2,6 +2,7 @@
 base.service_name                                               = Rhoi gwybod am eich incwm a’ch treuliau bob chwarter
 base.back                                                       = Yn ôl
 base.continue                                                   = Yn eich blaen
+base.update                                                     = Diweddaru
 base.sign-out                                                   = Allgofnodi
 base.day                                                        = Diwrnod
 base.month                                                      = Mis
