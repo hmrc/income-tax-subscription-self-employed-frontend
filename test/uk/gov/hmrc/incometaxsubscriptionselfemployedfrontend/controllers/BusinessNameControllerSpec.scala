@@ -32,10 +32,13 @@ import scala.concurrent.Future
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
   with MockIncomeTaxSubscriptionConnector {
+
+  val id: String = "testId"
+
   override val controllerName: String = "BusinessNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessNameController$.show(false),
-    "submit" -> TestBusinessNameController$.submit(false)
+    "show" -> TestBusinessNameController$.show(id, false),
+    "submit" -> TestBusinessNameController$.submit(id, false)
   )
 
   object TestBusinessNameController$ extends BusinessNameController(
@@ -55,7 +58,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessNameController.businessNameKey)(
           Right(Some(BusinessNameModel("Business")))
         )
-        val result = TestBusinessNameController$.show(false)(FakeRequest())
+        val result = TestBusinessNameController$.show(id, false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -64,7 +67,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessNameController.businessNameKey)(
           Right(Some(BusinessNameModel("")))
         )
-        val result = TestBusinessNameController$.show(false)(FakeRequest())
+        val result = TestBusinessNameController$.show(id, false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -75,7 +78,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessNameController.businessNameKey)(
           Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
-        intercept[InternalServerException](await(TestBusinessNameController$.show(false)(FakeRequest())))
+        intercept[InternalServerException](await(TestBusinessNameController$.show(id, false)(FakeRequest())))
       }
 
     }
@@ -86,20 +89,20 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       "the connector has data to save and not in edit mode" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessNameController.businessNameKey, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessNameController$.submit(false)(FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+        val result = TestBusinessNameController$.submit(id, false)(FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
         )
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
 
       }
 
       "the connector has data to save and is in edit mode" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessNameController.businessNameKey, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessNameController$.submit(true)(FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+        val result = TestBusinessNameController$.submit(id, true)(FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
         )
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show(id).url)
 
       }
     }
@@ -108,7 +111,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       "the connector has no data to save" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessNameController.businessNameKey, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessNameController$.submit(false)(FakeRequest())
+        val result = TestBusinessNameController$.submit(id, false)(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
@@ -118,13 +121,13 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
-        TestBusinessNameController$.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      s"redirect to ${routes.BusinessListCYAController.show(id).url}" in {
+        TestBusinessNameController$.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show(id).url
       }
     }
     "not in edit mode" should {
-      s"redirect to ${routes.BusinessStartDateController.show().url}" in {
-        TestBusinessNameController$.backUrl(isEditMode = false) mustBe routes.BusinessStartDateController.show().url
+      s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
+        TestBusinessNameController$.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
       }
     }
   }

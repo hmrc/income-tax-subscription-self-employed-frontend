@@ -1,19 +1,21 @@
 # Assets
 GET         /assets/*file                       controllers.Assets.at(path="/public", file)
 
-GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.show(isEditMode: Boolean ?= false)
-POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.submit(isEditMode: Boolean ?= false)
+GET        /details                             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.InitialiseController.initialise
 
-GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show(isEditMode: Boolean ?= false)
-POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit(isEditMode: Boolean ?= false)
+GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false)
 
-GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show(isEditMode: Boolean ?= false)
-POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit(isEditMode: Boolean ?= false)
+GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
+
+GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
 
 GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.show
 POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.submit
 
-GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.show
+GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.show(id: String)
 
 GET        /language/:lang                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.LanguageSwitchController.switchToLanguage(lang: String)
 

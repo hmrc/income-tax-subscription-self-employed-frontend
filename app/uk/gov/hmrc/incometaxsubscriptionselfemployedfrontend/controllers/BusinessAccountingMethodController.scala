@@ -76,7 +76,7 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
   }
 
   def backUrl(): String =
-    routes.BusinessListCYAController.show().url
+    routes.BusinessListCYAController.show("fakeId" /*TODO To be Removed when no longer used in CYA url */).url
 }
 
 object BusinessAccountingMethodController {

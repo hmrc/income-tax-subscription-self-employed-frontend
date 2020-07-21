@@ -26,6 +26,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.Busines
 
 class BusinessTradeNameControllerISpec extends ComponentSpecBase {
 
+  val businessId: String = "testId"
+
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
 
@@ -36,7 +38,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments(BusinessTradeNameController.businessTradeNameKey)(NO_CONTENT)
 
         When("GET /details/business-trade is called")
-        val res = getBusinessTradeName()
+        val res = getBusinessTradeName(businessId)
 
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
@@ -54,7 +56,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments(BusinessTradeNameController.businessTradeNameKey)(OK, Json.toJson(testValidBusinessTradeNameModel))
 
         When("GET /details/business-trade is called")
-        val res = getBusinessTradeName()
+        val res = getBusinessTradeName(businessId)
 
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
@@ -75,7 +77,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testValidBusinessTradeNameModel))(OK)
 
         When("POST /details/business-trade is called")
-        val res = submitBusinessTradeName(inEditMode = false, Some(testValidBusinessTradeNameModel))
+        val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
 
 
         Then("Should return a SEE_OTHER")
@@ -90,7 +92,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testInvalidBusinessTradeNameModel))(OK)
 
         When("POST /details/business-trade is called")
-        val res = submitBusinessTradeName(inEditMode = false, Some(testInvalidBusinessTradeNameModel))
+        val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testInvalidBusinessTradeNameModel))
 
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
@@ -110,7 +112,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
           stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testValidBusinessTradeNameModel))(OK)
 
           When("POST /details/business-trade is called")
-          val res = submitBusinessTradeName(inEditMode = true, Some(testValidBusinessTradeNameModel))
+          val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testValidBusinessTradeNameModel))
 
 
           Then(s"Should return a $SEE_OTHER with a redirect location of check your answers")
@@ -127,7 +129,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
           stubSaveSelfEmployments(BusinessTradeNameController.businessTradeNameKey, Json.toJson(testInvalidBusinessTradeNameModel))(OK)
 
           When("POST /details/business-trade is called")
-          val res = submitBusinessTradeName(inEditMode = true, Some(testInvalidBusinessTradeNameModel))
+          val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testInvalidBusinessTradeNameModel))
 
 
           Then("Should return a BAD_REQUEST and THE FORM With errors")

@@ -46,6 +46,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     businessName = BusinessNameModel("ABC Limited"),
     businessTradeName = BusinessTradeNameModel("Plumbing")
   )
+  val id: String = "testId"
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
 
@@ -54,7 +55,8 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       getAllSelfEmploymentModel,
       testCall,
       testBackUrl,
-      implicitDateFormatter
+      implicitDateFormatter,
+      id
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
@@ -87,7 +89,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
         "has a change link" in new Setup {
           val changeLink: Element = document.getSummaryList.getSummaryListRow(1).getSummaryListActions.selectFirst("a")
           changeLink.text mustBe CheckYourAnswersMessages.change
-          changeLink.attr("href") mustBe routes.BusinessStartDateController.show(isEditMode = true).url
+          changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id, isEditMode = true).url
         }
       }
 
@@ -101,7 +103,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
         "has a change link" in new Setup {
           val changeLink: Element = document.getSummaryList.getSummaryListRow(2).getSummaryListActions.selectFirst("a")
           changeLink.text mustBe CheckYourAnswersMessages.change
-          changeLink.attr("href") mustBe routes.BusinessNameController.show(isEditMode = true).url
+          changeLink.attr("href") mustBe routes.BusinessNameController.show(id, isEditMode = true).url
         }
       }
 
@@ -115,7 +117,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
         "has a change link" in new Setup {
           val changeLink: Element = document.getSummaryList.getSummaryListRow(3).getSummaryListActions.selectFirst("a")
           changeLink.text mustBe CheckYourAnswersMessages.change
-          changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(isEditMode = true).url
+          changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id, isEditMode = true).url
         }
       }
     }
