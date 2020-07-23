@@ -78,7 +78,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     ws.url(s"http://localhost:${portNumber.value}$baseUrl$path").withFollowRedirects(false)
 
 
-  def getBusinessStartDate(id: String): WSResponse = get("/details/business-start-date?id=$id")
+  def getBusinessStartDate(id: String): WSResponse = get(s"/details/business-start-date?id=$id")
 
 
   def submitBusinessStartDate(request: Option[BusinessStartDate], id: String, inEditMode: Boolean = false): WSResponse = {

@@ -26,19 +26,5 @@ object IntegrationTestConstants {
         }""")
   }
 
-  val testStartDate: DateModel = DateModel.dateConvert(LocalDate.now)
-  val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
-  val testBusinessStartDateModel = BusinessStartDate(testStartDate)
-  val testValidBusinessStartDateModel = BusinessStartDate(testValidStartDate)
-
-  val testBusinessName: String = "businessName"
-  val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
-  val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
-
-  val testValidBusinessTradeName: String = "Plumbing"
-  val testInvalidBusinessTradeName: String = "!()+{}?^~"
-  val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
-  val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
-
   val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
 }

@@ -20,6 +20,7 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
@@ -32,11 +33,11 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessAccountingMethodController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessAccountingMethodController$.show(),
-    "submit" -> TestBusinessAccountingMethodController$.submit()
+    "show" -> TestBusinessAccountingMethodController.show(),
+    "submit" -> TestBusinessAccountingMethodController.submit()
   )
 
-  object TestBusinessAccountingMethodController$ extends BusinessAccountingMethodController(
+  object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
     mockMessagesControllerComponents,
     mockIncomeTaxSubscriptionConnector,
     mockAuthService
@@ -51,17 +52,17 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return ok (200)" when {
       "the connector returns data" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(
+        mockGetSelfEmployments(businessAccountingMethodKey)(
           Right(Some(testAccountingMethodModel))
         )
-        val result = TestBusinessAccountingMethodController$.show()(FakeRequest())
+        val result = TestBusinessAccountingMethodController.show()(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Right(None))
-        val result = TestBusinessAccountingMethodController$.show()(FakeRequest())
+        mockGetSelfEmployments(businessAccountingMethodKey)(Right(None))
+        val result = TestBusinessAccountingMethodController.show()(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -69,16 +70,16 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "Throw an internal exception" when {
       "there is an unexpected status failure" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show()(FakeRequest())))
-        response.message mustBe("[BusinessAccountingMethodController][show] - Unexpected status: 500")
+        mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show()(FakeRequest())))
+        response.message mustBe ("[BusinessAccountingMethodController][show] - Unexpected status: 500")
       }
 
       "there is an invalid Json" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(InvalidJson))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show()(FakeRequest())))
-        response.message mustBe("[BusinessAccountingMethodController][show] - Invalid Json")
+        mockGetSelfEmployments(businessAccountingMethodKey)(Left(InvalidJson))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show()(FakeRequest())))
+        response.message mustBe ("[BusinessAccountingMethodController][show] - Invalid Json")
       }
     }
 
@@ -89,9 +90,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER)" when {
       "the user submits valid data" in {
         mockAuthSuccess()
-        mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController$.submit()(
+        mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessAccountingMethodController.submit()(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
         )
         status(result) mustBe SEE_OTHER
@@ -102,9 +102,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
-        mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          "invalid")(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController$.submit()(FakeRequest())
+        mockSaveSelfEmployments(businessAccountingMethodKey, "invalid")(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessAccountingMethodController.submit()(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
@@ -114,7 +113,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   "The back url" should {
     "return a url for the business trade name page" in {
       mockAuthSuccess()
-      TestBusinessAccountingMethodController$.backUrl() mustBe routes.BusinessListCYAController.show("fakeId").url
+      TestBusinessAccountingMethodController.backUrl() mustBe routes.BusinessListCYAController.show().url
     }
   }
   authorisationTests()

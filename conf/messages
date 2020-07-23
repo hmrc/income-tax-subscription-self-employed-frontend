@@ -67,7 +67,7 @@ business.accounting_method.accruals                             = <span class="h
 # Check your answers
 check_your_answers.title                                        = Check your answers
 check_your_answers.heading                                      = Check your answers
-check_your_answers.sub_heading                                  = Business 1
+check_your_answers.sub_heading                                  = Business {0}
 check_your_answers.trading_start_date                           = Trading start date of business
 check_your_answers.business_name                                = Business name
 check_your_answers.business_trade                               = Business trade

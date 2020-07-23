@@ -18,7 +18,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 
 import java.time.LocalDate
 
-import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 object TestModels {
@@ -32,14 +31,6 @@ object TestModels {
   val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
   val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
 
-  val testGetAllSelfEmploymentModel: GetAllSelfEmploymentModel = GetAllSelfEmploymentModel(
-    businessStartDate = testBusinessStartDateModel,
-    businessName = testBusinessNameModel,
-    businessTradeName = testValidBusinessTradeNameModel
-  )
-  val testGetAllSelfEmploymentModelJsValue: JsValue = Json.toJsObject(testGetAllSelfEmploymentModel)
-
-  val mockBusinessNameModel = BusinessNameModel("ITSA me, Mario")
-
+  val mockBusinessNameModel: BusinessNameModel = BusinessNameModel("ITSA me, Mario")
 
 }

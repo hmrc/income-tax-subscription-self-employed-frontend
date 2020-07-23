@@ -22,25 +22,25 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testBusinessStartDateModel
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
-  with MockIncomeTaxSubscriptionConnector {
+  with MockMultipleSelfEmploymentsService {
 
   val id: String = "testId"
 
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessStartBusinessStartDateController$.show(id, isEditMode = false),
-    "submit" -> TestBusinessStartBusinessStartDateController$.submit(id, isEditMode = false)
+    "show" -> TestBusinessStartDateController.show(id, isEditMode = false),
+    "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false)
   )
 
-  object TestBusinessStartBusinessStartDateController$ extends BusinessStartDateController(
+  object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
-    mockIncomeTaxSubscriptionConnector,
+    mockMultipleSelfEmploymentsService,
     mockAuthService, mockLanguageUtils
   )
 
@@ -48,31 +48,46 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     BusinessStartDateForm.businessStartDateForm("error").fill(businessStartDateModel).data.toSeq
   }
 
+  def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
+    id = id,
+    businessStartDate = Some(BusinessStartDate(DateModel("8", "8", "2016"))),
+    businessName = Some(BusinessNameModel("testBusinessName")),
+    businessTradeName = Some(BusinessTradeNameModel("testTrade"))
+  )
+
   "Show" should {
 
     "return ok (200)" when {
       "the connector returns data" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(
+        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
+        mockFetchBusinessStartDate(id)(
           Right(Some(BusinessStartDate(DateModel("01", "01", "2000"))))
         )
-        val result = TestBusinessStartBusinessStartDateController$.show(id, isEditMode = false)(FakeRequest())
+        val result = TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Right(None))
-        val result = TestBusinessStartBusinessStartDateController$.show(id, isEditMode = false)(FakeRequest())
+        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
+        mockFetchBusinessStartDate(id)(Right(None))
+        val result = TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
     }
     "Throw an internal exception error" when {
-      "the connector returns an error" in {
+      "the connector returns an error fetching all businesses" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestBusinessStartBusinessStartDateController$.show(id, false)(FakeRequest())))
+        mockFetchAllBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())))
+      }
+      "the connector returns an error fetching the business start date" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
+        mockFetchBusinessStartDate(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())))
       }
     }
 
@@ -83,8 +98,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "return 303, SEE_OTHER)" when {
         "the user submits valid data" in {
           mockAuthSuccess()
-          mockSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestBusinessStartBusinessStartDateController$.submit(id, isEditMode = false)(
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
             FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
           status(result) mustBe SEE_OTHER
@@ -96,46 +111,52 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "return 303, SEE_OTHER)" when {
         "the user submits valid data" in {
           mockAuthSuccess()
-          mockSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestBusinessStartBusinessStartDateController$.submit(id, isEditMode = true)(
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          val result = TestBusinessStartDateController.submit(id, isEditMode = true)(
             FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show(id).url)
+          redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url)
         }
       }
     }
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
-        mockSaveSelfEmployments(BusinessStartDateController.businessStartDateKey, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessStartBusinessStartDateController$.submit(id, false)(FakeRequest())
+        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
+        mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessStartDateController.submit(id, isEditMode = false)(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
     }
   }
 
-  "The back url" when {
-    "not in edit mode" when {
-      s"point to what-year-to-sign-up page" in {
-        mockAuthSuccess()
-        mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Right(None))
-        TestBusinessStartBusinessStartDateController$.backUrl(id, isEditMode = false) contains
-          "/report-quarterly/income-and-expenses/sign-up/business/what-year-to-sign-up"
-
+  "The back url" should {
+    "go to the check your answers page" when {
+      "in edit mode" in {
+        TestBusinessStartDateController.backUrl(id, Nil, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      }
+      "the business is not the first complete entered business" in {
+        val businesses: Seq[SelfEmploymentData] = Seq(
+          selfEmploymentData("testIdOne"),
+          selfEmploymentData("testIdTwo")
+        )
+        TestBusinessStartDateController.backUrl("testIdTwo", businesses, isEditMode = false) mustBe routes.BusinessListCYAController.show().url
       }
     }
-    "in edit mode" when {
-      s"point to what-year-to-sign-up page" in {
-        mockAuthSuccess()
-        mockGetSelfEmployments(BusinessStartDateController.businessStartDateKey)(Right(None))
-        TestBusinessStartBusinessStartDateController$.backUrl(id, isEditMode = true) mustBe
-          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show(id).url
+    "go to the what year to sign up page" when {
+      "not in edit mode and the business is the first complete entered business" in {
+        val businesses: Seq[SelfEmploymentData] = Seq(
+          selfEmploymentData("testIdOne"),
+          selfEmploymentData("testIdTwo")
+        )
+        TestBusinessStartDateController.backUrl("testIdOne", businesses, isEditMode = false) must contain
+        "/report-quarterly/income-and-expenses/sign-up/business/what-year-to-sign-up"
       }
     }
   }
-  authorisationTests()
 
+  authorisationTests()
 
 }

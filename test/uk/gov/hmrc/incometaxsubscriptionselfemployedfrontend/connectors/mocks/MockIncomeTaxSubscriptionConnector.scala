@@ -22,7 +22,6 @@ import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmploymentsHttpParser.GetAllSelfEmploymentResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
@@ -52,8 +51,4 @@ trait MockIncomeTaxSubscriptionConnector extends UnitTestTrait with MockitoSugar
     )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 
-  def mockGetAllSelfEmployments()
-                               (response: GetAllSelfEmploymentResponse): OngoingStubbing[Future[GetAllSelfEmploymentResponse]] = {
-    when(mockIncomeTaxSubscriptionConnector.getAllSelfEmployments()(ArgumentMatchers.any())).thenReturn(Future.successful(response))
-  }
 }
