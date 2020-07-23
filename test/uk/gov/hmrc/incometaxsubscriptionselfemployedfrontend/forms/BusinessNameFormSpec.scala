@@ -22,7 +22,6 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.{Form, FormError}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel._
 
 class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
