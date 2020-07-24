@@ -68,6 +68,9 @@
         @business.businessName.map(name => businessName(name, business.id))
         @business.businessTradeName.map(trade => businessTrade(trade, business.id))
     </dl>
+    <div class="form-group">
+        <a id="remove-business-@businessNumber" href=@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.RemoveBusinessController.show(business.id).url>@messages("check_your_answers.remove_business", businessNumber)</a>
+    </div>
 }
 
 @main_template(title = messages("check_your_answers.title")) {
