@@ -151,8 +151,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           selfEmploymentData("testIdOne"),
           selfEmploymentData("testIdTwo")
         )
-        TestBusinessStartDateController.backUrl("testIdOne", businesses, isEditMode = false) must contain
-        "/report-quarterly/income-and-expenses/sign-up/business/what-year-to-sign-up"
+        TestBusinessStartDateController.backUrl("testIdOne", businesses, isEditMode = false) must include(
+        "/report-quarterly/income-and-expenses/sign-up/business/what-year-to-sign-up")
       }
     }
   }

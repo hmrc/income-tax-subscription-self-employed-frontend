@@ -33,6 +33,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val allSelfEmployedUrl = s"$protectedMicroServiceUrl/income-tax-subscription/self-employments/all"
   lazy val incomeTaxSubscriptionFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-frontend.url")
   lazy val feedbackUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/feedback"
+  lazy val howDoYouReceiveYourIncomeUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
 
   val contactFormServiceIdentifier = "MTDIT"

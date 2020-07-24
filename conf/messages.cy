@@ -70,8 +70,10 @@ check_your_answers.sub_heading                                  = Busnes {0}
 check_your_answers.trading_start_date                           = Dyddiad dechrau masnachu’r busnes
 check_your_answers.business_name                                = Enw’r busnes
 check_your_answers.business_trade                               = Masnach y busnes
+check_your_answers.remove_business                              = Dileu busnes {0}
 
 # Check your answers add another business
 error.add_another_business.limit_reached                        = Gallwch ychwanegu hyd at {0} o fusnesau yn unig
 error.add_another_business.invalid                              = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
 error.add_another_business.empty                                = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
+

@@ -33,6 +33,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     val heading: String = title
 
     def subHeading(businessNumber: Int): String = s"Business $businessNumber"
+    def removeBusiness(businessNumber: Int): String = s"Remove business $businessNumber"
 
     val continue = "Continue"
     val backLink = "Back"
@@ -128,6 +129,14 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1", isEditMode = true).url
           }
         }
+
+        "has a row for the remove business link" which {
+          "has a remove business link" in new Setup {
+            val removeLink: Element = document.getElementById("remove-business-1")
+            removeLink.text mustBe CheckYourAnswersMessages.removeBusiness(1)
+            removeLink.attr("href") mustBe routes.RemoveBusinessController.show("1").url
+          }
+        }
       }
     }
 
@@ -178,6 +187,14 @@ class CheckYourAnswersViewSpec extends ViewSpec {
               changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1", isEditMode = true).url
             }
           }
+
+          "has a row for the remove business link" which {
+            "has a remove business link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val removeLink: Element = document.getElementById("remove-business-1")
+              removeLink.text mustBe CheckYourAnswersMessages.removeBusiness(1)
+              removeLink.attr("href") mustBe routes.RemoveBusinessController.show("1").url
+            }
+          }
         }
       }
       "for the second business" should {
@@ -224,6 +241,14 @@ class CheckYourAnswersViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(3).getSummaryListActions.selectFirst("a")
               changeLink.text mustBe CheckYourAnswersMessages.change
               changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "2", isEditMode = true).url
+            }
+          }
+
+          "has a row for the remove business link" which {
+            "has a remove business link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val removeLink: Element = document.getElementById("remove-business-2")
+              removeLink.text mustBe CheckYourAnswersMessages.removeBusiness(2)
+              removeLink.attr("href") mustBe routes.RemoveBusinessController.show("2").url
             }
           }
         }
