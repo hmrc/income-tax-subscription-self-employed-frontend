@@ -17,7 +17,8 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils
 
 import play.api.data.validation._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessAccountingMethodForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.AddAnotherBusinessForm.addAnotherBusinessForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.{AddAnotherBusinessForm, BusinessAccountingMethodForm}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.DateMapping._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessTradeNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.ConstraintUtil._
@@ -39,6 +40,8 @@ object DataMap {
     val emptyDate: String => DataMap = (prefix: String) => date(prefix)("", "", "")
 
     val alwaysFailInvalid: Invalid = Invalid("always fail")
+
+    def addAnotherBusiness(value: String): DataMap = Map(AddAnotherBusinessForm.addAnotherBusiness -> value)
 
     def businessTradeNameMap(name: String): DataMap = Map(businessTradeName -> name)
 
