@@ -40,16 +40,10 @@ class BusinessListCYAController @Inject()(authService: AuthService,
                                          (implicit val ec: ExecutionContext, val appConfig: AppConfig, dateFormatter: ImplicitDateFormatterImpl)
   extends FrontendController(mcc) with I18nSupport {
 
-  def backUrl(businesses: Seq[SelfEmploymentData]): String = {
-    val lastCompleteBusinessId: String = businesses.filter(_.isComplete).last.id
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(lastCompleteBusinessId).url
-  }
-
   def view(businesses: Seq[SelfEmploymentData])(implicit request: Request[AnyContent]): Html = {
     check_your_answers(
       answers = businesses,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.show(),
-      backUrl = backUrl(businesses),
       implicitDateFormatter = dateFormatter
     )
   }

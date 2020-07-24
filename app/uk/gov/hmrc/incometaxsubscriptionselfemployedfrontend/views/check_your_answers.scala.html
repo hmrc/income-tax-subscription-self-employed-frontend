@@ -24,7 +24,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 
-@(answers: Seq[SelfEmploymentData], postAction: Call, backUrl: String, implicitDateFormatter: ImplicitDateFormatter)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(answers: Seq[SelfEmploymentData], postAction: Call, implicitDateFormatter: ImplicitDateFormatter)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @summaryRow(question: String, answer: String, changeUrl: Option[String]) = {
     <div class="govuk-summary-list__row">
@@ -71,8 +71,6 @@
 }
 
 @main_template(title = messages("check_your_answers.title")) {
-
-    @back_link(backUrl)
 
     <h1 class="heading-large">@messages("check_your_answers.heading")</h1>
 
