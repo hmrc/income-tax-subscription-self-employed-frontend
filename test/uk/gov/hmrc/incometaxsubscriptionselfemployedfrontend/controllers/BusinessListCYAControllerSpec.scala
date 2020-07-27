@@ -107,30 +107,6 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
 
   }
 
-  "the back url" should {
-    "return the business trade name url with the id of the completed business" when {
-      "there is a single business" in {
-        val businesses: Seq[SelfEmploymentData] = Seq(businessData)
-        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessData.id).url
-      }
-      "there are multiple businesses" in {
-        val businessOne: SelfEmploymentData = businessData.copy(id = "testIdOne")
-        val businessTwo: SelfEmploymentData = businessData.copy(id = "testIdTwo")
-        val businesses: Seq[SelfEmploymentData] = Seq(businessOne, businessTwo)
-
-        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessTwo.id).url
-      }
-      "there are unfinished businesses" in {
-        val businessOne: SelfEmploymentData = businessData.copy(id = "testIdOne")
-        val businessTwo: SelfEmploymentData = businessData.copy(id = "testIdTwo", businessTradeName = None)
-        val businesses: Seq[SelfEmploymentData] = Seq(businessOne, businessTwo)
-
-        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessOne.id).url
-      }
-
-    }
-  }
-
   authorisationTests()
 
 }

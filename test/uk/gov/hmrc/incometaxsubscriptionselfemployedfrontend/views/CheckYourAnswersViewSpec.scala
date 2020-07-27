@@ -43,9 +43,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     val businessTrade = "Business trade"
   }
 
-  val backUrl: String = testBackUrl
-  val action: Call = testCall
-
   def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
     id = id,
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
@@ -59,7 +56,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     val page: HtmlFormat.Appendable = check_your_answers(
       businesses,
       testCall,
-      testBackUrl,
       implicitDateFormatter
     )(FakeRequest(), implicitly, appConfig)
 
@@ -257,11 +253,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
     "have a continue button" in new Setup {
       document.getSubmitButton.text mustBe CheckYourAnswersMessages.continue
-    }
-
-    "have a backlink" in new Setup {
-      document.getBackLink.text mustBe CheckYourAnswersMessages.backLink
-      document.getBackLink.attr("href") mustBe testBackUrl
     }
 
   }
