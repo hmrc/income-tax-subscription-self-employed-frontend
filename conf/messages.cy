@@ -12,6 +12,8 @@ base.userResearch.title                                         = Helpu i wella 
 base.userResearch.link                                          = Atebwch ychydig o gwestiynau am eich hunan er mwyn ymuno â’r panel ymchwil
 base.title.error                                                = Error: {0}
 base.change                                                     = Newid
+base.yes                                                        = Iawn
+base.no                                                         = Na
 
 # Business start date
 business.start_date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
@@ -71,6 +73,7 @@ check_your_answers.trading_start_date                           = Dyddiad dechra
 check_your_answers.business_name                                = Enw’r busnes
 check_your_answers.business_trade                               = Masnach y busnes
 check_your_answers.remove_business                              = Dileu busnes {0}
+check_your_answers.add_another_business_heading                 = A hoffech ychwanegu busnes unig fasnachwr arall?
 
 # Check your answers add another business
 error.add_another_business.limit_reached                        = Gallwch ychwanegu hyd at {0} o fusnesau yn unig

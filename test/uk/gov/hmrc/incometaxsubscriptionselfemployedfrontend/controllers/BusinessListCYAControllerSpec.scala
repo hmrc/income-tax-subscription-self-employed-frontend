@@ -23,6 +23,8 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.AddAnotherBusinessForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 
 import scala.concurrent.Future
@@ -105,6 +107,105 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
       }
     }
 
+  }
+
+  "submit" should {
+    "return 303, SEE_OTHER" when {
+      "the connector returns successful json and submit with Yes option redirect to Initialise controller" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(Some(Seq(
+          businessData
+        ))))
+
+        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+          .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_yes))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+
+      }
+
+      "the connector returns successful json and submit with No option redirect to Business Accounting method page" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(Some(Seq(
+          businessData
+        ))))
+
+        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+          .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_no))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessAccountingMethodController.show().url)
+      }
+
+    }
+
+    "return (303) redirect to business start date page" when {
+      "no businesses are returned" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(None))
+
+        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+          .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_no))
+        status(result) mustBe 303
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+      }
+      "no complete businesses are returned" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(Some(Seq(
+          businessData.copy(businessName = None)
+        ))))
+
+        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+          .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_no))
+        status(result) mustBe 303
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+      }
+    }
+
+    "throw an internal server error" when {
+      "there is an unexpected status failure" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.submit()(FakeRequest())))
+        response.message mustBe "[BusinessListCYAController][submit] - getSelfEmployments connection failure, status: 500"
+      }
+
+      "the connector returns an invalid Json" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(InvalidJson))
+
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.submit()(FakeRequest()
+          .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_yes))))
+        response.message mustBe ("[BusinessListCYAController][submit] - Invalid Json")
+      }
+    }
+
+  }
+
+  "the back url" should {
+    "return the business trade name url with the id of the completed business" when {
+      "there is a single business" in {
+        val businesses: Seq[SelfEmploymentData] = Seq(businessData)
+        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessData.id).url
+      }
+      "there are multiple businesses" in {
+        val businessOne: SelfEmploymentData = businessData.copy(id = "testIdOne")
+        val businessTwo: SelfEmploymentData = businessData.copy(id = "testIdTwo")
+        val businesses: Seq[SelfEmploymentData] = Seq(businessOne, businessTwo)
+
+        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessTwo.id).url
+      }
+      "there are unfinished businesses" in {
+        val businessOne: SelfEmploymentData = businessData.copy(id = "testIdOne")
+        val businessTwo: SelfEmploymentData = businessData.copy(id = "testIdTwo", businessTradeName = None)
+        val businesses: Seq[SelfEmploymentData] = Seq(businessOne, businessTwo)
+
+        TestBusinessListCYAController.backUrl(businesses) mustBe routes.BusinessTradeNameController.show(businessOne.id).url
+      }
+
+    }
   }
 
   authorisationTests()

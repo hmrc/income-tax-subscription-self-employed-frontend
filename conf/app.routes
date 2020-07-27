@@ -16,6 +16,7 @@ GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptio
 POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.submit
 
 GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.show
+POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.submit
 
 GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.RemoveBusinessController.show(id: String)
 

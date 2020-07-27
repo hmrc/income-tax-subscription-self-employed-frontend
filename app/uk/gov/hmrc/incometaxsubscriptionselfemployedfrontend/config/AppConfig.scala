@@ -35,6 +35,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val feedbackUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/feedback"
   lazy val howDoYouReceiveYourIncomeUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
+  lazy val limitOnNumberOfBusinesses = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
 
   val contactFormServiceIdentifier = "MTDIT"
   val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")

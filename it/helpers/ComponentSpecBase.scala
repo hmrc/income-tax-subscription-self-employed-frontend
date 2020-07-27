@@ -136,6 +136,21 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getCheckYourAnswers: WSResponse = get(s"/details/business-list")
+
+  def submitCheckYourAnswers(request: Option[AddAnotherBusinessModel],
+                             currentBusinesses: Int,
+                             limit: Int
+                            ): WSResponse = {
+    val uri = s"/details/business-list"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          AddAnotherBusinessForm.addAnotherBusinessForm(currentBusinesses,limit).fill(model).data.map { case (k, v) => (k, Seq(v)) }
+      )
+    )
+  }
+
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim
 
