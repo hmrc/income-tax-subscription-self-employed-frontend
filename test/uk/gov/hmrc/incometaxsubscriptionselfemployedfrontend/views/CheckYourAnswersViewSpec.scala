@@ -38,7 +38,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     def removeBusiness(businessNumber: Int): String = s"Remove business $businessNumber"
 
     val continue = "Continue"
-    val backLink = "Back"
     val change = "Change"
     val tradingStartDate = "Trading start date of business"
     val businessName = "Business name"
@@ -47,9 +46,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     val yes = "Yes"
     val no = "No"
   }
-
-  val backUrl: String = testBackUrl
-  val action: Call = testCall
 
   def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
     id = id,
@@ -61,14 +57,11 @@ class CheckYourAnswersViewSpec extends ViewSpec {
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
 
   class Setup(addAnotherForm: Form[AddAnotherBusinessModel] = AddAnotherBusinessForm.addAnotherBusinessForm(1,5),
-              businesses: Seq[SelfEmploymentData] = Seq(selfEmploymentData("1")),
-              limit: Int = 5) {
+              businesses: Seq[SelfEmploymentData] = Seq(selfEmploymentData("1"))) {
     val page: HtmlFormat.Appendable = check_your_answers(
       addAnotherForm,
       businesses,
-      limit,
       testCall,
-      testBackUrl,
       implicitDateFormatter
     )(FakeRequest(), implicitly, appConfig)
 
@@ -304,11 +297,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
     "have a continue button" in new Setup {
       document.getSubmitButton.text mustBe CheckYourAnswersMessages.continue
-    }
-
-    "have a backlink" in new Setup {
-      document.getBackLink.text mustBe CheckYourAnswersMessages.backLink
-      document.getBackLink.attr("href") mustBe testBackUrl
     }
 
   }
