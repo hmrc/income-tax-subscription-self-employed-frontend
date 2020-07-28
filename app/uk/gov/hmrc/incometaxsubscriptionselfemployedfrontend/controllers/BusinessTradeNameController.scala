@@ -19,13 +19,13 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc._
 import play.twirl.api.Html
-import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessTradeNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessTradeNameModel, SelfEmploymentData}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_trade_name
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -50,25 +50,39 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      multipleSelfEmploymentsService.fetchBusinessTrade(id).map {
-        case Right(businessTradeName) =>
-          Ok(view(businessTradeNameValidationForm.fill(businessTradeName), id, isEditMode = isEditMode))
-        case error => throw new InternalServerException(error.toString)
+      withAllBusinesses { businesses =>
+        val currentBusiness = businesses.find(_.id == id)
+        (currentBusiness.flatMap(_.businessName), currentBusiness.flatMap(_.businessTradeName)) match {
+          case (Some(name), trade) => Future.successful(Ok(view(businessTradeNameValidationForm(name.businessName, businesses).fill(trade), id, isEditMode)))
+          case (None, _) => Future.successful(Redirect(routes.BusinessNameController.show(id)))
+        }
       }
     }
   }
 
+  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async {
+    implicit request =>
+      authService.authorised() {
+        withAllBusinesses { businesses =>
+          businesses.find(_.id == id).flatMap(_.businessName) match {
+            case Some(name) => businessTradeNameValidationForm(name.businessName, businesses).bindFromRequest.fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
+              businessTradeName =>
+                multipleSelfEmploymentsService.saveBusinessTrade(id, businessTradeName).map(_ =>
+                  Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
+                )
+            )
+            case None => Future.successful(Redirect(routes.BusinessNameController.show(id)))
+          }
+        }
+      }
+  }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      businessTradeNameValidationForm.bindFromRequest.fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
-        businessTradeName =>
-          multipleSelfEmploymentsService.saveBusinessTrade(id, businessTradeName).map(_ =>
-            Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
-          )
-      )
+  private def withAllBusinesses(f: Seq[SelfEmploymentData] => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
+    multipleSelfEmploymentsService.fetchAllBusinesses.flatMap {
+      case Right(businesses) => f(businesses)
+      case Left(error) => throw new InternalServerException(s"[BusinessTradeNameController][withAllBusinesses] - Error retrieving businesses, error: $error")
     }
   }
 
