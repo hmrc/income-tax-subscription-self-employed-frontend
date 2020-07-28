@@ -113,7 +113,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
-          BusinessTradeNameForm.businessTradeNameValidationForm.fill(model).data.map {
+          BusinessTradeNameForm.businessTradeNameValidationForm("", Nil).fill(model).data.map {
             case (k, v) =>
               (k, Seq(v))
           }
@@ -132,6 +132,21 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
             case (k, v) =>
               (k, Seq(v))
           }
+      )
+    )
+  }
+
+  def getCheckYourAnswers: WSResponse = get(s"/details/business-list")
+
+  def submitCheckYourAnswers(request: Option[AddAnotherBusinessModel],
+                             currentBusinesses: Int,
+                             limit: Int
+                            ): WSResponse = {
+    val uri = s"/details/business-list"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          AddAnotherBusinessForm.addAnotherBusinessForm(currentBusinesses,limit).fill(model).data.map { case (k, v) => (k, Seq(v)) }
       )
     )
   }

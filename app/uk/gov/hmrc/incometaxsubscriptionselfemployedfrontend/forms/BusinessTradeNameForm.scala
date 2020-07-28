@@ -18,11 +18,11 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import play.api.data.validation.Constraint
+import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.StringConstraints._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.MappingUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.ConstraintUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.MappingUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessTradeNameModel, SelfEmploymentData}
 
 object BusinessTradeNameForm {
 
@@ -30,16 +30,30 @@ object BusinessTradeNameForm {
 
   val businessTradeNameMaxLength = 160
 
-  val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength,
-    "error.business_trade_name.maxLength")
+  val tradeNameEmpty: Constraint[String] = nonEmpty("error.business_trade_name.empty")
+  val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.business_trade_name.maxLength")
+  val tradeNameInvalidCharacters: Constraint[String] = validateChar("error.business_trade_name.invalid")
 
+  def duplicateNameTrade(businessName: String, businesses: Seq[SelfEmploymentData]): Constraint[String] = constraint[String] { trade =>
 
-  val businessTradeNameValidationForm = Form(
+    val hasDuplicateNameTrade: Boolean = businesses.exists(business =>
+      business.businessName.exists(_.businessName == businessName) &&
+        business.businessTradeName.exists(_.businessTradeName == trade)
+    )
+
+    if (hasDuplicateNameTrade) {
+      Invalid("error.business_trade_name.duplicate")
+    } else {
+      Valid
+    }
+
+  }
+
+  def businessTradeNameValidationForm(businessName: String, businesses: Seq[SelfEmploymentData]): Form[BusinessTradeNameModel] = Form(
     mapping(
       businessTradeName -> oText.toText.verifying(
-        nonEmpty("error.business_trade_name.empty") andThen
-          nameTooLong andThen
-          validateChar("error.business_trade_name.invalid"))
+        tradeNameEmpty andThen nameTooLong andThen tradeNameInvalidCharacters andThen duplicateNameTrade(businessName, businesses)
+      )
     )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
   )
 }

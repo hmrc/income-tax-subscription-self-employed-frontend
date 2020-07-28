@@ -32,5 +32,7 @@ object TestModels {
   val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
 
   val mockBusinessNameModel: BusinessNameModel = BusinessNameModel("ITSA me, Mario")
+  val mockAddAnotherBusinessModelWithYes: AddAnotherBusinessModel = AddAnotherBusinessModel(Yes)
+  val mockAddAnotherBusinessModelWithNo: AddAnotherBusinessModel = AddAnotherBusinessModel(No)
 
 }

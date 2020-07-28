@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessTradeNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 
@@ -45,7 +45,13 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   )
 
   def modelToFormData(businessTradeNameModel: BusinessTradeNameModel): Seq[(String, String)] = {
-    BusinessTradeNameForm.businessTradeNameValidationForm.fill(businessTradeNameModel).data.toSeq
+    BusinessTradeNameForm.businessTradeNameValidationForm("", Nil).fill(businessTradeNameModel).data.toSeq
+  }
+
+  def testSelfEmploymentData(id: String = id,
+                             businessName: Option[BusinessNameModel] = Some(BusinessNameModel("testName")),
+                             businessTrade: Option[BusinessTradeNameModel] = Some(BusinessTradeNameModel("testTrade"))): SelfEmploymentData = {
+    SelfEmploymentData(id, Some(BusinessStartDate(DateModel("1", "1", "1"))), businessName, businessTrade)
   }
 
   "Show" should {
@@ -53,25 +59,39 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
     "return ok (200)" when {
       "the connector returns data" in {
         mockAuthSuccess()
-        mockFetchBusinessTrade(id)(
-          Right(Some(testValidBusinessTradeNameModel))
-        )
+        mockFetchAllBusinesses(Right(Seq(testSelfEmploymentData())))
+
         val result = TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())
+
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
-      "the connector returns no data" in {
+      "the connector returns data for the current business but with no trade" in {
         mockAuthSuccess()
-        mockFetchBusinessTrade(id)(Right(None))
+        mockFetchAllBusinesses(Right(Seq(testSelfEmploymentData(businessTrade = None))))
+
         val result = TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())
+
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
+      }
+    }
+    "return see other (303)" when {
+      "the connector returns data for the current business but the name is not present" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq(testSelfEmploymentData(businessName = None, businessTrade = None))))
+
+        val result = TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessNameController.show(id).url)
       }
     }
     "Throw an internal exception error" when {
       "the connector returns an error" in {
         mockAuthSuccess()
-        mockFetchBusinessTrade(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchAllBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
         intercept[InternalServerException](await(TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())))
       }
     }
@@ -80,13 +100,27 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   "Submit - it is not in edit mode" should {
 
-    "return 303, SEE_OTHER)" when {
-      "the user submits valid data" in {
+    "return 303, SEE_OTHER" when {
+      "the user has not answered the business name question for the current business" in {
         mockAuthSuccess()
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+        mockFetchAllBusinesses(Right(Seq(testSelfEmploymentData(businessName = None, businessTrade = None))))
+
         val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessNameController.show(id).url)
+      }
+      "the user submits valid data" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq(testSelfEmploymentData(businessTrade = None))))
+        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+
+        val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(
+          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+        )
+
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
       }
@@ -94,8 +128,25 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq(testSelfEmploymentData(businessTrade = None))))
         mockSaveBusinessTrade(id, testInvalidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+
         val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(FakeRequest())
+
+        status(result) mustBe BAD_REQUEST
+        contentType(result) mustBe Some("text/html")
+      }
+      "the user submits a trade which causes a duplicate business name/trade combo" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq(
+          testSelfEmploymentData(id = "idOne", businessName = Some(BusinessNameModel("nameOne")), businessTrade = Some(BusinessTradeNameModel("tradeOne"))),
+          testSelfEmploymentData(id = "idTwo", businessName = Some(BusinessNameModel("nameOne")), businessTrade = None)
+        )))
+
+        val result = TestBusinessTradeNameController.submit("idTwo", isEditMode = false)(
+          FakeRequest().withFormUrlEncodedBody(modelToFormData(BusinessTradeNameModel("tradeOne")): _*)
+        )
+
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
@@ -107,10 +158,13 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
     s"return a redirect to '${routes.BusinessListCYAController.show().url}" when {
       "the user submits valid data" in {
         mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq(testSelfEmploymentData())))
         mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+
         val result = TestBusinessTradeNameController.submit(id, isEditMode = true)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
+
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
       }

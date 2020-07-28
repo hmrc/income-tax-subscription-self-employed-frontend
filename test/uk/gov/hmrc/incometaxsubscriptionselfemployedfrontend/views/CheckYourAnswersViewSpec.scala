@@ -18,10 +18,12 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
+import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.AddAnotherBusinessForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.check_your_answers
@@ -41,7 +43,13 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     val tradingStartDate = "Trading start date of business"
     val businessName = "Business name"
     val businessTrade = "Business trade"
+    val addAnotherBusinessHeading = "Do you want to add another sole trader business?"
+    val yes = "Yes"
+    val no = "No"
   }
+
+  val backUrl: String = testBackUrl
+  val action: Call = testCall
 
   def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
     id = id,
@@ -52,10 +60,15 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
 
-  class Setup(businesses: Seq[SelfEmploymentData] = Seq(selfEmploymentData("1"))) {
+  class Setup(addAnotherForm: Form[AddAnotherBusinessModel] = AddAnotherBusinessForm.addAnotherBusinessForm(1,5),
+              businesses: Seq[SelfEmploymentData] = Seq(selfEmploymentData("1")),
+              limit: Int = 5) {
     val page: HtmlFormat.Appendable = check_your_answers(
+      addAnotherForm,
       businesses,
+      limit,
       testCall,
+      testBackUrl,
       implicitDateFormatter
     )(FakeRequest(), implicitly, appConfig)
 
@@ -251,8 +264,51 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       }
     }
 
+    "has a heading to add another sole trader business" in new Setup {
+      document.getElementById("add-another-business-heading").text mustBe CheckYourAnswersMessages.addAnotherBusinessHeading
+    }
+
+    "have a radioset" which {
+      lazy val radioset = new Setup().document.select("fieldset")
+
+      "has the correct legend" in {
+        radioset.select("legend").text() mustBe CheckYourAnswersMessages.addAnotherBusinessHeading
+      }
+
+      "has only two options" in {
+        radioset.select("div.multiple-choice").size() mustBe 2
+      }
+
+      "has a yes option" which {
+
+        "has the correct label" in {
+          radioset.select("""[for="addAnotherBusiness-Yes"]""").text() mustBe CheckYourAnswersMessages.yes
+        }
+
+        "has the correct value" in {
+          radioset.select("#yes-no").attr("value") mustBe "Yes"
+        }
+      }
+
+      "has a no option" which {
+
+        "has the correct label" in {
+          radioset.select("""[for="addAnotherBusiness-No"]""").text() mustBe CheckYourAnswersMessages.no
+        }
+
+        "has the correct value" in {
+          radioset.select("#yes-no-2").attr("value") mustBe "No"
+        }
+      }
+    }
+
     "have a continue button" in new Setup {
       document.getSubmitButton.text mustBe CheckYourAnswersMessages.continue
+    }
+
+    "have a backlink" in new Setup {
+      document.getBackLink.text mustBe CheckYourAnswersMessages.backLink
+      document.getBackLink.attr("href") mustBe testBackUrl
     }
 
   }

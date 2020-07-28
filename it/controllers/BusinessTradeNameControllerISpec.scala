@@ -23,7 +23,7 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessTradeNameModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, DateModel, SelfEmploymentData}
 
 class BusinessTradeNameControllerISpec extends ComponentSpecBase {
 
@@ -34,15 +34,37 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
   val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
 
-  val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(id = businessId, businessTradeName = Some(testValidBusinessTradeNameModel)))
+  val testBusiness: SelfEmploymentData = SelfEmploymentData(
+    id = businessId,
+    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1"))),
+    businessName = Some(BusinessNameModel("testName")),
+    businessTradeName = Some(testValidBusinessTradeNameModel)
+  )
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
+
+    "the user hasn't entered their business name" should {
+      "redirect to the business name page" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessName = None, businessTradeName = None))))
+
+        When("GET /details/business-trade is called")
+        val res = getBusinessTradeName(businessId)
+
+        Then("should return a SEE_OTHER to the business name page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(BusinessNameUri)
+        )
+      }
+    }
 
     "the Connector receives no content" should {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
 
         When("GET /details/business-trade is called")
         val res = getBusinessTradeName(businessId)
@@ -60,7 +82,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "show the current business trade name page with name values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness)))
 
         When("GET /details/business-trade is called")
         val res = getBusinessTradeName(businessId)
@@ -81,21 +103,42 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
         When("POST /details/business-trade is called")
         val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
 
         Then("Should return a SEE_OTHER")
         res must have(
-          httpStatus(SEE_OTHER)
+          httpStatus(SEE_OTHER),
+          redirectURI(BusinessListCYAUri)
+        )
+      }
+
+      "the form data is valid but is a duplicate submission" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(
+          testBusiness.copy(id = "idOne"),
+          testBusiness.copy(id = "idTwo", businessTradeName = None)
+        )))
+
+
+        When("POST /details/business-trade is called")
+        val res = submitBusinessTradeName("idTwo", inEditMode = false, Some(testValidBusinessTradeNameModel))
+
+        Then("Should return a SEE_OTHER")
+        res must have(
+          httpStatus(BAD_REQUEST),
+          pageTitle("Error: What is the trade of your business?")
         )
       }
 
       "the form data is invalid and connector stores it unsuccessfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
 
         When("POST /details/business-trade is called")
         val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testInvalidBusinessTradeNameModel))
@@ -112,8 +155,8 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
+        stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
         When("POST /details/business-trade is called")
         val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testValidBusinessTradeNameModel))

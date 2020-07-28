@@ -17,6 +17,7 @@ object IntegrationTestConstants {
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
   val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
   val BusinessListCYAUri = s"$baseURI/details/business-list"
+  val InitialiseUri = s"$baseURI/details"
 
   object Auth {
     def idsResponseJson(internalId: String, externalId: String): JsValue = Json.parse(

@@ -19,15 +19,26 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms
 import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.FormError
+import play.api.data.{Form, FormError}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 
 
 class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessTradeNameForm._
+
+  def businessTradeForm(businessName: String = "testName", businesses: Seq[SelfEmploymentData] = Nil): Form[BusinessTradeNameModel] = {
+    businessTradeNameValidationForm(businessName, businesses)
+  }
+
+  def testSelfEmploymentData(id: String, businessName: String, businessTrade: String): SelfEmploymentData = SelfEmploymentData(
+    id,
+    Some(BusinessStartDate(DateModel("1", "1", "1"))),
+    Some(BusinessNameModel(businessName)),
+    Some(BusinessTradeNameModel(businessTrade))
+  )
 
   "The BusinessTradeNameForm" should {
     "transform a valid request to the case class" in {
@@ -36,7 +47,7 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       val expected = BusinessTradeNameModel(testValidBusinessTradeName)
 
-      val actual = businessTradeNameValidationForm.bind(testInput).value
+      val actual = businessTradeForm().bind(testInput).value
 
       actual shouldBe Some(expected)
     }
@@ -48,42 +59,60 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       val empty = "error.business_trade_name.empty"
       val maxLen = "error.business_trade_name.maxLength"
       val invalid = "error.business_trade_name.invalid"
+      val duplicate = "error.business_trade_name.duplicate"
 
       "the map be empty" in {
         val emptyInput0 = DataMap.EmptyMap
-        val emptyTest0 = businessTradeNameValidationForm.bind(emptyInput0)
-        emptyTest0.errors must contain(FormError(businessTradeName,empty))
+        val emptyTest0 = businessTradeForm().bind(emptyInput0)
+        emptyTest0.errors must contain(FormError(businessTradeName, empty))
       }
 
       "the name be empty" in {
         val emptyInput = DataMap.businessTradeNameMap("")
-        val emptyTest = businessTradeNameValidationForm.bind(emptyInput)
-        emptyTest.errors must contain(FormError(businessTradeName,empty))
+        val emptyTest = businessTradeForm().bind(emptyInput)
+        emptyTest.errors must contain(FormError(businessTradeName, empty))
       }
 
       "the name is too long" in {
         val maxLengthInput = DataMap.businessTradeNameMap("a" * maxLength + 1)
-        val maxLengthTest = businessTradeNameValidationForm.bind(maxLengthInput)
-        maxLengthTest.errors must contain(FormError(businessTradeName,maxLen))
+        val maxLengthTest = businessTradeForm().bind(maxLengthInput)
+        maxLengthTest.errors must contain(FormError(businessTradeName, maxLen))
       }
 
       "the name should be invalid" in {
         val invalidInput = DataMap.businessTradeNameMap("!()+{}?^~")
-        val invalidTest = businessTradeNameValidationForm.bind(invalidInput)
-        invalidTest.errors must contain(FormError(businessTradeName,invalid))
+        val invalidTest = businessTradeForm().bind(invalidInput)
+        invalidTest.errors must contain(FormError(businessTradeName, invalid))
       }
 
       "the name is max characters and acceptable" in {
         val withinLimitInput = DataMap.businessTradeNameMap("a" * maxLength)
-        val withinLimitTest = businessTradeNameValidationForm.bind(withinLimitInput)
+        val withinLimitTest = businessTradeForm().bind(withinLimitInput)
         withinLimitTest.value mustNot contain(maxLen)
       }
 
-      "The following submission should be valid" in {
-        val valid = DataMap.businessTradeNameMap("Test business")
-        val result = businessTradeNameValidationForm.bind(valid)
-        result.hasErrors shouldBe false
-        result.hasGlobalErrors shouldBe false
+      "there is another business with the same name and trade" in {
+        val duplicateTrade = DataMap.businessTradeNameMap("tradeOne")
+        val duplicateTest = businessTradeForm(
+          businessName = "nameOne",
+          businesses = Seq(testSelfEmploymentData("idOne", "nameOne", "tradeOne"))
+        ).bind(duplicateTrade)
+        duplicateTest.errors must contain(FormError(businessTradeName, duplicate))
+      }
+
+      "The following submission should be valid" when {
+        "there is another business with the same name but not trade" in {
+          val valid = DataMap.businessTradeNameMap("tradeTwo")
+          val result = businessTradeForm(businessName = "nameOne", businesses = Seq(testSelfEmploymentData("idOne", "nameOne", "tradeOne"))).bind(valid)
+          result.hasErrors shouldBe false
+          result.hasGlobalErrors shouldBe false
+        }
+        "there are no other businesses" in {
+          val valid = DataMap.businessTradeNameMap("Test business")
+          val result = businessTradeForm().bind(valid)
+          result.hasErrors shouldBe false
+          result.hasGlobalErrors shouldBe false
+        }
       }
     }
   }
