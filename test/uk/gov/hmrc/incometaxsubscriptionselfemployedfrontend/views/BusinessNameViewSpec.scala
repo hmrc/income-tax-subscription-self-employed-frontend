@@ -47,7 +47,7 @@ class BusinessNameViewSpec extends ViewSpec {
   val testError: FormError = FormError("businessName", "testError")
   val testError2: FormError = FormError("businessName", "testError2")
 
-  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm) {
+  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = business_name(
       businessNameForm,
       testCall,
@@ -94,13 +94,13 @@ class BusinessNameViewSpec extends ViewSpec {
 
   }
 
-  "must display form error on page" in new Setup(false, BusinessNameForm.businessNameValidationForm.withError(testError)) {
+  "must display form error on page" in new Setup(false, BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
     document.mustHaveErrorSummary(List[String](testError.message))
     document.listErrorMessages(List[String](testError.message))
 
   }
 
-  "must display multiple form errors on page" in new Setup(false, BusinessNameForm.businessNameValidationForm.withError(testError).withError(testError2)) {
+  "must display multiple form errors on page" in new Setup(false, BusinessNameForm.businessNameValidationForm(Nil).withError(testError).withError(testError2)) {
     document.mustHaveErrorSummary(List[String](testError.message, testError2.message))
     document.listErrorMessages(List[String](testError.message, testError2.message))
   }

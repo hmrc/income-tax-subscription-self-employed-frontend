@@ -18,7 +18,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.StringConstraints._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.ConstraintUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.MappingUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 
@@ -27,13 +29,22 @@ object BusinessNameForm {
 
   val businessName = "businessName"
 
+  private val businessNameMaxLength: Int = 160
 
-  def businessNameValidationForm: Form[BusinessNameModel] = Form(
+  val nameNotEmpty: Constraint[String] = nonEmpty("error.business_name.empty")
+  val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, "error.business_name.max_length")
+  val nameValidChars: Constraint[String] = validateChar("error.business_name.invalid_character")
+
+  def nameIsNotExcluded(excludedNames: Seq[BusinessNameModel]): Constraint[String] = constraint[String] { name =>
+    if (excludedNames.exists(_.businessName == name)) Invalid("error.business_trade_name.duplicate")
+    else Valid
+  }
+
+  def businessNameValidationForm(excludedBusinessNames: Seq[BusinessNameModel]): Form[BusinessNameModel] = Form(
     mapping(
-      businessName -> oText.toText.transform[String](_.trim, identity).verifying(
-        nonEmpty("error.business_name.empty"),
-        maxLength(160, "error.business_name.max_length"),
-        validateChar("error.business_name.invalid_character"))
+      businessName -> trimmedText.verifying(
+        nameNotEmpty andThen nameMaxLength andThen nameValidChars andThen nameIsNotExcluded(excludedBusinessNames)
+      )
     )(BusinessNameModel.apply)(BusinessNameModel.unapply)
   )
 }
