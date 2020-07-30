@@ -264,10 +264,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     "have a radioset" which {
       lazy val radioset = new Setup().document.select("fieldset")
 
-      "has the correct legend" in {
-        radioset.select("legend").text() mustBe CheckYourAnswersMessages.addAnotherBusinessHeading
-      }
-
       "has only two options" in {
         radioset.select("div.multiple-choice").size() mustBe 2
       }
@@ -275,7 +271,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       "has a yes option" which {
 
         "has the correct label" in {
-          radioset.select("""[for="addAnotherBusiness-Yes"]""").text() mustBe CheckYourAnswersMessages.yes
+          radioset.select("""[for="yes-no"]""").text() mustBe CheckYourAnswersMessages.yes
         }
 
         "has the correct value" in {
@@ -286,7 +282,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       "has a no option" which {
 
         "has the correct label" in {
-          radioset.select("""[for="addAnotherBusiness-No"]""").text() mustBe CheckYourAnswersMessages.no
+          radioset.select("""[for="yes-no-2"]""").text() mustBe CheckYourAnswersMessages.no
         }
 
         "has the correct value" in {

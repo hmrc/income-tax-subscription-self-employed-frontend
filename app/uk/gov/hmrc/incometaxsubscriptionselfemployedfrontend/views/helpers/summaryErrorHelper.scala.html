@@ -16,14 +16,14 @@
 
 @import play.api.data.{Form, _}
 
-@(form: Form[_])(implicit messages: Messages)
+@(form: Form[_], appendStringForHref: Option[String] = None)(implicit messages: Messages)
 
 @errors = @{
     form.errors
 }
 
 @errMsg(err: FormError) = {
-    <li><a href="#@err.key">@{messages(s"${err.message}",err.args:_*)}</a></li>
+    <li><a href="#@err.key@if(appendStringForHref.isDefined){-@{appendStringForHref.get}}">@{messages(s"${err.message}",err.args:_*)}</a></li>
 }
 
 @if(form.hasErrors) {
