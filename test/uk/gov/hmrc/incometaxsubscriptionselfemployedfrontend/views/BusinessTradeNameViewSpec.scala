@@ -42,9 +42,10 @@ class BusinessTradeNameViewSpec extends ViewSpec {
   val action: Call = testCall
   val taxYearEnd: Int = 2020
   val testError: FormError = FormError("businessTradeName", "testError")
+  val id: String = "testId"
 
   class Setup(isEditMode: Boolean = false,
-              businessTradeNameForm: Form[BusinessTradeNameModel] = BusinessTradeNameForm.businessTradeNameValidationForm("", Nil)) {
+              businessTradeNameForm: Form[BusinessTradeNameModel] = BusinessTradeNameForm.businessTradeNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = business_trade_name(
       businessTradeNameForm,
       testCall,
@@ -84,7 +85,7 @@ class BusinessTradeNameViewSpec extends ViewSpec {
       document.getBackLink.attr("href") mustBe testBackUrl
     }
     "must display form error on page along with textInput and hintText" in
-      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm("", Nil).withError(testError)) {
+      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
         document.mustHaveErrorSummary(List[String](testError.message))
         document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
         document.mustHavePara(BusinessTradeNameMessages.hintText)
