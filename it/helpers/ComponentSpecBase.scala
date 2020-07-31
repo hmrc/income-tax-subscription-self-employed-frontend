@@ -101,7 +101,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
-          BusinessNameForm.businessNameValidationForm.fill(model).data.map { case (k, v) => (k, Seq(v)) }
+          BusinessNameForm.businessNameValidationForm(Nil).fill(model).data.map { case (k, v) => (k, Seq(v)) }
       )
     )
   }

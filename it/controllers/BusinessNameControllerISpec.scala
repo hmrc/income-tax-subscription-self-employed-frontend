@@ -64,7 +64,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments(businessesKey)(NO_CONTENT)
         stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-        When("Post /details/business-name is scalled")
+        When("Post /details/business-name is called")
         val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
 
         Then("should return a SEE_OTHER")
@@ -76,6 +76,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "the form data is invalid" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
 
         When("POST /details/business-name")
         val res = submitBusinessName(businessId, inEditMode = false, Some(testEmptyBusinessNameModel))

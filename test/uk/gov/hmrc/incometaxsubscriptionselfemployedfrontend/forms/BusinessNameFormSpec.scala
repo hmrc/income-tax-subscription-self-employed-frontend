@@ -25,8 +25,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessName
 
 class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  def form: Form[BusinessNameModel] = {
-    businessNameValidationForm
+  def form(excludedBusinessNames: Seq[BusinessNameModel] = Nil): Form[BusinessNameModel] = {
+    businessNameValidationForm(excludedBusinessNames)
   }
 
   lazy val testNameValid = "business"
@@ -35,56 +35,64 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
   lazy val testNameInvalidChar = "!"
 
   "BusinessNameForm" should {
-    "should correctly validate a business name" in {
-      val testInput = Map(businessName -> testNameValid)
 
-      val expected = BusinessNameModel(testNameValid)
+    "correctly validate a business name" when {
+      "there are no excluded names" in {
+        val testInput = Map(businessName -> testNameValid)
+        val expected = BusinessNameModel(testNameValid)
+        val actual = form().bind(testInput).value
 
-      val actual = form.bind(testInput).value
+        actual shouldBe Some(expected)
+      }
+      "there are excluded names but the user does not enter one of them" in {
+        val testInput = Map(businessName -> testNameValid)
+        val expected = BusinessNameModel(testNameValid)
+        val actual = form(excludedBusinessNames = Seq(
+          BusinessNameModel("nameOne"), BusinessNameModel("nameTwo")
+        )).bind(testInput).value
 
-      actual shouldBe Some(expected)
+        actual shouldBe Some(expected)
+      }
     }
 
-    "should invalidate an empty business name" in {
+    "invalidate an empty business name" in {
       val testInput = Map(businessName -> testNameEmpty)
 
-      val emptyTest = form.bind(testInput)
+      val emptyTest = form().bind(testInput)
       emptyTest.errors must contain(FormError(businessName, "error.business_name.empty"))
     }
 
-    "should invalidate a business name that is over 160 characters" in {
-
+    "invalidate a business name that is over 160 characters" in {
       val testInput = Map(businessName -> testNameTooLong)
 
-      val tooLongTest = form.bind(testInput)
+      val tooLongTest = form().bind(testInput)
       tooLongTest.errors must contain(FormError(businessName, "error.business_name.max_length"))
     }
 
-    "should invalidate a business name that includes invalid characters" in {
+    "invalidate a business name that includes invalid characters" in {
 
       val testInput = Map(businessName -> testNameInvalidChar)
 
-      val invalidCharTest = form.bind(testInput)
+      val invalidCharTest = form().bind(testInput)
       invalidCharTest.errors must contain(FormError(businessName, "error.business_name.invalid_character"))
     }
 
-    "should invalidate a business name that includes invalid characters and is too long" in {
-      val testNameMultipleErrors = testNameInvalidChar + testNameTooLong
-      val testInput = Map(businessName -> testNameMultipleErrors)
+    "invalidate a business name which is in the list of excluded business names" in {
+      val testInput = Map(businessName -> "nameOne")
+      val expected = BusinessNameModel(testNameValid)
+      val actual = form(excludedBusinessNames = Seq(
+        BusinessNameModel("nameOne"), BusinessNameModel("nameTwo")
+      )).bind(testInput)
 
-      val multipleErrorsTest = form.bind(testInput)
-      multipleErrorsTest.errors mustBe List(FormError(businessName, "error.business_name.max_length"), FormError(businessName,"error.business_name.invalid_character"))
+      actual.errors must contain(FormError(businessName, "error.business_trade_name.duplicate"))
     }
 
-    "should remove a leading space from business name" in {
-
+    "remove a leading space from business name" in {
       val testInput = Map(businessName -> (" " + testNameValid))
+      val expected = BusinessNameModel(testNameValid)
+      val leadingSpaceTest = form().bind(testInput).value
 
-      val expected = Map(businessName -> testNameValid)
-
-      val leadingSpaceTest = form.bind(testInput).value
-      val testExpected = form.bind(expected).value
-      leadingSpaceTest shouldBe testExpected
+      leadingSpaceTest shouldBe Some(expected)
     }
   }
 }
