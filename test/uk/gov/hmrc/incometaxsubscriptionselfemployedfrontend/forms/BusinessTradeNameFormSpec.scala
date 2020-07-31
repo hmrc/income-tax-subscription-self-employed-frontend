@@ -29,8 +29,8 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessTradeNameForm._
 
-  def businessTradeForm(businessName: String = "testName", businesses: Seq[SelfEmploymentData] = Nil): Form[BusinessTradeNameModel] = {
-    businessTradeNameValidationForm(businessName, businesses)
+  def businessTradeForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel] = Nil): Form[BusinessTradeNameModel] = {
+    businessTradeNameValidationForm(excludedBusinessTradeNames)
   }
 
   def testSelfEmploymentData(id: String, businessName: String, businessTrade: String): SelfEmploymentData = SelfEmploymentData(
@@ -85,28 +85,28 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         invalidTest.errors must contain(FormError(businessTradeName, invalid))
       }
 
-      "the name is max characters and acceptable" in {
+      "the name should not allow just a space" in {
+        val emptyInput = DataMap.businessTradeNameMap(" ")
+        val invalidTest = businessTradeForm().bind(emptyInput)
+        invalidTest.errors must contain(FormError(businessTradeName, empty))
+      }
+
+      "the name be max characters and acceptable" in {
         val withinLimitInput = DataMap.businessTradeNameMap("a" * maxLength)
         val withinLimitTest = businessTradeForm().bind(withinLimitInput)
         withinLimitTest.value mustNot contain(maxLen)
       }
 
-      "there is another business with the same name and trade" in {
-        val duplicateTrade = DataMap.businessTradeNameMap("tradeOne")
-        val duplicateTest = businessTradeForm(
-          businessName = "nameOne",
-          businesses = Seq(testSelfEmploymentData("idOne", "nameOne", "tradeOne"))
-        ).bind(duplicateTrade)
-        duplicateTest.errors must contain(FormError(businessTradeName, duplicate))
+      "invalidate a business trade which is in the list of excluded business trade" in {
+        val testInput = Map(businessTradeName -> "nameOne")
+        val expected = BusinessNameModel(testValidBusinessTradeName)
+        val actual = businessTradeForm(excludedBusinessTradeNames = Seq(
+          BusinessTradeNameModel("nameOne"), BusinessTradeNameModel("nameTwo")
+        )).bind(testInput)
+        actual.errors must contain(FormError(businessTradeName, "error.business_trade_name.duplicate"))
       }
 
       "The following submission should be valid" when {
-        "there is another business with the same name but not trade" in {
-          val valid = DataMap.businessTradeNameMap("tradeTwo")
-          val result = businessTradeForm(businessName = "nameOne", businesses = Seq(testSelfEmploymentData("idOne", "nameOne", "tradeOne"))).bind(valid)
-          result.hasErrors shouldBe false
-          result.hasGlobalErrors shouldBe false
-        }
         "there are no other businesses" in {
           val valid = DataMap.businessTradeNameMap("Test business")
           val result = businessTradeForm().bind(valid)
@@ -117,3 +117,4 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     }
   }
 }
+

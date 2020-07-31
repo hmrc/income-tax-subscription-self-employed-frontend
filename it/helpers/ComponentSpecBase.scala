@@ -113,7 +113,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
-          BusinessTradeNameForm.businessTradeNameValidationForm("", Nil).fill(model).data.map {
+          BusinessTradeNameForm.businessTradeNameValidationForm(Nil).fill(model).data.map {
             case (k, v) =>
               (k, Seq(v))
           }

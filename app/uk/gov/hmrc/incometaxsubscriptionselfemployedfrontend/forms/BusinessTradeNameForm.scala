@@ -34,25 +34,15 @@ object BusinessTradeNameForm {
   val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.business_trade_name.maxLength")
   val tradeNameInvalidCharacters: Constraint[String] = validateChar("error.business_trade_name.invalid")
 
-  def duplicateNameTrade(businessName: String, businesses: Seq[SelfEmploymentData]): Constraint[String] = constraint[String] { trade =>
-
-    val hasDuplicateNameTrade: Boolean = businesses.exists(business =>
-      business.businessName.exists(_.businessName == businessName) &&
-        business.businessTradeName.exists(_.businessTradeName == trade)
-    )
-
-    if (hasDuplicateNameTrade) {
-      Invalid("error.business_trade_name.duplicate")
-    } else {
-      Valid
-    }
-
+  def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
+    if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.business_trade_name.duplicate")
+    else Valid
   }
 
-  def businessTradeNameValidationForm(businessName: String, businesses: Seq[SelfEmploymentData]): Form[BusinessTradeNameModel] = Form(
+  def businessTradeNameValidationForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel]): Form[BusinessTradeNameModel] = Form(
     mapping(
-      businessTradeName -> oText.toText.verifying(
-        tradeNameEmpty andThen nameTooLong andThen tradeNameInvalidCharacters andThen duplicateNameTrade(businessName, businesses)
+      businessTradeName -> trimmedText.verifying(
+        tradeNameEmpty andThen nameTooLong andThen tradeNameInvalidCharacters andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
       )
     )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
   )

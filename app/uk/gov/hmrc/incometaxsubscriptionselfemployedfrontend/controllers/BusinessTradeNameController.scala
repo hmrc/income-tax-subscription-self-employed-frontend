@@ -51,32 +51,41 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAllBusinesses { businesses =>
+        val excludedBusinessTradeNames = getExcludedBusinessTradeNames(id, businesses)
         val currentBusiness = businesses.find(_.id == id)
         (currentBusiness.flatMap(_.businessName), currentBusiness.flatMap(_.businessTradeName)) match {
-          case (Some(name), trade) => Future.successful(Ok(view(businessTradeNameValidationForm(name.businessName, businesses).fill(trade), id, isEditMode)))
           case (None, _) => Future.successful(Redirect(routes.BusinessNameController.show(id)))
+          case (_, trade) =>
+            Future.successful(Ok(view(businessTradeNameValidationForm(excludedBusinessTradeNames).fill(trade), id, isEditMode)))
         }
       }
     }
   }
 
+
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async {
     implicit request =>
       authService.authorised() {
         withAllBusinesses { businesses =>
-          businesses.find(_.id == id).flatMap(_.businessName) match {
-            case Some(name) => businessTradeNameValidationForm(name.businessName, businesses).bindFromRequest.fold(
-              formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
-              businessTradeName =>
-                multipleSelfEmploymentsService.saveBusinessTrade(id, businessTradeName).map(_ =>
-                  Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
-                )
-            )
-            case None => Future.successful(Redirect(routes.BusinessNameController.show(id)))
-          }
+          val excludedBusinessTradeNames = getExcludedBusinessTradeNames(id, businesses)
+          businessTradeNameValidationForm(excludedBusinessTradeNames).bindFromRequest.fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
+            businessTradeNameData =>
+              multipleSelfEmploymentsService.saveBusinessTrade(id, businessTradeNameData).map(_ =>
+                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
+              )
+          )
         }
       }
+  }
+
+  private def getExcludedBusinessTradeNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessTradeNameModel] = {
+    val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
+    businesses.filterNot(_.id == id).filter {
+      case SelfEmploymentData(_, _, Some(name),_) if currentBusinessName contains name => true
+      case _ => false
+    }.flatMap(_.businessTradeName)
   }
 
   private def withAllBusinesses(f: Seq[SelfEmploymentData] => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
