@@ -66,11 +66,10 @@
     </span>
     }
     <fieldset @fieldSetClassValue>
-        <legend class="visuallyhidden" id="@field.name">@legend</legend>
 
         <div class="multiple-choice" @dataTarget(options(0))>
             <input id="yes-no" type="radio" name="@field.name" value="@valueAttr(options(0))" @isSelected(options(0).optionName)>
-            <label @options(0).classes.fold("")(x => s"""class="$x"""") for="@{field.name}-@options(0).optionName">@Html(options(0).message)</label>
+            <label @options(0).classes.fold("")(x => s"""class="$x"""") for="yes-no">@Html(options(0).message)</label>
         </div>
         @options(0).conditionalContent.map{content =>
             <div id="@options(0).optionName" class="panel panel-indent panel-border-narrow js-hidden">
@@ -79,7 +78,7 @@
         }
         <div class="multiple-choice" @dataTarget(options(1))>
             <input id="yes-no-2" type="radio" name="@field.name" value="@valueAttr(options(1))" @isSelected(options(1).optionName)>
-            <label @options(1).classes.fold("")(x => s"""class="$x"""") for="@{field.name}-@options(1).optionName">@Html(options(1).message)</label>
+            <label @options(1).classes.fold("")(x => s"""class="$x"""") for="yes-no-2">@Html(options(1).message)</label>
         </div>
         @options(1).conditionalContent.map{content =>
         <div id="@options(1).optionName" class="panel panel-indent panel-border-narrow js-hidden">

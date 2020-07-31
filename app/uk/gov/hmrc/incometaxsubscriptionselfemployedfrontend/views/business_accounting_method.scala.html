@@ -47,7 +47,7 @@
 @main_template(title = messages("business.accounting_method.title"), form = Some(businessAccountingMethodForm), scriptElem = Some(scripts)) {
     @back_link(backUrl)
 
-    @summaryErrorHelper(businessAccountingMethodForm)
+    @summaryErrorHelper(businessAccountingMethodForm, Some(AccountingMethodMapping.option_cash))
 
     <h1 class="heading-large">@question</h1>
 

@@ -25,7 +25,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AddAnotherB
 
 object AddAnotherBusinessForm {
 
-  val addAnotherBusiness = "addAnotherBusiness"
+  val addAnotherBusiness = "yes-no"
 
   def maxBusinessesValidation(currentBusinesses: Int, limit: Int): Constraint[YesNo] = constraint[YesNo] {
     case Yes => if (currentBusinesses >= limit) Invalid(s"error.add_another_business.limit_reached", limit) else Valid

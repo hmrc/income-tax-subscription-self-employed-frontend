@@ -81,7 +81,6 @@ class RadioHelperSpec extends UnitTestTrait {
       val testField = testForm(radioName)
       val doc = radioHelper(testField, testLegend, testOptions, testForm).doc
       doc.getElementsByTag("div").hasClass("form-group") shouldBe true
-      doc.getElementsByTag("legend").text() shouldBe testLegend
       val inputs = doc.getElementsByTag("input")
       inputs.size() shouldBe 2
       inputs.get(0).attr("name") shouldBe radioName
