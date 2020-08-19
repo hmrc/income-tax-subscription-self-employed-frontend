@@ -80,3 +80,12 @@ error.add_another_business.limit_reached                        = Gallwch ychwan
 error.add_another_business.invalid                              = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
 error.add_another_business.empty                                = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
 
+# Business Address page
+addressLookup.index.title                                       = Beth yw cyfeiriad eich busnes?
+addressLookup.lookupPage.title                                  = Dewiswch gyfeiriad busnes
+addressLookup.lookupPage.heading                                = Dewiswch gyfeiriad busnes
+addressLookup.editPage.title                                    = Rhowch gyfeiriad busnes
+addressLookup.editPage.heading                                  = Rhowch gyfeiriad busnes
+addressLookup.confirmPage.title                                 = Cadarnhau cyfeiriad busnes
+addressLookup.confirmPage.heading                               = Cadarnhau cyfeiriad busnes
+

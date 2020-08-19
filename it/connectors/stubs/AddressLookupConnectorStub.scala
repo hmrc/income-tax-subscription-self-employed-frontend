@@ -1,0 +1,26 @@
+
+package connectors.stubs
+
+import helpers.servicemocks.WireMockMethods
+import play.api.libs.json.{JsValue, Json}
+
+object AddressLookupConnectorStub extends WireMockMethods {
+
+  private def addressLookupInitializeUrl = s"/api/v2/init"
+  private def getAddressDetailsUrl(id: String) = s"/api/confirmed\\?id=$id"
+
+  def stubGetAddressLookupDetails(id: String)(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
+    when(
+      method = GET,
+      uri = getAddressDetailsUrl(id)
+    ) thenReturn(responseStatus, responseBody)
+  }
+
+  def stubInitializeAddressLookup(locationHeader: String, body: JsValue = Json.obj())(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
+    when (
+      method = POST,
+      uri = addressLookupInitializeUrl,
+      body = body
+    ) thenReturn (responseStatus, Map("Location" -> locationHeader), responseBody)
+  }
+}

@@ -81,3 +81,11 @@ error.add_another_business.limit_reached                        = You can only a
 error.add_another_business.invalid                              = Select yes if you want to add another sole trader business
 error.add_another_business.empty                                = Select yes if you want to add another sole trader business
 
+# Business Address page
+addressLookup.index.title                                       = What is your business address?
+addressLookup.lookupPage.title                                  = Select business address
+addressLookup.lookupPage.heading                                = Select business address
+addressLookup.editPage.title                                    = Enter business address
+addressLookup.editPage.heading                                  = Enter business address
+addressLookup.confirmPage.title                                 = Confirm business address
+addressLookup.confirmPage.heading                               = Confirm business address
