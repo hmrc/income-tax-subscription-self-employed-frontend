@@ -28,4 +28,65 @@ object IntegrationTestConstants {
   }
 
   val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
+
+  def testAddressLookupConfig(continueUrl: String): String =
+    s"""{
+       |  "version": 2,
+       |  "options": {
+       |    "continueUrl": "$continueUrl",
+       |    "showBackButtons": true,
+       |    "includeHMRCBranding": true,
+       |    "ukMode": true,
+       |    "selectPageConfig": {
+       |      "proposalListLimit": 50,
+       |      "showSearchLinkAgain": true
+       |    },
+       |    "confirmPageConfig": {
+       |      "showChangeLink": true,
+       |      "showSubHeadingAndInfo": true,
+       |      "showSearchAgainLink": false,
+       |      "showConfirmChangeText": true
+       |    },
+       |    "timeoutConfig": {
+       |      "timeoutAmount": 900,
+       |      "timeoutUrl": "http://tax.service.gov.uk/income-tax-subscription-frontend/session-timeout"
+       |    }
+       |},
+       |    "labels": {
+       |      "en": {
+       |        "appLevelLabels": {
+       |          "navTitle": "What is your business address?"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "Select business address",
+       |          "heading": "Select business address"
+       |        },
+       |        "editPageLabels": {
+       |          "title": "Enter business address",
+       |          "heading": "Enter business address"
+       |        },
+       |        "confirmPageLabels": {
+       |          "title": "Confirm business address",
+       |          "heading": "Confirm business address"
+       |        }
+       |      },
+       |      "cy": {
+       |        "appLevelLabels": {
+       |          "navTitle": "Beth yw cyfeiriad eich busnes?"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "Dewiswch gyfeiriad busnes",
+       |          "heading": "Dewiswch gyfeiriad busnes"
+       |        },
+       |        "editPageLabels": {
+       |          "title": "Rhowch gyfeiriad busnes",
+       |          "heading": "Rhowch gyfeiriad busnes"
+       |        },
+       |        "confirmPageLabels": {
+       |          "title": "Cadarnhau cyfeiriad busnes",
+       |          "heading": "Cadarnhau cyfeiriad busnes"
+       |        }
+       |      }
+       |    }
+       |  }""".stripMargin
 }
