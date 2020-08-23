@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.address
 
 import org.scalatest.EitherValues
 import play.api.libs.json.Json
-import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NO_CONTENT}
+import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, ACCEPTED}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
@@ -31,7 +31,7 @@ class PostAddressLookupHttpParserSpec extends UnitTestTrait with EitherValues {
   "PostAddressLookupHttpReads" when {
     "read" should {
       "parse a correctly formatted OK response as a PostAddressLookupSuccessResponse" in {
-        val httpResponse = HttpResponse(NO_CONTENT, Some(Json.obj()), Map("Location" -> Seq("onRampUri")))
+        val httpResponse = HttpResponse(ACCEPTED, Some(Json.obj()), Map("Location" -> Seq("onRampUri")))
 
         val res = postAddressLookupHttpReads.read(testHttpVerb, testUri, httpResponse)
 

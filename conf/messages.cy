@@ -86,6 +86,7 @@ addressLookup.lookupPage.title                                  = Dewiswch gyfei
 addressLookup.lookupPage.heading                                = Dewiswch gyfeiriad busnes
 addressLookup.editPage.title                                    = Rhowch gyfeiriad busnes
 addressLookup.editPage.heading                                  = Rhowch gyfeiriad busnes
+addressLookup.editPage.postcodeLabel                            = Cod post y DU
 addressLookup.confirmPage.title                                 = Cadarnhau cyfeiriad busnes
 addressLookup.confirmPage.heading                               = Cadarnhau cyfeiriad busnes
 

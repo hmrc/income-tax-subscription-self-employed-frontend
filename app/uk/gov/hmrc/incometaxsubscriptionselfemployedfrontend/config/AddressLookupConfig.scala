@@ -59,7 +59,8 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
        |        },
        |        "editPageLabels": {
        |          "title": "${messagesApi("addressLookup.editPage.title")}",
-       |          "heading": "${messagesApi("addressLookup.editPage.heading")}"
+       |          "heading": "${messagesApi("addressLookup.editPage.heading")}",
+       |          "postcodeLabel": "${messagesApi("addressLookup.editPage.postcodeLabel")}"
        |        },
        |        "confirmPageLabels": {
        |          "title": "${messagesApi("addressLookup.confirmPage.title")}",
@@ -76,7 +77,8 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
        |        },
        |        "editPageLabels": {
        |          "title": "${messagesApi("addressLookup.editPage.title")(cy)}",
-       |          "heading": "${messagesApi("addressLookup.editPage.heading")(cy)}"
+       |          "heading": "${messagesApi("addressLookup.editPage.heading")(cy)}",
+       |          "postcodeLabel": "${messagesApi("addressLookup.editPage.postcodeLabel")(cy)}"
        |        },
        |        "confirmPageLabels": {
        |          "title": "${messagesApi("addressLookup.confirmPage.title")(cy)}",

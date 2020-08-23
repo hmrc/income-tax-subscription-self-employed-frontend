@@ -87,5 +87,6 @@ addressLookup.lookupPage.title                                  = Select busines
 addressLookup.lookupPage.heading                                = Select business address
 addressLookup.editPage.title                                    = Enter business address
 addressLookup.editPage.heading                                  = Enter business address
+addressLookup.editPage.postcodeLabel                            = Postcode
 addressLookup.confirmPage.title                                 = Confirm business address
 addressLookup.confirmPage.heading                               = Confirm business address
