@@ -72,6 +72,7 @@ check_your_answers.sub_heading                                  = Busnes {0}
 check_your_answers.trading_start_date                           = Dyddiad dechrau masnachu’r busnes
 check_your_answers.business_name                                = Enw’r busnes
 check_your_answers.business_trade                               = Masnach y busnes
+check_your_answers.business_address                             = Cyfeiriad y busnes
 check_your_answers.remove_business                              = Dileu busnes {0}
 check_your_answers.add_another_business_heading                 = A hoffech ychwanegu busnes unig fasnachwr arall?
 
@@ -81,9 +82,10 @@ error.add_another_business.invalid                              = Dewiswch ‘Ia
 error.add_another_business.empty                                = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
 
 # Business Address page
-addressLookup.index.title                                       = Beth yw cyfeiriad eich busnes?
-addressLookup.lookupPage.title                                  = Dewiswch gyfeiriad busnes
-addressLookup.lookupPage.heading                                = Dewiswch gyfeiriad busnes
+addressLookup.selectPage.title                                  = Dewiswch gyfeiriad busnes
+addressLookup.selectPage.heading                                = Dewiswch gyfeiriad busnes
+addressLookup.lookupPage.title                                  = Beth yw cyfeiriad eich busnes?
+addressLookup.lookupPage.heading                                = Beth yw cyfeiriad eich busnes?
 addressLookup.editPage.title                                    = Rhowch gyfeiriad busnes
 addressLookup.editPage.heading                                  = Rhowch gyfeiriad busnes
 addressLookup.editPage.postcodeLabel                            = Cod post y DU

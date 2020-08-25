@@ -27,11 +27,12 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
   val testValidBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
   val testValidBusinessTradeName: String = "Plumbing"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
-
+  val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel("testId1", Address(Seq("line1", "line2", "line3"), "TF3 4NT"))
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId,
     businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
-    businessTradeName = Some(testValidBusinessTradeNameModel)
+    businessTradeName = Some(testValidBusinessTradeNameModel),
+    businessAddress = Some(testBusinessAddressModel)
   ))
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-list" when {

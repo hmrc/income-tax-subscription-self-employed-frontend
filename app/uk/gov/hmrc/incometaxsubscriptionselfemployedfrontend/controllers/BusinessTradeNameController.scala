@@ -73,7 +73,8 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
               Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
             businessTradeNameData =>
               multipleSelfEmploymentsService.saveBusinessTrade(id, businessTradeNameData).map(_ =>
-                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
+                Redirect(
+                  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id))
               )
           )
         }
@@ -83,7 +84,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
   private def getExcludedBusinessTradeNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessTradeNameModel] = {
     val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
     businesses.filterNot(_.id == id).filter {
-      case SelfEmploymentData(_, _, Some(name),_) if currentBusinessName contains name => true
+      case SelfEmploymentData(_, _, Some(name),_, _) if currentBusinessName contains name => true
       case _ => false
     }.flatMap(_.businessTradeName)
   }

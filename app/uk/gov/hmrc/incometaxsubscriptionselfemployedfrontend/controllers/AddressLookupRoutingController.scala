@@ -20,14 +20,12 @@ import javax.inject.Inject
 import play.api.i18n.Lang
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.addressIdKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.{AddressLookupConnector, IncomeTaxSubscriptionConnector}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessAddressModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.ExecutionContext
@@ -35,13 +33,14 @@ import scala.concurrent.ExecutionContext
 class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents,
                                                authService: AuthService,
                                                addressLookupConnector: AddressLookupConnector,
-                                               incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector
+                                               multipleSelfEmploymentsService: MultipleSelfEmploymentsService
                                               )(implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
 
-  def initialiseAddressLookupJourney(): Action[AnyContent] = Action.async { implicit request =>
+  def initialiseAddressLookupJourney(itsaId: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       implicit val lang: Lang = mcc.messagesApi.preferred(request).lang
-      val continueUrl = appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl + routes.AddressLookupRoutingController.addressLookupRedirect(None).url
+      val continueUrl =
+        appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl + routes.AddressLookupRoutingController.addressLookupRedirect(itsaId, None).url
       addressLookupConnector.initialiseAddressLookup(continueUrl) map (
         response =>
           response match {
@@ -53,7 +52,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def addressLookupRedirect(id: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+  def addressLookupRedirect(itsaId: String, id: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       if (!id.isDefined) {
         throw new InternalServerException(
@@ -63,7 +62,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
           addressDetailsResponse =>
             addressDetailsResponse match {
               case Right(Some(addressDetails)) =>
-                incomeTaxSubscriptionConnector.saveSelfEmployments[BusinessAddressModel](addressIdKey, addressDetails) map (_ =>
+                multipleSelfEmploymentsService.saveBusinessAddress(itsaId, addressDetails).map(_ =>
                   Redirect(routes.BusinessListCYAController.show()))
               case Right(None) => throw new InternalServerException(
                 s"[AddressLookupRoutingController][addressLookupRedirect] - No address details found with id: $id")

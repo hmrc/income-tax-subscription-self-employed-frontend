@@ -18,7 +18,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Address(lines: Seq[String], postcode: String)
+case class Address(lines: Seq[String], postcode: String) {
+  override def toString: String = s"${lines.mkString(", ")}, $postcode"
+}
 
 case class BusinessAddressModel(auditRef: String,
                                 address: Address)
