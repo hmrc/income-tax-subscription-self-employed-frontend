@@ -37,13 +37,13 @@ trait MockAddressLookupConnector extends UnitTestTrait with MockitoSugar with Be
     reset(mockAddressLookupConnector)
   }
 
-  def mockGetAddressDetails(id: String)(response: Future[GetAddressLookupDetailsResponse]): OngoingStubbing[Future[GetAddressLookupDetailsResponse]] = {
+  def mockGetAddressDetails(id: String)(response: GetAddressLookupDetailsResponse): OngoingStubbing[Future[GetAddressLookupDetailsResponse]] = {
     when(mockAddressLookupConnector.getAddressDetails(
-      ArgumentMatchers.eq(id))(ArgumentMatchers.any())).thenReturn(response)
+      ArgumentMatchers.eq(id))(ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 
-  def mockSaveAddressLookup(continueUrl: String)
-                           (response: PostAddressLookupResponse): OngoingStubbing[Future[PostAddressLookupResponse]] = {
+  def mockInitialiseAddressLookup(continueUrl: String)
+                                 (response: PostAddressLookupResponse): OngoingStubbing[Future[PostAddressLookupResponse]] = {
     when(mockAddressLookupConnector.initialiseAddressLookup(
       ArgumentMatchers.eq(continueUrl))(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }

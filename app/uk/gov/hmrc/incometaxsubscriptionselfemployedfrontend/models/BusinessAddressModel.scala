@@ -20,8 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 
 case class Address(lines: Seq[String], postcode: String)
 
-case class BusinessAddressModel(id: String,
-                                redirectUrl: String,
+case class BusinessAddressModel(auditRef: String,
                                 address: Address)
 
 object Address {

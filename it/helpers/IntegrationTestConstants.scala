@@ -1,8 +1,6 @@
 
 package helpers
 
-import java.time.LocalDate
-
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
@@ -63,7 +61,8 @@ object IntegrationTestConstants {
        |        },
        |        "editPageLabels": {
        |          "title": "Enter business address",
-       |          "heading": "Enter business address"
+       |          "heading": "Enter business address",
+       |          "postcodeLabel":"Postcode"
        |        },
        |        "confirmPageLabels": {
        |          "title": "Confirm business address",
@@ -80,7 +79,8 @@ object IntegrationTestConstants {
        |        },
        |        "editPageLabels": {
        |          "title": "Rhowch gyfeiriad busnes",
-       |          "heading": "Rhowch gyfeiriad busnes"
+       |          "heading": "Rhowch gyfeiriad busnes",
+       |          "postcodeLabel":"Cod post y DU"
        |        },
        |        "confirmPageLabels": {
        |          "title": "Cadarnhau cyfeiriad busnes",

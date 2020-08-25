@@ -20,10 +20,10 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
   private implicit val lang: Lang = Lang("en")
 
-  val businessAddressModel = BusinessAddressModel(id = "1", redirectUrl = "http://localhost/redirectUrl",
+  val businessAddressModel = BusinessAddressModel(auditRef = "1",
     Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))
 
-  val successJson = Json.obj("id"-> "1", "redirectUrl" -> "http://localhost/redirectUrl",
+  val successJson = Json.obj("auditRef"-> "1",
     "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> "TF3 4NT"))
 
   "GetAddressLookupDetails" should {
@@ -64,7 +64,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
 
   "Initialise AddressLookup journey" should {
     "Return PostSelfEmploymentsSuccessResponse" in {
-      stubInitializeAddressLookup("testLocation", Json.toJson(testAddressLookupConfig("testUrl")))(NO_CONTENT)
+      stubInitializeAddressLookup(Json.parse(testAddressLookupConfig("testUrl")))("testLocation", ACCEPTED)
 
       val res = connector.initialiseAddressLookup("testUrl")
 
@@ -72,7 +72,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
     }
 
     "Return UnexpectedStatusFailure(status)" in {
-      stubInitializeAddressLookup("testLocation", Json.toJson(testAddressLookupConfig("test")))(INTERNAL_SERVER_ERROR)
+      stubInitializeAddressLookup(Json.parse(testAddressLookupConfig("test")))("testLocation", INTERNAL_SERVER_ERROR)
 
       val res = connector.initialiseAddressLookup("test")
 

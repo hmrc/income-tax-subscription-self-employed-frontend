@@ -29,7 +29,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
   val testHttpVerb = "GET"
   val testUri = "/"
 
-  val testValidJson: JsObject = Json.obj("id"-> "1", "redirectUrl" -> "http://localhost/redirectUrl",
+  val testValidJson: JsObject = Json.obj("auditRef"-> "1",
     "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> "TF3 4NT"))
 
   "GetAddressLookupDetailsHttpReads" when {
@@ -39,7 +39,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
 
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
-        res mustBe Right(Some(BusinessAddressModel(id = "1", redirectUrl = "http://localhost/redirectUrl",
+        res mustBe Right(Some(BusinessAddressModel(auditRef = "1",
           Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))))
       }
       "parse an incorrectly formatted Ok response as an invalid Json" in {

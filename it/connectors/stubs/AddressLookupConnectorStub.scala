@@ -16,7 +16,7 @@ object AddressLookupConnectorStub extends WireMockMethods {
     ) thenReturn(responseStatus, responseBody)
   }
 
-  def stubInitializeAddressLookup(locationHeader: String, body: JsValue = Json.obj())(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
+  def stubInitializeAddressLookup(body: JsValue = Json.obj())(locationHeader: String, responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
     when (
       method = POST,
       uri = addressLookupInitializeUrl,

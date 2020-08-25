@@ -20,5 +20,6 @@ object SelfEmploymentDataKeys {
 
   val businessesKey: String = "Businesses"
   val businessAccountingMethodKey: String = "BusinessAccountingMethod"
+  val addressIdKey: String = "addressId"
 
 }

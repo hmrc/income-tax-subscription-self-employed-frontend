@@ -42,7 +42,7 @@ class AddressLookupConnector @Inject()(appConfig: AppConfig,
   def initialiseAddressLookup(continueUrl: String)
                              (implicit hc: HeaderCarrier, language: Lang): Future[PostAddressLookupResponse] = {
     http.POST[JsValue, PostAddressLookupResponse](addressLookupInitializeUrl,
-      Json.toJson(addressLookupConfig.config(continueUrl)))
+      Json.parse(addressLookupConfig.config(continueUrl)))
   }
 
   def getAddressDetails(id: String)(implicit hc: HeaderCarrier): Future[GetAddressLookupDetailsResponse] = {

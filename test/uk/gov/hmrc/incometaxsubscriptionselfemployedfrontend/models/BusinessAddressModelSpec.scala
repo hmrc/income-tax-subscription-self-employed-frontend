@@ -25,9 +25,8 @@ class BusinessAddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
 
   "BusinessAddressModel" should {
 
-    val businessAddressModel = BusinessAddressModel(id = "1", redirectUrl = "http://localhost/redirectUrl",
-      Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))
-    val json = Json.obj("id"-> "1", "redirectUrl" -> "http://localhost/redirectUrl",
+    val businessAddressModel = BusinessAddressModel(auditRef = "1", Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))
+    val json = Json.obj("auditRef"-> "1",
       "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> "TF3 4NT"))
 
     "read from Json correctly" in {

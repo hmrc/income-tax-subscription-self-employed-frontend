@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup
 
-import play.api.http.Status.NO_CONTENT
+import play.api.http.Status.ACCEPTED
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object PostAddressLookupHttpParser {
@@ -27,7 +27,7 @@ object PostAddressLookupHttpParser {
     new HttpReads[PostAddressLookupResponse] {
       override def read(method: String, url: String, response: HttpResponse): PostAddressLookupResponse = {
         response.status match {
-          case NO_CONTENT => Right(
+          case ACCEPTED => Right(
             PostAddressLookupSuccessResponse(response.header(key = "Location"))
           )
           case status => Left(UnexpectedStatusFailure(status))
