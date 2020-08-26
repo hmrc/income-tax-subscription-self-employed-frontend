@@ -16,6 +16,8 @@ object IntegrationTestConstants {
   val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
   val BusinessListCYAUri = s"$baseURI/details/business-list"
   val InitialiseUri = s"$baseURI/details"
+  def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
+  def businessAddressLookupRedirectUri(itsaId: String): String = s"$baseURI/details/address-lookup/$itsaId"
 
   object Auth {
     def idsResponseJson(internalId: String, externalId: String): JsValue = Json.parse(
@@ -52,12 +54,13 @@ object IntegrationTestConstants {
        |},
        |    "labels": {
        |      "en": {
-       |        "appLevelLabels": {
-       |          "navTitle": "What is your business address?"
-       |        },
-       |        "lookupPageLabels": {
+       |        "selectPageLabels": {
        |          "title": "Select business address",
        |          "heading": "Select business address"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "What is your business address?",
+       |          "heading": "What is your business address?"
        |        },
        |        "editPageLabels": {
        |          "title": "Enter business address",
@@ -70,12 +73,13 @@ object IntegrationTestConstants {
        |        }
        |      },
        |      "cy": {
-       |        "appLevelLabels": {
-       |          "navTitle": "Beth yw cyfeiriad eich busnes?"
-       |        },
-       |        "lookupPageLabels": {
+       |        "selectPageLabels": {
        |          "title": "Dewiswch gyfeiriad busnes",
        |          "heading": "Dewiswch gyfeiriad busnes"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "Beth yw cyfeiriad eich busnes?",
+       |          "heading": "Beth yw cyfeiriad eich busnes?"
        |        },
        |        "editPageLabels": {
        |          "title": "Rhowch gyfeiriad busnes",

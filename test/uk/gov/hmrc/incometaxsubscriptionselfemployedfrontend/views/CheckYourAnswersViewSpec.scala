@@ -41,6 +41,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     val change = "Change"
     val tradingStartDate = "Trading start date of business"
     val businessName = "Business name"
+    val businessAddress = "Business address"
     val businessTrade = "Business trade"
     val addAnotherBusinessHeading = "Do you want to add another sole trader business?"
     val yes = "Yes"
@@ -51,7 +52,8 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     id = id,
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
     businessName = Some(BusinessNameModel(s"ABC Limited $id")),
-    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing $id"))
+    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing $id")),
+    businessAddress = Some(BusinessAddressModel(s"AuditRefId$id", Address(Seq(s"line$id", "line9", "line99"), "TF3 4NT")))
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -132,6 +134,20 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           }
         }
 
+        "has a row for the business address" which {
+          "has a label to identify it" in new Setup {
+            document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
+          }
+          "has a answer the user gave" in new Setup {
+            document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line1, line9, line99, TF3 4NT"
+          }
+          "has a change link" in new Setup {
+            val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectFirst("a")
+            changeLink.text mustBe CheckYourAnswersMessages.change
+            changeLink.attr("href") mustBe appConfig.addressLookupChangeUrl("AuditRefId1")
+          }
+        }
+
         "has a row for the remove business link" which {
           "has a remove business link" in new Setup {
             val removeLink: Element = document.getElementById("remove-business-1")
@@ -190,6 +206,20 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             }
           }
 
+          "has a row for the business address" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line1, line9, line99, TF3 4NT"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe appConfig.addressLookupChangeUrl("AuditRefId1")
+            }
+          }
+
           "has a row for the remove business link" which {
             "has a remove business link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val removeLink: Element = document.getElementById("remove-business-1")
@@ -243,6 +273,20 @@ class CheckYourAnswersViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(3).getSummaryListActions.selectFirst("a")
               changeLink.text mustBe CheckYourAnswersMessages.change
               changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "2", isEditMode = true).url
+            }
+          }
+
+          "has a row for the business address" which {
+            "has a label to identify it" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
+            }
+            "has a answer the user gave" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              document.getSummaryList(2).getSummaryListRow(4).getSummaryListValue.text mustBe "line2, line9, line99, TF3 4NT"
+            }
+            "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
+              val changeLink: Element = document.getSummaryList(2).getSummaryListRow(4).getSummaryListActions.selectFirst("a")
+              changeLink.text mustBe CheckYourAnswersMessages.change
+              changeLink.attr("href") mustBe appConfig.addressLookupChangeUrl("AuditRefId2")
             }
           }
 

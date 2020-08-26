@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccess
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessAddressModel, BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, SelfEmploymentData}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 
@@ -88,4 +88,13 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
     ).thenReturn(Future.successful(response))
   }
 
+  def mockSaveBusinessAddress(businessId: String, businessAddress: BusinessAddressModel)
+                          (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+    when(
+      mockMultipleSelfEmploymentsService.saveBusinessAddress(
+        ArgumentMatchers.eq(businessId),
+        ArgumentMatchers.eq(businessAddress)
+      )(ArgumentMatchers.any())
+    ).thenReturn(Future.successful(response))
+  }
 }

@@ -52,7 +52,8 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
     id = id,
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1"))),
     businessName = Some(BusinessNameModel("testName")),
-    businessTradeName = Some(BusinessTradeNameModel("testTrade"))
+    businessTradeName = Some(BusinessTradeNameModel("testTrade")),
+    businessAddress = Some(BusinessAddressModel("12345", Address(Seq("line1"), "TF3 4NT")))
   )
 
   "Show" should {
@@ -112,7 +113,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
       }
     }
     "return 400, SEE_OTHER)" when {
@@ -163,7 +164,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
       }
       "the user does not update their trade" in {
         mockAuthSuccess()
@@ -175,7 +176,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
       }
     }
   }

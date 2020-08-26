@@ -59,6 +59,15 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     saveData(businessId, _.copy(businessTradeName = Some(businessTrade)))
   }
 
+  def fetchBusinessAddress(businessId: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessAddressModel]]] = {
+    findData[BusinessAddressModel](businessId, _.businessAddress)
+  }
+
+  def saveBusinessAddress(businessId: String, businessAddress: BusinessAddressModel)
+                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
+    saveData(businessId, _.copy(businessAddress = Some(businessAddress)))
+  }
+
   def fetchAllBusinesses(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Seq[SelfEmploymentData]]] = {
     incomeTaxSubscriptionConnector.getSelfEmployments[Seq[SelfEmploymentData]](businessesKey) map {
       case Right(Some(data)) => Right(data)

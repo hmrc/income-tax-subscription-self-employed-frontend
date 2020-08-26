@@ -153,8 +153,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getAddressLookupInitialise(): WSResponse = get("/address-lookup-initialise")
-  def getAddressLookup(id: String): WSResponse = get(s"/details/address-lookup?id=$id")
+  def getAddressLookupInitialise(itsaId: String): WSResponse = get(s"/address-lookup-initialise/$itsaId")
+  def getAddressLookup(itsaId: String, id: String): WSResponse = get(s"/details/address-lookup/${itsaId}?id=$id")
 
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim

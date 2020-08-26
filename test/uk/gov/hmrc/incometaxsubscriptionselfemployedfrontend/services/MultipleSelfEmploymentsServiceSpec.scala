@@ -35,11 +35,14 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
   def businessTrade(id: String): BusinessTradeNameModel = BusinessTradeNameModel(s"Plumbing $id")
 
+  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(s"Audit Ref $id", Address(Seq("line1", "line2", "line3"), "TF3 4NT"))
+
   def fullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
     id = id,
     businessStartDate = Some(businessStartDate(id)),
     businessName = Some(businessName(id)),
-    businessTradeName = Some(businessTrade(id))
+    businessTradeName = Some(businessTrade(id)),
+    businessAddress = Some(businessAddress(id))
   )
 
   "findData[T]" must {
@@ -132,6 +135,20 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
 
         await(service.findData[BusinessTradeNameModel]("1", _.businessTradeName)) mustBe Right(Some(businessTrade("1")))
+      }
+    }
+  }
+
+  "fetchBusinessAddress" must {
+    "return the business address" when {
+      "the business has the business name" in new Setup {
+        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
+          response = Right(Some(Seq(
+            fullSelfEmploymentData("1")
+          )))
+        )
+
+        await(service.findData[BusinessAddressModel]("1", _.businessAddress)) mustBe Right(Some(businessAddress("1")))
       }
     }
   }
@@ -267,4 +284,20 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
     }
   }
 
+  "saveBusinessAddress" must {
+    "return a save success" when {
+      "business address was successfully saved" in new Setup {
+        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
+          response = Right(None)
+        )
+        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
+          id = businessesKey,
+          value = Seq(SelfEmploymentData("1", businessAddress = Some(businessAddress("1"))))
+        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+
+        await(service.saveData("1", _.copy(businessAddress = Some(businessAddress("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+      }
+    }
+  }
 }

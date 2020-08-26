@@ -22,9 +22,11 @@ import play.api.libs.json._
 case class SelfEmploymentData(id: String,
                               businessStartDate: Option[BusinessStartDate] = None,
                               businessName: Option[BusinessNameModel] = None,
-                              businessTradeName: Option[BusinessTradeNameModel] = None) {
+                              businessTradeName: Option[BusinessTradeNameModel] = None,
+                              businessAddress: Option[BusinessAddressModel] = None
+                             ) {
 
-  val isComplete: Boolean = businessStartDate.isDefined && businessName.isDefined && businessTradeName.isDefined
+  val isComplete: Boolean = businessStartDate.isDefined && businessName.isDefined && businessTradeName.isDefined && businessAddress.isDefined
 
 }
 

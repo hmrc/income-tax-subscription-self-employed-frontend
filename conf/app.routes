@@ -20,8 +20,8 @@ POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptio
 
 GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.RemoveBusinessController.show(id: String)
 
-GET        /address-lookup-initialise           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.initialiseAddressLookupJourney()
-GET        /details/address-lookup              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.addressLookupRedirect(id: Option[String] ?= None)
+GET        /address-lookup-initialise/:itsaId   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.initialiseAddressLookupJourney(itsaId: String)
+GET        /details/address-lookup/:itsaId      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.addressLookupRedirect(itsaId: String, id: Option[String] ?= None)
 
 GET        /language/:lang                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.LanguageSwitchController.switchToLanguage(lang: String)
 

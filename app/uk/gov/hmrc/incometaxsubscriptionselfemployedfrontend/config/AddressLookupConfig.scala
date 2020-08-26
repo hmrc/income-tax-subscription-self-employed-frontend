@@ -50,8 +50,9 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
        |},
        |    "labels": {
        |      "en": {
-       |        "appLevelLabels": {
-       |          "navTitle": "${messagesApi("addressLookup.index.title")}"
+       |        "selectPageLabels": {
+       |          "title": "${messagesApi("addressLookup.selectPage.title")}",
+       |          "heading": "${messagesApi("addressLookup.selectPage.heading")}"
        |        },
        |        "lookupPageLabels": {
        |          "title": "${messagesApi("addressLookup.lookupPage.title")}",
@@ -68,8 +69,9 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
        |        }
        |      },
        |      "cy": {
-       |        "appLevelLabels": {
-       |          "navTitle": "${messagesApi("addressLookup.index.title")(cy)}"
+       |        "selectPageLabels": {
+       |          "title": "${messagesApi("addressLookup.selectPage.title")(cy)}",
+       |          "heading": "${messagesApi("addressLookup.selectPage.heading")(cy)}"
        |        },
        |        "lookupPageLabels": {
        |          "title": "${messagesApi("addressLookup.lookupPage.title")(cy)}",

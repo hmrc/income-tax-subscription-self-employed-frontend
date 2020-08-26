@@ -73,6 +73,7 @@ check_your_answers.sub_heading                                  = Business {0}
 check_your_answers.trading_start_date                           = Trading start date of business
 check_your_answers.business_name                                = Business name
 check_your_answers.business_trade                               = Business trade
+check_your_answers.business_address                             = Business address
 check_your_answers.remove_business                              = Remove business {0}
 check_your_answers.add_another_business_heading                 = Do you want to add another sole trader business?
 
@@ -82,9 +83,10 @@ error.add_another_business.invalid                              = Select yes if 
 error.add_another_business.empty                                = Select yes if you want to add another sole trader business
 
 # Business Address page
-addressLookup.index.title                                       = What is your business address?
-addressLookup.lookupPage.title                                  = Select business address
-addressLookup.lookupPage.heading                                = Select business address
+addressLookup.selectPage.title                                  = Select business address
+addressLookup.selectPage.heading                                = Select business address
+addressLookup.lookupPage.title                                  = What is your business address?
+addressLookup.lookupPage.heading                                = What is your business address?
 addressLookup.editPage.title                                    = Enter business address
 addressLookup.editPage.heading                                  = Enter business address
 addressLookup.editPage.postcodeLabel                            = Postcode

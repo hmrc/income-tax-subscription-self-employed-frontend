@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessAddressModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AddAnotherBusinessModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Yes
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.No
@@ -67,12 +68,20 @@
     summaryRow(question, answer, Some(changeUrl))
 }
 
+@businessAddress(businessAddress: BusinessAddressModel, addressId: String) = @{
+    val question: String = messages("check_your_answers.business_address")
+    val answer: String = businessAddress.address.toString
+    val changeUrl: String = appConfig.addressLookupChangeUrl(addressId)
+    summaryRow(question, answer, Some(changeUrl))
+}
+
 @businessTable(business: SelfEmploymentData, businessNumber: Int) = {
     <h2 class="heading-medium" id="check-your-answer-heading">@messages("check_your_answers.sub_heading", businessNumber)</h2>
     <dl class="govuk-summary-list">
         @business.businessStartDate.map(startDate => tradingStartDate(startDate, business.id))
         @business.businessName.map(name => businessName(name, business.id))
         @business.businessTradeName.map(trade => businessTrade(trade, business.id))
+        @business.businessAddress.map(address => businessAddress(address, address.auditRef))
     </dl>
     <div class="form-group">
         <a id="remove-business-@businessNumber" href=@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.RemoveBusinessController.show(business.id).url>@messages("check_your_answers.remove_business", businessNumber)</a>
