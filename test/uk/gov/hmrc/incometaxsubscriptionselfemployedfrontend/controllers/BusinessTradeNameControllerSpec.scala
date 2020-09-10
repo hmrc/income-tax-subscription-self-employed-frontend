@@ -164,7 +164,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
       }
       "the user does not update their trade" in {
         mockAuthSuccess()
@@ -173,6 +173,36 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         )
         mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
         val result = TestBusinessTradeNameController.submit(id, isEditMode = true)(
+          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+      }
+    }
+  }
+
+  "Submit - it is not in edit mode" should {
+
+    "return a redirect to address look up" when {
+      "the user submits valid data" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
+        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+
+        val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(
+          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+        )
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+      }
+      "the user does not update their trade" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(
+          Right(Seq(selfEmploymentData))
+        )
+        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
         status(result) mustBe SEE_OTHER
