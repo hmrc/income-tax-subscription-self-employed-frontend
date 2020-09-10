@@ -73,8 +73,12 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
               Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
             businessTradeNameData =>
               multipleSelfEmploymentsService.saveBusinessTrade(id, businessTradeNameData).map(_ =>
-                Redirect(
-                  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id))
+                if (isEditMode) {
+                  Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
+                } else {
+                  Redirect(
+                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id))
+                }
               )
           )
         }
