@@ -92,3 +92,17 @@ addressLookup.editPage.postcodeLabel                            = Cod post y DU
 addressLookup.confirmPage.title                                 = Cadarnhau cyfeiriad busnes
 addressLookup.confirmPage.heading                               = Cadarnhau cyfeiriad busnes
 
+# Agent Business start date
+business.agent.start_date.title                                 = Pryd y dechreuodd busnes eich cleient fasnachu?
+business.agent.start_date.heading                               = Pryd y dechreuodd busnes eich cleient fasnachu?
+business.agent.start_date.exampleStartDate                      = Er enghraifft, 1 8 2014
+
+# Agent Date errors
+error.agent.date.empty                                          = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
+error.agent.day.empty                                           = Mae’n rhaid i’r dyddiad gynnwys diwrnod
+error.agent.month.empty                                         = Mae’n rhaid i’r dyddiad gynnwys mis
+error.agent.year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
+error.agent.day.month.empty                                     = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
+error.agent.day.year.empty                                      = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
+error.agent.month.year.empty                                    = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
+error.agent.business_accounting_period.minStartDate             = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
