@@ -1,0 +1,50 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.api.data.Form
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.DateOfCommencementForm._
+@import uk.gov.hmrc.play.views.html.helpers.form
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.main_template
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
+
+@(dateOfCommencementForm: Form[BusinessStartDate], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@main_template(title = messages("business.agent.start_date.title"), form = Some(dateOfCommencementForm)) {
+
+    @back_link(backUrl)
+
+    @summaryErrorHelper(dateOfCommencementForm)
+
+    <h1 class="heading-large">@messages("business.agent.start_date.heading")</h1>
+
+    @form(action = postAction) {
+
+        @dateHelper(
+            field = dateOfCommencementForm(startDate),
+            parentForm = dateOfCommencementForm,
+            hintText = Some(messages("business.agent.start_date.exampleStartDate"))
+        )
+
+        @if(isEditMode) {
+            @continueButton(Some(messages("base.update")))
+        } else {
+            @continueButton()
+        }
+    }
+}
