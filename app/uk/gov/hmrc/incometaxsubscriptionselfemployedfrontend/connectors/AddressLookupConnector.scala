@@ -36,7 +36,7 @@ class AddressLookupConnector @Inject()(appConfig: AppConfig,
   }
 
   def getAddressDetailsUrl(id: String): String = {
-    s"${appConfig.addressLookupUrl}/api/confirmed?id=$id"
+    s"${appConfig.addressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
   def initialiseAddressLookup(continueUrl: String)
