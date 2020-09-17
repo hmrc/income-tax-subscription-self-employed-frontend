@@ -7,7 +7,7 @@ import play.api.libs.json.{JsValue, Json}
 object AddressLookupConnectorStub extends WireMockMethods {
 
   private def addressLookupInitializeUrl = s"/api/v2/init"
-  private def getAddressDetailsUrl(id: String) = s"/api/confirmed\\?id=$id"
+  private def getAddressDetailsUrl(id: String) = s"/api/v2/confirmed\\?id=$id"
 
   def stubGetAddressLookupDetails(id: String)(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
     when(
