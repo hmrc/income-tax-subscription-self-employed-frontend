@@ -106,3 +106,11 @@ error.agent.day.month.empty                                     = Mae’n rhaid 
 error.agent.day.year.empty                                      = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
 error.agent.month.year.empty                                    = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
 error.agent.business_accounting_period.minStartDate             = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+
+# Agent Business Name errors
+error.agent.business_name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient
+error.agent.business_name.max_length                            = Mae’n rhaid i enw’r busnes fod yn 160 o gymeriadau neu lai
+error.agent.business_name.invalid_character                     = Ni all enw’r busnes gynnwys !, “ “ , * na ?
+
+#Agent Trade Name errors
+error.agent.business_trade_name.duplicate                       = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
