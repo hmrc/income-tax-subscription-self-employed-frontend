@@ -96,7 +96,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
-          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.show().url)
+          Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
       }
     }
     "return 400, SEE_OTHER)" when {
