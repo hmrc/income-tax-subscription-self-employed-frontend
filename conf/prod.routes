@@ -1,6 +1,8 @@
 # Add all the application routes to the app.routes file
 
 ->         /report-quarterly/income-and-expenses/sign-up/self-employments             app.Routes
+->         /report-quarterly/income-and-expenses/sign-up/self-employments/client      agent.Routes
+
 ->         /                                                                          health.Routes
 ->         /template                                                                  template.Routes
 
