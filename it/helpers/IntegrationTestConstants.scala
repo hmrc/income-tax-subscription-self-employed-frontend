@@ -12,7 +12,7 @@ object IntegrationTestConstants {
   val baseURI = "/report-quarterly/income-and-expenses/sign-up/self-employments"
   val BusinessStartDateUri = s"$baseURI/details/business-start-date"
   val DateOfCommencementUri = s"$baseURI/client/details/business-start-date"
-  val ClientBusinessNameUri = s"$incomeTaxSubscriptionFrontendBaseUrl/client/business/name"
+  val ClientBusinessNameUri = s"$baseURI/client/details/business-name"
   val BusinessNameUri = s"$baseURI/details/business-name"
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
   val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
