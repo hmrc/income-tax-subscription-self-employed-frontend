@@ -79,10 +79,10 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel))
 
 
-      Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+      Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
       res must have(
         httpStatus(SEE_OTHER),
-        redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
+        redirectURI(BusinessAccountingMethodUri)
       )
     }
 

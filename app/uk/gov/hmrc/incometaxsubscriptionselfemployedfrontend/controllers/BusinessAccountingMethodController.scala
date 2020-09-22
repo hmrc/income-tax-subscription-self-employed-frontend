@@ -69,8 +69,9 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors))),
         businessAccountingMethod =>
-          incomeTaxSubscriptionConnector.saveSelfEmployments(businessAccountingMethodKey, businessAccountingMethod) map (
-            _ => Redirect(appConfig.subscriptionFrontendRoutingController))
+          incomeTaxSubscriptionConnector.saveSelfEmployments(businessAccountingMethodKey, businessAccountingMethod) map (_ =>
+            Redirect(routes.BusinessAccountingMethodController.show())
+            )
       )
     }
   }

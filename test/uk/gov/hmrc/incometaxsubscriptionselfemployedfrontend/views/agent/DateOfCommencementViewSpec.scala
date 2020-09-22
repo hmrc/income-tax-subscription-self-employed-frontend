@@ -33,7 +33,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.da
 class DateOfCommencementViewSpec extends ViewSpec {
 
   object DateOfCommencementMessages {
-    val title = "When did your client‘s business start trading?"
+    val title = "When did your client`s business start trading?"
     val heading: String = title
     val exampleStartDate = "For example, 1 8 2014"
     val continue = "Continue"

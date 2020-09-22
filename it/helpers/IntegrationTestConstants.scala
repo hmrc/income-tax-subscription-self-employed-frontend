@@ -8,11 +8,9 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 object IntegrationTestConstants {
 
   lazy val id: String = "AA111111A"
-  val incomeTaxSubscriptionFrontendBaseUrl = "/report-quarterly/income-and-expenses/sign-up"
+
   val baseURI = "/report-quarterly/income-and-expenses/sign-up/self-employments"
   val BusinessStartDateUri = s"$baseURI/details/business-start-date"
-  val DateOfCommencementUri = s"$baseURI/client/details/business-start-date"
-  val ClientBusinessNameUri = s"$incomeTaxSubscriptionFrontendBaseUrl/client/business/name"
   val BusinessNameUri = s"$baseURI/details/business-name"
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
   val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"

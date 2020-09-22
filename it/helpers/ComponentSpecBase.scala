@@ -11,7 +11,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.DateOfCommencementForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
@@ -83,20 +82,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getBusinessStartDate(id: String): WSResponse = get(s"/details/business-start-date?id=$id")
 
-  def getDateOfCommencement(): WSResponse = get("/client/details/business-start-date")
-
-  def submitDateOfCommencement(request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-start-date?isEditMode=$inEditMode"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          DateOfCommencementForm.dateOfCommencementForm("error").fill(model).data.map {
-            case (k, v) =>
-              (k, Seq(v))
-          }
-      )
-    )
-  }
 
   def submitBusinessStartDate(request: Option[BusinessStartDate], id: String, inEditMode: Boolean = false): WSResponse = {
     val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode"

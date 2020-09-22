@@ -30,12 +30,12 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.bu
 class BusinessNameViewSpec extends ViewSpec {
 
   object BusinessNameMessages {
-    val title = "What is the name of your client`s business?"
+    val title = "What is the name of your client‘s business?"
     val heading: String = title
     val continue = "Continue"
     val backLink = "Back"
     val update = "Update"
-    val line1 = "This is the business name they used to register for Self Assessment. If their business does not have a name, enter your client`s full name."
+    val line1 = "This is the business name they used to register for Self Assessment. If their business does not have a name, enter your client‘s full name."
     val emptyError = "Enter your client`s name or the name of their business"
   }
 
