@@ -138,22 +138,15 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "in edit mode" in {
         TestBusinessStartDateController.backUrl(id, Nil, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
       }
-      "the business is not the first complete entered business" in {
-        val businesses: Seq[SelfEmploymentData] = Seq(
-          selfEmploymentData("testIdOne"),
-          selfEmploymentData("testIdTwo")
-        )
-        TestBusinessStartDateController.backUrl("testIdTwo", businesses, isEditMode = false) mustBe routes.BusinessListCYAController.show().url
-      }
     }
-    "go to the what year to sign up page" when {
-      "not in edit mode and the business is the first complete entered business" in {
+    "go to the income source page" when {
+      "not in edit mode" in {
         val businesses: Seq[SelfEmploymentData] = Seq(
           selfEmploymentData("testIdOne"),
           selfEmploymentData("testIdTwo")
         )
         TestBusinessStartDateController.backUrl("testIdOne", businesses, isEditMode = false) must include(
-        "/report-quarterly/income-and-expenses/sign-up/business/what-year-to-sign-up")
+        "/report-quarterly/income-and-expenses/sign-up/details/income-receive")
       }
     }
   }
