@@ -2,4 +2,6 @@
 GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DateOfCommencementController.show(isEditMode: Boolean ?= false)
 POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DateOfCommencementController.submit(isEditMode: Boolean ?= false)
 
+GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.show(isEditMode: Boolean ?= false)
+POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.submit(isEditMode: Boolean ?= false)
 

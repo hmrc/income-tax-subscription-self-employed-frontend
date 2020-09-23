@@ -88,7 +88,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
   private def withAllBusinesses(f: Seq[SelfEmploymentData] => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
     multipleSelfEmploymentsService.fetchAllBusinesses.flatMap {
       case Right(businesses) => f(businesses)
-      case Left(error) => throw new InternalServerException(s"[BusinessTradeNameController][withAllBusinesses] - Error retrieving businesses, error: $error")
+      case Left(error) => throw new InternalServerException(s"[BusinessNameController][withAllBusinesses] - Error retrieving businesses, error: $error")
     }
   }
 

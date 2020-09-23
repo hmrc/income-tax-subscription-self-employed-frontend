@@ -74,7 +74,7 @@ class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
             if (isEditMode) {
               Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show())
             } else {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show())
             }
             )
       )

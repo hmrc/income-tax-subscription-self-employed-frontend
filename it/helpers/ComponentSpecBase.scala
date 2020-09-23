@@ -98,6 +98,21 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getClientBusinessName(): WSResponse = get("/client/details/business-name")
+
+  def submitClientBusinessName(request: Option[BusinessNameModel], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-name?isEditMode=$inEditMode"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm.businessNameValidationForm(Nil).fill(model).data.map {
+            case (k, v) =>
+              (k, Seq(v))
+          }
+      )
+    )
+  }
+
   def submitBusinessStartDate(request: Option[BusinessStartDate], id: String, inEditMode: Boolean = false): WSResponse = {
     val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode"
     post(uri)(
