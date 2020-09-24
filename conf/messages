@@ -118,5 +118,9 @@ error.agent.business_name.empty                                 = Enter your cli
 error.agent.business_name.max_length                            = Business name must be 160 characters or fewer
 error.agent.business_name.invalid_character                     = Business name cannot include !, " ", * or ?
 
+#Agent Trade Name
+business.agent.trade_name.title                                 = What is the trade of your client‘s business?
+business.agent.trade_name.hint                                  = For example: plumbing, electrical work, consulting
+
 #Agent Trade Name errors
 error.agent.business_trade_name.duplicate                       = You cannot enter the same trade and same business name
