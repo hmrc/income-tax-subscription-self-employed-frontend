@@ -39,7 +39,8 @@ object BusinessNameForm {
     else Valid
   }
 
-  def businessNameValidationForm(excludedBusinessNames: Seq[BusinessNameModel]): Form[BusinessNameModel] = Form(
+  //Default value for excludedBusinessNames can be removed when multiple self-employed is implemented
+  def businessNameValidationForm(excludedBusinessNames: Seq[BusinessNameModel] = Seq()): Form[BusinessNameModel] = Form(
     mapping(
       businessName -> trimmedText.verifying(
         nameNotEmpty andThen nameMaxLength andThen nameValidChars andThen nameIsNotExcluded(excludedBusinessNames)

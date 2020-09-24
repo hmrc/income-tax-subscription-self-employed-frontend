@@ -107,6 +107,11 @@ error.agent.day.year.empty                                      = Mae’n rhaid 
 error.agent.month.year.empty                                    = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
 error.agent.business_accounting_period.minStartDate             = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
 
+# Agent Business Name
+business.agent.name.title                                       = Beth yw enw busnes eich cleient?
+business.agent.name.heading                                     = Beth yw enw busnes eich cleient?
+business.agent.name.line_1                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar ei fusnes, nodwch enw llawn eich cleient.
+
 # Agent Business Name errors
 error.agent.business_name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient
 error.agent.business_name.max_length                            = Mae’n rhaid i enw’r busnes fod yn 160 o gymeriadau neu lai

@@ -91,11 +91,10 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   }
 
   def backUrl(id: String, businesses: Seq[SelfEmploymentData], isEditMode: Boolean): String = {
-    val isFirstCompleteBusiness: Boolean = businesses.find(_.isComplete).exists(_.id == id)
-    if (isEditMode || !isFirstCompleteBusiness) {
+    if (isEditMode) {
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
     } else {
-      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/what-year-to-sign-up"
+      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
     }
   }
 
