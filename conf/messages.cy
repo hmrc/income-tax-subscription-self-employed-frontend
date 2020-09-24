@@ -117,6 +117,10 @@ error.agent.business_name.empty                                 = Nodwch enw’c
 error.agent.business_name.max_length                            = Mae’n rhaid i enw’r busnes fod yn 160 o gymeriadau neu lai
 error.agent.business_name.invalid_character                     = Ni all enw’r busnes gynnwys !, “ “ , * na ?
 
+#Agent Trade Name
+business.agent.trade_name.title                                 = Beth yw masnach busnes eich cleient?
+business.agent.trade_name.hint                                  = Er enghraifft: plymio, gwaith trydanol, ymgynghori
+
 #Agent Trade Name errors
 error.agent.business_trade_name.empty                           = Nodwch fasnach busnes eich cleient
 error.agent.business_trade_name.maxLength                       = Mae‘n rhaid i fasnach y busnes fod yn 160 o gymeriadau neu lai
