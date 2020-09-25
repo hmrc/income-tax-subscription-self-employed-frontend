@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContextExecutor
 
 trait UnitTestTrait extends PlaySpec with GuiceOneServerPerSuite with I18nSupport {
 
-  implicit val executionContext: ExecutionContextExecutor = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
