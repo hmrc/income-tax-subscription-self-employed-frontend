@@ -113,6 +113,21 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getClientTradeName(): WSResponse = get("/client/details/business-trade")
+
+  def submitClientTradeName(request: Option[BusinessTradeNameModel], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-trade?isEditMode=$inEditMode"
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          BusinessTradeNameForm.businessTradeNameValidationForm(Nil).fill(model).data.map {
+            case (k, v) =>
+              (k, Seq(v))
+          }
+      )
+    )
+  }
+
   def submitBusinessStartDate(request: Option[BusinessStartDate], id: String, inEditMode: Boolean = false): WSResponse = {
     val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode"
     post(uri)(
