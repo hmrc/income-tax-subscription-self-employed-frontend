@@ -127,3 +127,14 @@ error.agent.business_trade_name.empty                           = Enter the trad
 error.agent.business_trade_name.maxLength                       = Business trade must be 160 characters or fewer
 error.agent.business_trade_name.invalid                         = Business trade must only include letters a to z, hyphens, spaces and apostrophes
 error.agent.business_trade_name.duplicate                       = You cannot enter the same trade and same business name
+
+#Agent Business Address page
+agent.addressLookup.selectPage.title                            = Select client‘s business address
+agent.addressLookup.selectPage.heading                          = Select client‘s business address
+agent.addressLookup.lookupPage.title                            = What is your client‘s business address?
+agent.addressLookup.lookupPage.heading                          = What is your client‘s business address?
+agent.addressLookup.editPage.title                              = Enter client‘s business address
+agent.addressLookup.editPage.heading                            = Enter client‘s business address
+agent.addressLookup.editPage.postcodeLabel                      = Postcode
+agent.addressLookup.confirmPage.title                           = Confirm client‘s business address
+agent.addressLookup.confirmPage.heading                         = Confirm client‘s business address

@@ -14,6 +14,7 @@ object IntegrationTestConstants {
   val DateOfCommencementUri = s"$baseURI/client/details/business-start-date"
   val ClientBusinessNameUri = s"$baseURI/client/details/business-name"
   val ClientBusinessTradeNameUri = s"$baseURI/client/details/business-trade"
+  val ClientBusinessAddressInitialiseUri = s"$baseURI/client/address-lookup-initialise"
   val BusinessNameUri = s"$baseURI/details/business-name"
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
   val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
@@ -92,6 +93,71 @@ object IntegrationTestConstants {
        |        "confirmPageLabels": {
        |          "title": "Cadarnhau cyfeiriad busnes",
        |          "heading": "Cadarnhau cyfeiriad busnes"
+       |        }
+       |      }
+       |    }
+       |  }""".stripMargin
+
+  def testAddressLookupConfigClient(continueUrl: String): String =
+    s"""{
+       |  "version": 2,
+       |  "options": {
+       |    "continueUrl": "$continueUrl",
+       |    "showBackButtons": true,
+       |    "includeHMRCBranding": true,
+       |    "ukMode": true,
+       |    "selectPageConfig": {
+       |      "proposalListLimit": 50,
+       |      "showSearchLinkAgain": true
+       |    },
+       |    "confirmPageConfig": {
+       |      "showChangeLink": true,
+       |      "showSubHeadingAndInfo": true,
+       |      "showSearchAgainLink": false,
+       |      "showConfirmChangeText": true
+       |    },
+       |    "timeoutConfig": {
+       |      "timeoutAmount": 900,
+       |      "timeoutUrl": "http://tax.service.gov.uk/income-tax-subscription-frontend/session-timeout"
+       |    }
+       |},
+       |    "labels": {
+       |      "en": {
+       |        "selectPageLabels": {
+       |          "title": "Select client‘s business address",
+       |          "heading": "Select client‘s business address"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "What is your client‘s business address?",
+       |          "heading": "What is your client‘s business address?"
+       |        },
+       |        "editPageLabels": {
+       |          "title": "Enter client‘s business address",
+       |          "heading": "Enter client‘s business address",
+       |          "postcodeLabel":"Postcode"
+       |        },
+       |        "confirmPageLabels": {
+       |          "title": "Confirm client‘s business address",
+       |          "heading": "Confirm client‘s business address"
+       |        }
+       |      },
+       |      "cy": {
+       |        "selectPageLabels": {
+       |          "title": "dewis cyfeiriad busnes y cleient",
+       |          "heading": "dewis cyfeiriad busnes y cleient"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "Beth yw cyfeiriad busnes eich cleient?",
+       |          "heading": "Beth yw cyfeiriad busnes eich cleient?"
+       |        },
+       |        "editPageLabels": {
+       |          "title": "Rhowch gyfeiriad busnes y cleient",
+       |          "heading": "Rhowch gyfeiriad busnes y cleient",
+       |          "postcodeLabel":"Cod post y DU"
+       |        },
+       |        "confirmPageLabels": {
+       |          "title": "Cadarnhau cyfeiriad busnes y cleient",
+       |          "heading": "Cadarnhau cyfeiriad busnes y cleient"
        |        }
        |      }
        |    }

@@ -67,8 +67,10 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
             if (isEditMode) {
               Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show())
             } else {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show())
-            }            )
+              Redirect(
+                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney())
+            }
+          )
       )
     }
   }
@@ -77,7 +79,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
     if (isEditMode) {
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show().url
     } else {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney().url
     }
   }
 

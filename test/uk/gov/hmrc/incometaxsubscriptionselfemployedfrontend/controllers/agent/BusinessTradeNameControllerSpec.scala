@@ -88,8 +88,9 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
-          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show().url)
-
+          Some(
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney().url
+          )
       }
     }
     "return 400, SEE_OTHER)" when {
