@@ -90,4 +90,74 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
        |    }
        |  }""".stripMargin
   }
+
+  //scalastyle:off
+  def agentConfig(continueUrl: String)(implicit language: Lang): String = {
+
+    val cy = Lang("CY")
+
+    s"""{
+       |  "version": 2,
+       |  "options": {
+       |    "continueUrl": "$continueUrl",
+       |    "showBackButtons": true,
+       |    "includeHMRCBranding": true,
+       |    "ukMode": true,
+       |    "selectPageConfig": {
+       |      "proposalListLimit": 50,
+       |      "showSearchLinkAgain": true
+       |    },
+       |    "confirmPageConfig": {
+       |      "showChangeLink": true,
+       |      "showSubHeadingAndInfo": true,
+       |      "showSearchAgainLink": false,
+       |      "showConfirmChangeText": true
+       |    },
+       |    "timeoutConfig": {
+       |      "timeoutAmount": 900,
+       |      "timeoutUrl": "http://tax.service.gov.uk/income-tax-subscription-frontend/session-timeout"
+       |    }
+       |},
+       |    "labels": {
+       |      "en": {
+       |        "selectPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.selectPage.title")}",
+       |          "heading": "${messagesApi("agent.addressLookup.selectPage.heading")}"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.lookupPage.title")}",
+       |          "heading": "${messagesApi("agent.addressLookup.lookupPage.heading")}"
+       |        },
+       |        "editPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.editPage.title")}",
+       |          "heading": "${messagesApi("agent.addressLookup.editPage.heading")}",
+       |          "postcodeLabel": "${messagesApi("agent.addressLookup.editPage.postcodeLabel")}"
+       |        },
+       |        "confirmPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.confirmPage.title")}",
+       |          "heading": "${messagesApi("agent.addressLookup.confirmPage.heading")}"
+       |        }
+       |      },
+       |      "cy": {
+       |        "selectPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.selectPage.title")(cy)}",
+       |          "heading": "${messagesApi("agent.addressLookup.selectPage.heading")(cy)}"
+       |        },
+       |        "lookupPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.lookupPage.title")(cy)}",
+       |          "heading": "${messagesApi("agent.addressLookup.lookupPage.heading")(cy)}"
+       |        },
+       |        "editPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.editPage.title")(cy)}",
+       |          "heading": "${messagesApi("agent.addressLookup.editPage.heading")(cy)}",
+       |          "postcodeLabel": "${messagesApi("agent.addressLookup.editPage.postcodeLabel")(cy)}"
+       |        },
+       |        "confirmPageLabels": {
+       |          "title": "${messagesApi("agent.addressLookup.confirmPage.title")(cy)}",
+       |          "heading": "${messagesApi("agent.addressLookup.confirmPage.heading")(cy)}"
+       |        }
+       |      }
+       |    }
+       |  }""".stripMargin
+  }
 }

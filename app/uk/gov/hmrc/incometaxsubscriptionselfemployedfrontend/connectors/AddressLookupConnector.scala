@@ -28,7 +28,6 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressLookupConnector @Inject()(appConfig: AppConfig,
-                                       addressLookupConfig: AddressLookupConfig,
                                        http: HttpClient)(implicit ec: ExecutionContext) {
 
   def addressLookupInitializeUrl: String = {
@@ -39,10 +38,9 @@ class AddressLookupConnector @Inject()(appConfig: AppConfig,
     s"${appConfig.addressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
-  def initialiseAddressLookup(continueUrl: String)
+  def initialiseAddressLookup(data: String)
                              (implicit hc: HeaderCarrier, language: Lang): Future[PostAddressLookupResponse] = {
-    http.POST[JsValue, PostAddressLookupResponse](addressLookupInitializeUrl,
-      Json.parse(addressLookupConfig.config(continueUrl)))
+    http.POST[JsValue, PostAddressLookupResponse](addressLookupInitializeUrl, Json.parse(data))
   }
 
   def getAddressDetails(id: String)(implicit hc: HeaderCarrier): Future[GetAddressLookupDetailsResponse] = {

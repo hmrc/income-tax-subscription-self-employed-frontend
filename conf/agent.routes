@@ -9,3 +9,7 @@ POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptio
 # Business Trade Name Page
 GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.show(isEditMode: Boolean ?= false)
 POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.submit(isEditMode: Boolean ?= false)
+
+GET        /address-lookup-initialise           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney
+GET        /details/address-lookup              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(id: Option[String] ?= None)
+

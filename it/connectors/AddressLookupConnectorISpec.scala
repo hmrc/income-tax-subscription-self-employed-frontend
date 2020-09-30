@@ -66,7 +66,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
     "Return PostSelfEmploymentsSuccessResponse" in {
       stubInitializeAddressLookup(Json.parse(testAddressLookupConfig("testUrl")))("testLocation", ACCEPTED)
 
-      val res = connector.initialiseAddressLookup("testUrl")
+      val res = connector.initialiseAddressLookup(testAddressLookupConfig("testUrl"))
 
       await(res) mustBe Right(PostAddressLookupSuccessResponse(Some("testLocation")))
     }
@@ -74,7 +74,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
     "Return UnexpectedStatusFailure(status)" in {
       stubInitializeAddressLookup(Json.parse(testAddressLookupConfig("test")))("testLocation", INTERNAL_SERVER_ERROR)
 
-      val res = connector.initialiseAddressLookup("test")
+      val res = connector.initialiseAddressLookup(testAddressLookupConfig("test"))
 
       await(res) mustBe Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
     }

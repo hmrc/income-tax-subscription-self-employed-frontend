@@ -126,3 +126,14 @@ error.agent.business_trade_name.empty                           = Nodwch fasnach
 error.agent.business_trade_name.maxLength                       = Mae‘n rhaid i fasnach y busnes fod yn 160 o gymeriadau neu lai
 error.agent.business_trade_name.invalid                         = Ni all enw‘r busnes gynnwys !, “ “ , * na ?
 error.agent.business_trade_name.duplicate                       = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
+
+#Agent Business Address page
+agent.addressLookup.selectPage.title                            = dewis cyfeiriad busnes y cleient
+agent.addressLookup.selectPage.heading                          = dewis cyfeiriad busnes y cleient
+agent.addressLookup.lookupPage.title                            = Beth yw cyfeiriad busnes eich cleient?
+agent.addressLookup.lookupPage.heading                          = Beth yw cyfeiriad busnes eich cleient?
+agent.addressLookup.editPage.title                              = Rhowch gyfeiriad busnes y cleient
+agent.addressLookup.editPage.heading                            = Rhowch gyfeiriad busnes y cleient
+agent.addressLookup.editPage.postcodeLabel                      = Cod post y DU
+agent.addressLookup.confirmPage.title                           = Cadarnhau cyfeiriad busnes y cleient
+agent.addressLookup.confirmPage.heading                         = Cadarnhau cyfeiriad busnes y cleient

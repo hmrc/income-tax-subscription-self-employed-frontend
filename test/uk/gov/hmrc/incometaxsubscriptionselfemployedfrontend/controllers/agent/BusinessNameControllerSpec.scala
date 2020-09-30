@@ -87,7 +87,7 @@ with MockIncomeTaxSubscriptionConnector {
             FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
-          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show().url)
+          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney().url)
         }
       }
       "return 400, SEE_OTHER)" when {
