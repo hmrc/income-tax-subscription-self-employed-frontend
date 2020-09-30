@@ -34,7 +34,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                                authService: AuthService,
                                                addressLookupConnector: AddressLookupConnector,
                                                addressLookupConfig: AddressLookupConfig,
-                                               incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
+                                               incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector
                                               )(implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
 
   def initialiseAddressLookupJourney(): Action[AnyContent] = Action.async { implicit request =>
