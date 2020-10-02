@@ -86,7 +86,7 @@ class DateOfCommencementControllerISpec extends ComponentSpecBase {
       res must have(
         httpStatus(SEE_OTHER),
 
-        redirectURI(DateOfCommencementUri)
+        redirectURI(ClientBusinessListCYAUri)
       )
     }
 

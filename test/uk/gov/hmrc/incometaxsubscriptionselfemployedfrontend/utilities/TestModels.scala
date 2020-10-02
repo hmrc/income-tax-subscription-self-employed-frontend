@@ -129,21 +129,21 @@ object TestModels {
        |    "labels": {
        |      "en": {
        |        "selectPageLabels": {
-       |          "title": "Select client‘s business address",
-       |          "heading": "Select client‘s business address"
+       |          "title": "Select client’s business address",
+       |          "heading": "Select client’s business address"
        |        },
        |        "lookupPageLabels": {
-       |          "title": "What is your client‘s business address?",
-       |          "heading": "What is your client‘s business address?"
+       |          "title": "What is your client’s business address?",
+       |          "heading": "What is your client’s business address?"
        |        },
        |        "editPageLabels": {
-       |          "title": "Enter client‘s business address",
-       |          "heading": "Enter client‘s business address",
+       |          "title": "Enter client’s business address",
+       |          "heading": "Enter client’s business address",
        |          "postcodeLabel":"Postcode"
        |        },
        |        "confirmPageLabels": {
-       |          "title": "Confirm client‘s business address",
-       |          "heading": "Confirm client‘s business address"
+       |          "title": "Confirm client’s business address",
+       |          "heading": "Confirm client’s business address"
        |        }
        |      },
        |      "cy": {

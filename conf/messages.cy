@@ -137,3 +137,12 @@ agent.addressLookup.editPage.heading                            = Rhowch gyfeiri
 agent.addressLookup.editPage.postcodeLabel                      = Cod post y DU
 agent.addressLookup.confirmPage.title                           = Cadarnhau cyfeiriad busnes y cleient
 agent.addressLookup.confirmPage.heading                         = Cadarnhau cyfeiriad busnes y cleient
+
+# Check your answers
+agent.check_your_answers.title                                  = Gwiriwch eich atebion
+agent.check_your_answers.heading                                = Gwiriwch eich atebion
+agent.check_your_answers.trading_start_date                     = Dyddiad dechrau masnachu’r busnes
+agent.check_your_answers.business_name                          = Enw’r busnes
+agent.check_your_answers.business_trade                         = Masnach y busnes
+agent.check_your_answers.business_address                       = Cyfeiriad y busnes
+agent.check_your_answers.confirm_and_sign_up                    = Cadarnhau a chofrestru

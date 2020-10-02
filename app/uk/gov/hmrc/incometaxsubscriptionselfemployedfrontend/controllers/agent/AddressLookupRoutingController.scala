@@ -60,18 +60,15 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
           s"[AddressLookupRoutingController][addressLookupRedirect] - Id not returned from address service")
       } else {
         addressLookupConnector.getAddressDetails(id.get) flatMap {
-          addressDetailsResponse =>
-            addressDetailsResponse match {
-              case Right(Some(addressDetails)) =>
-                incomeTaxSubscriptionConnector.saveSelfEmployments(AddressLookupRoutingController.businessAddress, addressDetails).map(_ =>
-                  Redirect(routes.BusinessTradeNameController.show()))
-              case Right(None) => throw new InternalServerException(
-                s"[AddressLookupRoutingController][addressLookupRedirect] - No address details found with id: $id")
-              case Left(InvalidJson) => throw new InternalServerException(
-                s"[AddressLookupRoutingController][addressLookupRedirect] - Invalid json response")
-              case Left(GetAddressLookupDetailsHttpParser.UnexpectedStatusFailure(status)) => throw new InternalServerException(
-                s"[AddressLookupRoutingController][addressLookupRedirect] - Unexpected response, status: $status")
-            }
+          case Right(Some(addressDetails)) =>
+            incomeTaxSubscriptionConnector.saveSelfEmployments(AddressLookupRoutingController.businessAddress, addressDetails).map(_ =>
+              Redirect(routes.BusinessListCYAController.show()))
+          case Right(None) => throw new InternalServerException(
+            s"[AddressLookupRoutingController][addressLookupRedirect] - No address details found with id: $id")
+          case Left(InvalidJson) => throw new InternalServerException(
+            s"[AddressLookupRoutingController][addressLookupRedirect] - Invalid json response")
+          case Left(GetAddressLookupDetailsHttpParser.UnexpectedStatusFailure(status)) => throw new InternalServerException(
+            s"[AddressLookupRoutingController][addressLookupRedirect] - Unexpected response, status: $status")
         }
       }
     }

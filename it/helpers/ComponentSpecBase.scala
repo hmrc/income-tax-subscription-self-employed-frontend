@@ -198,6 +198,12 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getClientCheckYourAnswers: WSResponse = get(s"/client/details/business-list")
+  def submitClientCheckYourAnswers(): WSResponse = {
+    val uri = s"/client/details/business-list"
+    post(uri)(Map.empty[String, Seq[String]])
+  }
+
   def getAddressLookupInitialise(itsaId: String): WSResponse = get(s"/address-lookup-initialise/$itsaId")
   def getAddressLookup(itsaId: String, id: String): WSResponse = get(s"/details/address-lookup/${itsaId}?id=$id")
 

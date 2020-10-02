@@ -13,3 +13,5 @@ POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptio
 GET        /address-lookup-initialise           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney
 GET        /details/address-lookup              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(id: Option[String] ?= None)
 
+GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.show
+POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.submit

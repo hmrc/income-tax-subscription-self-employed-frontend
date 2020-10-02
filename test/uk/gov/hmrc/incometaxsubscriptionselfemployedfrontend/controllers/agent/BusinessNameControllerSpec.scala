@@ -110,7 +110,7 @@ with MockIncomeTaxSubscriptionConnector {
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show().url)
+            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url)
         }
       }
       "return 400, SEE_OTHER)" when {

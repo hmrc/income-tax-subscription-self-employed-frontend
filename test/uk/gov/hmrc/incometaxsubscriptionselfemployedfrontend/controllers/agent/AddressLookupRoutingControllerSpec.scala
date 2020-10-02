@@ -93,7 +93,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         val result = TestAddressLookupRoutingController.addressLookupRedirect(Some("12345"))(FakeRequest())
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
-          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show().url)
+          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url)
       }
     }
 

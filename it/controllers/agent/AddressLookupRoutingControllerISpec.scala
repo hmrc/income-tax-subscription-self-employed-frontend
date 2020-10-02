@@ -83,7 +83,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
       Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
       res must have(
         httpStatus(SEE_OTHER),
-        redirectURI(ClientBusinessTradeNameUri)
+        redirectURI(ClientBusinessListCYAUri)
       )
     }
 

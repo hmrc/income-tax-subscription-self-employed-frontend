@@ -40,9 +40,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
-                                              incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,                                              authService: AuthService,
-                                              val languageUtils: LanguageUtils)
-                                             (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
+                                             incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
+                                             authService: AuthService,
+                                             val languageUtils: LanguageUtils)
+                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
   with I18nSupport with ImplicitDateFormatter {
 
   def view(dateOfCommencementForm: Form[BusinessStartDate], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
@@ -72,7 +73,7 @@ class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
         businessStartDateData =>
           incomeTaxSubscriptionConnector.saveSelfEmployments(DateOfCommencementController.businessStartDateKey, businessStartDateData) map (_ =>
             if (isEditMode) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show())
             } else {
               Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show())
             }
@@ -83,7 +84,7 @@ class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
 
   def backUrl(isEditMode: Boolean): String = {
     if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url
     } else {
       appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
     }
@@ -93,9 +94,8 @@ class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
     dateOfCommencementForm(DateOfCommencementForm.minStartDate.toLongDate)
   }
 
+}
 
 object DateOfCommencementController {
   val businessStartDateKey: String = "BusinessStartDate"
-}
-
 }
