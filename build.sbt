@@ -6,6 +6,7 @@ val appName = "income-tax-subscription-self-employed-frontend"
 lazy val microservice = Project(appName, file("."))
   .settings(scalaVersion := "2.12.12")
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(
     majorVersion                     := 0,
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test
