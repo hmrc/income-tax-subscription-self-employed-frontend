@@ -129,6 +129,20 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       }
     }
   }
+
+  "The back url" when {
+    "in edit mode" should {
+      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
+        TestBusinessTradeNameController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      }
+    }
+    "not in edit mode" should {
+      s"redirect to ${routes.BusinessNameController.show().url}" in {
+        TestBusinessTradeNameController.backUrl(isEditMode = false) mustBe routes.BusinessNameController.show().url
+      }
+    }
+  }
+
   authorisationTests()
 
 }

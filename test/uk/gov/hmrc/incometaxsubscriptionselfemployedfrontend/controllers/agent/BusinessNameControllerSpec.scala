@@ -123,5 +123,19 @@ with MockIncomeTaxSubscriptionConnector {
         }
       }
     }
+
+    "The back url" when {
+      "in edit mode" should {
+        s"redirect to ${routes.BusinessListCYAController.show().url}" in {
+          TestBusinessNameController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        }
+      }
+      "not in edit mode" should {
+        s"redirect to ${routes.DateOfCommencementController.show().url}" in {
+          TestBusinessNameController.backUrl(isEditMode = false) mustBe routes.DateOfCommencementController.show().url
+        }
+      }
+    }
+
   }
 }
