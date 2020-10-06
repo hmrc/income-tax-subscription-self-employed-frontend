@@ -84,7 +84,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       res must have(
         httpStatus(SEE_OTHER),
 
-        redirectURI(ClientBusinessNameUri)
+        redirectURI(ClientBusinessListCYAUri)
       )
     }
 

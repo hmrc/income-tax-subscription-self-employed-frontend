@@ -63,7 +63,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
         businessNameData =>
           incomeTaxSubscriptionConnector.saveSelfEmployments(BusinessNameController.businessName, businessNameData).map(_ =>
             if (isEditMode) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show())
             } else {
               Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show())
             }
@@ -74,14 +74,13 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
 
   def backUrl(isEditMode: Boolean): String =
     if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url
     } else {
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show().url
     }
 
-  object BusinessNameController {
-    val businessName: String = "BusinessName"
-  }
 }
 
-
+object BusinessNameController {
+  val businessName: String = "BusinessName"
+}

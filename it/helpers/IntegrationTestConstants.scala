@@ -19,6 +19,7 @@ object IntegrationTestConstants {
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
   val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
   val BusinessListCYAUri = s"$baseURI/details/business-list"
+  val ClientBusinessListCYAUri = s"$baseURI/client/details/business-list"
   val InitialiseUri = s"$baseURI/details"
   def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
   def businessAddressLookupRedirectUri(itsaId: String): String = s"$baseURI/details/address-lookup/$itsaId"
@@ -124,21 +125,21 @@ object IntegrationTestConstants {
        |    "labels": {
        |      "en": {
        |        "selectPageLabels": {
-       |          "title": "Select client‘s business address",
-       |          "heading": "Select client‘s business address"
+       |          "title": "Select client’s business address",
+       |          "heading": "Select client’s business address"
        |        },
        |        "lookupPageLabels": {
-       |          "title": "What is your client‘s business address?",
-       |          "heading": "What is your client‘s business address?"
+       |          "title": "What is your client’s business address?",
+       |          "heading": "What is your client’s business address?"
        |        },
        |        "editPageLabels": {
-       |          "title": "Enter client‘s business address",
-       |          "heading": "Enter client‘s business address",
+       |          "title": "Enter client’s business address",
+       |          "heading": "Enter client’s business address",
        |          "postcodeLabel":"Postcode"
        |        },
        |        "confirmPageLabels": {
-       |          "title": "Confirm client‘s business address",
-       |          "heading": "Confirm client‘s business address"
+       |          "title": "Confirm client’s business address",
+       |          "heading": "Confirm client’s business address"
        |        }
        |      },
        |      "cy": {

@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json, Reads, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmployedDetailsHttpParser.GetAllSelfEmployedDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsResponse
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -43,8 +44,8 @@ class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
     http.GET[GetSelfEmploymentsResponse[T]](selfEmployedURL(id))
   }
 
+  //Could be removed after multiple self employments implementation for agent CYA
+  def getAllSelfEmployedDetails[T]()(implicit hc: HeaderCarrier, reads: Reads[T]): Future[GetAllSelfEmployedDetailsResponse[T]] = {
+    http.GET[GetAllSelfEmployedDetailsResponse[T]](appConfig.allSelfEmployedUrl)
+  }
 }
-
-
-
-
