@@ -46,45 +46,45 @@ class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
                                             (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
   with I18nSupport with ImplicitDateFormatter {
 
-  def view(dateOfCommencementForm: Form[BusinessStartDate], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
+  def view(dateOfCommencementForm: Form[BusinessStartDate],  id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
     date_of_commencement(
       dateOfCommencementForm = dateOfCommencementForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.submit(isEditMode),
+      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.submit(id,isEditMode),
       isEditMode,
-      backUrl = backUrl(isEditMode)
+      backUrl = backUrl(id, isEditMode)
     )
   }
 
-  def show(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       incomeTaxSubscriptionConnector.getSelfEmployments[BusinessStartDate](DateOfCommencementController.businessStartDateKey).map {
-        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData),isEditMode))
+        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData),id,isEditMode))
         case error => throw new InternalServerException(error.toString)
       }
     }
   }
 
 
-  def submit(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       form.bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors,isEditMode))),
+          Future.successful(BadRequest(view(formWithErrors,id,isEditMode))),
         businessStartDateData =>
           incomeTaxSubscriptionConnector.saveSelfEmployments(DateOfCommencementController.businessStartDateKey, businessStartDateData) map (_ =>
             if (isEditMode) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show(id))
             } else {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id))
             }
             )
       )
     }
   }
 
-  def backUrl(isEditMode: Boolean): String = {
+  def backUrl(id: String,isEditMode: Boolean): String = {
     if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show(id).url
     } else {
       appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
     }

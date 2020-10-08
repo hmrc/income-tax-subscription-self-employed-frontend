@@ -62,7 +62,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         addressLookupConnector.getAddressDetails(id.get) flatMap {
           case Right(Some(addressDetails)) =>
             incomeTaxSubscriptionConnector.saveSelfEmployments(AddressLookupRoutingController.businessAddress, addressDetails).map(_ =>
-              Redirect(routes.BusinessListCYAController.show()))
+              Redirect(routes.BusinessListCYAController.show("")))
           case Right(None) => throw new InternalServerException(
             s"[AddressLookupRoutingController][addressLookupRedirect] - No address details found with id: $id")
           case Left(InvalidJson) => throw new InternalServerException(

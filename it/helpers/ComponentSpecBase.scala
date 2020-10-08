@@ -83,10 +83,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getBusinessStartDate(id: String): WSResponse = get(s"/details/business-start-date?id=$id")
 
-  def getDateOfCommencement(): WSResponse = get("/client/details/business-start-date")
+  def getDateOfCommencement(id: String): WSResponse = get(s"/client/details/business-start-date?id=$id")
 
-  def submitDateOfCommencement(request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-start-date?isEditMode=$inEditMode"
+  def submitDateOfCommencement(id: String,request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-start-date?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -98,10 +98,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientBusinessName(): WSResponse = get("/client/details/business-name")
+  def getClientBusinessName(id: String): WSResponse = get(s"/client/details/business-name?id=$id")
 
-  def submitClientBusinessName(request: Option[BusinessNameModel], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-name?isEditMode=$inEditMode"
+  def submitClientBusinessName(id: String, request: Option[BusinessNameModel], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-name?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -113,10 +113,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientTradeName(): WSResponse = get("/client/details/business-trade")
+  def getClientTradeName(id: String): WSResponse = get(s"/client/details/business-trade?id=$id")
 
-  def submitClientTradeName(request: Option[BusinessTradeNameModel], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-trade?isEditMode=$inEditMode"
+  def submitClientTradeName(id: String,request: Option[BusinessTradeNameModel], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-trade?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -198,9 +198,9 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientCheckYourAnswers: WSResponse = get(s"/client/details/business-list")
-  def submitClientCheckYourAnswers(): WSResponse = {
-    val uri = s"/client/details/business-list"
+  def getClientCheckYourAnswers(id: String): WSResponse = get(s"/client/details/business-list?id=$id")
+  def submitClientCheckYourAnswers(id: String): WSResponse = {
+    val uri = s"/client/details/business-list?id=$id"
     post(uri)(Map.empty[String, Seq[String]])
   }
 

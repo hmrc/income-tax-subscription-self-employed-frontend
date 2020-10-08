@@ -34,7 +34,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.Mo
 
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector {
-
   val itsaId = "testId1"
   val mockAddressLookupConfig: AddressLookupConfig = mock[AddressLookupConfig]
 
@@ -93,7 +92,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         val result = TestAddressLookupRoutingController.addressLookupRedirect(Some("12345"))(FakeRequest())
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
-          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url)
+          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show("").url)
       }
     }
 

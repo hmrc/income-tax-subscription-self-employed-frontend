@@ -10,7 +10,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 
 class BusinessTradeNameControllerISpec extends ComponentSpecBase {
-
+  val businessId: String = "testId"
   val testValidBusinessTradeName: String = "Plumbing"
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
@@ -25,7 +25,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments("BusinessTradeName")(NO_CONTENT)
 
         When("GET /client/details/business-trade is called")
-        val res = getClientTradeName()
+        val res = getClientTradeName(businessId)
 
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
@@ -41,7 +41,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments("BusinessTradeName")(OK, Json.toJson(testValidBusinessTradeNameModel))
 
         When("GET /client/details/business-trade is called")
-        val res = getClientTradeName()
+        val res = getClientTradeName(businessId)
 
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
@@ -59,7 +59,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       stubSaveSelfEmployments("BusinessTradeName", Json.toJson(testValidBusinessTradeNameModel))(OK)
 
       When("POST /client/details/business-trade is called")
-      val res = submitClientTradeName(Some(testValidBusinessTradeNameModel))
+      val res = submitClientTradeName(businessId,Some(testValidBusinessTradeNameModel))
 
       Then("Should return a SEE_OTHER with a redirect location of Business Trade name")
       res must have(
@@ -74,7 +74,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       stubSaveSelfEmployments("BusinessTradeName", Json.toJson(testInvalidBusinessTradeNameModel))(OK)
 
       When("POST /client/details/business-trade is called")
-      val res = submitClientTradeName(Some(testInvalidBusinessTradeNameModel))
+      val res = submitClientTradeName(businessId,Some(testInvalidBusinessTradeNameModel))
 
       Then("Should return a BAD_REQUEST and THE FORM With errors")
       res must have(

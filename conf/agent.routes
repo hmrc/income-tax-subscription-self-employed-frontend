@@ -1,17 +1,20 @@
+# Initialiser
+GET        /details                             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.InitialiseController.initialise
+
 # Date Of Commencement Page
-GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DateOfCommencementController.show(isEditMode: Boolean ?= false)
-POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DateOfCommencementController.submit(isEditMode: Boolean ?= false)
+GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DateOfCommencementController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DateOfCommencementController.submit(id: String, isEditMode: Boolean ?= false)
 
 # Business Name Page
-GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.show(isEditMode: Boolean ?= false)
-POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.submit(isEditMode: Boolean ?= false)
+GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
 
 # Business Trade Name Page
-GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.show(isEditMode: Boolean ?= false)
-POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.submit(isEditMode: Boolean ?= false)
+GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
 
 GET        /address-lookup-initialise           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney
 GET        /details/address-lookup              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(id: Option[String] ?= None)
 
-GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.show
-POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.submit
+GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.show(id: String)
+POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.submit(id: String)

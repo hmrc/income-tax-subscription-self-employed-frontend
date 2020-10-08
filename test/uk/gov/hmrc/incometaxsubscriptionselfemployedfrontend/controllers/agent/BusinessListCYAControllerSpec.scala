@@ -36,7 +36,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
 
   override val controllerName: String = "BusinessListCYAController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessListCYAController.show()
+    "show" -> TestBusinessListCYAController.show(id)
   )
 
   object TestBusinessListCYAController extends BusinessListCYAController(
@@ -61,7 +61,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           businessData
         )))
 
-        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.show(id)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -72,9 +72,9 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetAllSelfEmployedDetails[GetAllSelfEmploymentModel](Right(None))
 
-        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.show(id)(FakeRequest())
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.DateOfCommencementController.show().url)
+        redirectLocation(result) mustBe Some(routes.DateOfCommencementController.show(id).url)
       }
     }
 
@@ -83,7 +83,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetAllSelfEmployedDetails[GetAllSelfEmploymentModel](Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show(id)(FakeRequest())))
         response.message mustBe "[BusinessListCYAController][show] - getAllSelfEmployedDetails connection failure, status: 500"
       }
 
@@ -91,7 +91,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetAllSelfEmployedDetails[GetAllSelfEmploymentModel](Left(InvalidJson))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show(id)(FakeRequest())))
         response.message mustBe ("[BusinessListCYAController][show] - Invalid Json")
       }
     }
@@ -103,10 +103,10 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
       "submit redirect to BusinessCYA controller" in {
         mockAuthSuccess()
 
-        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.submit(id)(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show(id).url)
 
       }
     }

@@ -30,11 +30,12 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
 with MockIncomeTaxSubscriptionConnector {
+  val id: String = "testId"
 
   override val controllerName: String = "BusinessNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessNameController.show(isEditMode = false),
-    "submit" -> TestBusinessNameController.submit(isEditMode = false)
+    "show" -> TestBusinessNameController.show(id,isEditMode = false),
+    "submit" -> TestBusinessNameController.submit(id,isEditMode = false)
   )
 
   object TestBusinessNameController extends BusinessNameController(
@@ -55,14 +56,14 @@ with MockIncomeTaxSubscriptionConnector {
         mockGetSelfEmployments("BusinessName")(
           Right(Some(mockBusinessNameModel))
         )
-        val result = TestBusinessNameController.show(isEditMode = false)(FakeRequest())
+        val result = TestBusinessNameController.show(id,isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockGetSelfEmployments("BusinessName")(Right(None))
-        val result = TestBusinessNameController.show(isEditMode = false)(FakeRequest())
+        val result = TestBusinessNameController.show(id,isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -71,7 +72,7 @@ with MockIncomeTaxSubscriptionConnector {
       "the connector returns an error" in {
         mockAuthSuccess()
         mockGetSelfEmployments("BusinessName")(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestBusinessNameController.show(isEditMode = false)(FakeRequest())))
+        intercept[InternalServerException](await(TestBusinessNameController.show(id,isEditMode = false)(FakeRequest())))
       }
     }
 
@@ -83,7 +84,7 @@ with MockIncomeTaxSubscriptionConnector {
         "the user submits valid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessName", mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestBusinessNameController.submit(isEditMode = false)(
+          val result = TestBusinessNameController.submit(id,isEditMode = false)(
             FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
@@ -94,7 +95,7 @@ with MockIncomeTaxSubscriptionConnector {
         "the user submits invalid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessName", mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestBusinessNameController.submit(isEditMode = false)(FakeRequest())
+          val result = TestBusinessNameController.submit(id,isEditMode = false)(FakeRequest())
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
         }
@@ -105,19 +106,19 @@ with MockIncomeTaxSubscriptionConnector {
         "the user submits valid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessName", mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestBusinessNameController.submit(isEditMode = true)(
+          val result = TestBusinessNameController.submit(id,isEditMode = true)(
             FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url)
+            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show(id).url)
         }
       }
       "return 400, SEE_OTHER)" when {
         "the user submits invalid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessName", mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestBusinessNameController.submit(isEditMode = true)(FakeRequest())
+          val result = TestBusinessNameController.submit(id,isEditMode = true)(FakeRequest())
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
         }
@@ -126,13 +127,13 @@ with MockIncomeTaxSubscriptionConnector {
 
     "The back url" when {
       "in edit mode" should {
-        s"redirect to ${routes.BusinessListCYAController.show().url}" in {
-          TestBusinessNameController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        s"redirect to ${routes.BusinessListCYAController.show(id).url}" in {
+          TestBusinessNameController.backUrl(id,isEditMode = true) mustBe routes.BusinessListCYAController.show(id).url
         }
       }
       "not in edit mode" should {
-        s"redirect to ${routes.DateOfCommencementController.show().url}" in {
-          TestBusinessNameController.backUrl(isEditMode = false) mustBe routes.DateOfCommencementController.show().url
+        s"redirect to ${routes.DateOfCommencementController.show(id).url}" in {
+          TestBusinessNameController.backUrl(id,isEditMode = false) mustBe routes.DateOfCommencementController.show(id).url
         }
       }
     }

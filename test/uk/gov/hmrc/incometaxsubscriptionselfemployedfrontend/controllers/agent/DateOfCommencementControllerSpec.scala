@@ -30,11 +30,12 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 
 class DateOfCommencementControllerSpec extends ControllerBaseSpec
 with MockIncomeTaxSubscriptionConnector {
+  val id: String = "testId"
 
   override val controllerName: String = "DateOfCommencementController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestDateOfCommencementController.show(isEditMode = false),
-    "submit" -> TestDateOfCommencementController.submit(isEditMode = false)
+    "show" -> TestDateOfCommencementController.show(id,isEditMode = false),
+    "submit" -> TestDateOfCommencementController.submit(id,isEditMode = false)
   )
 
   object TestDateOfCommencementController extends DateOfCommencementController(
@@ -55,14 +56,14 @@ with MockIncomeTaxSubscriptionConnector {
         mockGetSelfEmployments("BusinessStartDate")(
           Right(Some(BusinessStartDate(DateModel("01", "01", "2000"))))
         )
-        val result = TestDateOfCommencementController.show(isEditMode = false)(FakeRequest())
+        val result = TestDateOfCommencementController.show(id,isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockGetSelfEmployments("BusinessStartDate")(Right(None))
-        val result = TestDateOfCommencementController.show(isEditMode = false)(FakeRequest())
+        val result = TestDateOfCommencementController.show(id,isEditMode = false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -71,7 +72,7 @@ with MockIncomeTaxSubscriptionConnector {
       "the connector returns an error" in {
         mockAuthSuccess()
         mockGetSelfEmployments("BusinessStartDate")(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestDateOfCommencementController.show(isEditMode = false)(FakeRequest())))
+        intercept[InternalServerException](await(TestDateOfCommencementController.show(id,isEditMode = false)(FakeRequest())))
       }
     }
 
@@ -83,18 +84,18 @@ with MockIncomeTaxSubscriptionConnector {
         "the user submits valid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessStartDate", testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestDateOfCommencementController.submit(isEditMode = false)(
+          val result = TestDateOfCommencementController.submit(id,isEditMode = false)(
             FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
           status(result) mustBe SEE_OTHER
-          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show().url)
+          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show(id).url)
         }
       }
       "return 400, SEE_OTHER)" when {
         "the user submits invalid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessStartDate", testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestDateOfCommencementController.submit(isEditMode = false)(FakeRequest())
+          val result = TestDateOfCommencementController.submit(id,isEditMode = false)(FakeRequest())
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
         }
@@ -105,19 +106,19 @@ with MockIncomeTaxSubscriptionConnector {
         "the user submits valid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessStartDate", testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestDateOfCommencementController.submit(isEditMode = true)(
+          val result = TestDateOfCommencementController.submit(id,isEditMode = true)(
             FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url)
+            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show(id).url)
         }
       }
       "return 400, SEE_OTHER)" when {
         "the user submits invalid data" in {
           mockAuthSuccess()
           mockSaveSelfEmployments("BusinessStartDate", testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
-          val result = TestDateOfCommencementController.submit(isEditMode = true)(FakeRequest())
+          val result = TestDateOfCommencementController.submit(id,isEditMode = true)(FakeRequest())
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
         }

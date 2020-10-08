@@ -38,45 +38,45 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                        authService: AuthService)
                                       (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) with I18nSupport {
 
-  def view(businessNameForm: Form[BusinessNameModel], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.business_name(
       businessNameForm = businessNameForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.submit(isEditMode = isEditMode),
+      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
-      backUrl = backUrl(isEditMode)
+      backUrl = backUrl(id, isEditMode)
     )
 
-  def show(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       incomeTaxSubscriptionConnector.getSelfEmployments[BusinessNameModel](BusinessNameController.businessName).map {
-        case Right(businessName) =>  Ok(view(businessNameValidationForm().fill(businessName), isEditMode = isEditMode))
+        case Right(businessName) =>  Ok(view(businessNameValidationForm().fill(businessName), id, isEditMode = isEditMode))
         case error => throw new InternalServerException(error.toString)
       }
     }
   }
 
-  def submit(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       businessNameValidationForm(Seq()).bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, isEditMode = isEditMode))),
+          Future.successful(BadRequest(view(formWithErrors,id, isEditMode = isEditMode))),
         businessNameData =>
           incomeTaxSubscriptionConnector.saveSelfEmployments(BusinessNameController.businessName, businessNameData).map(_ =>
             if (isEditMode) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show(id))
             } else {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show())
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show(id))
             }
           )
       )
     }
   }
 
-  def backUrl(isEditMode: Boolean): String =
+  def backUrl(id: String, isEditMode: Boolean): String =
     if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show(id).url
     } else {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show(id).url
     }
 
 }

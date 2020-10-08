@@ -39,19 +39,19 @@ class BusinessListCYAController @Inject()(authService: AuthService,
                                          (implicit val ec: ExecutionContext, val appConfig: AppConfig, dateFormatter: ImplicitDateFormatterImpl)
   extends FrontendController(mcc) with I18nSupport {
 
-  def view(selfEmploymentData: GetAllSelfEmploymentModel)(implicit request: Request[AnyContent]): Html = {
+  def view(selfEmploymentData: GetAllSelfEmploymentModel, id: String)(implicit request: Request[AnyContent]): Html = {
     check_your_answers(
       selfEmploymentAnswers = selfEmploymentData,
-      postAction = routes.BusinessListCYAController.submit(),
-      implicitDateFormatter = dateFormatter
+      postAction = routes.BusinessListCYAController.submit(id),
+      implicitDateFormatter = dateFormatter, id
     )
   }
 
-  def show: Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       incomeTaxSubscriptionConnector.getAllSelfEmployedDetails[GetAllSelfEmploymentModel]().map {
-        case Right(Some(getAllSelfEmployment)) => Ok(view(getAllSelfEmployment))
-        case Right(_) => Redirect(routes.DateOfCommencementController.show())
+        case Right(Some(getAllSelfEmployment)) => Ok(view(getAllSelfEmployment,id))
+        case Right(_) => Redirect(routes.DateOfCommencementController.show(id))
         case Left(UnexpectedStatusFailure(status)) =>
           throw new InternalServerException(s"[BusinessListCYAController][show] - getAllSelfEmployedDetails connection failure, status: $status")
         case Left(InvalidJson) =>
@@ -60,9 +60,9 @@ class BusinessListCYAController @Inject()(authService: AuthService,
     }
   }
 
-  def submit(): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      Future.successful(Redirect(routes.BusinessListCYAController.show()))
+      Future.successful(Redirect(routes.BusinessListCYAController.show(id)))
     }
   }
 }

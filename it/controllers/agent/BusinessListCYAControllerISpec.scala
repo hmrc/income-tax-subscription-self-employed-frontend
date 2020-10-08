@@ -15,7 +15,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataK
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 class BusinessListCYAControllerISpec extends ComponentSpecBase {
-
+  val businessId: String = "testId"
   val testBusinessName: String = "businessName"
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
@@ -39,7 +39,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
         stubGetAllSelfEmployedDetails(NO_CONTENT)
 
         When("GET /client/details/business-list is called")
-        val res = getClientCheckYourAnswers
+        val res = getClientCheckYourAnswers(businessId)
 
         Then("should return an OK with the BusinessNamePage")
         res must have(
@@ -55,7 +55,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
         stubGetAllSelfEmployedDetails(OK, Json.toJson(testGetAllSelfEmploymentModel))
 
         When("GET /client/details/business-list is called")
-        val res = getClientCheckYourAnswers
+        val res = getClientCheckYourAnswers(businessId)
 
         Then("should return an OK with the CheckYourAnswers page")
         res must have(
@@ -72,7 +72,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
       stubAuthSuccess()
 
       When("POST /client/details/business-list is called")
-      val result = submitClientCheckYourAnswers()
+      val result = submitClientCheckYourAnswers(businessId)
 
       Then("should return SEE_OTHER with InitialiseURI")
 

@@ -31,7 +31,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.AddAnotherBusinessForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 
-@(selfEmploymentAnswers: GetAllSelfEmploymentModel, postAction: Call, implicitDateFormatter: ImplicitDateFormatter)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(selfEmploymentAnswers: GetAllSelfEmploymentModel, postAction: Call, implicitDateFormatter: ImplicitDateFormatter, id: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @summaryRow(question: String, answer: String, changeUrl: Option[String]) = {
     <div class="govuk-summary-list__row">
@@ -49,21 +49,21 @@
     import implicitDateFormatter.LongDate
     val question: String = messages("agent.check_your_answers.trading_start_date")
     val answer: String = businessStartDate.startDate.toLocalDate.toLongDate
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show(isEditMode = true).url
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show(id, isEditMode = true).url
     summaryRow(question, answer, Some(changeUrl))
 }
 
 @businessName(businessName: BusinessNameModel) = @{
     val question: String = messages("agent.check_your_answers.business_name")
     val answer: String = businessName.businessName
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(isEditMode = true).url
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id, isEditMode = true).url
     summaryRow(question, answer, Some(changeUrl))
 }
 
 @businessTrade(businessTrade: BusinessTradeNameModel) = @{
     val question: String = messages("agent.check_your_answers.business_trade")
     val answer: String = businessTrade.businessTradeName
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show(isEditMode = true).url
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show(id, isEditMode = true).url
     summaryRow(question, answer, Some(changeUrl))
 }
 

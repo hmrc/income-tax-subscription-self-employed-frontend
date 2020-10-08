@@ -13,6 +13,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessName
 
 
 class BusinessNameControllerISpec extends ComponentSpecBase {
+  val businessId: String = "testId"
 
   val testValidBusinessNameModel: BusinessNameModel = BusinessNameModel("testBusinessName")
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
@@ -27,7 +28,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments("BusinessName")(NO_CONTENT)
 
         When("GET /client/business/start-date is called")
-        val res = getClientBusinessName()
+        val res = getClientBusinessName(businessId)
 
         Then("should return an OK with the ClientBusinessName Page")
         res must have(
@@ -43,7 +44,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubGetSelfEmployments("BusinessName")(OK, Json.toJson(testValidBusinessNameModel))
 
         When("GET /client/business/start-date is called")
-        val res = getClientBusinessName()
+        val res = getClientBusinessName(businessId)
 
         Then("should return an OK with the ClientBusinessName Page")
         res must have(
@@ -62,7 +63,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       stubSaveSelfEmployments("BusinessName", Json.toJson(testValidBusinessNameModel))(OK)
 
       When("POST /client/details/business-name is called")
-      val res = submitClientBusinessName(Some(testValidBusinessNameModel))
+      val res = submitClientBusinessName(businessId,Some(testValidBusinessNameModel))
 
       Then("Should return a SEE_OTHER with a redirect location of business name")
       res must have(
@@ -77,7 +78,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       stubSaveSelfEmployments("BusinessName", Json.toJson(testValidBusinessNameModel))(OK)
 
       When("POST /business/start-date is called")
-      val res = submitClientBusinessName(Some(testValidBusinessNameModel), inEditMode = true)
+      val res = submitClientBusinessName(businessId,Some(testValidBusinessNameModel), inEditMode = true)
 
 
       Then("Should return a SEE_OTHER with a redirect location of ClientBusinessName")
@@ -94,7 +95,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       stubSaveSelfEmployments("BusinessName", Json.toJson(testEmptyBusinessNameModel))(OK)
 
       When("POST /business/start-date is called")
-      val res = submitClientBusinessName(Some(testEmptyBusinessNameModel))
+      val res = submitClientBusinessName(businessId, Some(testEmptyBusinessNameModel))
 
       Then("Should return a BAD_REQUEST and THE FORM With errors")
       res must have(
