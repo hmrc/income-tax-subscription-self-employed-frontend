@@ -147,3 +147,8 @@ agent.check_your_answers.business_name                          = Business name
 agent.check_your_answers.business_trade                         = Business trade
 agent.check_your_answers.business_address                       = Business address
 agent.check_your_answers.confirm_and_sign_up                    = Confirm and sign up
+
+# Check your answers add another business
+agent.error.add_another_business.limit_reached                  = You can only add up to {0} businesses
+agent.error.add_another_business.invalid                        = Select yes if you want to add another sole trader business
+agent.error.add_another_business.empty                          = Select yes if you want to add another sole trader business
