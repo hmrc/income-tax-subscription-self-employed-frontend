@@ -146,3 +146,7 @@ agent.check_your_answers.business_name                          = Enw’r busnes
 agent.check_your_answers.business_trade                         = Masnach y busnes
 agent.check_your_answers.business_address                       = Cyfeiriad y busnes
 agent.check_your_answers.confirm_and_sign_up                    = Cadarnhau a chofrestru
+
+# Agent Business Accounting Method page
+agent.error.business_accounting_method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
+agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol

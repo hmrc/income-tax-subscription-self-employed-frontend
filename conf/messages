@@ -152,3 +152,7 @@ agent.check_your_answers.confirm_and_sign_up                    = Confirm and si
 agent.error.add_another_business.limit_reached                  = You can only add up to {0} businesses
 agent.error.add_another_business.invalid                        = Select yes if you want to add another sole trader business
 agent.error.add_another_business.empty                          = Select yes if you want to add another sole trader business
+
+# Agent Business Accounting Method page
+agent.error.business_accounting_method.invalid                  = Select if your client uses cash accounting or standard accounting
+agent.error.business_accounting_method.empty                    = Select if your client uses cash accounting or standard accounting
