@@ -154,5 +154,12 @@ agent.error.add_another_business.invalid                        = Select yes if 
 agent.error.add_another_business.empty                          = Select yes if you want to add another sole trader business
 
 # Agent Business Accounting Method page
+agent.business.accounting_method.title                          = What accounting method does your client use for their self-employed business?
+agent.business.accounting_method.heading                        = What accounting method does your client use for their self-employed business?
+agent.business.accounting_method.cash                           = <span class="heading-small">Cash accounting</span>
+agent.business.accounting_method.accruals                       = <span class="heading-small">Standard accounting</span>
+
+# Agent Business Accounting Method page
 agent.error.business_accounting_method.invalid                  = Select if your client uses cash accounting or standard accounting
 agent.error.business_accounting_method.empty                    = Select if your client uses cash accounting or standard accounting
+
