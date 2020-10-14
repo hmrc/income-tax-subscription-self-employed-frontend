@@ -142,11 +142,13 @@ agent.addressLookup.confirmPage.heading                         = Confirm client
 # Check your answers
 agent.check_your_answers.title                                  = Check your answers
 agent.check_your_answers.heading                                = Check your answers
+agent.check_your_answers.sub_heading                            = Business {0}
 agent.check_your_answers.trading_start_date                     = Trading start date of business
 agent.check_your_answers.business_name                          = Business name
 agent.check_your_answers.business_trade                         = Business trade
 agent.check_your_answers.business_address                       = Business address
-agent.check_your_answers.confirm_and_sign_up                    = Confirm and sign up
+agent.check_your_answers.add_another_business_heading           = Do you want to add another self-employed business?
+agent.check_your_answers.remove_business                        = Remove business {0}
 
 # Check your answers add another business
 agent.error.add_another_business.limit_reached                  = You can only add up to {0} businesses

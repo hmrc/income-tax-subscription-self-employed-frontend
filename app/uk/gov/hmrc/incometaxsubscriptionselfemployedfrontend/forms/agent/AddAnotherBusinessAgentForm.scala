@@ -23,7 +23,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.Ye
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.ConstraintUtil.constraint
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AddAnotherBusinessModel, No, Yes, YesNo}
 
-object AddAnotherBusinessForm {
+object AddAnotherBusinessAgentForm {
 
   val addAnotherBusiness = "yes-no"
 

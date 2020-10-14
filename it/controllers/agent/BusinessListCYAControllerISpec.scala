@@ -15,7 +15,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataK
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 class BusinessListCYAControllerISpec extends ComponentSpecBase {
-
+  val businessId: String = "testId"
   val testBusinessName: String = "businessName"
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
@@ -27,24 +27,26 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
   val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel("testId1", Address(Seq("line1", "line2", "line3"), "TF3 4NT"))
 
-  val testGetAllSelfEmploymentModel: GetAllSelfEmploymentModel = GetAllSelfEmploymentModel(
-    testBusinessStartDateModel, testBusinessNameModel, testValidBusinessTradeNameModel, testBusinessAddressModel)
-
+  val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId,
+    businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+    businessTradeName = Some(testValidBusinessTradeNameModel),
+    businessAddress = Some(testBusinessAddressModel)
+  ))
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-list" when {
     "the Connector is empty" should {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetAllSelfEmployedDetails(NO_CONTENT)
+        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
 
         When("GET /client/details/business-list is called")
-        val res = getClientCheckYourAnswers
+        val res = getClientCheckYourAnswers(businessId)
 
         Then("should return an OK with the BusinessNamePage")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(DateOfCommencementUri)
+          redirectURI(ClientInitialiseUri)
         )
       }
     }
@@ -52,10 +54,10 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
       "show check your answers page" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetAllSelfEmployedDetails(OK, Json.toJson(testGetAllSelfEmploymentModel))
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /client/details/business-list is called")
-        val res = getClientCheckYourAnswers
+        val res = getClientCheckYourAnswers(businessId)
 
         Then("should return an OK with the CheckYourAnswers page")
         res must have(
@@ -67,12 +69,13 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-list" when {
-    "return SEE_OTHER when clicking on Confirm and Signup" in {
+    "return SEE_OTHER when clicking on continue" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
+      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("POST /client/details/business-list is called")
-      val result = submitClientCheckYourAnswers()
+      val result = submitClientCheckYourAnswers(Some(AddAnotherBusinessModel(No)),1, 5)
 
       Then("should return SEE_OTHER with InitialiseURI")
 
@@ -81,6 +84,25 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
         redirectURI(ClientBusinessListCYAUri)
 
       )
+    }
+
+    "return BAD_REQUEST when no Answer is given" in {
+      Given("I setup the Wiremock stubs")
+      stubAuthSuccess()
+      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+
+      When("POST /details/business-list is called")
+      val result = submitClientCheckYourAnswers(None,1, 5)
+      val doc: Document = Jsoup.parse(result.body)
+
+      Then("should return an BAD_REQUEST")
+
+      result must have(
+        httpStatus(BAD_REQUEST)
+      )
+
+      val errorMessage = doc.select("span[class=error-notification]")
+      errorMessage.text() mustBe "Select yes if you want to add another sole trader business"
     }
   }
 }

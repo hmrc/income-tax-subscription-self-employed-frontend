@@ -108,7 +108,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
       stubAuthSuccess()
       stubGetAddressLookupDetails("testId1")(OK, Json.obj("abc" -> "def"))
 
-      When("POST /details/business-accounting-method is called")
+      When("POST /details/address-lookup/12345 is called")
       val res = getAddressLookup("12345", "testId1")
 
 
@@ -123,7 +123,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
       stubAuthSuccess()
       stubGetAddressLookupDetails("testId1")(BAD_REQUEST)
 
-      When("POST /details/business-accounting-method is called")
+      When("POST /details/address-lookup/12345 is called")
       val res = getAddressLookup("12345", "testId1")
 
 
