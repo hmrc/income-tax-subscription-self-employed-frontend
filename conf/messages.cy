@@ -156,3 +156,7 @@ agent.business.accounting_method.accruals                       = <span class="h
 # Agent Business Accounting Method page
 agent.error.business_accounting_method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
 agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
+
+## Title pattern
+titlePattern.serviceName.govUk = {0} - Cyfrif Treth Busnes - GOV.UK
+base.title.error               = Gwall: {0} - Cyfrif Treth Busnes - GOV.UK

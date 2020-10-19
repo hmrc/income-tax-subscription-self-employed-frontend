@@ -38,6 +38,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
   object BusinessAccountingMethodMessages {
     val title = "What accounting method does your client use for their self-employed business?"
+    val titleSuffix = " - Business Tax account - GOV.UK"
     val heading: String = title
     val cash = "Cash accounting"
     val accruals = "Standard accounting"
@@ -58,7 +59,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
   "Business Accounting Method Page" must {
 
     "have a title" in new Setup {
-      document.title mustBe BusinessAccountingMethodMessages.title
+      document.title mustBe BusinessAccountingMethodMessages.title + BusinessAccountingMethodMessages.titleSuffix
     }
 
     "have a backlink" in new Setup {
