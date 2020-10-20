@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes

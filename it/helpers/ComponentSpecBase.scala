@@ -11,7 +11,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.DateOfCommencementForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.{AddAnotherBusinessAgentForm, DateOfCommencementForm}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
@@ -83,10 +83,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getBusinessStartDate(id: String): WSResponse = get(s"/details/business-start-date?id=$id")
 
-  def getDateOfCommencement(): WSResponse = get("/client/details/business-start-date")
+  def getDateOfCommencement(id: String): WSResponse = get(s"/client/details/business-start-date?id=$id")
 
-  def submitDateOfCommencement(request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-start-date?isEditMode=$inEditMode"
+  def submitDateOfCommencement(id: String,request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-start-date?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -98,10 +98,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientBusinessName(): WSResponse = get("/client/details/business-name")
+  def getClientBusinessName(id: String): WSResponse = get(s"/client/details/business-name?id=$id")
 
-  def submitClientBusinessName(request: Option[BusinessNameModel], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-name?isEditMode=$inEditMode"
+  def submitClientBusinessName(id: String, inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {
+    val uri = s"/client/details/business-name?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -113,10 +113,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientTradeName(): WSResponse = get("/client/details/business-trade")
+  def getClientTradeName(id: String): WSResponse = get(s"/client/details/business-trade?id=$id")
 
-  def submitClientTradeName(request: Option[BusinessTradeNameModel], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-trade?isEditMode=$inEditMode"
+  def submitClientTradeName(id: String,request: Option[BusinessTradeNameModel], inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-trade?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -198,17 +198,24 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientCheckYourAnswers: WSResponse = get(s"/client/details/business-list")
-  def submitClientCheckYourAnswers(): WSResponse = {
+  def getClientCheckYourAnswers(id: String): WSResponse = get(s"/client/details/business-list?id=$id")
+  def submitClientCheckYourAnswers(request: Option[AddAnotherBusinessModel],
+                                   currentBusinesses: Int,
+                                   limit: Int): WSResponse = {
     val uri = s"/client/details/business-list"
-    post(uri)(Map.empty[String, Seq[String]])
+    post(uri)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          AddAnotherBusinessAgentForm.addAnotherBusinessForm(currentBusinesses,limit).fill(model).data.map { case (k, v) => (k, Seq(v)) }
+      )
+    )
   }
 
   def getAddressLookupInitialise(itsaId: String): WSResponse = get(s"/address-lookup-initialise/$itsaId")
-  def getAddressLookup(itsaId: String, id: String): WSResponse = get(s"/details/address-lookup/${itsaId}?id=$id")
+  def getAddressLookup(itsaId: String, id: String): WSResponse = get(s"/details/address-lookup/$itsaId?id=$id")
 
-  def getClientAddressLookupInitialise(): WSResponse = get(s"/client/address-lookup-initialise")
-  def getClientAddressLookup(id: String): WSResponse = get(s"/client/details/address-lookup?id=$id")
+  def getClientAddressLookupInitialise(itsaId: String): WSResponse = get(s"/client/address-lookup-initialise/$itsaId")
+  def getClientAddressLookup(itsaId: String, id: String): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
 
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim

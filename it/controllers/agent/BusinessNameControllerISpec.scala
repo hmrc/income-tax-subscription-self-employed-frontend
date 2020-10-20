@@ -1,21 +1,24 @@
 
 package controllers.agent
 
-import java.time.LocalDate
-
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, SelfEmploymentData}
 
 
 class BusinessNameControllerISpec extends ComponentSpecBase {
+  val businessId: String = "testId"
 
-  val testValidBusinessNameModel: BusinessNameModel = BusinessNameModel("testBusinessName")
+  val testBusinessName: String = "testBusinessName"
+  val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
+  val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testBusinessNameModel)))
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
+  val testEmptyBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testEmptyBusinessNameModel)))
 
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-name" when {
@@ -24,10 +27,10 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments("BusinessName")(NO_CONTENT)
+        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
 
-        When("GET /client/business/start-date is called")
-        val res = getClientBusinessName()
+        When("GET /client/details/business-name is called")
+        val res = getClientBusinessName(businessId)
 
         Then("should return an OK with the ClientBusinessName Page")
         res must have(
@@ -40,10 +43,10 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "show the current date of commencement page with date values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments("BusinessName")(OK, Json.toJson(testValidBusinessNameModel))
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /client/business/start-date is called")
-        val res = getClientBusinessName()
+        val res = getClientBusinessName(businessId)
 
         Then("should return an OK with the ClientBusinessName Page")
         res must have(
@@ -56,51 +59,69 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-name" when {
-    "the form data is valid and connector stores it successfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments("BusinessName", Json.toJson(testValidBusinessNameModel))(OK)
+    "not in edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-      When("POST /client/details/business-name is called")
-      val res = submitClientBusinessName(Some(testValidBusinessNameModel))
+        When("POST /client/details/business-name is called")
+        val res = submitClientBusinessName(businessId, false, Some(testBusinessNameModel))
 
-      Then("Should return a SEE_OTHER with a redirect location of business name")
-      res must have(
-        httpStatus(SEE_OTHER),
+        Then("Should return a SEE_OTHER with a redirect location of business name")
+        res must have(
+          httpStatus(SEE_OTHER),
           redirectURI(ClientBusinessTradeNameUri)
-      )
+        )
+      }
+
+      "the form data is invalid" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubSaveSelfEmployments(businessesKey, Json.toJson(testEmptyBusinesses))(OK)
+
+        When("POST /client/details/business-name is called")
+        val res = submitClientBusinessName(businessId, false, Some(testEmptyBusinessNameModel))
+
+        Then("Should return a BAD_REQUEST and THE FORM With errors")
+        res must have(
+          httpStatus(BAD_REQUEST)
+        )
+      }
     }
+    "in edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-    "the form data is valid and connector stores it successfully in edit mode" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments("BusinessName", Json.toJson(testValidBusinessNameModel))(OK)
+        When("POST /client/details/business-name is called")
+        val res = submitClientBusinessName(businessId, true, Some(testBusinessNameModel))
 
-      When("POST /business/start-date is called")
-      val res = submitClientBusinessName(Some(testValidBusinessNameModel), inEditMode = true)
+        Then("Should return a SEE_OTHER with a redirect location of business name")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ClientBusinessListCYAUri)
+        )
+      }
 
+      "the form data is invalid" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubSaveSelfEmployments(businessesKey, Json.toJson(testEmptyBusinesses))(OK)
 
-      Then("Should return a SEE_OTHER with a redirect location of ClientBusinessName")
-      res must have(
-        httpStatus(SEE_OTHER),
+        When("POST /client/details/business-name is called")
+        val res = submitClientBusinessName(businessId, true, Some(testEmptyBusinessNameModel))
 
-        redirectURI(ClientBusinessListCYAUri)
-      )
+        Then("Should return a BAD_REQUEST and THE FORM With errors")
+        res must have(
+          httpStatus(BAD_REQUEST)
+        )
+      }
     }
-
-    "the form data is invalid and connector stores it unsuccessfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments("BusinessName", Json.toJson(testEmptyBusinessNameModel))(OK)
-
-      When("POST /business/start-date is called")
-      val res = submitClientBusinessName(Some(testEmptyBusinessNameModel))
-
-      Then("Should return a BAD_REQUEST and THE FORM With errors")
-      res must have(
-        httpStatus(BAD_REQUEST)
-      )
-    }
-
   }
 }

@@ -21,6 +21,7 @@ object IntegrationTestConstants {
   val BusinessListCYAUri = s"$baseURI/details/business-list"
   val ClientBusinessListCYAUri = s"$baseURI/client/details/business-list"
   val InitialiseUri = s"$baseURI/details"
+  val ClientInitialiseUri = s"$baseURI/client/details"
   def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
   def businessAddressLookupRedirectUri(itsaId: String): String = s"$baseURI/details/address-lookup/$itsaId"
 

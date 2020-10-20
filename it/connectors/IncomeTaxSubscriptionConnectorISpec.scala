@@ -9,7 +9,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetAllSelfEmployedDetailsHttpParser, GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
 
 
 class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
@@ -56,43 +56,6 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
       val res = connector.getSelfEmployments[DummyModel](id)
 
       await(res) mustBe Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-
-    }
-  }
-
-  "GetAllSelfEmployedDetails" should {
-    "Return Some DummyModel" in {
-      val successfulResponseBody: JsObject = Json.obj("body" -> "Test Body")
-
-      stubGetAllSelfEmployedDetails(OK, successfulResponseBody)
-
-      val res = connector.getAllSelfEmployedDetails[DummyModel]
-
-      await(res) mustBe Right(Some(DummyModel(body = "Test Body")))
-    }
-
-    "Return InvalidJson" in {
-      stubGetAllSelfEmployedDetails(OK, Json.obj())
-
-      val res = connector.getAllSelfEmployedDetails[DummyModel]
-
-      await(res) mustBe Left(GetAllSelfEmployedDetailsHttpParser.InvalidJson)
-    }
-
-    "Return None" in {
-      stubGetAllSelfEmployedDetails(NO_CONTENT, Json.obj())
-
-      val res = connector.getAllSelfEmployedDetails[DummyModel]
-
-      await(res) mustBe Right(None)
-
-    }
-    "Return UnexpectedStatusFailure" in {
-      stubGetAllSelfEmployedDetails(INTERNAL_SERVER_ERROR, Json.obj())
-
-      val res = connector.getAllSelfEmployedDetails[DummyModel]
-
-      await(res) mustBe Left(GetAllSelfEmployedDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
 
     }
   }

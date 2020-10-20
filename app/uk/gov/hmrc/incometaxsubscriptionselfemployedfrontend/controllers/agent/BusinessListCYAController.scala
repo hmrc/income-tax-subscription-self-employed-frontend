@@ -17,20 +17,23 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import javax.inject.{Inject, Singleton}
+import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetAllSelfEmployedDetailsHttpParser.{InvalidJson, UnexpectedStatusFailure}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{GetAllSelfEmploymentModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnotherBusinessAgentForm.addAnotherBusinessForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AddAnotherBusinessModel, No, SelfEmploymentData, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.check_your_answers
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class BusinessListCYAController @Inject()(authService: AuthService,
@@ -39,9 +42,10 @@ class BusinessListCYAController @Inject()(authService: AuthService,
                                          (implicit val ec: ExecutionContext, val appConfig: AppConfig, dateFormatter: ImplicitDateFormatterImpl)
   extends FrontendController(mcc) with I18nSupport {
 
-  def view(selfEmploymentData: GetAllSelfEmploymentModel)(implicit request: Request[AnyContent]): Html = {
+  def view(addAnotherBusinessForm: Form[AddAnotherBusinessModel], businesses: Seq[SelfEmploymentData])(implicit request: Request[AnyContent]): Html = {
     check_your_answers(
-      selfEmploymentAnswers = selfEmploymentData,
+      addAnotherBusinessForm = addAnotherBusinessForm,
+      answers = businesses,
       postAction = routes.BusinessListCYAController.submit(),
       implicitDateFormatter = dateFormatter
     )
@@ -49,11 +53,12 @@ class BusinessListCYAController @Inject()(authService: AuthService,
 
   def show: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      incomeTaxSubscriptionConnector.getAllSelfEmployedDetails[GetAllSelfEmploymentModel]().map {
-        case Right(Some(getAllSelfEmployment)) => Ok(view(getAllSelfEmployment))
-        case Right(_) => Redirect(routes.DateOfCommencementController.show())
+      incomeTaxSubscriptionConnector.getSelfEmployments[Seq[SelfEmploymentData]](businessesKey).map {
+        case Right(Some(businesses)) if businesses.exists(_.isComplete) =>
+          Ok(view(addAnotherBusinessForm(businesses.size, appConfig.limitOnNumberOfBusinesses), businesses.filter(_.isComplete)))
+        case Right(_) => Redirect(routes.InitialiseController.initialise())
         case Left(UnexpectedStatusFailure(status)) =>
-          throw new InternalServerException(s"[BusinessListCYAController][show] - getAllSelfEmployedDetails connection failure, status: $status")
+          throw new InternalServerException(s"[BusinessListCYAController][show] - getSelfEmployments connection failure, status: $status")
         case Left(InvalidJson) =>
           throw new InternalServerException("[BusinessListCYAController][show] - Invalid Json")
       }
@@ -62,7 +67,21 @@ class BusinessListCYAController @Inject()(authService: AuthService,
 
   def submit(): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      Future.successful(Redirect(routes.BusinessListCYAController.show()))
+      incomeTaxSubscriptionConnector.getSelfEmployments[Seq[SelfEmploymentData]](businessesKey).map {
+        case Right(Some(businesses)) if businesses.exists(_.isComplete) =>
+          addAnotherBusinessForm(businesses.size, appConfig.limitOnNumberOfBusinesses).bindFromRequest.fold(
+            formWithErrors => BadRequest(view(formWithErrors, businesses)),
+            addAnotherBusinessModel => addAnotherBusinessModel.addAnotherBusiness match {
+              case Yes => Redirect(routes.InitialiseController.initialise())
+              case No => Redirect(routes.BusinessListCYAController.show())
+            }
+          )
+        case Right(_) => Redirect(routes.InitialiseController.initialise())
+        case Left(UnexpectedStatusFailure(status)) =>
+          throw new InternalServerException(s"[BusinessListCYAController][submit] - getSelfEmployments connection failure, status: $status")
+        case Left(InvalidJson) =>
+          throw new InternalServerException("[BusinessListCYAController][submit] - Invalid Json")
+      }
     }
   }
 }

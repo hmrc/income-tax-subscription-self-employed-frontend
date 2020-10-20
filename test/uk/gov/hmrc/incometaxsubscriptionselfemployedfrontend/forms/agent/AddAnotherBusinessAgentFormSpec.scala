@@ -19,12 +19,12 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.data.FormError
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnotherBusinessForm._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnotherBusinessAgentForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils._
 
-class AddAnotherBusinessFormSpec extends PlaySpec with GuiceOneAppPerTest {
+class AddAnotherBusinessAgentFormSpec extends PlaySpec with GuiceOneAppPerTest {
 
 
   "The AddAnotherBusinessForm" should {
