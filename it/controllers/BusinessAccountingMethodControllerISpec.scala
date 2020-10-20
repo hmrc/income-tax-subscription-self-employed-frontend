@@ -26,7 +26,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataK
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
 
-
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 
     "the Connector receives no content" should {
@@ -41,7 +40,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(
           httpStatus(OK),
-          pageTitle("How do you record your income and expenses for your self-employed business?"),
+          pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
           radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = None)
         )
       }
@@ -61,7 +60,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(
           httpStatus(OK),
-          pageTitle("How do you record your income and expenses for your self-employed business?"),
+          pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
           radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
         )
       }
@@ -94,11 +93,10 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       When("POST /details/business-accounting-method is called")
       val res = submitBusinessAccountingMethod(None)
 
-
       Then("Should return a BAD_REQUEST and THE FORM With errors")
       res must have(
         httpStatus(BAD_REQUEST),
-        pageTitle("Error: How do you record your income and expenses for your self-employed business?")
+        pageTitle("Error: How do you record your income and expenses for your self-employed business?" + titleSuffix)
       )
     }
 

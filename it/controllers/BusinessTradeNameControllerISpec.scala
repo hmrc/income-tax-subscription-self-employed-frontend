@@ -72,7 +72,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
           httpStatus(OK),
-          pageTitle("What is the trade of your business?"),
+          pageTitle("What is the trade of your business?" + titleSuffix),
           textField("businessTradeName", "")
         )
       }
@@ -90,7 +90,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
           httpStatus(OK),
-          pageTitle("What is the trade of your business?"),
+          pageTitle("What is the trade of your business?" + titleSuffix),
           textField("businessTradeName", testValidBusinessTradeName)
         )
       }
@@ -131,7 +131,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: What is the trade of your business?")
+          pageTitle("Error: What is the trade of your business?" + titleSuffix)
         )
       }
 
@@ -146,7 +146,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: What is the trade of your business?")
+          pageTitle("Error: What is the trade of your business?" + titleSuffix)
         )
       }
 

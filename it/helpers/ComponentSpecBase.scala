@@ -25,6 +25,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   implicit def ws(implicit app: Application): WSClient = app.injector.instanceOf[WSClient]
 
+  val titleSuffix = " - Business Tax account - GOV.UK"
+
   val mockHost: String = WiremockHelper.wiremockHost
   val mockPort: String = WiremockHelper.wiremockPort.toString
   val mockUrl: String = s"http://$mockHost:$mockPort"

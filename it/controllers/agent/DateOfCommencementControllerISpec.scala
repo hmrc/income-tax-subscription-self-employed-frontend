@@ -52,7 +52,7 @@ class DateOfCommencementControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the DateOfCommencement Page")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your client’s business start trading?"),
+          pageTitle("When did your client’s business start trading?" + titleSuffix),
           dateField("startDate", testValidStartDate)
         )
       }
