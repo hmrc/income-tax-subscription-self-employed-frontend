@@ -137,7 +137,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           .withFormUrlEncodedBody(AddAnotherBusinessAgentForm.addAnotherBusiness -> YesNoMapping.option_no))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessAccountingMethodController.show().url)
       }
 
     }

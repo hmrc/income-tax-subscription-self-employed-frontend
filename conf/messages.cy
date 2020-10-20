@@ -150,8 +150,8 @@ agent.check_your_answers.confirm_and_sign_up                    = Cadarnhau a ch
 # Agent Business Accounting Method page
 agent.business.accounting_method.title                          = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
 agent.business.accounting_method.heading                        = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
-agent.business.accounting_method.cash                           = <span class="heading-small">Cyfrifyddu arian parod</span>
-agent.business.accounting_method.accruals                       = <span class="heading-small">Cyfrifyddu safonol</span>
+agent.business.accounting_method.cash                           = Cyfrifyddu arian parod
+agent.business.accounting_method.accruals                       = Cyfrifyddu safonol
 
 # Agent Business Accounting Method page
 agent.error.business_accounting_method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol

@@ -73,7 +73,7 @@ class BusinessListCYAController @Inject()(authService: AuthService,
             formWithErrors => BadRequest(view(formWithErrors, businesses)),
             addAnotherBusinessModel => addAnotherBusinessModel.addAnotherBusiness match {
               case Yes => Redirect(routes.InitialiseController.initialise())
-              case No => Redirect(routes.BusinessListCYAController.show())
+              case No => Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.show())
             }
           )
         case Right(_) => Redirect(routes.InitialiseController.initialise())
