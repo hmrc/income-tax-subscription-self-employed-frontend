@@ -35,7 +35,6 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
   val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
   val testBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testStartDate)
   val testValidBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
-  val titleSuffix = " - Business Tax account - GOV.UK"
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(id = businessId, businessStartDate = Some(testValidBusinessStartDateModel)))
 
@@ -53,7 +52,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your business start trading?" + titleSuffix)
+          pageTitle("When did your business start trading?")
         )
       }
     }
@@ -70,7 +69,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your business start trading?" + titleSuffix),
+          pageTitle("When did your business start trading?"),
           dateField("startDate", testValidStartDate)
         )
       }
@@ -107,7 +106,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: When did your business start trading?" + titleSuffix)
+          pageTitle("Error: When did your business start trading?")
         )
       }
     }
