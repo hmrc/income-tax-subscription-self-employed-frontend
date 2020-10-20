@@ -165,3 +165,6 @@ agent.business.accounting_method.accruals                       = <span class="h
 agent.error.business_accounting_method.invalid                  = Select if your client uses cash accounting or standard accounting
 agent.error.business_accounting_method.empty                    = Select if your client uses cash accounting or standard accounting
 
+## Title pattern
+titlePattern.serviceName.govUk = {0} - Business Tax account - GOV.UK
+base.title.error               = Error: {0} - Business Tax account - GOV.UK

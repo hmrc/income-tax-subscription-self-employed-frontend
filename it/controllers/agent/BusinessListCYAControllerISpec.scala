@@ -26,6 +26,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
   val testValidBusinessTradeName: String = "Plumbing"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
   val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel("testId1", Address(Seq("line1", "line2", "line3"), "TF3 4NT"))
+  val titleSuffix = " - Business Tax account - GOV.UK"
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId,
     businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
@@ -62,7 +63,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the CheckYourAnswers page")
         res must have(
           httpStatus(OK),
-          pageTitle("Check your answers")
+          pageTitle("Check your answers" + titleSuffix)
         )
       }
     }

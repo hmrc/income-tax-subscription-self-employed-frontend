@@ -31,6 +31,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
     val title = "When did your business start trading?"
+    val titleSuffix = " - Business Tax account - GOV.UK"
     val heading: String = title
     val exampleStartDate = "For example, 1 4 2018"
     val continue = "Continue"
@@ -59,7 +60,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
   "Business Start Date" must {
 
     "have a title" in new Setup {
-      document.title mustBe BusinessStartDateMessages.title
+      document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
     }
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessStartDateMessages.heading

@@ -31,6 +31,7 @@ class BusinessNameViewSpec extends ViewSpec {
 
   object BusinessNameMessages {
     val title = "What is the name of your client’s business?"
+    val titleSuffix = " - Business Tax account - GOV.UK"
     val heading: String = title
     val continue = "Continue"
     val backLink = "Back"
@@ -57,7 +58,7 @@ class BusinessNameViewSpec extends ViewSpec {
 
   "Business Name Page" must {
     "have a title" in new Setup() {
-      document.title mustBe BusinessNameMessages.title
+      document.title mustBe BusinessNameMessages.title + BusinessNameMessages.titleSuffix
     }
     "have a heading" in new Setup() {
       document.getH1Element.text mustBe BusinessNameMessages.heading

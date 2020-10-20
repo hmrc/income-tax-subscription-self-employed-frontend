@@ -34,6 +34,7 @@ class DateOfCommencementViewSpec extends ViewSpec {
 
   object DateOfCommencementMessages {
     val title = "When did your client’s business start trading?"
+    val titleSuffix = " - Business Tax account - GOV.UK"
     val heading: String = title
     val exampleStartDate = "For example, 1 8 2014"
     val continue = "Continue"
@@ -61,7 +62,7 @@ class DateOfCommencementViewSpec extends ViewSpec {
   "Date of Commencement" must {
 
     "have a title" in new Setup {
-      document.title mustBe DateOfCommencementMessages.title
+      document.title mustBe DateOfCommencementMessages.title + DateOfCommencementMessages.titleSuffix
     }
     "have a heading" in new Setup {
       document.getH1Element.text mustBe DateOfCommencementMessages.heading
