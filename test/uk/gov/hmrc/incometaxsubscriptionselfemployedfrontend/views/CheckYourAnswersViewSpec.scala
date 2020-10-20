@@ -31,7 +31,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val title = "Check your answers"
-    val titleSuffix = " - Business Tax account - GOV.UK"
     val heading: String = title
 
     def subHeading(businessNumber: Int): String = s"Business $businessNumber"
@@ -73,7 +72,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
   "Check Your Answers" must {
 
     "have a title" in new Setup {
-      document.title mustBe CheckYourAnswersMessages.title + CheckYourAnswersMessages.titleSuffix
+      document.title mustBe CheckYourAnswersMessages.title
     }
 
     "have a heading" in new Setup {

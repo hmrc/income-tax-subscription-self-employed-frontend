@@ -33,7 +33,6 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
   val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
-  val titleSuffix = " - Business Tax account - GOV.UK"
 
   val testBusiness: SelfEmploymentData = SelfEmploymentData(
     id = businessId,
@@ -73,7 +72,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
           httpStatus(OK),
-          pageTitle("What is the trade of your business?" + titleSuffix),
+          pageTitle("What is the trade of your business?"),
           textField("businessTradeName", "")
         )
       }
@@ -91,7 +90,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
           httpStatus(OK),
-          pageTitle("What is the trade of your business?" + titleSuffix),
+          pageTitle("What is the trade of your business?"),
           textField("businessTradeName", testValidBusinessTradeName)
         )
       }
@@ -132,7 +131,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: What is the trade of your business?" + titleSuffix)
+          pageTitle("Error: What is the trade of your business?")
         )
       }
 
@@ -147,7 +146,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: What is the trade of your business?" + titleSuffix)
+          pageTitle("Error: What is the trade of your business?")
         )
       }
 

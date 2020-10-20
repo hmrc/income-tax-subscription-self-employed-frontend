@@ -17,7 +17,6 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
   val testBusinessName: String = "businessName"
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
-  val titleSuffix = " - Business Tax account - GOV.UK"
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testBusinessNameModel)))
 
@@ -34,7 +33,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessNamePage")
         res must have(
           httpStatus(OK),
-          pageTitle("What is the name of your business?" + titleSuffix)
+          pageTitle("What is the name of your business?")
         )
       }
     }
@@ -50,7 +49,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessNamePage")
         res must have(
           httpStatus(OK),
-          pageTitle("What is the name of your business?" + titleSuffix),
+          pageTitle("What is the name of your business?"),
           textField("businessName", testBusinessName)
         )
       }
@@ -85,7 +84,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: What is the name of your business?" + titleSuffix)
+          pageTitle("Error: What is the name of your business?")
         )
       }
     }

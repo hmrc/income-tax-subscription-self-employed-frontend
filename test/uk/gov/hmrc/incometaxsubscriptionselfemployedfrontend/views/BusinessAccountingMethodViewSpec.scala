@@ -34,7 +34,6 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
   object BusinessAccountingMethodMessages {
     val title = "How do you record your income and expenses for your self-employed business?"
-    val titleSuffix = " - Business Tax account - GOV.UK"
     val heading: String = title
     val accordion = "Show me an example"
     val accordionLine_1 = "You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:"
@@ -61,7 +60,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
   "Business Accounting Method Page" must {
 
     "have a title" in new Setup {
-      document.title mustBe BusinessAccountingMethodMessages.title + BusinessAccountingMethodMessages.titleSuffix
+      document.title mustBe BusinessAccountingMethodMessages.title
     }
 
     "have a backlink" in new Setup {
