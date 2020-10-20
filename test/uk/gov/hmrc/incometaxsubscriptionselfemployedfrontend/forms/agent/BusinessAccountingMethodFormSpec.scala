@@ -20,14 +20,13 @@ import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm.agentBusinessAccountingMethodForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Cash}
 
 class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessAccountingMethodForm._
 
   "The BusinessAccountingMethodForm" should {
     "transform a valid request to the case class" in {
@@ -36,7 +35,7 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
 
       val expected = AccountingMethodModel(Cash)
 
-      val actual = agentBusinessAccountingMethodForm.bind(testInput).value
+      val actual = businessAccountingMethodForm.bind(testInput).value
 
       actual shouldBe Some(expected)
     }
@@ -50,32 +49,32 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
 
       "the map be empty" in {
         val emptyInput0 = DataMap.EmptyMap
-        val emptyTest0 = agentBusinessAccountingMethodForm.bind(emptyInput0)
+        val emptyTest0 = businessAccountingMethodForm.bind(emptyInput0)
         emptyTest0.errors must contain(FormError(businessAccountingMethod,empty))
       }
 
       "the name be empty" in {
         val emptyInput = DataMap.businessAccountingMethod("")
-        val emptyTest = agentBusinessAccountingMethodForm.bind(emptyInput)
+        val emptyTest = businessAccountingMethodForm.bind(emptyInput)
         emptyTest.errors must contain(FormError(businessAccountingMethod,empty))
       }
 
       "the name should be invalid" in {
         val invalidInput = DataMap.businessAccountingMethod("invalid")
-        val invalidTest = agentBusinessAccountingMethodForm.bind(invalidInput)
+        val invalidTest = businessAccountingMethodForm.bind(invalidInput)
         invalidTest.errors must contain(FormError(businessAccountingMethod, invalid))
       }
 
       "The following Cash submission should be valid" in {
         val valid = DataMap.businessAccountingMethod(AccountingMethodMapping.option_cash)
-        val result = agentBusinessAccountingMethodForm.bind(valid)
+        val result = businessAccountingMethodForm.bind(valid)
         result.hasErrors shouldBe false
         result.hasGlobalErrors shouldBe false
       }
 
       "The following Accruals submission should be valid" in {
         val valid = DataMap.businessAccountingMethod(AccountingMethodMapping.option_accruals)
-        val result = agentBusinessAccountingMethodForm.bind(valid)
+        val result = businessAccountingMethodForm.bind(valid)
         result.hasErrors shouldBe false
         result.hasGlobalErrors shouldBe false
       }

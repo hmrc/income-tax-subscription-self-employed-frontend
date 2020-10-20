@@ -22,12 +22,11 @@ import play.api.data.validation.Invalid
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 
-
 object BusinessAccountingMethodForm {
 
   val businessAccountingMethod = "businessAccountingMethod"
 
-  val agentBusinessAccountingMethodForm = Form(
+  val businessAccountingMethodForm: Form[AccountingMethodModel] = Form(
     mapping(
       businessAccountingMethod -> AccountingMethodMapping(
         errInvalid = Invalid("agent.error.business_accounting_method.invalid"),

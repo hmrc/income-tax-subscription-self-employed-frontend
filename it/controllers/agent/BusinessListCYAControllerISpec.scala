@@ -81,7 +81,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
 
       result must have(
         httpStatus(SEE_OTHER),
-        redirectURI(ClientBusinessListCYAUri)
+        redirectURI(ClientBusinessAccountingMethodUri)
 
       )
     }
@@ -106,4 +106,3 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
     }
   }
 }
-

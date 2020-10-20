@@ -158,8 +158,8 @@ agent.error.add_another_business.empty                          = Select yes if 
 # Agent Business Accounting Method page
 agent.business.accounting_method.title                          = What accounting method does your client use for their self-employed business?
 agent.business.accounting_method.heading                        = What accounting method does your client use for their self-employed business?
-agent.business.accounting_method.cash                           = <span class="heading-small">Cash accounting</span>
-agent.business.accounting_method.accruals                       = <span class="heading-small">Standard accounting</span>
+agent.business.accounting_method.cash                           = Cash accounting
+agent.business.accounting_method.accruals                       = Standard accounting
 
 # Agent Business Accounting Method page
 agent.error.business_accounting_method.invalid                  = Select if your client uses cash accounting or standard accounting

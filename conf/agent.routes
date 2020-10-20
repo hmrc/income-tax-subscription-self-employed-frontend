@@ -23,3 +23,6 @@ POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptio
 
 # Remove business
 GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.RemoveBusinessController.show(id: String)
+
+GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show
+POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit
