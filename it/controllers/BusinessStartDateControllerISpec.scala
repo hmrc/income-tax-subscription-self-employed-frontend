@@ -52,7 +52,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your business start trading?")
+          pageTitle("When did your business start trading?" + titleSuffix)
         )
       }
     }
@@ -69,7 +69,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your business start trading?"),
+          pageTitle("When did your business start trading?" + titleSuffix),
           dateField("startDate", testValidStartDate)
         )
       }
@@ -106,7 +106,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: When did your business start trading?")
+          pageTitle("Error: When did your business start trading?" + titleSuffix)
         )
       }
     }
