@@ -31,7 +31,7 @@ class BusinessTradeNameViewSpec extends ViewSpec {
 
   object BusinessTradeNameMessages {
     val title = "What is the trade of your client’s business?"
-    val titleSuffix = " - Business Tax account - GOV.UK"
+    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
     val hintText = "For example: plumbing, electrical work, consulting"
     val continue = "Continue"
