@@ -17,7 +17,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
   val testBusinessName: String = "businessName"
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
-  val titleSuffix = " - Business Tax account - GOV.UK"
+  val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testBusinessNameModel)))
 

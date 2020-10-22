@@ -34,7 +34,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
   object BusinessAccountingMethodMessages {
     val title = "How do you record your income and expenses for your self-employed business?"
-    val titleSuffix = " - Business Tax account - GOV.UK"
+    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
     val accordion = "Show me an example"
     val accordionLine_1 = "You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:"

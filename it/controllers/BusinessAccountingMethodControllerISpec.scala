@@ -26,7 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataK
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
 
-val titleSuffix = " - Business Tax account - GOV.UK"
+val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 

@@ -35,7 +35,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
   val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
   val testBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testStartDate)
   val testValidBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
-  val titleSuffix = " - Business Tax account - GOV.UK"
+  val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(id = businessId, businessStartDate = Some(testValidBusinessStartDateModel)))
 

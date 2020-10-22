@@ -34,7 +34,7 @@ class DateOfCommencementViewSpec extends ViewSpec {
 
   object DateOfCommencementMessages {
     val title = "When did your client’s business start trading?"
-    val titleSuffix = " - Business Tax account - GOV.UK"
+    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
     val exampleStartDate = "For example, 1 8 2014"
     val continue = "Continue"

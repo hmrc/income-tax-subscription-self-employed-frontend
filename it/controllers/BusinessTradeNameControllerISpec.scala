@@ -33,7 +33,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
   val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
-  val titleSuffix = " - Business Tax account - GOV.UK"
+  val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
 
   val testBusiness: SelfEmploymentData = SelfEmploymentData(
     id = businessId,
