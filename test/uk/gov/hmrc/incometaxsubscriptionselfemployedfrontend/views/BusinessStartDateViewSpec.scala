@@ -31,7 +31,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
     val title = "When did your business start trading?"
-    val titleSuffix = " - Business Tax account - GOV.UK"
+    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
     val exampleStartDate = "For example, 1 4 2018"
     val continue = "Continue"

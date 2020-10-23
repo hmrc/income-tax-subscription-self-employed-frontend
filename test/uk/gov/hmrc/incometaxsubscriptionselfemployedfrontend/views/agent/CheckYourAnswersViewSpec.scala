@@ -32,7 +32,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val title = "Check your answers"
-    val titleSuffix = " - Business Tax account - GOV.UK"
+    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
 
     def subHeading(businessNumber: Int): String = s"Business $businessNumber"

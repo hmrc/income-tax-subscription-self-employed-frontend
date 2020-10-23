@@ -158,5 +158,5 @@ agent.error.business_accounting_method.invalid                  = Dewiswch a yw�
 agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
 
 ## Title pattern
-titlePattern.serviceName.govUk = {0} - Cyfrif Treth Busnes - GOV.UK
-base.title.error               = Gwall: {0} - Cyfrif Treth Busnes - GOV.UK
+titlePattern.serviceName.govUk = {0} - Rhoi gwybod am eich incwm a’ch treuliau bob chwarter - GOV.UK
+base.title.error               = Gwall: {0} - Rhoi gwybod am eich incwm a’ch treuliau bob chwarter - GOV.UK
