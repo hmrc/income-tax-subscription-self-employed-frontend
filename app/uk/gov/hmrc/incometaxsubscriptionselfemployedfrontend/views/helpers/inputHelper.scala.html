@@ -34,16 +34,16 @@ field.errors
 }
 
 @hintText(hint: String) = {
-    <span class="form-hint">
+    <span class="form-hint" id="hint-@field.name">
     @hint
     </span>
 }
 
-    @hasError = @{parentForm.errors(field.name).nonEmpty}
+@hasError = @{parentForm.errors(field.name).nonEmpty}
 
-    @errorNotification = @{
-        errors.map(errMsg)
-    }
+@errorNotification = @{
+    errors.map(errMsg)
+}
 
 <div class="form-group form-field@divClass.map(cls => s" $cls")@if(hasError) { form-field--error}">
         @errorNotification
@@ -52,9 +52,13 @@ field.errors
         @formHint.fold(Nil: Seq[Html])(_.map(hintText))
     </label>
 
-    <input name="@field.name" class="form-control" id="@field.name" type="text"
+    @if(formHint.isDefined) {
+        <input name="@field.name" class="form-control" id="@field.name" type="text" aria-describedby="hint-@field.name"
+    } else {
+        <input name="@field.name" class="form-control" id="@field.name" type="text"
+    }
         @maxLength.fold(Html(""))(max => Html(s"maxlength=$max"))
-    value="@field.value.fold("")(v => v)"
+        value="@field.value.fold("")(v => v)"
         @if(isNumeric) {
             pattern="[0-9]*" inputmode="numeric"}
     >

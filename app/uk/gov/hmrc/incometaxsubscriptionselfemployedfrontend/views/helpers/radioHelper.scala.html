@@ -51,11 +51,12 @@
         case false => option.optionName
     }
 }
-    @dataTarget(radioOption: RadioOption) = {
-        @if(radioOption.conditionalContent.isDefined){
-            data-target = @radioOption.optionName
-        }
+
+@dataTarget(radioOption: RadioOption) = {
+    @if(radioOption.conditionalContent.isDefined){
+        data-target = @radioOption.optionName
     }
+}
 
 
 <div class="form-group @if(hasError) { form-field--error}">
