@@ -28,7 +28,7 @@
 @hasError = @{ parentForm.errors(field.name).nonEmpty }
 
 @errorNotification = {
-    @if(hasError){<span class="error-notification" role="tooltip" id="error-message-@{field.name}">@{messages(s"${parentForm.error(field.name).get.message}",parentForm.error(field.name).get.args:_*)}</span>}
+    @if(hasError){<span class="error-notification" id="error-message-@{field.name}">@{messages(s"${parentForm.error(field.name).get.message}",parentForm.error(field.name).get.args:_*)}</span>}
 }
 
 @* SAR-2367 a hacky fix until a formal decision is made. This changes the spacing for day & month fields in the Welsh language to match the year *@
