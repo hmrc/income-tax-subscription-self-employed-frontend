@@ -155,4 +155,19 @@ class DateOfCommencementControllerSpec extends ControllerBaseSpec with MockMulti
       }
     }
   }
+
+  "The back url" when {
+    "in edit mode" should {
+      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
+        TestDateOfCommencementController.backUrl(id,isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      }
+    }
+    "not in edit mode" should {
+      s"redirect to ${routes.BusinessNameController.show(id).url}" in {
+        TestDateOfCommencementController.backUrl(id,
+          isEditMode = false) mustBe "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/what-year-to-sign-up"
+      }
+    }
+  }
+
 }

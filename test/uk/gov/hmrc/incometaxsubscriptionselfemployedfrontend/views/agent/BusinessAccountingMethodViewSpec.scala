@@ -43,14 +43,17 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     val cash = "Cash accounting"
     val accruals = "Standard accounting"
     val continue = "Continue"
+    val update = "Update"
     val backLink = "Back"
   }
 
-  class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm) {
+  class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
+              isEditMode: Boolean = false) {
     val page: HtmlFormat.Appendable = business_accounting_method(
       businessAccountingMethodForm,
       testCall,
-      testBackUrl
+      testBackUrl,
+      isEditMode
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
@@ -84,8 +87,12 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
       document.getForm.attr("action") mustBe testCall.url
     }
 
-    "have a continue button" in new Setup {
+    "have a continue button when not in edit mode" in new Setup {
       document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.continue
+    }
+
+    "have a update button when in edit mode" in new Setup(isEditMode = true) {
+      document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.update
     }
 
     "must display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {

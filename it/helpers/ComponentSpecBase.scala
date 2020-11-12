@@ -187,8 +187,9 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientBusinessAccountingMethod(): WSResponse = get("/client/details/business-accounting-method")
 
-  def submitClientBusinessAccountingMethod(request: Option[AccountingMethodModel]): WSResponse = {
-    val uri = "/client/details/business-accounting-method"
+  def submitClientBusinessAccountingMethod(request: Option[AccountingMethodModel],
+                                           inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-accounting-method?isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
