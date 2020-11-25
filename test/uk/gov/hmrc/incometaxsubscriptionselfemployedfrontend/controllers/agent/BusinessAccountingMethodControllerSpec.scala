@@ -33,8 +33,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessAccountingMethodController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessAccountingMethodController$.show(),
-    "submit" -> TestBusinessAccountingMethodController$.submit()
+    "show" -> TestBusinessAccountingMethodController$.show(isEditMode = false),
+    "submit" -> TestBusinessAccountingMethodController$.submit(isEditMode = false)
   )
 
   object TestBusinessAccountingMethodController$ extends BusinessAccountingMethodController(
@@ -55,14 +55,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(
           Right(Some(testAccountingMethodModel))
         )
-        val result = TestBusinessAccountingMethodController$.show()(FakeRequest())
+        val result = TestBusinessAccountingMethodController$.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Right(None))
-        val result = TestBusinessAccountingMethodController$.show()(FakeRequest())
+        val result = TestBusinessAccountingMethodController$.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -71,14 +71,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       "there is an unexpected status failure" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show(false)(FakeRequest())))
         response.message mustBe("[BusinessAccountingMethodController][show] - Unexpected status: 500")
       }
 
       "there is an invalid Json" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(InvalidJson))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show(false)(FakeRequest())))
         response.message mustBe("[BusinessAccountingMethodController][show] - Invalid Json")
       }
     }
@@ -87,17 +87,30 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   "Submit" should {
 
-    "return 303, SEE_OTHER)" when {
+    "return 303, SEE_OTHER not in edit mode" when {
       "the user submits valid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
           testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController$.submit()(
+        val result = TestBusinessAccountingMethodController$.submit(false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
-          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.show().url)
+          Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=false")
+      }
+    }
+    "return 303, SEE_OTHER in edit mode" when {
+      "the user submits valid data" in {
+        mockAuthSuccess()
+        mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+          testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
+        val result = TestBusinessAccountingMethodController$.submit(true)(
+          FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe
+          Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=true")
       }
     }
     "return 400, SEE_OTHER)" when {
@@ -105,7 +118,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
           "invalid")(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController$.submit()(FakeRequest())
+        val result = TestBusinessAccountingMethodController$.submit(false)(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
@@ -113,9 +126,17 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" should {
-    "return a url for the business trade name page" in {
-      mockAuthSuccess()
-      TestBusinessAccountingMethodController$.backUrl() mustBe routes.BusinessListCYAController.show().url
+    "not in edit mode" when {
+      "return a url for the business trade name page" in {
+        mockAuthSuccess()
+        TestBusinessAccountingMethodController$.backUrl(false) mustBe routes.BusinessListCYAController.show().url
+      }
+    }
+    "in edit mode" when {
+      "return a url for the business trade name page" in {
+        mockAuthSuccess()
+        TestBusinessAccountingMethodController$.backUrl(true) mustBe s"${appConfig.subscriptionFrontendClientRoutingController}"
+      }
     }
   }
   authorisationTests()

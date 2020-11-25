@@ -55,38 +55,74 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
 
   }
 
-  "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
-    "the form data is valid and connector stores it successfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-        Json.toJson(testAccountingMethodModel))(OK)
+  "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" should {
+    "not in edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+          Json.toJson(testAccountingMethodModel))(OK)
 
-      When("POST /client/details/business-accounting-method is called")
-      val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel))
+        When("POST /client/details/business-accounting-method is called")
+        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel))
 
 
-      Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
-      res must have(
-        httpStatus(SEE_OTHER),
-        redirectURI(ClientBusinessAccountingMethodUri)
-      )
+        Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=false")
+        )
+      }
+
+      "the form data is invalid and connector stores it unsuccessfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+          Json.toJson("invalid"))(OK)
+
+        When("POST /client/details/business-accounting-method is called")
+        val res = submitClientBusinessAccountingMethod(None)
+
+
+        Then("Should return a BAD_REQUEST and THE FORM With errors")
+        res must have(
+          httpStatus(BAD_REQUEST),
+        )
+      }
     }
+    "in edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+          Json.toJson(testAccountingMethodModel))(OK)
 
-    "the form data is invalid and connector stores it unsuccessfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-        Json.toJson("invalid"))(OK)
-
-      When("POST /client/details/business-accounting-method is called")
-      val res = submitClientBusinessAccountingMethod(None)
+        When("POST /client/details/business-accounting-method?isEditMode=true is called")
+        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel), true)
 
 
-      Then("Should return a BAD_REQUEST and THE FORM With errors")
-      res must have(
-        httpStatus(BAD_REQUEST),
-      )
+        Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=true")
+        )
+      }
+
+      "the form data is invalid and connector stores it unsuccessfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+          Json.toJson("invalid"))(OK)
+
+        When("POST /client/details/business-accounting-method is called")
+        val res = submitClientBusinessAccountingMethod(None)
+
+
+        Then("Should return a BAD_REQUEST and THE FORM With errors")
+        res must have(
+          httpStatus(BAD_REQUEST),
+        )
+      }
     }
 
   }
