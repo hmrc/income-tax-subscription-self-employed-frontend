@@ -23,54 +23,49 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.DateOfCommencementForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.DateOfCommencementForm.dateOfCommencementForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.date_of_commencement
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.date_of_commencement
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.FormUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
-                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                             authService: AuthService,
-                                             val languageUtils: LanguageUtils)
-                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
+class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
+                                            multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
+                                            authService: AuthService,
+                                            val languageUtils: LanguageUtils)
+                                           (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
   with I18nSupport with ImplicitDateFormatter {
 
-  def view(dateOfCommencementForm: Form[BusinessStartDate],  id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
+  def view(dateOfCommencementForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
     date_of_commencement(
       dateOfCommencementForm = dateOfCommencementForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.submit(id,isEditMode),
+      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
-      backUrl = backUrl(id, isEditMode)
+      backUrl = backUrl(isEditMode)
     )
   }
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      multipleSelfEmploymentsService.fetchAllBusinesses.flatMap {
-        case Right(businesses) =>
-          multipleSelfEmploymentsService.fetchBusinessStartDate(id).map {
-            case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
-            case Left(error) => throw new InternalServerException(error.toString)
-          }
+      multipleSelfEmploymentsService.fetchBusinessStartDate(id).map {
+        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
         case Left(error) => throw new InternalServerException(error.toString)
       }
     }
   }
 
-
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       form.bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors,id,isEditMode))),
+          Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
         businessStartDateData =>
           multipleSelfEmploymentsService.saveBusinessStartDate(id, businessStartDateData).map(_ =>
             if (isEditMode) {
@@ -83,7 +78,7 @@ class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String,isEditMode: Boolean): String = {
+  def backUrl(isEditMode: Boolean): String = {
     if (isEditMode) {
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url
     } else {
@@ -92,7 +87,10 @@ class DateOfCommencementController @Inject()(mcc: MessagesControllerComponents,
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {
-    dateOfCommencementForm(DateOfCommencementForm.minStartDate.toLongDate)
+    businessStartDateForm(
+      minStartDate = BusinessStartDateForm.minStartDate.toLongDate,
+      maxStartDate = BusinessStartDateForm.maxStartDate.toLongDate
+    )
   }
 
 }

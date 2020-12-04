@@ -22,17 +22,14 @@ import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.DateOfCommencementForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.date_of_commencement
 
+class BusinessStartDateViewSpec extends ViewSpec {
 
-
-
-class DateOfCommencementViewSpec extends ViewSpec {
-
-  object DateOfCommencementMessages {
+  object BusinessStartDateMessages {
     val title = "When did your client’s business start trading?"
     val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
@@ -48,7 +45,9 @@ class DateOfCommencementViewSpec extends ViewSpec {
   val testError: FormError = FormError("startDate", "testError")
 
   class Setup(isEditMode: Boolean = false,
-              dateOfCommencementForm: Form[BusinessStartDate] = DateOfCommencementForm.dateOfCommencementForm("testMessage")) {
+              dateOfCommencementForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm(
+                "minStartDateError", "maxStartDateError"
+              )) {
     val page: HtmlFormat.Appendable = date_of_commencement(
       dateOfCommencementForm,
       testCall,
@@ -62,31 +61,34 @@ class DateOfCommencementViewSpec extends ViewSpec {
   "Date of Commencement" must {
 
     "have a title" in new Setup {
-      document.title mustBe DateOfCommencementMessages.title + DateOfCommencementMessages.titleSuffix
+      document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
     }
     "have a heading" in new Setup {
-      document.getH1Element.text mustBe DateOfCommencementMessages.heading
+      document.getH1Element.text mustBe BusinessStartDateMessages.heading
     }
     "have a Form" in new Setup {
       document.getForm.attr("method") mustBe testCall.method
       document.getForm.attr("action") mustBe testCall.url
     }
     "have a fieldset with dateInputs" in new Setup {
-      document.mustHaveDateField("startDate", "", DateOfCommencementMessages.exampleStartDate)
+      document.mustHaveDateField("startDate", "", BusinessStartDateMessages.exampleStartDate)
     }
     "have a continue button when not in edit mode" in new Setup {
-      document.getSubmitButton.text mustBe DateOfCommencementMessages.continue
+      document.getSubmitButton.text mustBe BusinessStartDateMessages.continue
     }
     "have update button when in edit mode" in new Setup(true) {
-      document.getSubmitButton.text mustBe DateOfCommencementMessages.update
+      document.getSubmitButton.text mustBe BusinessStartDateMessages.update
     }
     "have a backlink " in new Setup {
-      document.getBackLink.text mustBe DateOfCommencementMessages.backLink
+      document.getBackLink.text mustBe BusinessStartDateMessages.backLink
       document.getBackLink.attr("href") mustBe testBackUrl
     }
-    "must display form error on page" in new Setup(false,DateOfCommencementForm.dateOfCommencementForm("testMessage").withError(testError)) {
+    "must display form error on page" in new Setup(
+      isEditMode = false,
+      dateOfCommencementForm = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").withError(testError)
+    ) {
       document.mustHaveErrorSummary(List[String](testError.message))
-      document.mustHaveDateField("startDate", "", DateOfCommencementMessages.exampleStartDate, Some(testError.message))
+      document.mustHaveDateField("startDate", "", BusinessStartDateMessages.exampleStartDate, Some(testError.message))
     }
 
   }

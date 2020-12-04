@@ -200,8 +200,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
         }
       }
       "not in edit mode" should {
-        s"redirect to ${routes.DateOfCommencementController.show(id).url}" in {
-          TestBusinessNameController.backUrl(id,isEditMode = false) mustBe routes.DateOfCommencementController.show(id).url
+        s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
+          TestBusinessNameController.backUrl(id,isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
         }
       }
     }

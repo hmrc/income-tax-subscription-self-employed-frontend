@@ -36,6 +36,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     val heading: String = title
 
     def subHeading(businessNumber: Int): String = s"Business $businessNumber"
+
     def removeBusiness(businessNumber: Int): String = s"Remove business $businessNumber"
 
     val continue = "Continue"
@@ -61,7 +62,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
 
-  class Setup(addAnotherForm: Form[AddAnotherBusinessModel] = AddAnotherBusinessAgentForm.addAnotherBusinessForm(1,5),
+  class Setup(addAnotherForm: Form[AddAnotherBusinessModel] = AddAnotherBusinessAgentForm.addAnotherBusinessForm(1, 5),
               businesses: Seq[SelfEmploymentData] = Seq(selfEmploymentData("1"))) {
     val page: HtmlFormat.Appendable = check_your_answers(
       addAnotherForm,
@@ -105,7 +106,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           "has a change link" in new Setup {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectFirst("a")
             changeLink.text mustBe CheckYourAnswersMessages.change
-            changeLink.attr("href") mustBe routes.DateOfCommencementController.show(id = "1", isEditMode = true).url
+            changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "1", isEditMode = true).url
           }
         }
 
@@ -119,7 +120,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           "has a change link" in new Setup {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectFirst("a")
             changeLink.text mustBe CheckYourAnswersMessages.change
-            changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "1",isEditMode = true).url
+            changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "1", isEditMode = true).url
           }
         }
 
@@ -133,7 +134,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           "has a change link" in new Setup {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectFirst("a")
             changeLink.text mustBe CheckYourAnswersMessages.change
-            changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1",isEditMode = true).url
+            changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1", isEditMode = true).url
           }
         }
 
@@ -176,7 +177,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectFirst("a")
               changeLink.text mustBe CheckYourAnswersMessages.change
-              changeLink.attr("href") mustBe routes.DateOfCommencementController.show(id = "1", isEditMode = true).url
+              changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "1", isEditMode = true).url
             }
           }
 
@@ -246,7 +247,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(1).getSummaryListActions.selectFirst("a")
               changeLink.text mustBe CheckYourAnswersMessages.change
-              changeLink.attr("href") mustBe routes.DateOfCommencementController.show(id = "2", isEditMode = true).url
+              changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "2", isEditMode = true).url
             }
           }
 

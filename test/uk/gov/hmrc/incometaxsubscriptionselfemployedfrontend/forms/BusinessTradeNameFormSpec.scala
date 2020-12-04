@@ -27,7 +27,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 
 class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessTradeNameForm._
+  import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm._
 
   def businessTradeForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel] = Nil): Form[BusinessTradeNameModel] = {
     businessTradeNameValidationForm(excludedBusinessTradeNames)

@@ -34,7 +34,7 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents, authServ
     authService.authorised() {
       val id = UUID.randomUUID().toString
 
-      Future.successful(Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show(id)))
+      Future.successful(Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.show(id)))
     }
   }
 }

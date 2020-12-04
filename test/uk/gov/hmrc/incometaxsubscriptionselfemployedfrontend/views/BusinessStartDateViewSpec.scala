@@ -22,7 +22,7 @@ import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_start_date
@@ -45,7 +45,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val testError: FormError = FormError("startDate", "testError")
 
   class Setup(isEditMode: Boolean = false,
-              businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm("testMessage")) {
+              businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError")) {
     val page: HtmlFormat.Appendable = business_start_date(
       businessStartDateForm,
       testCall,
@@ -82,7 +82,10 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.getBackLink.text mustBe BusinessStartDateMessages.backLink
       document.getBackLink.attr("href") mustBe testBackUrl
     }
-    "must display form error on page" in new Setup(false, BusinessStartDateForm.businessStartDateForm("testMessage").withError(testError)) {
+    "must display form error on page" in new Setup(
+      isEditMode = false,
+      businessStartDateForm = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").withError(testError)
+    ) {
       document.mustHaveErrorSummary(List[String](testError.message))
       document.mustHaveDateField("startDate", "", BusinessStartDateMessages.exampleStartDate, Some(testError.message))
     }

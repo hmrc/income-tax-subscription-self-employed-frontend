@@ -22,7 +22,8 @@
         divClass: Option[String] = None,
         labelClass: Option[String] = None,
         isNumeric: Boolean = false,
-        formHint: Option[Seq[String]] = None
+        formHint: Option[Seq[String]] = None,
+        showErrors: Boolean = true
 )(implicit messages: Messages)
 
 @errors = @{
@@ -30,7 +31,9 @@ field.errors
 }
 
 @errMsg(err: FormError) = {
-    <span class="error-notification">@{messages(s"${err.message}",err.args:_*)}</span>
+    @if(showErrors) {
+        <span class="error-notification">@{messages(s"${err.message}",err.args:_*)}</span>
+    }
 }
 
 @hintText(hint: String) = {
@@ -39,7 +42,7 @@ field.errors
     </span>
 }
 
-@hasError = @{parentForm.errors(field.name).nonEmpty}
+@hasError = @{showErrors && parentForm.errors(field.name).nonEmpty}
 
 @errorNotification = @{
     errors.map(errMsg)

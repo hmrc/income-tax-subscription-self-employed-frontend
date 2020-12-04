@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints
 
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.ConstraintUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.constraint
 
 object StringConstraints {
 
@@ -25,7 +25,7 @@ object StringConstraints {
   val charRegex = """^([ A-Za-z0-9&@£$€¥#.,:;-])*$"""
 
   val validateChar: String => Constraint[String] = msgKey => constraint[String](
-  x => if (x.matches(charRegex)) Valid else Invalid(msgKey)
+    x => if (x.matches(charRegex)) Valid else Invalid(msgKey)
   )
 
   val nonEmpty: String => Constraint[String] = msgKey => constraint[String](

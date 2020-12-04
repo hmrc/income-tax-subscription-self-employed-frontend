@@ -25,10 +25,11 @@ error.date.empty                                                = Nodwch y dyddi
 error.day.empty                                                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod
 error.month.empty                                               = Mae’n rhaid i’r dyddiad gynnwys mis
 error.year.empty                                                = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
-error.day.month.empty                                           = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
-error.day.year.empty                                            = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
-error.month.year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
-error.business_accounting_period.minStartDate                   = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+error.day_month.empty                                           = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
+error.day_year.empty                                            = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
+error.month_year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
+error.business_start_date.maxStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+error.business_start_date.minStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}
 
 # Business Name
 business.name.title                                             = Beth yw enw’ch busnes?
@@ -102,10 +103,11 @@ error.agent.date.empty                                          = Nodwch y dyddi
 error.agent.day.empty                                           = Mae’n rhaid i’r dyddiad gynnwys diwrnod
 error.agent.month.empty                                         = Mae’n rhaid i’r dyddiad gynnwys mis
 error.agent.year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
-error.agent.day.month.empty                                     = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
-error.agent.day.year.empty                                      = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
-error.agent.month.year.empty                                    = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
-error.agent.business_accounting_period.minStartDate             = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+error.agent.day_month.empty                                     = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
+error.agent.day_year.empty                                      = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
+error.agent.month_year.empty                                    = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
+error.agent.business_start_date.maxStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+error.agent.business_start_date.minStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}
 
 # Agent Business Name
 business.agent.name.title                                       = Beth yw enw busnes eich cleient?

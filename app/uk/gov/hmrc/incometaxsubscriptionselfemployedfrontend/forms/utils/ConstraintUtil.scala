@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.validation.utils
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils
 
 import play.api.data.validation.{Constraint, Valid, ValidationResult}
 
-
-object AgentConstraintUtil {
+object ConstraintUtil {
 
   def constraint[A](f: A => ValidationResult): Constraint[A] = Constraint[A]("")(f)
 
