@@ -57,6 +57,21 @@ trait CustomMatchers {
       }
     }
 
+    def elementTextByID(id: String)(expectedValue: String): HavePropertyMatcher[WSResponse, String] =
+    new HavePropertyMatcher[WSResponse, String] {
+
+      def apply(response: WSResponse): HavePropertyMatchResult[String] = {
+        val body = Jsoup.parse(response.body)
+
+        HavePropertyMatchResult(
+          body.getElementById(id).text == expectedValue,
+          s"elementByID($id)",
+          expectedValue,
+          body.getElementById(id).text
+        )
+      }
+    }
+
   def dateField(id: String, expectedValue: DateModel): HavePropertyMatcher[WSResponse, String] =
     new HavePropertyMatcher[WSResponse, String] {
 
@@ -142,4 +157,3 @@ trait CustomMatchers {
   }
 
 }
-

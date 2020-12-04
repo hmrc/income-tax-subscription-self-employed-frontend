@@ -33,8 +33,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessAccountingMethodController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessAccountingMethodController.show(),
-    "submit" -> TestBusinessAccountingMethodController.submit()
+    "show" -> TestBusinessAccountingMethodController.show(isEditMode = false),
+    "submit" -> TestBusinessAccountingMethodController.submit(isEditMode = false)
   )
 
   object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
@@ -55,14 +55,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(businessAccountingMethodKey)(
           Right(Some(testAccountingMethodModel))
         )
-        val result = TestBusinessAccountingMethodController.show()(FakeRequest())
+        val result = TestBusinessAccountingMethodController.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Right(None))
-        val result = TestBusinessAccountingMethodController.show()(FakeRequest())
+        val result = TestBusinessAccountingMethodController.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -71,14 +71,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       "there is an unexpected status failure" in {
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show(false)(FakeRequest())))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Unexpected status: 500")
       }
 
       "there is an invalid Json" in {
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(InvalidJson))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show(false)(FakeRequest())))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Invalid Json")
       }
     }
@@ -88,32 +88,57 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   "Submit" should {
 
     "return 303, SEE_OTHER)" when {
-      "the user submits valid data" in {
-        mockAuthSuccess()
-        mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController.submit()(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
-        )
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe
-          Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
+      "the user submits valid data" when {
+        "not in edit mode" should {
+          "redirect to sign up front end rerouting page" in {
+            mockAuthSuccess()
+            mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
+            val result = TestBusinessAccountingMethodController.submit(false)(
+              FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+            )
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe
+              Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
+          }
+        }
+
+        "in edit mode" should {
+          "redirect to sign up front end check your answer page" in {
+            mockAuthSuccess()
+            mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
+            val result = TestBusinessAccountingMethodController.submit(true)(
+              FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+            )
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe
+              Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/check-your-answers")
+          }
+        }
       }
     }
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(businessAccountingMethodKey, "invalid")(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController.submit()(FakeRequest())
+        val result = TestBusinessAccountingMethodController.submit(false)(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
     }
   }
 
-  "The back url" should {
-    "return a url for the business trade name page" in {
-      mockAuthSuccess()
-      TestBusinessAccountingMethodController.backUrl() mustBe routes.BusinessListCYAController.show().url
+  "The back url" when {
+    "not in edit mode" should {
+      "return a url for the business list CYA page" in {
+        mockAuthSuccess()
+        TestBusinessAccountingMethodController.backUrl(false) mustBe routes.BusinessListCYAController.show().url
+      }
+    }
+    "in edit mode" should {
+      "return a url for the sign up front end final CYA page" in {
+        mockAuthSuccess()
+        TestBusinessAccountingMethodController.backUrl(true) mustBe appConfig.subscriptionFrontendFinalCYAController
+      }
     }
   }
   authorisationTests()

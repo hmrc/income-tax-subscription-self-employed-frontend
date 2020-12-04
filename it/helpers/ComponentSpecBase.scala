@@ -174,10 +174,11 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getBusinessAccountingMethod(): WSResponse = get("/details/business-accounting-method")
+  def getBusinessAccountingMethod(inEditMode: Boolean = false): WSResponse = get(s"/details/business-accounting-method?isEditMode=$inEditMode")
 
-  def submitBusinessAccountingMethod(request: Option[AccountingMethodModel]): WSResponse = {
-    val uri = "/details/business-accounting-method"
+  def submitBusinessAccountingMethod(request: Option[AccountingMethodModel],
+                                     inEditMode: Boolean = false): WSResponse = {
+    val uri = s"/details/business-accounting-method?isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -246,4 +247,3 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim
 
 }
-

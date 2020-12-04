@@ -45,13 +45,15 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     val accruals = "Standard accounting"
     val accrualsDescription = "You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’."
     val continue = "Continue"
+    val update = "Update"
     val backLink = "Back"
   }
 
-  class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm) {
+  class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm, isEditMode: Boolean = false) {
     val page: HtmlFormat.Appendable = business_accounting_method(
       businessAccountingMethodForm,
       testCall,
+      isEditMode,
       testBackUrl
     )(FakeRequest(), implicitly, appConfig)
 
@@ -125,8 +127,12 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
       document.getForm.attr("action") mustBe testCall.url
     }
 
-    "have a continue button" in new Setup {
+    "have a continue button when it is not in edit mode" in new Setup {
       document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.continue
+    }
+
+    "have an update button when it is in edit mode" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm, true) {
+      document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.update
     }
 
   }

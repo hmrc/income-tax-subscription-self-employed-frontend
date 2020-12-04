@@ -25,7 +25,6 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
-
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 
     "the Connector receives no content" should {
@@ -46,43 +45,91 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       }
     }
 
-    "Connector returns a previously selected Accounting method option" should {
-      "show the current business accounting method page with previously selected option" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+    "Connector returns a previously selected Accounting method option" when {
+      "not in edit mode" should {
+        "show the current business accounting method page with previously selected option and a continue button" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
-        When("GET /details/business-accounting-method is called")
-        val res = getBusinessAccountingMethod()
+          When("GET /details/business-accounting-method is called")
+          val res = getBusinessAccountingMethod()
 
-        val expectedText = removeHtmlMarkup(messages("business.accounting_method.cash"))
+          val expectedText = removeHtmlMarkup(messages("business.accounting_method.cash"))
 
-        Then("should return an OK with the BusinessAccountingMethodPage")
-        res must have(
-          httpStatus(OK),
-          pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
-          radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
-        )
+          Then("should return an OK with the BusinessAccountingMethodPage")
+          res must have(
+            httpStatus(OK),
+            pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
+            elementTextByID(id = "continue-button")("Continue"),
+            radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
+          )
+        }
       }
+
+      "in edit mode" should {
+        "show the current business accounting method page with previously selected option and an update button" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+
+          When("GET /details/business-accounting-method is called")
+          val res = getBusinessAccountingMethod(true)
+
+          val expectedText = removeHtmlMarkup(messages("business.accounting_method.cash"))
+
+          Then("should return an OK with the BusinessAccountingMethodPage")
+          res must have(
+            httpStatus(OK),
+            pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
+            elementTextByID(id = "continue-button")("Update"),
+            radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
+          )
+        }
+      }
+
     }
 
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
-    "the form data is valid and connector stores it successfully" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+    "the form data is valid and connector stores it successfully" when {
+      "not in edit mode" should {
+        "redirect to sign up frontend business routing controller" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
 
-      When("POST /details/business-accounting-method is called")
-      val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel))
+          When("POST /details/business-accounting-method is called")
+          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel))
 
 
-      Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
-      res must have(
-        httpStatus(SEE_OTHER),
-        redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
-      )
+          Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
+          )
+        }
+      }
+
+      "in edit mode" should {
+        "redirect to sign up frontend final check your answer page" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+
+          When("POST /details/business-accounting-method is called")
+          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), true)
+
+
+          Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/check-your-answers")
+          )
+        }
+      }
+
     }
 
     "the form data is invalid and connector stores it unsuccessfully" in {
