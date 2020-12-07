@@ -20,7 +20,7 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.ConstraintUtil.constraint
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.constraint
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AddAnotherBusinessModel, No, Yes, YesNo}
 
 object AddAnotherBusinessAgentForm {

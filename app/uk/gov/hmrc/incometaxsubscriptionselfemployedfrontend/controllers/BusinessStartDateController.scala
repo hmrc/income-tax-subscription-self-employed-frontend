@@ -23,17 +23,17 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStartDateForm.businessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_start_date
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
@@ -44,25 +44,21 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
   with I18nSupport with ImplicitDateFormatter {
 
-  def view(businessStartDateForm: Form[BusinessStartDate], id: String, businesses: Seq[SelfEmploymentData], isEditMode: Boolean)
+  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html = {
     business_start_date(
       businessStartDateForm = businessStartDateForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
-      backUrl = backUrl(id, businesses, isEditMode)
+      backUrl = backUrl(isEditMode)
     )
   }
 
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      multipleSelfEmploymentsService.fetchAllBusinesses.flatMap {
-        case Right(businesses) =>
-          multipleSelfEmploymentsService.fetchBusinessStartDate(id).map {
-            case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, businesses, isEditMode))
-            case Left(error) => throw new InternalServerException(error.toString)
-          }
+      multipleSelfEmploymentsService.fetchBusinessStartDate(id).map {
+        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
         case Left(error) => throw new InternalServerException(error.toString)
       }
     }
@@ -73,10 +69,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     authService.authorised() {
       form.bindFromRequest.fold(
         formWithErrors => {
-          multipleSelfEmploymentsService.fetchAllBusinesses.map {
-            case Right(businesses) => BadRequest(view(formWithErrors, id, businesses, isEditMode))
-            case Left(error) => throw new InternalServerException(error.toString)
-          }
+          Future.successful(BadRequest(view(formWithErrors, id, isEditMode)))
         },
         businessStartDateData =>
           multipleSelfEmploymentsService.saveBusinessStartDate(id, businessStartDateData).map(_ =>
@@ -90,7 +83,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, businesses: Seq[SelfEmploymentData], isEditMode: Boolean): String = {
+  def backUrl(isEditMode: Boolean): String = {
     if (isEditMode) {
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
     } else {
@@ -99,7 +92,10 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {
-    businessStartDateForm(BusinessStartDateForm.minStartDate.toLongDate)
+    businessStartDateForm(
+      minStartDate = BusinessStartDateForm.minStartDate.toLongDate,
+      maxStartDate = BusinessStartDateForm.maxStartDate.toLongDate
+    )
   }
 
 }

@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils
 
-import play.api.data.Forms._
-import play.api.data._
+import play.api.data.Form
 
-object MappingUtil {
+object FormUtil {
 
-  val trimmedText: Mapping[String] = default(text, "").transform(_.trim, identity)
-
-  val oText: Mapping[Option[String]] = optional(text)
-
-  implicit class OTextUtil(mapping: Mapping[Option[String]]) {
-    def toText: Mapping[String] =
-      mapping.transform(
-        x => x.fold("")(x => x),
-        x => Some(x)
-      )
+  implicit class FormUtil[T](form: Form[T]) {
+    def fill(data: Option[T]): Form[T] = data.fold(form)(form.fill)
   }
 
 }

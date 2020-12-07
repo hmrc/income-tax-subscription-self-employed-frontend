@@ -22,7 +22,7 @@ import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessNameForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_name

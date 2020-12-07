@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.helpers
 
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.MappingUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil._
 import org.scalatest.Matchers._
 import play.api.data.Form
 import play.api.data.Forms._

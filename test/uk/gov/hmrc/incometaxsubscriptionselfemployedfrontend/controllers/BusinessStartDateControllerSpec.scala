@@ -22,7 +22,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testBusinessStartDateModel
@@ -45,7 +45,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   )
 
   def modelToFormData(businessStartDateModel: BusinessStartDate): Seq[(String, String)] = {
-    BusinessStartDateForm.businessStartDateForm("error").fill(businessStartDateModel).data.toSeq
+    BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").fill(businessStartDateModel).data.toSeq
   }
 
   def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
@@ -61,7 +61,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     "return ok (200)" when {
       "the connector returns data" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
         mockFetchBusinessStartDate(id)(
           Right(Some(BusinessStartDate(DateModel("01", "01", "2000"))))
         )
@@ -71,7 +70,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       }
       "the connector returns no data" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
         mockFetchBusinessStartDate(id)(Right(None))
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())
         status(result) mustBe OK
@@ -79,14 +77,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       }
     }
     "Throw an internal exception error" when {
-      "the connector returns an error fetching all businesses" in {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())))
-      }
       "the connector returns an error fetching the business start date" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
         mockFetchBusinessStartDate(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
         intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())))
       }
@@ -136,17 +128,12 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   "The back url" should {
     "go to the check your answers page" when {
       "in edit mode" in {
-        TestBusinessStartDateController.backUrl(id, Nil, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        TestBusinessStartDateController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
       }
     }
     "go to the income source page" when {
       "not in edit mode" in {
-        val businesses: Seq[SelfEmploymentData] = Seq(
-          selfEmploymentData("testIdOne"),
-          selfEmploymentData("testIdTwo")
-        )
-        TestBusinessStartDateController.backUrl("testIdOne", businesses, isEditMode = false) must include(
-        "/report-quarterly/income-and-expenses/sign-up/details/income-receive")
+        TestBusinessStartDateController.backUrl(isEditMode = false) must include("/report-quarterly/income-and-expenses/sign-up/details/income-receive")
       }
     }
   }

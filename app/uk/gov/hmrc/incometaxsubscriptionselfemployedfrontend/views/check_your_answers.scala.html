@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.play.views.html.helpers.form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.AddAnotherBusinessForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.main_template
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.helpers.RadioOption
@@ -28,7 +29,6 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AddAnotherBusinessModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Yes
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.No
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.AddAnotherBusinessForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 
 @(addAnotherBusinessForm: Form[AddAnotherBusinessModel], answers: Seq[SelfEmploymentData], postAction: Call, implicitDateFormatter: ImplicitDateFormatter)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)

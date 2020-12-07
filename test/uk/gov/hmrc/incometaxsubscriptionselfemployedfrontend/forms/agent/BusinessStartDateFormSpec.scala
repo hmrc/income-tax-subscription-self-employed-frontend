@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import java.time.LocalDate
 
@@ -22,21 +22,19 @@ import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.{Form, FormError}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.startDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
 
 class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm._
-
-
   def form: Form[BusinessStartDate] = {
     businessStartDateForm(BusinessStartDateForm.minStartDate.toString, BusinessStartDateForm.maxStartDate.toString)
   }
 
-  "The BusinessStartDateForm" should {
+  "The DateOfCommencementForm" should {
     "transform a valid request to the date form case class" in {
 
       val testDateDay = "31"
@@ -59,10 +57,10 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "when testing the validation" should {
 
       "output the appropriate error messages for the start date" when {
-        val empty = "error.date.empty"
-        val invalid = "error.date.empty"
-        val beforeMax = "error.business_start_date.maxStartDate"
-        val beforeMin = "error.business_start_date.minStartDate"
+        val empty = "error.agent.date.empty"
+        val invalid = "error.agent.date.empty"
+        val beforeMax = "error.agent.business_start_date.maxStartDate"
+        val beforeMin = "error.agent.business_start_date.minStartDate"
 
         val dayKeyError: String = s"$startDate.$day"
         val monthKeyError: String = s"$startDate.$month"
@@ -78,7 +76,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
           val invalidTest = form.bind(DataMap.date(startDate)("29", "2", "2017"))
           invalidTest.errors must contain(FormError(startDate, invalid))
         }
-        "it is within 2 years" in {
+        "it is older than 2 years" in {
           val oneYearAgo: LocalDate = LocalDate.now.minusYears(1)
           val maxTest = form.bind(DataMap.date(startDate)(
             oneYearAgo.getDayOfMonth.toString,
@@ -93,27 +91,27 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         }
         "it is is missing the day" in {
           val minTest = form.bind(DataMap.date(startDate)("", "4", "2017"))
-          minTest.errors must contain(FormError(dayKeyError, "error.day.empty"))
+          minTest.errors must contain(FormError(dayKeyError, "error.agent.day.empty"))
         }
         "it is is missing the month" in {
           val minTest = form.bind(DataMap.date(startDate)("06", "", "2017"))
-          minTest.errors must contain(FormError(monthKeyError, "error.month.empty"))
+          minTest.errors must contain(FormError(monthKeyError, "error.agent.month.empty"))
         }
         "it is is missing the year" in {
           val minTest = form.bind(DataMap.date(startDate)("06", "4", ""))
-          minTest.errors must contain(FormError(yearKeyError, "error.year.empty"))
+          minTest.errors must contain(FormError(yearKeyError, "error.agent.year.empty"))
         }
         "it is is missing the day and month" in {
           val minTest = form.bind(DataMap.date(startDate)("", "", "2017"))
-          minTest.errors must contain(FormError(dayKeyError, "error.day_month.empty"))
+          minTest.errors must contain(FormError(dayKeyError, "error.agent.day_month.empty"))
         }
         "it is is missing the day and year" in {
           val minTest = form.bind(DataMap.date(startDate)("", "4", ""))
-          minTest.errors must contain(FormError(dayKeyError, "error.day_year.empty"))
+          minTest.errors must contain(FormError(dayKeyError, "error.agent.day_year.empty"))
         }
         "it is is missing the month and year" in {
           val minTest = form.bind(DataMap.date(startDate)("06", "", ""))
-          minTest.errors must contain(FormError(monthKeyError, "error.month_year.empty"))
+          minTest.errors must contain(FormError(monthKeyError, "error.agent.month_year.empty"))
         }
       }
     }

@@ -18,6 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation
 
 import org.scalatest.{Matchers, WordSpecLike}
 import play.api.data.validation.{Constraints, Invalid, Valid}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints
 
 class StringConstraintsSpec extends Constraints with WordSpecLike with Matchers {
 

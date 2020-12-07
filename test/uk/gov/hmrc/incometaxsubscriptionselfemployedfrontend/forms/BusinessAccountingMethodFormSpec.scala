@@ -27,7 +27,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingM
 
 class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.BusinessAccountingMethodForm._
+  import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm._
 
   "The BusinessAccountingMethodForm" should {
     "transform a valid request to the case class" in {

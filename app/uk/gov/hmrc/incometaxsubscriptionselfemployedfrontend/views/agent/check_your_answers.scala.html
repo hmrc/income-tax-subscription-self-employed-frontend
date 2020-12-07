@@ -49,7 +49,7 @@
     import implicitDateFormatter.LongDate
     val question: String = messages("agent.check_your_answers.trading_start_date")
     val answer: String = businessStartDate.startDate.toLocalDate.toLongDate
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.DateOfCommencementController.show(businessId, isEditMode = true).url
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
     summaryRow(question, answer, Some(changeUrl))
 }
 

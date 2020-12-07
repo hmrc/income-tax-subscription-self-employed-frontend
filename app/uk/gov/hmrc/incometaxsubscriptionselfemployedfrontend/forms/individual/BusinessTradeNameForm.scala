@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.StringConstraints._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.ConstraintUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.utils.MappingUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessTradeNameModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{maxLength, nonEmpty, validateChar}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.trimmedText
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 
 object BusinessTradeNameForm {
 
