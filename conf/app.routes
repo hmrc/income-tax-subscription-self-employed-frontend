@@ -12,8 +12,8 @@ POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptio
 GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
 POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
 
-GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.show
-POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.submit
+GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.show(isEditMode: Boolean ?= false)
+POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.submit(isEditMode: Boolean ?= false)
 
 GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.show
 POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessListCYAController.submit

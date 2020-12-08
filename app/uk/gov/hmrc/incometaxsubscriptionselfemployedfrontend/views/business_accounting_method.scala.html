@@ -25,7 +25,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.helpers.RadioOption
 
 
-@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @question = @{
     messages("business.accounting_method.heading")
@@ -66,7 +66,11 @@
             parentForm = businessAccountingMethodForm
         )
 
-        @continueButton()
+        @if(isEditMode) {
+            @continueButton(Some(messages("base.update")))
+        } else {
+            @continueButton()
+        }
     }
 
 }

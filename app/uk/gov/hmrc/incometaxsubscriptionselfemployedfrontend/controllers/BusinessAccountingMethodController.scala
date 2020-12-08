@@ -43,18 +43,19 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
                                                   (implicit val ec: ExecutionContext, val appConfig: AppConfig)
   extends FrontendController(mcc) with I18nSupport {
 
-  def view(businessAccountingMethodForm: Form[AccountingMethodModel])(implicit request: Request[AnyContent]): Html =
+  def view(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     business_accounting_method(
       businessAccountingMethodForm = businessAccountingMethodForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.submit(),
-      backUrl = backUrl()
+      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.submit(isEditMode),
+      isEditMode: Boolean,
+      backUrl = backUrl(isEditMode)
     )
 
-  def show(): Action[AnyContent] = Action.async { implicit request =>
+  def show(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       incomeTaxSubscriptionConnector.getSelfEmployments[AccountingMethodModel](businessAccountingMethodKey).map {
         case Right(accountingMethod) =>
-          Ok(view(businessAccountingMethodForm.fill(accountingMethod)))
+          Ok(view(businessAccountingMethodForm.fill(accountingMethod), isEditMode))
         case Left(UnexpectedStatusFailure(_@status)) =>
           throw new InternalServerException(s"[BusinessAccountingMethodController][show] - Unexpected status: $status")
         case Left(InvalidJson) =>
@@ -63,18 +64,29 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
     }
   }
 
-  def submit(): Action[AnyContent] = Action.async { implicit request =>
+  def submit(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       businessAccountingMethodForm.bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+          Future.successful(BadRequest(view(formWithErrors, isEditMode))),
         businessAccountingMethod =>
-          incomeTaxSubscriptionConnector.saveSelfEmployments(businessAccountingMethodKey, businessAccountingMethod) map (
-            _ => Redirect(appConfig.subscriptionFrontendRoutingController))
+          incomeTaxSubscriptionConnector.saveSelfEmployments(businessAccountingMethodKey, businessAccountingMethod).map(_ =>
+            if (isEditMode) {
+              Redirect(appConfig.subscriptionFrontendFinalCYAController)
+            } else {
+              Redirect(appConfig.subscriptionFrontendRoutingController)
+            }
+          )
       )
     }
   }
 
-  def backUrl(): String =
-    routes.BusinessListCYAController.show().url
+  def backUrl(isEditMode: Boolean): String = {
+    if (isEditMode) {
+      appConfig.subscriptionFrontendFinalCYAController
+    } else {
+      routes.BusinessListCYAController.show().url
+    }
+  }
+
 }
