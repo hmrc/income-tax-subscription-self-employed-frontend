@@ -38,8 +38,8 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
        |      "showSearchLinkAgain": true
        |    },
        |    "confirmPageConfig": {
-       |      "showChangeLink": true,
-       |      "showSubHeadingAndInfo": true,
+       |      "showChangeLink": false,
+       |      "showSubHeadingAndInfo": false,
        |      "showSearchAgainLink": false,
        |      "showConfirmChangeText": true
        |    },

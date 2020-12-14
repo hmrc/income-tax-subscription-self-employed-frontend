@@ -121,7 +121,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val twoYearsAgo: LocalDate = LocalDate.now.minusYears(2)
         val testData = DataMap.date(startDate)(
           day = twoYearsAgo.getDayOfMonth.toString,
-          month = twoYearsAgo.getDayOfMonth.toString,
+          month = twoYearsAgo.getMonthValue.toString,
           year = twoYearsAgo.getYear.toString
         )
         val validated = form.bind(testData)
@@ -132,7 +132,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val earliestAllowedDate: LocalDate = LocalDate.of(1900, 1, 1)
         val testData = DataMap.date(startDate)(
           day = earliestAllowedDate.getDayOfMonth.toString,
-          month = earliestAllowedDate.getDayOfMonth.toString,
+          month = earliestAllowedDate.getMonthValue.toString,
           year = earliestAllowedDate.getYear.toString
         )
         val validated = form.bind(testData)

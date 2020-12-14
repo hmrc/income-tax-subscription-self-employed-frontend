@@ -7,7 +7,7 @@ base.sign-out                                                   = Sign out
 base.day                                                        = Day
 base.month                                                      = Month
 base.year                                                       = Year
-base.error_heading                                              = There’s a problem
+base.error_heading                                              = There is a problem
 base.userResearch.title                                         = Help to improve our service
 base.userResearch.link                                          = Answer some questions about yourself to join the research panel
 base.title.error                                                = Error: {0}
@@ -17,8 +17,9 @@ base.yes                                                        = Yes
 base.no                                                         = No
 
 # Business start date
-business.start_date.title                                       = When did your business start trading?
-business.start_date.heading                                     = When did your business start trading?
+business.start_date.title                                       = When did your sole trader business start trading?
+business.start_date.heading                                     = When did your sole trader business start trading?
+business.start_date.line_1                                      = If you have multiple sole trader businesses, enter the start date of your main business.
 business.start_date.exampleStartDate                            = For example, 1 4 2018
 
 # Date errors
@@ -33,9 +34,9 @@ error.business_start_date.maxStartDate                          = The date your 
 error.business_start_date.minStartDate                          = The date your business started must be on or after {0}
 
 # Business Name
-business.name.title                                             = What is the name of your business?
-business.name.heading                                           = What is the name of your business?
-business.name.line_1                                            = This is the business name you used to register for Self Assessment. If your business does not have a name, enter your own full name.
+business.name.title                                             = What is the name of your sole trader business?
+business.name.heading                                           = What is the name of your sole trader business?
+business.name.line_1                                            = This is the business name you used to register for Self Assessment. If your business does not have a separate name, enter your own first and last name.
 
 # Business Name errors
 error.business_name.empty                                       = Enter your name or the name of your business
@@ -58,8 +59,9 @@ error.business_accounting_method.invalid                        = Select if you 
 error.business_accounting_method.empty                          = Select if you use cash accounting or standard accounting
 
 # Business Accounting Method page
-business.accounting_method.title                                = How do you record your income and expenses for your self-employed business?
-business.accounting_method.heading                              = How do you record your income and expenses for your self-employed business?
+business.accounting_method.title                                = What accounting method do you use for your sole trader business?
+business.accounting_method.heading                              = What accounting method do you use for your sole trader business?
+business.accounting_method.line_1                               = If you have more than one sole trader business, all your businesses need to have the same accounting method.
 business.accounting_method.accordion                            = Show me an example
 business.accounting_method.accordion.line_1                     = You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:
 business.accounting_method.accordion.bullet_1                   = May 2017, you use ‘cash accounting’
@@ -90,7 +92,7 @@ addressLookup.lookupPage.title                                  = What is your b
 addressLookup.lookupPage.heading                                = What is your business address?
 addressLookup.editPage.title                                    = Enter business address
 addressLookup.editPage.heading                                  = Enter business address
-addressLookup.editPage.postcodeLabel                            = Postcode
+addressLookup.editPage.postcodeLabel                            = Postcode (optional)
 addressLookup.confirmPage.title                                 = Confirm business address
 addressLookup.confirmPage.heading                               = Confirm business address
 
@@ -168,5 +170,5 @@ agent.error.business_accounting_method.invalid                  = Select if your
 agent.error.business_accounting_method.empty                    = Select if your client uses cash accounting or standard accounting
 
 ## Title pattern
-titlePattern.serviceName.govUk = {0} - Report your income and expenses quarterly - GOV.UK
-base.title.error               = Error: {0} - Report your income and expenses quarterly - GOV.UK
+titlePattern.serviceName.govUk                                  = {0} - Report your income and expenses quarterly - GOV.UK
+base.title.error                                                = Error: {0} - Report your income and expenses quarterly - GOV.UK

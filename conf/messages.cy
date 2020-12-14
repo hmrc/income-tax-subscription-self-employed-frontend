@@ -18,6 +18,7 @@ base.no                                                         = Na
 # Business start date
 business.start_date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
 business.start_date.heading                                     = Pryd y dechreuodd eich busnes fasnachu?
+business.start_date.line_1                                      = Os oes gennych nifer o fusnesau unig fasnachwr, nodwch ddyddiad dechrau eich prif fusnes.
 business.start_date.exampleStartDate                            = Er enghraifft, 1 8 2014
 
 # Date errors
@@ -32,9 +33,9 @@ error.business_start_date.maxStartDate                          = Mae’n rhaid 
 error.business_start_date.minStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}
 
 # Business Name
-business.name.title                                             = Beth yw enw’ch busnes?
-business.name.heading                                           = Beth yw enw’ch busnes?
-business.name.line_1                                            = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar eich busnes, nodwch eich enw llawn eich hun.
+business.name.title                                             = Beth yw enw’ch busnes fel unig fasnachwr?
+business.name.heading                                           = Beth yw enw’ch busnes fel unig fasnachwr?
+business.name.line_1                                            = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gwahanol ar eich busnes, nodwch eich enw cyntaf ac enw olaf.
 
 # Business Name errors
 error.business_name.empty                                       = Nodwch eich enw neu enw’ch busnes
@@ -57,8 +58,9 @@ error.business_accounting_method.invalid                        = Dewiswch os yd
 error.business_accounting_method.empty                          = Dewiswch os ydych yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
 
 # Business Accounting Method page
-business.accounting_method.title                                = Sut rydych yn cofnodi’ch incwm a’ch treuliau ar gyfer eich busnes eiddo yn y DU?
-business.accounting_method.heading                              = Sut rydych yn cofnodi’ch incwm a’ch treuliau ar gyfer eich busnes eiddo yn y DU?
+business.accounting_method.title                                = Pa ddull cyfrifyddu a ydych yn ei ddefnyddio ar gyfer eich busnes unig fasnachwr?
+business.accounting_method.heading                              = Pa ddull cyfrifyddu a ydych yn ei ddefnyddio ar gyfer eich busnes unig fasnachwr?
+business.accounting_method.line_1                               = Os oes gennych fwy nag un busnes unig fasnachwr, mae angen i’ch holl fusnesau gael yr un dull cyfrifyddu.
 business.accounting_method.accordion                            = Rhowch enghraifft i mi
 business.accounting_method.accordion.line_1                     = Gwnaethoch greu anfoneb i rywun ym mis Mawrth 2017, ond ni chawsoch yr arian tan fis Mai 2017. Os ydych yn rhoi gwybod i CThEM eich bod wedi cael yr incwm hwn ym:
 business.accounting_method.accordion.bullet_1                   = mis Mai 2017, rydych yn defnyddio ‘cyfrifyddu arian parod’
@@ -89,7 +91,7 @@ addressLookup.lookupPage.title                                  = Beth yw cyfeir
 addressLookup.lookupPage.heading                                = Beth yw cyfeiriad eich busnes?
 addressLookup.editPage.title                                    = Rhowch gyfeiriad busnes
 addressLookup.editPage.heading                                  = Rhowch gyfeiriad busnes
-addressLookup.editPage.postcodeLabel                            = Cod post y DU
+addressLookup.editPage.postcodeLabel                            = Cod post (dewisol)
 addressLookup.confirmPage.title                                 = Cadarnhau cyfeiriad busnes
 addressLookup.confirmPage.heading                               = Cadarnhau cyfeiriad busnes
 

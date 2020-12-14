@@ -33,9 +33,10 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
   val emptyError = "Select if you use cash accounting or standard accounting"
 
   object BusinessAccountingMethodMessages {
-    val title = "How do you record your income and expenses for your self-employed business?"
+    val title = "What accounting method do you use for your sole trader business?"
     val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
+    val line_1: String = "If you have more than one sole trader business, all your businesses need to have the same accounting method."
     val accordion = "Show me an example"
     val accordionLine_1 = "You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:"
     val accordionBullet_1 = "May 2017, you use ‘cash accounting’"
@@ -73,18 +74,18 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessAccountingMethodMessages.heading
-
     }
 
+    "have a paragraph" in new Setup {
+      document.getParagraphNth(3) mustBe BusinessAccountingMethodMessages.line_1
+    }
 
     "have an accordion summary" in new Setup {
       document.select("details summary span.summary").text() mustBe BusinessAccountingMethodMessages.accordion
-
     }
 
     "have an accordion heading" in new Setup {
-      document.getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
-
+      document.getParagraphNth(4) mustBe BusinessAccountingMethodMessages.accordionLine_1
     }
 
     "have an accordion bullets list 1" in new Setup {

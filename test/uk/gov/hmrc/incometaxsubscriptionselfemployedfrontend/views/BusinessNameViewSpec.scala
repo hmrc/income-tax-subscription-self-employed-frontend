@@ -32,13 +32,13 @@ class BusinessNameViewSpec extends ViewSpec {
   object BusinessNameMessages {
 
 
-    val title = "What is the name of your business?"
+    val title = "What is the name of your sole trader business?"
     val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading = title
     val continue = "Continue"
     val update = "Update"
     val backLink = "Back"
-    val line1 = "This is the business name you used to register for Self Assessment. If your business does not have a name, enter your own full name."
+    val line1 = "This is the business name you used to register for Self Assessment. If your business does not have a separate name, enter your own first and last name."
     val emptyError = "Enter your name or the name of your business"
 
   }
