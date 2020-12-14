@@ -49,8 +49,8 @@ object IntegrationTestConstants {
        |      "showSearchLinkAgain": true
        |    },
        |    "confirmPageConfig": {
-       |      "showChangeLink": true,
-       |      "showSubHeadingAndInfo": true,
+       |      "showChangeLink": false,
+       |      "showSubHeadingAndInfo": false,
        |      "showSearchAgainLink": false,
        |      "showConfirmChangeText": true
        |    },
@@ -72,7 +72,7 @@ object IntegrationTestConstants {
        |        "editPageLabels": {
        |          "title": "Enter business address",
        |          "heading": "Enter business address",
-       |          "postcodeLabel":"Postcode"
+       |          "postcodeLabel":"Postcode (optional)"
        |        },
        |        "confirmPageLabels": {
        |          "title": "Confirm business address",
@@ -91,7 +91,7 @@ object IntegrationTestConstants {
        |        "editPageLabels": {
        |          "title": "Rhowch gyfeiriad busnes",
        |          "heading": "Rhowch gyfeiriad busnes",
-       |          "postcodeLabel":"Cod post y DU"
+       |          "postcodeLabel":"Cod post (dewisol)"
        |        },
        |        "confirmPageLabels": {
        |          "title": "Cadarnhau cyfeiriad busnes",

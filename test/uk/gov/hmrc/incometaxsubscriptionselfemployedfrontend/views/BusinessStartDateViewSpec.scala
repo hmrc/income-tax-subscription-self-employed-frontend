@@ -30,9 +30,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business
 class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
-    val title = "When did your business start trading?"
+    val title = "When did your sole trader business start trading?"
     val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
     val heading: String = title
+    val line_1: String = "If you have multiple sole trader businesses, enter the start date of your main business."
     val exampleStartDate = "For example, 1 4 2018"
     val continue = "Continue"
     val backLink = "Back"
@@ -64,6 +65,9 @@ class BusinessStartDateViewSpec extends ViewSpec {
     }
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessStartDateMessages.heading
+    }
+    "have a paragraph" in new Setup {
+      document.select("article p").text mustBe BusinessStartDateMessages.line_1
     }
     "have a Form" in new Setup {
       document.getForm.attr("method") mustBe testCall.method

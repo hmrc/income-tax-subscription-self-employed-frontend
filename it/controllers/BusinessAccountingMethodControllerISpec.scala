@@ -39,7 +39,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(
           httpStatus(OK),
-          pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
+          pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
           radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = None)
         )
       }
@@ -60,7 +60,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
           Then("should return an OK with the BusinessAccountingMethodPage")
           res must have(
             httpStatus(OK),
-            pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
+            pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
             elementTextByID(id = "continue-button")("Continue"),
             radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
           )
@@ -81,7 +81,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
           Then("should return an OK with the BusinessAccountingMethodPage")
           res must have(
             httpStatus(OK),
-            pageTitle("How do you record your income and expenses for your self-employed business?" + titleSuffix),
+            pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
             elementTextByID(id = "continue-button")("Update"),
             radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
           )
@@ -143,7 +143,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       Then("Should return a BAD_REQUEST and THE FORM With errors")
       res must have(
         httpStatus(BAD_REQUEST),
-        pageTitle("Error: How do you record your income and expenses for your self-employed business?" + titleSuffix)
+        pageTitle("Error: What accounting method do you use for your sole trader business?" + titleSuffix)
       )
     }
 
