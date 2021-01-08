@@ -155,7 +155,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
     "not in edit mode" should {
       s"redirect to ${routes.BusinessNameController.show(id).url}" in {
         TestBusinessStartDateController.backUrl(isEditMode = false) must
-          include("/report-quarterly/income-and-expenses/sign-up/client/business/what-year-to-sign-up")
+          include("/report-quarterly/income-and-expenses/sign-up/client/income")
       }
     }
   }

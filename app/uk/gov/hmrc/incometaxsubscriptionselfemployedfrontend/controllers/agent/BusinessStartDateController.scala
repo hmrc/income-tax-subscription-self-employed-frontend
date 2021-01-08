@@ -82,7 +82,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     if (isEditMode) {
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url
     } else {
-      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/business/what-year-to-sign-up"
+      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
     }
   }
 
