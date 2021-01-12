@@ -38,7 +38,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
   object BusinessAccountingMethodMessages {
     val title = "What accounting method does your client use for their self-employed business?"
-    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
+    val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
     val cash = "Cash accounting"
     val accruals = "Standard accounting"

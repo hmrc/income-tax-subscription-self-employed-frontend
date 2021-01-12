@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.play.views.html.helpers.form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.main_template
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.agent_main_template
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.helpers.RadioOption
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
@@ -87,7 +87,7 @@
     </div>
 }
 
-@main_template(title = messages("agent.check_your_answers.title")) {
+@agent_main_template(title = messages("agent.check_your_answers.title")) {
 
 
     <h1 class="heading-large">@messages("agent.check_your_answers.heading")</h1>

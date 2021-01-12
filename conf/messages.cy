@@ -15,6 +15,9 @@ base.change                                                     = Newid
 base.yes                                                        = Iawn
 base.no                                                         = Na
 
+## Service name
+agent_service_name.title                                        = Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient
+
 # Business start date
 business.start_date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
 business.start_date.heading                                     = Pryd y dechreuodd eich busnes fasnachu?
@@ -164,3 +167,5 @@ agent.error.business_accounting_method.empty                    = Dewiswch a yw�
 ## Title pattern
 titlePattern.serviceName.govUk = {0} - Rhoi gwybod am eich incwm a’ch treuliau bob chwarter - GOV.UK
 base.title.error               = Gwall: {0} - Rhoi gwybod am eich incwm a’ch treuliau bob chwarter - GOV.UK
+principleBase.title.error                                       = Gwall: {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
+agentBase.title.error                                           = Gwall: {0} - Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient - GOV.UK

@@ -31,7 +31,7 @@ class BusinessNameViewSpec extends ViewSpec {
 
   object BusinessNameMessages {
     val title = "What is the name of your client’s business?"
-    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
+    val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
     val continue = "Continue"
     val backLink = "Back"

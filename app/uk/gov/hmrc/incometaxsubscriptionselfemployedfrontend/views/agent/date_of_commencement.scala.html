@@ -20,12 +20,12 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.main_template
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.agent_main_template
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
 
 @(dateOfCommencementForm: Form[BusinessStartDate], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = messages("business.agent.start_date.title"), form = Some(dateOfCommencementForm)) {
+@agent_main_template(title = messages("business.agent.start_date.title"), form = Some(dateOfCommencementForm)) {
 
     @back_link(backUrl)
 
