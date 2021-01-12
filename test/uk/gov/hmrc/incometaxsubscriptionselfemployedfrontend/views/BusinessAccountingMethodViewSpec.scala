@@ -34,7 +34,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
   object BusinessAccountingMethodMessages {
     val title = "What accounting method do you use for your sole trader business?"
-    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
+    val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
     val line_1: String = "If you have more than one sole trader business, all your businesses need to have the same accounting method."
     val accordion = "Show me an example"

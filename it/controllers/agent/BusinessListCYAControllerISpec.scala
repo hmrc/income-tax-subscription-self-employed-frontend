@@ -77,7 +77,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the CheckYourAnswers page")
         res must have(
           httpStatus(OK),
-          pageTitle("Check your answers" + titleSuffix)
+          pageTitle("Check your answers" + agentTitleSuffix)
         )
       }
     }

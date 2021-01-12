@@ -33,7 +33,7 @@ class BusinessNameViewSpec extends ViewSpec {
 
 
     val title = "What is the name of your sole trader business?"
-    val titleSuffix = " - Report your income and expenses quarterly - GOV.UK"
+    val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading = title
     val continue = "Continue"
     val update = "Update"

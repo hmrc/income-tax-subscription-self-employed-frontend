@@ -52,15 +52,15 @@
 
 @prefixedTitle = @{
     form match {
-        case Some(validationForm) if validationForm.hasErrors => Messages("base.title.error", title)
-        case _ => Messages("titlePattern.serviceName.govUk", title)
+        case Some(validationForm) if validationForm.hasErrors => Messages("agentBase.title.error", title)
+        case _ => Messages("agentTitlePattern.serviceName.govUk", title)
     }
 }
 
     @govuk_wrapper(
         appConfig = appConfig,
         title = prefixedTitle,
-        navigationTitle = Some(Messages("base.service_name")),
+        navigationTitle = Some(Messages("agent_service_name.title")),
         mainClass = mainClass,
         bodyClasses = bodyClasses,
         sidebar = sidebar,
