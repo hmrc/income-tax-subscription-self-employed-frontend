@@ -41,8 +41,8 @@
 * put all all default assets for this service here
 *@
 @defaultScriptElem = {
-        @* append custom scripts *@
-@scriptElem.fold(HtmlFormat.empty)(x => x)
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/skipMainContent.js")"></script>
+    @scriptElem.fold(HtmlFormat.empty)(x => x)
 }
 
 @headStyle = {
