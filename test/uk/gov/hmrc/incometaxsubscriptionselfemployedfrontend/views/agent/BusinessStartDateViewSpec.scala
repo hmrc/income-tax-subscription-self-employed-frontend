@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.da
 class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
-    val title = "When did your client’s business start trading?"
+    val title = "When did your client’s sole trader business start trading?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
     val exampleStartDate = "For example, 1 8 2014"

@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.bu
 class BusinessTradeNameViewSpec extends ViewSpec {
 
   object BusinessTradeNameMessages {
-    val title = "What is the trade of your client’s business?"
+    val title = "What is the trade of your client’s sole trader business?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
     val hintText = "For example: plumbing, electrical work, consulting"
