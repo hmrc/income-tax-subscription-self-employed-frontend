@@ -76,9 +76,13 @@ check_your_answers.title                                        = Gwiriwch eich 
 check_your_answers.heading                                      = Gwiriwch eich atebion
 check_your_answers.sub_heading                                  = Busnes {0}
 check_your_answers.trading_start_date                           = Dyddiad dechrau masnachu’r busnes
+check_your_answers.trading_start_date.change                    = Newid dyddiad dechrau masnachu’r busnes
 check_your_answers.business_name                                = Enw’r busnes
+check_your_answers.business_name.change                         = Newid enw’r busnes
 check_your_answers.business_trade                               = Masnach y busnes
+check_your_answers.business_trade.change                        = Newid masnach y busnes
 check_your_answers.business_address                             = Cyfeiriad y busnes
+check_your_answers.business_address.change                      = Newid cyfeiriad y busnes
 check_your_answers.remove_business                              = Dileu busnes {0}
 check_your_answers.add_another_business_heading                 = A hoffech ychwanegu busnes unig fasnachwr arall?
 
@@ -149,9 +153,13 @@ agent.addressLookup.confirmPage.heading                         = Cadarnhau cyfe
 agent.check_your_answers.title                                  = Gwiriwch eich atebion
 agent.check_your_answers.heading                                = Gwiriwch eich atebion
 agent.check_your_answers.trading_start_date                     = Dyddiad dechrau masnachu’r busnes
+agent.check_your_answers.trading_start_date.change              = Newid dyddiad dechrau masnachu’r busnes
 agent.check_your_answers.business_name                          = Enw’r busnes
+agent.check_your_answers.business_name.change                   = Newid enw’r busnes
 agent.check_your_answers.business_trade                         = Masnach y busnes
+agent.check_your_answers.business_trade.change                  = Newid masnach y busnes
 agent.check_your_answers.business_address                       = Cyfeiriad y busnes
+agent.check_your_answers.business_address.change                = Newid cyfeiriad y busnes
 agent.check_your_answers.confirm_and_sign_up                    = Cadarnhau a chofrestru
 
 # Agent Business Accounting Method page

@@ -40,7 +40,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
   implicit class CustomSelectors(element: Element) {
 
-    def selectFirst(selector: String): Element = {
+    def selectHead(selector: String): Element = {
       element.select(selector).headOption match {
         case Some(element) => element
         case None => fail(s"No elements returned for selector: $selector")
@@ -57,7 +57,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
     def getH2Elements: Elements = element.getElementsByTag("h2")
 
-    def getH2Element(nth: Int = 1): Element = element.selectFirst(s"h2:nth-of-type($nth)")
+    def getH2Element(nth: Int = 1): Element = element.selectHead(s"h2:nth-of-type($nth)")
 
     def getFormElements: Elements = element.getElementsByClass("form-field-group")
 
@@ -90,17 +90,17 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
     def getFieldErrorMessage(id: String): Elements = element.select(s"""a[id=$id-error-summary]""")
 
     //Check your answers selectors
-    def getSummaryList(nth: Int = 1): Element = element.selectFirst(s"dl.govuk-summary-list:nth-of-type($nth)")
+    def getSummaryList(nth: Int = 1): Element = element.selectHead(s"dl.govuk-summary-list:nth-of-type($nth)")
 
     def getSummaryListRow(nth: Int): Element = {
-      element.selectFirst(s"div.govuk-summary-list__row:nth-of-type($nth)")
+      element.selectHead(s"div.govuk-summary-list__row:nth-of-type($nth)")
     }
 
-    def getSummaryListKey: Element = element.selectFirst("dt.govuk-summary-list__key")
+    def getSummaryListKey: Element = element.selectHead("dt.govuk-summary-list__key")
 
-    def getSummaryListValue: Element = element.selectFirst("dd.govuk-summary-list__value")
+    def getSummaryListValue: Element = element.selectHead("dd.govuk-summary-list__value")
 
-    def getSummaryListActions: Element = element.selectFirst("dd.govuk-summary-list__actions")
+    def getSummaryListActions: Element = element.selectHead("dd.govuk-summary-list__actions")
 
   }
 
