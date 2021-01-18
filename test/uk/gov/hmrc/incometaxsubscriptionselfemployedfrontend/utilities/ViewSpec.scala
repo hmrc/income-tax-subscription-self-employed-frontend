@@ -71,7 +71,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
     def getForm: Elements = element.select("form")
 
-    def getBackLink: Elements = element.select(s"a[class=back-link]")
+    def getBackLink: Elements = element.select(s"a[class=link-back]")
 
     def getParagraphNth(index: Int = 0): String = {
       element.select("p").get(index).text()
