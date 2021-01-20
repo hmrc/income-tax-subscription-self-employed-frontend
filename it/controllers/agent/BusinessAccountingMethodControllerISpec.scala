@@ -40,7 +40,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(
           httpStatus(OK),
-          pageTitle("What accounting method does your client use for their self-employed business?" + agentTitleSuffix),
+          pageTitle("What accounting method does your client use for their sole trader businesses?" + agentTitleSuffix),
           radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = None)
         )
       }
@@ -62,7 +62,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(
           httpStatus(OK),
-          pageTitle("What accounting method does your client use for their self-employed business?" + agentTitleSuffix),
+          pageTitle("What accounting method does your client use for their sole trader businesses?" + agentTitleSuffix),
           radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
         )
       }

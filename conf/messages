@@ -104,8 +104,8 @@ addressLookup.confirmPage.title                                 = Confirm busine
 addressLookup.confirmPage.heading                               = Confirm business address
 
 # Agent Business start date
-business.agent.start_date.title                                 = When did your client’s business start trading?
-business.agent.start_date.heading                               = When did your client’s business start trading?
+business.agent.start_date.title                                 = When did your client’s sole trader business start trading?
+business.agent.start_date.heading                               = When did your client’s sole trader business start trading?
 business.agent.start_date.exampleStartDate                      = For example, 1 8 2014
 
 # Agent Date errors
@@ -120,9 +120,9 @@ error.agent.business_start_date.maxStartDate                    = The date the b
 error.agent.business_start_date.minStartDate                    = The date your client’s business started must be on or after {0}
 
 # Agent Business Name
-business.agent.name.title                                       = What is the name of your client’s business?
-business.agent.name.heading                                     = What is the name of your client’s business?
-business.agent.name.line_1                                      = This is the business name they used to register for Self Assessment. If their business does not have a name, enter your client’s full name.
+business.agent.name.title                                       = What is the name of your client’s sole trader business?
+business.agent.name.heading                                     = What is the name of your client’s sole trader business?
+business.agent.name.line_1                                      = This is the business name they used to register for Self Assessment. If their business does not have a name, enter your client’s name.
 
 # Agent Business Name errors
 error.agent.business_name.empty                                 = Enter your client’s name or the name of their business
@@ -130,7 +130,7 @@ error.agent.business_name.max_length                            = Business name 
 error.agent.business_name.invalid_character                     = Business name cannot include !, " ", * or ?
 
 #Agent Trade Name
-business.agent.trade_name.title                                 = What is the trade of your client’s business?
+business.agent.trade_name.title                                 = What is the trade of your client’s sole trader business?
 business.agent.trade_name.hint                                  = For example: plumbing, electrical work, consulting
 
 #Agent Trade Name errors
@@ -171,8 +171,8 @@ agent.error.add_another_business.invalid                        = Select yes if 
 agent.error.add_another_business.empty                          = Select yes if you want to add another sole trader business
 
 # Agent Business Accounting Method page
-agent.business.accounting_method.title                          = What accounting method does your client use for their self-employed business?
-agent.business.accounting_method.heading                        = What accounting method does your client use for their self-employed business?
+agent.business.accounting_method.title                          = What accounting method does your client use for their sole trader businesses?
+agent.business.accounting_method.heading                        = What accounting method does your client use for their sole trader businesses?
 agent.business.accounting_method.cash                           = Cash accounting
 agent.business.accounting_method.accruals                       = Standard accounting
 

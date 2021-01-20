@@ -103,8 +103,8 @@ addressLookup.confirmPage.title                                 = Cadarnhau cyfe
 addressLookup.confirmPage.heading                               = Cadarnhau cyfeiriad busnes
 
 # Agent Business start date
-business.agent.start_date.title                                 = Pryd y dechreuodd busnes eich cleient fasnachu?
-business.agent.start_date.heading                               = Pryd y dechreuodd busnes eich cleient fasnachu?
+business.agent.start_date.title                                 = Pryd y dechreuodd busnes unig fasnachwr eich cleient fasnachu?
+business.agent.start_date.heading                               = Pryd y dechreuodd busnes unig fasnachwr eich cleient fasnachu?
 business.agent.start_date.exampleStartDate                      = Er enghraifft, 1 8 2014
 
 # Agent Date errors
@@ -119,9 +119,9 @@ error.agent.business_start_date.maxStartDate                    = Mae’n rhaid 
 error.agent.business_start_date.minStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}
 
 # Agent Business Name
-business.agent.name.title                                       = Beth yw enw busnes eich cleient?
-business.agent.name.heading                                     = Beth yw enw busnes eich cleient?
-business.agent.name.line_1                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar ei fusnes, nodwch enw llawn eich cleient.
+business.agent.name.title                                       = Beth yw enw busnes eich cleient fel unig fasnachwr?
+business.agent.name.heading                                     = Beth yw enw busnes eich cleient fel unig fasnachwr?
+business.agent.name.line_1                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar ei fusnes, nodwch enw eich cleient.
 
 # Agent Business Name errors
 error.agent.business_name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient
@@ -129,7 +129,7 @@ error.agent.business_name.max_length                            = Mae’n rhaid 
 error.agent.business_name.invalid_character                     = Ni all enw’r busnes gynnwys !, “ “ , * na ?
 
 #Agent Trade Name
-business.agent.trade_name.title                                 = Beth yw masnach busnes eich cleient?
+business.agent.trade_name.title                                 = Beth yw masnach busnes unig fasnachwr eich cleient?
 business.agent.trade_name.hint                                  = Er enghraifft: plymio, gwaith trydanol, ymgynghori
 
 #Agent Trade Name errors
