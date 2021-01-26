@@ -1,5 +1,5 @@
 ## Base ##
-base.service_name                                               = Rhoi gwybod am eich incwm a’ch treuliau bob chwarter
+base.service_name                                               = Defnyddio meddalwedd i anfon diweddariadau Treth Incwm
 base.back                                                       = Yn ôl
 base.continue                                                   = Yn eich blaen
 base.update                                                     = Diweddaru
@@ -173,7 +173,7 @@ agent.error.business_accounting_method.invalid                  = Dewiswch a yw�
 agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
 
 ## Title pattern
-titlePattern.serviceName.govUk = {0} - Rhoi gwybod am eich incwm a’ch treuliau bob chwarter - GOV.UK
-base.title.error               = Gwall: {0} - Rhoi gwybod am eich incwm a’ch treuliau bob chwarter - GOV.UK
-principleBase.title.error                                       = Gwall: {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
-agentBase.title.error                                           = Gwall: {0} - Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient - GOV.UK
+title_pattern.serviceName.govUk                                 = {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
+agent_title_pattern.serviceName.govUk                           = {0} - Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient - GOV.UK
+base.title.error                                                = Gwall: {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
+agent_base.title.error                                          = Gwall: {0} - Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient - GOV.UK
