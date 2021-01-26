@@ -53,7 +53,7 @@
 @prefixedTitle = @{
     form match {
         case Some(validationForm) if validationForm.hasErrors => Messages("base.title.error", title)
-        case _ => Messages("titlePattern.serviceName.govUk", title)
+        case _ => Messages("title_pattern.serviceName.govUk", title)
     }
 }
 
