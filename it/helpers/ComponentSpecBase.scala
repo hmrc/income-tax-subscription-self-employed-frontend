@@ -83,6 +83,14 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     await(buildClient(uri).get)
   }
 
+  def getWithHeaders(uri: String, headers: (String, String)*): WSResponse = {
+    await(
+      buildClient(uri)
+        .withHttpHeaders(headers: _*)
+        .get()
+    )
+  }
+
   def post[T](uri: String)(body: Map[String, Seq[String]]): WSResponse = {
     await(
       buildClient(uri)

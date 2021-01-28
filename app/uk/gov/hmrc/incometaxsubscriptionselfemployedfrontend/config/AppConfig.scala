@@ -20,6 +20,8 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.Lang
 import play.api.mvc.Call
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers._
 
 @Singleton
 class AppConfig @Inject()(servicesConfig: ServicesConfig) {
@@ -54,13 +56,22 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
 
   def languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),
-    "cymraeg" -> Lang("cy"))
+    "cymraeg" -> Lang("cy")
+  )
 
   def betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier"
 
   def betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
 
+//  def routeToSwitchLanguage(language: String): Call = {
+//    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.routes.LanguageSwitchController.switchToLanguage(language)
+//  }
+
   def routeToSwitchLanguage(language: String): Call = {
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.routes.LanguageSwitchController.switchToLanguage(language)
+    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.LanguageSwitchController.switchToLanguage(language)
+  }
+
+  def routeToSwitchAgentLanguage(language: String): Call = {
+    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AgentLanguageSwitchController.switchToLanguage(language)
   }
 }

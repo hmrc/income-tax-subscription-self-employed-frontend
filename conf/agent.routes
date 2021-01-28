@@ -26,3 +26,6 @@ GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptio
 
 GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show(isEditMode: Boolean ?= false)
 POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit(isEditMode: Boolean ?= false)
+
+#Welsh Language
+GET         /language/:lang                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AgentLanguageSwitchController.switchToLanguage(lang: String)
