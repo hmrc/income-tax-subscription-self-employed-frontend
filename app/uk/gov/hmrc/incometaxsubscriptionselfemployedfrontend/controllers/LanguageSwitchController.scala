@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-
-import javax.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import play.api.Configuration
 import play.api.i18n.Lang
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 
-@Singleton
-class LanguageSwitchController @Inject()(mcc: MessagesControllerComponents,
-                                         appConfig: AppConfig,
+class LanguageSwitchController @Inject()(appConfig: AppConfig,
                                          languageUtils: LanguageUtils,
-                                         configuration: Configuration) extends LanguageController(configuration, languageUtils, mcc) {
+                                         controllerComponents: ControllerComponents)
+  extends LanguageController(languageUtils, controllerComponents) {
 
-  override def languageMap: Map[String, Lang] = appConfig.languageMap
+    override def languageMap: Map[String, Lang] = appConfig.languageMap
 
-  override def fallbackURL: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.InitialiseController.initialise().url
-
-}
+    override def fallbackURL: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.InitialiseController.initialise().url
+  }

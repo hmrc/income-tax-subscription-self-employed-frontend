@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.agent
 
 import helpers.ComponentSpecBase
 import play.api.http.Status
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.{routes => individualRoutes}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.{routes => agentRoutes}
 
-class LanguageSwitchControllerISpec extends ComponentSpecBase {
+class AgentLanguageSwitchControllerISpec extends ComponentSpecBase {
 
   val testRefererRoute: String = "/test/referer/route"
 
   "GET /language/cymraeg" should {
     "update the PLAY_LANG cookie to cy and return the user where they were when a REFERER is in the headers" in {
-      lazy val resultCy: WSResponse = getWithHeaders("/language/cymraeg", "REFERER" -> testRefererRoute)
+      lazy val resultCy: WSResponse = getWithHeaders("/client/language/cymraeg", "REFERER" -> testRefererRoute)
       resultCy.headers.isDefinedAt("Set-Cookie") mustBe true
       resultCy.headers.toString.contains("PLAY_LANG=cy;") mustBe true
       resultCy must have(
@@ -37,19 +37,19 @@ class LanguageSwitchControllerISpec extends ComponentSpecBase {
     }
 
     "update the PLAY_LANG cookie to cy and return the user to the initialise page when REFERER is not in the headers" in {
-      lazy val resultCy: WSResponse = getWithHeaders("/language/cymraeg")
+      lazy val resultCy: WSResponse = getWithHeaders("/client/language/cymraeg")
       resultCy.headers.isDefinedAt("Set-Cookie") mustBe true
       resultCy.headers.toString.contains("PLAY_LANG=cy;") mustBe true
       resultCy must have(
         httpStatus(Status.SEE_OTHER),
-        redirectURI(individualRoutes.InitialiseController.initialise().url)
+        redirectURI(agentRoutes.InitialiseController.initialise().url)
       )
     }
   }
 
   "GET /language/english" should {
     "update the PLAY_LANG cookie to en and return the user where they were when a REFERER is in the headers" in {
-      lazy val resultEn: WSResponse = getWithHeaders("/language/english", "REFERER" -> testRefererRoute)
+      lazy val resultEn: WSResponse = getWithHeaders("/client/language/english", "REFERER" -> testRefererRoute)
       resultEn.headers.isDefinedAt("Set-Cookie") mustBe true
       resultEn.headers.toString.contains("PLAY_LANG=en;") mustBe true
       resultEn must have(
@@ -58,13 +58,14 @@ class LanguageSwitchControllerISpec extends ComponentSpecBase {
       )
     }
     "update the PLAY_LANG cookie to en and return the user to the initialise page when REFERER is not in the headers" in {
-      lazy val resultEn: WSResponse = getWithHeaders("/language/english")
+      lazy val resultEn: WSResponse = getWithHeaders("/client/language/english")
       resultEn.headers.isDefinedAt("Set-Cookie") mustBe true
       resultEn.headers.toString.contains("PLAY_LANG=en;") mustBe true
       resultEn must have(
         httpStatus(Status.SEE_OTHER),
-        redirectURI(individualRoutes.InitialiseController.initialise().url)
+        redirectURI(agentRoutes.InitialiseController.initialise().url)
       )
     }
   }
+
 }

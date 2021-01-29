@@ -23,7 +23,7 @@ GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptio
 GET        /address-lookup-initialise/:itsaId   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.initialiseAddressLookupJourney(itsaId: String)
 GET        /details/address-lookup/:itsaId      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.addressLookupRedirect(itsaId: String, id: Option[String] ?= None)
 
-GET        /language/:lang                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.LanguageSwitchController.switchToLanguage(lang: String)
+GET        /language/:lang                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
 GET        /logout                              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut
 
