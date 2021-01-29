@@ -63,10 +63,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
 
   def betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
 
-//  def routeToSwitchLanguage(language: String): Call = {
-//    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.language.routes.LanguageSwitchController.switchToLanguage(language)
-//  }
-
   def routeToSwitchLanguage(language: String): Call = {
     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.LanguageSwitchController.switchToLanguage(language)
   }
