@@ -32,9 +32,10 @@ class SignOutController @Inject()(mcc: MessagesControllerComponents,
 
   def signOut: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackUrl)))
+      Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackFrontendRedirectUrl)))
     }
   }
+  
 }
 
 object SignOutController {
