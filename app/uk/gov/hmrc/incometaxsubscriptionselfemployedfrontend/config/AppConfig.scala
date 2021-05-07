@@ -41,7 +41,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val subscriptionFrontendFinalCYAController: String = incomeTaxSubscriptionFrontendBaseUrl + "/check-your-answers"
   lazy val subscriptionFrontendClientRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/routing"
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
-  lazy val limitOnNumberOfBusinesses = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
+  lazy val limitOnNumberOfBusinesses: Int = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
   lazy val addressLookupUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
   def addressLookupChangeUrl(id: String): String = s"$addressLookupUrl/lookup-address/$id/lookup"
 
@@ -51,6 +51,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   val analyticsHost: String = servicesConfig.getString(s"google-analytics.host")
   val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   val reportAProblemNonJSUrl: String = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  val feedbackFrontendRedirectUrl: String = servicesConfig.getString("feedback-frontend.url")
 
   def ggSignOutUrl(redirectionUrl: String = incomeTaxSubscriptionFrontendBaseUrl): String = s"$ggUrl/bas-gateway/sign-out-without-state?continue=$redirectionUrl"
 
