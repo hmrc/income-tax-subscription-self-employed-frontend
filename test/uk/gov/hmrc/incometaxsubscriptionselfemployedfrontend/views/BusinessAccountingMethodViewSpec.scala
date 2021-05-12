@@ -77,7 +77,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     }
 
     "have a paragraph" in new Setup {
-      document.getParagraphNth(3) mustBe BusinessAccountingMethodMessages.line_1
+      document.getParagraphNth(2) mustBe BusinessAccountingMethodMessages.line_1
     }
 
     "have an accordion summary" in new Setup {
@@ -85,7 +85,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     }
 
     "have an accordion heading" in new Setup {
-      document.getParagraphNth(4) mustBe BusinessAccountingMethodMessages.accordionLine_1
+      document.getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
     }
 
     "have an accordion bullets list 1" in new Setup {
