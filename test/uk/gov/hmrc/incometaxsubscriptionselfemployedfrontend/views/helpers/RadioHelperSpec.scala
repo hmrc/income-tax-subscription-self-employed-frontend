@@ -22,6 +22,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.Mapping
 import org.scalatest.Matchers._
 import play.api.data.Form
 import play.api.data.Forms._
+import play.twirl.api.Html
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.radioHelper
 
 class RadioHelperSpec extends UnitTestTrait {
@@ -29,15 +30,16 @@ class RadioHelperSpec extends UnitTestTrait {
   case class TestData(radio: String)
 
   val radioName = "radio"
-  val testForm = Form(
+  val testForm: Form[TestData] = Form(
     mapping(
       radioName -> oText.toText.verifying(DataMap.alwaysFail)
     )(TestData.apply)(TestData.unapply)
   )
 
   val testLegend = "my test legend text"
-  val yesOption = RadioOption("yes", "Yes - you can")
-  val noOption = RadioOption("no", "No - you cannot")
+  val testContent: Html = Html("""<p id="test-content-id">Test Content</p>""")
+  val yesOption: RadioOption = RadioOption("yes", "Yes - you can")
+  val noOption: RadioOption = RadioOption("no", "No - you cannot")
   val testOptions: Seq[RadioOption] = Seq(yesOption, noOption)
 
   "RadioOption" should {
@@ -79,8 +81,9 @@ class RadioHelperSpec extends UnitTestTrait {
   "RadioHelper" should {
     "populate the relevent content in the correct positions" in {
       val testField = testForm(radioName)
-      val doc = radioHelper(testField, testLegend, testOptions, testForm).doc
+      val doc = radioHelper(testField, testLegend, Some(testContent), testOptions, testForm).doc
       doc.getElementsByTag("div").hasClass("form-group") shouldBe true
+      doc.select("p[id=test-content-id]").text shouldBe "Test Content"
       val inputs = doc.getElementsByTag("input")
       inputs.size() shouldBe 2
       inputs.get(0).attr("name") shouldBe radioName
@@ -102,7 +105,7 @@ class RadioHelperSpec extends UnitTestTrait {
 
       val filledForm = testForm.fill(TestData(noOption.optionName))
       val testField = filledForm(radioName)
-      val doc = radioHelper(testField, testLegend, testOptions, filledForm).doc
+      val doc = radioHelper(testField, testLegend, Some(testContent), testOptions, filledForm).doc
 
       val inputs = doc.getElementsByTag("input")
       inputs.size() shouldBe 2
@@ -114,13 +117,13 @@ class RadioHelperSpec extends UnitTestTrait {
 
     "when there is error on the field, the errors needs to be displayed, but not otherwise" in {
       val testField = testForm(radioName)
-      val doc = radioHelper(testField, testLegend, testOptions, testForm).doc
+      val doc = radioHelper(testField, testLegend, Some(testContent), testOptions, testForm).doc
       doc.getElementsByTag("div").hasClass("form-field--error") shouldBe false
       doc.getElementsByClass("error-notification").isEmpty shouldBe true
 
       val errorForm = testForm.bind(DataMap.EmptyMap)
       val errorField = errorForm(radioName)
-      val errDoc = radioHelper(errorField, testLegend, testOptions, errorForm).doc
+      val errDoc = radioHelper(errorField, testLegend, Some(testContent), testOptions, errorForm).doc
       errDoc.getElementsByTag("div").hasClass("form-field--error") shouldBe true
       errDoc.getElementsByClass("error-notification").isEmpty shouldBe false
     }

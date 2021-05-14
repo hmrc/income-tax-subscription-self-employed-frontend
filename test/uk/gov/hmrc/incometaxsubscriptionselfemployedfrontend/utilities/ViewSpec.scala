@@ -117,20 +117,21 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
     def listErrorMessages(errors: List[String]): Assertion = {
       errors.zipWithIndex.map {
-        case (error, index) => element.select(s"span.error-notification:nth-child(${index + 1})").text mustBe error
+        case (error, index) => element.selectHead(s"div.error-notification:nth-of-type(${index + 1})").text mustBe s"Error: $error"
       } forall (_ == succeed) mustBe true
     }
 
     def mustHaveDateField(id: String, legend: String, exampleDate: String, error: Option[String] = None): Assertion = {
       val ele = element.getElementById(id)
-      ele.select("span.form-label-bold").text() mustBe legend
-      ele.select("span.form-hint").text() mustBe exampleDate
+      ele.attr("aria-describedby") mustBe s"$id-hint${error.map(_ => s" $id-error").getOrElse("")}"
+      ele.selectHead("legend").text mustBe legend
+      ele.selectHead(s"div.form-hint[id=$id-hint]").text mustBe exampleDate
       ele.tag().toString mustBe "fieldset"
       mustHaveTextField(s"$id.dateDay", "Day")
       mustHaveTextField(s"$id.dateMonth", "Month")
       mustHaveTextField(s"$id.dateYear", "Year")
       error.map { message =>
-        ele.select("legend").select(".error-notification").text mustBe message
+        ele.selectHead(s"div[id=$id-error]").text mustBe s"Error: $message"
       }.getOrElse(succeed)
     }
 
@@ -146,6 +147,10 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
       element.getErrorSummary.select("h2").attr("id") mustBe "error-summary-heading"
       element.getErrorSummary.select("h2").text mustBe "There is a problem"
       element.getErrorSummary.select("ul > li").text mustBe errors.mkString(" ")
+    }
+
+    def mustHaveErrorNotificationMessage(error: String): Assertion = {
+      element.selectHead(s"div.error-notification").text mustBe s"Error: $error"
     }
 
 

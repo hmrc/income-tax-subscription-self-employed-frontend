@@ -51,21 +51,38 @@
         case false => option.optionName
     }
 }
-    @dataTarget(radioOption: RadioOption) = {
-        @if(radioOption.conditionalContent.isDefined){
-            data-target = @radioOption.optionName
-        }
-    }
 
+@dataTarget(radioOption: RadioOption) = {
+    @if(radioOption.conditionalContent.isDefined){
+        data-target = @radioOption.optionName
+    }
+}
+
+@errorNotification = {
+    @field.error.map { error =>
+        <div class="error-notification" id="@field.name-error">
+            <span class="visuallyhidden">@messages("error-notification.prefix")</span> @messages(error.message, error.args: _*)
+        </div>
+    }
+}
+
+@ariaDescribedBy = {
+    @if(field.error.isDefined) {
+        aria-describedby="@field.name-error"
+    }
+}
 
 <div class="form-group @if(hasError) { form-field--error}">
 
-    @if(hasError){
-    <span class="error-notification" id="error-message-@field.name">
-        @messages(s"${parentForm.error(field.name).get.message}", parentForm.error(field.name).get.args:_*)
-    </span>
-    }
-    <fieldset @fieldSetClassValue>
+    <fieldset @fieldSetClassValue @ariaDescribedBy>
+
+        <legend>
+            <h2 class="heading-medium">
+                @legend
+            </h2>
+        </legend>
+
+        @errorNotification
 
         <div class="multiple-choice" @dataTarget(options(0))>
             <input id="yes-no" type="radio" name="@field.name" value="@valueAttr(options(0))" @isSelected(options(0).optionName)>

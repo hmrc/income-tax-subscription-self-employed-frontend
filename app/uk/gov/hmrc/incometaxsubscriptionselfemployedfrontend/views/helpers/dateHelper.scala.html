@@ -18,10 +18,13 @@
 @import play.api.data.Field
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
-@(field: Field,
+@(
+        field: Field,
         label: Option[String] = None,
+        content: Option[Html] = None,
         hintText: Option[String] = None,
-        parentForm: Form[_]
+        parentForm: Form[_],
+        isPageHeading: Boolean = true
 )(implicit messages: Messages)
 
 @dateErrors = @{
@@ -30,7 +33,9 @@
 
 @errorNotification = {
     @dateErrors.headOption.map { error =>
-        <span class="error-notification" id="error-message-@{error.key}">@{messages(error.message, error.args: _*)}</span>
+        <div class="error-notification" id="@field.name-error">
+            <span class="visuallyhidden">@messages("error-notification.prefix")</span> @messages(error.message, error.args: _*)
+        </div>
     }
 }
 
@@ -42,45 +47,64 @@
     }
 }
 
-<div class="form-group form-field@if(dateErrors.nonEmpty) { form-field--error}">
-    @if(hintText.isDefined) {
-        <fieldset id="@field.name" aria-describedby="date-hint">
-    } else {
-        <fieldset id="@field.name">
+@formHint = {
+    @hintText.map { hint =>
+        <div class="form-hint" id="@field.name-hint">@hint</div>
     }
+}
+
+@ariaDescribedBy = {
+    @(hintText.isDefined, dateErrors.nonEmpty) match {
+        case (true, true) => { aria-describedby="@field.name-hint @field.name-error" }
+        case (true, false) => { aria-describedby="@field.name-hint" }
+        case (false, true) => { aria-describedby="@field.name-error" }
+        case (false, false) => {}
+    }
+}
+
+<div class="form-group form-field@if(dateErrors.nonEmpty) { form-field--error }">
+    <fieldset id="@field.name" @ariaDescribedBy>
         <legend>
-            <span class="form-label-bold">@label</span>
-            @hintText.map(hint => Html(s"""<span class="form-hint" id="date-hint" >$hint</span>"""))
-            @errorNotification
+            @if(isPageHeading) {
+                <h1 class="heading-large">@label</h1>
+            } else {
+                @label
+            }
         </legend>
-            <div class="form-date">
-                @inputHelper(
-                    field(day),
-                    parentForm = parentForm,
-                    label = Some(Messages("base.day")),
-                    divClass = Some(ifNotWelsh("form-group-day")),
-                    maxLength = Some(2),
-                    isNumeric = true,
-                    showErrors = false
-                )
-                @inputHelper(
-                    field(month),
-                    parentForm = parentForm,
-                    label = Some(Messages("base.month")),
-                    divClass = Some(ifNotWelsh("form-group-month")),
-                    maxLength = Some(2),
-                    isNumeric = true,
-                    showErrors = false
-                )
-                @inputHelper(
-                    field(year),
-                    parentForm = parentForm,
-                    label = Some(Messages("base.year")),
-                    divClass = Some("form-group-year"),
-                    maxLength = Some(4),
-                    isNumeric = true,
-                    showErrors = false
-                )
-            </div>
+        @content
+        @formHint
+        @errorNotification
+        <div class="form-date">
+            @inputHelper(
+                field(day),
+                parentForm = parentForm,
+                label = messages("base.day"),
+                divClass = Some(ifNotWelsh("form-group-day")),
+                maxLength = Some(2),
+                isNumeric = true,
+                showErrors = false,
+                isPageHeading = false
+            )
+            @inputHelper(
+                field(month),
+                parentForm = parentForm,
+                label = messages("base.month"),
+                divClass = Some(ifNotWelsh("form-group-month")),
+                maxLength = Some(2),
+                isNumeric = true,
+                showErrors = false,
+                isPageHeading = false
+            )
+            @inputHelper(
+                field(year),
+                parentForm = parentForm,
+                label = messages("base.year"),
+                divClass = Some("form-group-year"),
+                maxLength = Some(4),
+                isNumeric = true,
+                showErrors = false,
+                isPageHeading = false
+            )
+        </div>
     </fieldset>
 </div>

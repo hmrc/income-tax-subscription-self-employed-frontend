@@ -93,7 +93,6 @@
 
 @agent_main_template(title = messages("agent.check_your_answers.title")) {
 
-
     <h1 class="heading-large">@messages("agent.check_your_answers.heading")</h1>
 
     @answers.zip(1 to answers.length).map { case (business, businessNumber) =>
@@ -101,7 +100,7 @@
     }
 
     @form(action = postAction) {
-        <h2 class="heading-medium" id="add-another-business-heading">@messages("agent.check_your_answers.add_another_business_heading")</h2>
+
         @yesNoRadioHelper(
             field = addAnotherBusinessForm(AddAnotherBusinessAgentForm.addAnotherBusiness),
             legend = Messages("agent.check_your_answers.add_another_business_heading"),
@@ -112,6 +111,8 @@
             parentForm = addAnotherBusinessForm,
             inline = true
         )
+
         @continueButton()
+
     }
 }

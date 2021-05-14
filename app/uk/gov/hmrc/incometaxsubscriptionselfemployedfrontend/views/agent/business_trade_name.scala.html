@@ -31,20 +31,14 @@
 
     @summaryErrorHelper(businessTradeNameForm)
 
-    <h1 class="heading-large">@messages("business.agent.trade_name.title")</h1>
-
-    <p id="hint-businessTradeName" class="form-hint heading-xl-addon">
-        @messages("business.agent.trade_name.hint")
-    </p>
-
     @form(action = postAction) {
-            @inputHelper(
+        @inputHelper(
             field = businessTradeNameForm(businessTradeName),
-            label = Some(Messages("business.agent.trade_name.title")),
-            labelClass = Some("visuallyhidden"),
+            label = messages("business.agent.trade_name.title"),
             maxLength = Some(businessTradeNameMaxLength),
-            parentForm = businessTradeNameForm
-            )
+            parentForm = businessTradeNameForm,
+            formHint = Some(messages("business.agent.trade_name.hint"))
+        )
 
         @if(isEditMode) {
             @continueButton(Some(messages("base.update")))

@@ -89,19 +89,12 @@ class BusinessNameViewSpec extends ViewSpec {
   "have a backlink" in new Setup() {
     document.getBackLink.text mustBe BusinessNameMessages.backLink
     document.getBackLink.attr("href") mustBe testBackUrl
-
   }
 
   "must display form error on page" in new Setup(false, BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
     document.mustHaveErrorSummary(List[String](testError.message))
-    document.listErrorMessages(List[String](testError.message))
+    document.mustHaveErrorNotificationMessage(testError.message)
 
   }
-
-  "must display multiple form errors on page" in new Setup(false, BusinessNameForm.businessNameValidationForm(Nil).withError(testError).withError(testError2)) {
-    document.mustHaveErrorSummary(List[String](testError.message, testError2.message))
-    document.listErrorMessages(List[String](testError.message, testError2.message))
-  }
-
 
 }

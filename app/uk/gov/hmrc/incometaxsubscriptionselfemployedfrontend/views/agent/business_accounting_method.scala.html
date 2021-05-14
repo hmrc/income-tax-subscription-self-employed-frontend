@@ -30,36 +30,35 @@
 @question = @{
     messages("agent.business.accounting_method.heading")
 }
-@scripts = {
-<link rel="stylesheet" href="@routes.Assets.at("stylesheets/accounting_method_radio_fix.css")">
-}
 
+@scripts = {
+    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/accounting_method_radio_fix.css")">
+}
 
 @agent_main_template(title = messages("agent.business.accounting_method.title"), form = Some(businessAccountingMethodForm), scriptElem = Some(scripts)) {
     @back_link(backUrl)
 
     @summaryErrorHelper(businessAccountingMethodForm)
 
-    <h1 class="heading-large">@question</h1>
-
     @form(action = postAction) {
 
-    @radioHelper(
-        field = businessAccountingMethodForm(businessAccountingMethod),
-        legend = question,
-        inline = true,
-        options = Seq(
-            RadioOption(AccountingMethodMapping.option_cash, messages("agent.business.accounting_method.cash")),
-            RadioOption(AccountingMethodMapping.option_accruals, messages("agent.business.accounting_method.accruals"))
-        ),
-        parentForm = businessAccountingMethodForm
-    )
+        @radioHelper(
+            field = businessAccountingMethodForm(businessAccountingMethod),
+            legend = question,
+            inline = true,
+            options = Seq(
+                RadioOption(AccountingMethodMapping.option_cash, messages("agent.business.accounting_method.cash")),
+                RadioOption(AccountingMethodMapping.option_accruals, messages("agent.business.accounting_method.accruals"))
+            ),
+            parentForm = businessAccountingMethodForm
+        )
 
-    @if(isEditMode) {
-        @continueButton(Some(messages("base.update")))
-    } else {
-        @continueButton()
+        @if(isEditMode) {
+            @continueButton(Some(messages("base.update")))
+        } else {
+            @continueButton()
+        }
+
     }
-}
 
 }

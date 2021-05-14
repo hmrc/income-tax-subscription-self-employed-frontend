@@ -25,32 +25,30 @@
 
 @(businessNameForm: Form[BusinessNameModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = Messages("business.name.title"), form = Some(businessNameForm)) {
-  @back_link(backUrl)
-
-  @summaryErrorHelper(businessNameForm)
-
-  <h1 class="heading-large">@messages("business.name.heading")</h1>
-
+@inputContent = {
     <p>@messages("business.name.line_1")</p>
+}
+
+@main_template(title = Messages("business.name.title"), form = Some(businessNameForm)) {
+
+    @back_link(backUrl)
+
+    @summaryErrorHelper(businessNameForm)
 
     @form(action = postAction) {
 
-    <div class="form-group">
-    @inputHelper(
-      field = businessNameForm(businessName),
-      label = Some(Messages("business.name.heading")),
-      labelClass = Some("visuallyhidden"),
-      parentForm = businessNameForm
-    )
-    </div>
+        @inputHelper(
+            field = businessNameForm(businessName),
+            label = messages("business.name.heading"),
+            content = Some(inputContent),
+            parentForm = businessNameForm
+        )
 
+        @if(isEditMode) {
+            @continueButton(Some(messages("base.update")))
+        } else {
+            @continueButton()
+        }
 
-    @if(isEditMode) {
-        @continueButton(Some(messages("base.update")))
-    } else {
-        @continueButton()
     }
-
-  }
 }
