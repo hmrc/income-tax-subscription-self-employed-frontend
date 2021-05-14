@@ -40,7 +40,7 @@
         <dd class="govuk-summary-list__value">@answer</dd>
         <dd class="govuk-summary-list__actions">
         @changeUrl.map { link =>
-            <a href=@link.url>
+            <a href="@link.url">
                 <span aria-hidden="true">@messages("base.change")</span>
                 <span class="visuallyhidden">@link.hiddenContent</span>
             </a>
@@ -87,7 +87,7 @@
         @business.businessAddress.map(address => businessAddress(address, address.auditRef))
     </dl>
     <div class="form-group">
-        <a id="remove-business-@businessNumber" href=@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.RemoveBusinessController.show(business.id).url>@messages("agent.check_your_answers.remove_business", businessNumber)</a>
+        <a id="remove-business-@businessNumber" href="@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.RemoveBusinessController.show(business.id).url">@messages("agent.check_your_answers.remove_business", businessNumber)</a>
     </div>
 }
 

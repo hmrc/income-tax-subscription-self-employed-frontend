@@ -88,7 +88,7 @@
         @business.businessAddress.map(address => businessAddress(address, address.auditRef))
     </dl>
     <div class="form-group">
-        <a id="remove-business-@businessNumber" href=@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.RemoveBusinessController.show(business.id).url>@messages("check_your_answers.remove_business", businessNumber)</a>
+        <a id="remove-business-@businessNumber" href="@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.RemoveBusinessController.show(business.id).url">@messages("check_your_answers.remove_business", businessNumber)</a>
     </div>
 }
 
