@@ -116,8 +116,8 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
         httpStatus(BAD_REQUEST)
       )
 
-      val errorMessage = doc.select("span[class=error-notification]")
-      errorMessage.text() mustBe "Select yes if you want to add another sole trader business"
+      val errorMessage = doc.select("div[class=error-notification]")
+      errorMessage.text() mustBe "Error: Select yes if you want to add another sole trader business"
     }
   }
 }

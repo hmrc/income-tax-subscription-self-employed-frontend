@@ -25,26 +25,20 @@
 
 @(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call,isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-    @main_template(title = messages("business.trade_name.title"), form = Some(businessTradeNameForm)) {
+@main_template(title = messages("business.trade_name.title"), form = Some(businessTradeNameForm)) {
 
     @back_link(backUrl)
 
     @summaryErrorHelper(businessTradeNameForm)
 
-    <h1 class="heading-large">@messages("business.trade_name.heading")</h1>
-
-    <p id="hint-businessTradeName" class="form-hint heading-xl-addon">
-        @messages("business.trade_name.hint")
-    </p>
-
     @form(action = postAction) {
-            @inputHelper(
+        @inputHelper(
             field = businessTradeNameForm(businessTradeName),
-            label = Some(Messages("business.trade_name.heading")),
-            labelClass = Some("visuallyhidden"),
+            label = messages("business.trade_name.heading"),
+            formHint = Some(messages("business.trade_name.hint")),
             maxLength = Some(businessTradeNameMaxLength),
             parentForm = businessTradeNameForm
-            )
+        )
 
         @if(isEditMode) {
             @continueButton(Some(messages("base.update")))

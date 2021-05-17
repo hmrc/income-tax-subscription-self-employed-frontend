@@ -25,20 +25,22 @@
 
 @(businessStartDateForm: Form[BusinessStartDate], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
+@inputContent = {
+    <p>@messages("business.start_date.line_1")</p>
+}
+
 @main_template(title = messages("business.start_date.title"), form = Some(businessStartDateForm)) {
 
     @back_link(backUrl)
 
     @summaryErrorHelper(businessStartDateForm)
 
-    <h1 class="heading-large">@messages("business.start_date.heading")</h1>
-
-    <p>@messages("business.start_date.line_1")</p>
-
     @form(action = postAction) {
 
         @dateHelper(
             field = businessStartDateForm(startDate),
+            label = Some(messages("business.start_date.heading")),
+            content = Some(inputContent),
             parentForm = businessStartDateForm,
             hintText = Some(messages("business.start_date.exampleStartDate"))
         )
@@ -48,5 +50,6 @@
         } else {
             @continueButton()
         }
+
     }
 }

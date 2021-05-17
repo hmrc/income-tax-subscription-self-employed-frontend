@@ -15,55 +15,66 @@
  *@
 
 @import play.api.data.{Field, Form}
-@(field: Field,
-        label: Option[String] = None,
+@(
+        field: Field,
+        label: String,
+        content: Option[Html] = None,
         parentForm: Form[_],
         maxLength: Option[Int] = None,
         divClass: Option[String] = None,
         labelClass: Option[String] = None,
         isNumeric: Boolean = false,
-        formHint: Option[Seq[String]] = None,
-        showErrors: Boolean = true
+        formHint: Option[String] = None,
+        showErrors: Boolean = true,
+        isPageHeading: Boolean = true
 )(implicit messages: Messages)
 
-@errors = @{
-field.errors
+@hintText(hint: String) = {
+    <p class="form-hint" id="@field.name-hint">
+        @hint
+    </p>
 }
 
-@errMsg(err: FormError) = {
+@hasError = @{showErrors && field.error.isDefined}
+
+@errorNotification = {
     @if(showErrors) {
-        <span class="error-notification">@{messages(s"${err.message}",err.args:_*)}</span>
+        @field.error.map { error =>
+            <div class="error-notification" id="@field.name-error">
+                <span class="visuallyhidden">@messages("error-notification.prefix")</span> @messages(error.message, error.args: _*)
+            </div>
+        }
     }
 }
 
-@hintText(hint: String) = {
-    <span class="form-hint" id="hint-@field.name">
-    @hint
-    </span>
-}
-
-@hasError = @{showErrors && parentForm.errors(field.name).nonEmpty}
-
-@errorNotification = @{
-    errors.map(errMsg)
+@ariaDescribedBy = {
+    @(formHint.isDefined, field.error.isDefined) match {
+        case (true, true) => { aria-describedby="@field.name-hint @field.name-error" }
+        case (true, false) => { aria-describedby="@field.name-hint" }
+        case (false, true) => { aria-describedby="@field.name-error" }
+        case (false, false) => {}
+    }
 }
 
 <div class="form-group form-field@divClass.map(cls => s" $cls")@if(hasError) { form-field--error}">
-        @errorNotification
-    <label class='form-label @labelClass.fold("")(x => x)' for=@field.name>
-        @label.fold(Html(""))(label => Html(label))
-        @formHint.fold(Nil: Seq[Html])(_.map(hintText))
+
+    <label for="@field.name" class='form-label @labelClass.fold("")(x => x)'>
+        @if(isPageHeading) {
+            <h1 class="heading-large">@label</h1>
+        } else {
+            @label
+        }
     </label>
 
-    @if(formHint.isDefined) {
-        <input name="@field.name" class="form-control" id="@field.name" type="text" aria-describedby="hint-@field.name"
-    } else {
-        <input name="@field.name" class="form-control" id="@field.name" type="text"
-    }
+    @content
+
+    @formHint.map(hintText)
+
+    @errorNotification
+
+    <input name="@field.name" class="form-control" id="@field.name" type="text" @ariaDescribedBy
         @maxLength.fold(Html(""))(max => Html(s"maxlength=$max"))
         value="@field.value.fold("")(v => v)"
-        @if(isNumeric) {
-            pattern="[0-9]*" inputmode="numeric"}
-    >
+        @if(isNumeric) {pattern="[0-9]*" inputmode="numeric"}>
 </div>
 

@@ -50,7 +50,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     val backLink = "Back"
   }
 
-  class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm, isEditMode: Boolean = false) {
+  class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
+              isEditMode: Boolean = false) {
     val page: HtmlFormat.Appendable = business_accounting_method(
       businessAccountingMethodForm,
       testCall,
@@ -98,16 +99,16 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
     //radio button test
     "have a radio button for cash accounting" in new Setup {
-      document.getRadioButtonByIndex(0).select("#businessAccountingMethod-Cash").size() mustBe 1
+      document.getRadioButtonByIndex().select("#businessAccountingMethod-Cash").size() mustBe 1
     }
 
     "have a cash accounting heading for the radio button" in new Setup {
-      document.getRadioButtonByIndex(0).select("label span").text() mustBe BusinessAccountingMethodMessages.cash
+      document.getRadioButtonByIndex().select("label span").text() mustBe BusinessAccountingMethodMessages.cash
     }
 
     "have the correct description for the cash accounting radio button" in new Setup {
       val startIndex: Int = 16
-      document.getRadioButtonByIndex(0).select("label").text().substring(startIndex) mustBe BusinessAccountingMethodMessages.cashDescription
+      document.getRadioButtonByIndex().select("label").text().substring(startIndex) mustBe BusinessAccountingMethodMessages.cashDescription
     }
 
     "have a radio button for standard accounting" in new Setup {
@@ -138,13 +139,16 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
   }
 
-  "must display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {
+  "must display empty form error summary when submit with an empty form" in new Setup(
+    BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)
+  ) {
     document.mustHaveErrorSummary(List[String](emptyError))
   }
 
-  "must display empty form error message when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)) {
-
-    document.listErrorMessages(List[String](emptyError))
+  "must display empty form error message when submit with an empty form" in new Setup(
+    BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)
+  ) {
+    document.mustHaveErrorNotificationMessage(emptyError)
   }
 
 }

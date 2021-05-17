@@ -16,6 +16,8 @@ base.update                                                     = Update
 base.yes                                                        = Yes
 base.no                                                         = No
 
+error-notification.prefix                                       = Error:
+
 ## Service Name
 agent_service_name.title                                        = Use software to report your client’s Income Tax
 

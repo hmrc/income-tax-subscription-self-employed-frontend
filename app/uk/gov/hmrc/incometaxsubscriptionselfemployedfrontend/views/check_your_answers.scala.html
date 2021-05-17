@@ -103,7 +103,7 @@
     }
 
     @form(action = postAction) {
-        <h2 class="heading-medium" id="add-another-business-heading">@messages("check_your_answers.add_another_business_heading")</h2>
+
         @yesNoRadioHelper(
             field = addAnotherBusinessForm(AddAnotherBusinessForm.addAnotherBusiness),
             legend = Messages("check_your_answers.add_another_business_heading"),
@@ -114,7 +114,9 @@
             parentForm = addAnotherBusinessForm,
             inline = true
         )
+
         @continueButton()
+
     }
 
 

@@ -320,7 +320,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     }
 
     "has a heading to add another sole trader business" in new Setup {
-      document.getElementById("add-another-business-heading").text mustBe CheckYourAnswersMessages.addAnotherBusinessHeading
+      document.selectHead("legend").getH2Element().text mustBe CheckYourAnswersMessages.addAnotherBusinessHeading
     }
 
     "have a radioset" which {

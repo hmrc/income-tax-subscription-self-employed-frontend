@@ -30,17 +30,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business
 class BusinessNameViewSpec extends ViewSpec {
 
   object BusinessNameMessages {
-
-
     val title = "What is the name of your sole trader business?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
-    val heading = title
+    val heading: String = title
     val continue = "Continue"
     val update = "Update"
     val backLink = "Back"
     val line1 = "This is the business name you used to register for Self Assessment. If your business does not have a separate name, enter your own first and last name."
     val emptyError = "Enter your name or the name of your business"
-
   }
 
   val backUrl: String = testBackUrl
@@ -92,19 +89,11 @@ class BusinessNameViewSpec extends ViewSpec {
   "have a backlink" in new Setup() {
     document.getBackLink.text mustBe BusinessNameMessages.backLink
     document.getBackLink.attr("href") mustBe testBackUrl
-
   }
 
   "must display form error on page" in new Setup(false, BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
     document.mustHaveErrorSummary(List[String](testError.message))
-    document.listErrorMessages(List[String](testError.message))
-
+    document.mustHaveErrorNotificationMessage(testError.message)
   }
-
-  "must display multiple form errors on page" in new Setup(false, BusinessNameForm.businessNameValidationForm(Nil).withError(testError).withError(testError2)) {
-    document.mustHaveErrorSummary(List[String](testError.message, testError2.message))
-    document.listErrorMessages(List[String](testError.message, testError2.message))
-  }
-
 
 }

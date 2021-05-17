@@ -74,7 +74,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.getForm.attr("action") mustBe testCall.url
     }
     "have a fieldset with dateInputs" in new Setup {
-      document.mustHaveDateField("startDate", "", BusinessStartDateMessages.exampleStartDate)
+      document.mustHaveDateField("startDate", BusinessStartDateMessages.heading, BusinessStartDateMessages.exampleStartDate)
     }
     "have a continue button when not in edit mode" in new Setup {
       document.getSubmitButton.text mustBe BusinessStartDateMessages.continue
@@ -91,7 +91,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
       businessStartDateForm = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").withError(testError)
     ) {
       document.mustHaveErrorSummary(List[String](testError.message))
-      document.mustHaveDateField("startDate", "", BusinessStartDateMessages.exampleStartDate, Some(testError.message))
+      document.mustHaveDateField("startDate", BusinessStartDateMessages.heading, BusinessStartDateMessages.exampleStartDate, Some(testError.message))
     }
 
   }
