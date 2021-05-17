@@ -15,6 +15,8 @@ base.change                                                     = Newid
 base.yes                                                        = Iawn
 base.no                                                         = Na
 
+error-notification.prefix                                       = Gwall:
+
 ## Service name
 agent_service_name.title                                        = Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient
 
