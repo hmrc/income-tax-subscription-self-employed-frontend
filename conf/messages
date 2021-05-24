@@ -164,7 +164,7 @@ agent.check_your_answers.business_trade                         = Business trade
 agent.check_your_answers.business_trade.change                  = Change business trade
 agent.check_your_answers.business_address                       = Business address
 agent.check_your_answers.business_address.change                = Change business address
-agent.check_your_answers.add_another_business_heading           = Do you want to add another self-employed business?
+agent.check_your_answers.add_another_business_heading           = Do you want to add another sole trader business?
 agent.check_your_answers.remove_business                        = Remove business {0}
 
 # Check your answers add another business
