@@ -154,6 +154,7 @@ agent.addressLookup.confirmPage.heading                         = Cadarnhau cyfe
 # Check your answers
 agent.check_your_answers.title                                  = Gwiriwch eich atebion
 agent.check_your_answers.heading                                = Gwiriwch eich atebion
+agent.check_your_answers.sub_heading                            = Busnes {0}
 agent.check_your_answers.trading_start_date                     = Dyddiad dechrau masnachu’r busnes
 agent.check_your_answers.trading_start_date.change              = Newid dyddiad dechrau masnachu’r busnes
 agent.check_your_answers.business_name                          = Enw’r busnes
@@ -162,7 +163,14 @@ agent.check_your_answers.business_trade                         = Masnach y busn
 agent.check_your_answers.business_trade.change                  = Newid masnach y busnes
 agent.check_your_answers.business_address                       = Cyfeiriad y busnes
 agent.check_your_answers.business_address.change                = Newid cyfeiriad y busnes
+agent.check_your_answers.remove_business                        = Dileu busnes {0}
+agent.check_your_answers.add_another_business_heading           = A hoffech ychwanegu busnes unig fasnachwr arall?
 agent.check_your_answers.confirm_and_sign_up                    = Cadarnhau a chofrestru
+
+# Agent Check your answers add another business
+agent.error.add_another_business.limit_reached                  = Gallwch ychwanegu hyd at {0} o fusnesau yn unig
+agent.error.add_another_business.invalid                        = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
+agent.error.add_another_business.empty                          = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
 
 # Agent Business Accounting Method page
 agent.business.accounting_method.title                          = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
