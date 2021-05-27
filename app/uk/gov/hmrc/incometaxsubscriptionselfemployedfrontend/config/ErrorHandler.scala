@@ -16,15 +16,49 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import play.api.i18n.MessagesApi
-import play.api.mvc.Request
-import play.twirl.api.Html
+import play.api.mvc.Results._
+import play.api.mvc.{Request, RequestHeader, Result}
+import play.api.{Configuration, Environment, Logger}
+import uk.gov.hmrc.auth.core.{AuthorisationException, InsufficientEnrolments}
+import uk.gov.hmrc.http.NotFoundException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.error_template
+import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 
-@Singleton
-class ErrorHandler @Inject()(val messagesApi: MessagesApi, implicit val appConfig: AppConfig) extends FrontendErrorHandler {
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
-    error_template(pageTitle, heading, message)
+import scala.concurrent.Future
+
+class ErrorHandler @Inject()(val appConfig: AppConfig,
+                             val messagesApi: MessagesApi,
+                             val config: Configuration,
+                             val env: Environment
+                            ) extends FrontendErrorHandler with AuthRedirects with UrlHelpers{
+
+  override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
+    Future.successful(resolveError(request, exception))
+  }
+
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]):
+  play.twirl.api.HtmlFormat.Appendable =
+    error_template(pageTitle, heading, message)(implicitly, implicitly, appConfig)
+
+  override def resolveError(rh: RequestHeader, ex: Throwable): Result = {
+    ex match {
+      case _: InsufficientEnrolments =>
+        Logger.debug("[AuthenticationPredicate][async] No HMRC-MTD-IT Enrolment and/or No NINO.")
+        super.resolveError(rh, ex)
+      case _: AuthorisationException =>
+        Logger.debug("[AuthenticationPredicate][async] Unauthorised request. Redirect to Sign In.")
+        toGGLogin(redirectUrlOf(appConfig.incomeTaxSubscriptionFrontendBaseUrl, rh.path))
+      case _: NotFoundException =>
+        NotFound(notFoundTemplate(Request(rh, "")))
+      case _ =>
+        Logger.error(s"[ErrorHandler][resolveError] Internal Server Error, (${rh.method})(${rh.uri})", ex)
+        super.resolveError(rh, ex)
+    }
+  }
+
+  object ErrorHandler
+
 }
