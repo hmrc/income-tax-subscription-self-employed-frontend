@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.mockito.Mockito
 import play.api.data.Form
-import play.api.mvc.{Action, AnyContent, AnyContentAsFormUrlEncoded}
+import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.auth.core.{AuthorisationException, InvalidBearerToken}
@@ -66,6 +66,4 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
       fakeRequest.withFormUrlEncodedBody(form.data.toSeq: _*)
 
   }
-
-
 }
