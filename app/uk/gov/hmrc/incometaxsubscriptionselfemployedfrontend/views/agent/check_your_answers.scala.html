@@ -93,6 +93,7 @@
 
 @agent_main_template(title = messages("agent.check_your_answers.title")) {
 
+    @summaryErrorHelper(addAnotherBusinessForm)
     <h1 class="heading-large">@messages("agent.check_your_answers.heading")</h1>
 
     @answers.zip(1 to answers.length).map { case (business, businessNumber) =>
