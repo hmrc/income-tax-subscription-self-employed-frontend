@@ -1,5 +1,5 @@
 # Assets
-GET         /assets/*file                       controllers.Assets.at(path="/public", file)
+GET        /assets/*file                       controllers.Assets.at(path="/public", file)
 
 GET        /details                             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.InitialiseController.initialise
 
@@ -27,3 +27,5 @@ GET        /language/:lang                      uk.gov.hmrc.incometaxsubscriptio
 
 GET        /logout                              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut
 
+GET         /keep-alive                         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SessionTimeoutController.keepAlive
+GET         /timeout                            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SessionTimeoutController.timeout

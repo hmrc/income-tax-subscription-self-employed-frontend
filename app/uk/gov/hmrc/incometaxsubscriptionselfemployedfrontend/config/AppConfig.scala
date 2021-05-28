@@ -41,6 +41,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
   lazy val limitOnNumberOfBusinesses: Int = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
   lazy val addressLookupUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
+  lazy val timeoutLength: String = servicesConfig.getString("timeout.length")
+  lazy val countdownLength: String = servicesConfig.getString("timeout.countdown")
+
   def addressLookupChangeUrl(id: String): String = s"$addressLookupUrl/lookup-address/$id/lookup"
 
   val contactFormServiceIdentifier = "MTDIT"
