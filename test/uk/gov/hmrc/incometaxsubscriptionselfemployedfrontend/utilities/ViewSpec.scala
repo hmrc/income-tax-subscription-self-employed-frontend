@@ -37,6 +37,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
   val testBackUrl = "/test-back-url"
   val testCall: Call = Call("POST", "/test-url")
+  val fakeTestRequest = FakeRequest("POST", "/test-url")
 
   implicit class CustomSelectors(element: Element) {
 

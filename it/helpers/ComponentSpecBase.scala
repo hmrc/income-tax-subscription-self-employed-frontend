@@ -19,6 +19,7 @@ package helpers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import org.scalatestplus.play.{PlaySpec, PortNumber}
+import play.api.http.HeaderNames
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
@@ -198,6 +199,13 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
       )
     )
   }
+
+  def getTimeout: WSResponse = get(uri = "/timeout")
+  def getClientTimeout: WSResponse = get(uri = "/client/timeout")
+
+  def getKeepAlive: WSResponse = get(uri = "/keep-alive")
+  def getClientKeepAlive: WSResponse = get(uri = "/client/keep-alive")
+
 
   def getBusinessAccountingMethod(inEditMode: Boolean = false): WSResponse = get(s"/details/business-accounting-method?isEditMode=$inEditMode")
 

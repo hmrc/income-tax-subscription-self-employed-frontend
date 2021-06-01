@@ -1,31 +1,35 @@
 # Initialiser
-GET        /details                             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.InitialiseController.initialise
+GET         /details                                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.InitialiseController.initialise
 
 # Date Of Commencement Page
-GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false)
+GET         /details/business-start-date               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false)
+POST        /details/business-start-date               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false)
 
 # Business Name Page
-GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
+GET         /details/business-name                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
+POST        /details/business-name                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
 
 # Business Trade Name Page
-GET        /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-trade              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
+GET         /details/business-trade                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
+POST        /details/business-trade                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
 
 #Address Lookup routing
-GET        /address-lookup-initialise/:itsaId   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(itsaId: String)
-GET        /details/address-lookup/:itsaId      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(itsaId: String, id: Option[String] ?= None)
+GET         /address-lookup-initialise/:itsaId         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(itsaId: String)
+GET         /details/address-lookup/:itsaId            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(itsaId: String, id: Option[String] ?= None)
 
 #Check your answers
-GET        /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.show
-POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.submit
+GET         /details/business-list                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.show
+POST        /details/business-list                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.submit
 
 # Remove business
-GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.RemoveBusinessController.show(id: String)
+GET         /details/remove-business                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.RemoveBusinessController.show(id: String)
 
-GET        /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show(isEditMode: Boolean ?= false)
-POST       /details/business-accounting-method  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit(isEditMode: Boolean ?= false)
+GET         /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show(isEditMode: Boolean ?= false)
+POST        /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit(isEditMode: Boolean ?= false)
 
 #Welsh Language
-GET         /language/:lang                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AgentLanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AgentLanguageSwitchController.switchToLanguage(lang: String)
+
+#Session timeout
+GET         /keep-alive                                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.keepAlive
+GET         /timeout                                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.timeout
