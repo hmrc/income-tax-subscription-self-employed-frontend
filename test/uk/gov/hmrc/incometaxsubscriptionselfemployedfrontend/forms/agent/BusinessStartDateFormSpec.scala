@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
-import java.time.LocalDate
-
 import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.{Form, FormError}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.{businessStartDateForm, startDate}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.startDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
+
+import java.time.LocalDate
 
 class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
@@ -34,7 +33,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     businessStartDateForm(BusinessStartDateForm.minStartDate.toString, BusinessStartDateForm.maxStartDate.toString)
   }
 
-  "The DateOfCommencementForm" should {
+  "The Business Start Date Form" should {
     "transform a valid request to the date form case class" in {
 
       val testDateDay = "31"
@@ -57,8 +56,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "when testing the validation" should {
 
       "output the appropriate error messages for the start date" when {
-        val empty = "error.agent.date.empty"
-        val invalid = "error.agent.date.empty"
+        val empty = "error.agent.business_start_date.date.empty"
         val beforeMax = "error.agent.business_start_date.maxStartDate"
         val beforeMin = "error.agent.business_start_date.minStartDate"
 
@@ -66,15 +64,10 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val monthKeyError: String = s"$startDate.$month"
         val yearKeyError: String = s"$startDate.$year"
 
+        val errorContext: String = "error.agent.business_start_date"
+
         "the date is not supplied to the map" in {
-          form.bind(DataMap.EmptyMap).errors must contain(FormError(dayKeyError, empty))
-        }
-        "the date supplied is empty" in {
-          form.bind(DataMap.emptyDate(startDate)).errors must contain(FormError(dayKeyError, empty))
-        }
-        "it is an invalid date" in {
-          val invalidTest = form.bind(DataMap.date(startDate)("29", "2", "2017"))
-          invalidTest.errors must contain(FormError(startDate, invalid))
+          form.bind(DataMap.EmptyMap).errors must contain(FormError(startDate, empty))
         }
         "it is older than 2 years" in {
           val oneYearAgo: LocalDate = LocalDate.now.minusYears(1)
@@ -89,29 +82,37 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
           val minTest = form.bind(DataMap.date(startDate)("31", "12", "1899"))
           minTest.errors must contain(FormError(startDate, beforeMin, Seq(BusinessStartDateForm.minStartDate.toString)))
         }
-        "it is is missing the day" in {
-          val minTest = form.bind(DataMap.date(startDate)("", "4", "2017"))
-          minTest.errors must contain(FormError(dayKeyError, "error.agent.day.empty"))
+        "it is missing the day" in {
+          val test = form.bind(DataMap.date(startDate)("", "4", "2017"))
+          test.errors must contain(FormError(dayKeyError, s"$errorContext.day.empty"))
         }
-        "it is is missing the month" in {
-          val minTest = form.bind(DataMap.date(startDate)("06", "", "2017"))
-          minTest.errors must contain(FormError(monthKeyError, "error.agent.month.empty"))
+        "it is missing the month" in {
+          val test = form.bind(DataMap.date(startDate)("1", "", "2017"))
+          test.errors must contain(FormError(monthKeyError, s"$errorContext.month.empty"))
         }
-        "it is is missing the year" in {
-          val minTest = form.bind(DataMap.date(startDate)("06", "4", ""))
-          minTest.errors must contain(FormError(yearKeyError, "error.agent.year.empty"))
+        "it is missing the year" in {
+          val test = form.bind(DataMap.date(startDate)("1", "1", ""))
+          test.errors must contain(FormError(yearKeyError, s"$errorContext.year.empty"))
         }
-        "it is is missing the day and month" in {
-          val minTest = form.bind(DataMap.date(startDate)("", "", "2017"))
-          minTest.errors must contain(FormError(dayKeyError, "error.agent.day_month.empty"))
+        "it is missing multiple fields" in {
+          val test = form.bind(DataMap.date(startDate)("", "", "2017"))
+          test.errors must contain(FormError(startDate, s"$errorContext.day_month.empty"))
         }
-        "it is is missing the day and year" in {
-          val minTest = form.bind(DataMap.date(startDate)("", "4", ""))
-          minTest.errors must contain(FormError(dayKeyError, "error.agent.day_year.empty"))
+        "it has an invalid day" in {
+          val test = form.bind(DataMap.date(startDate)("0", "1", "2017"))
+          test.errors must contain(FormError(dayKeyError, s"$errorContext.invalid"))
         }
-        "it is is missing the month and year" in {
-          val minTest = form.bind(DataMap.date(startDate)("06", "", ""))
-          minTest.errors must contain(FormError(monthKeyError, "error.agent.month_year.empty"))
+        "it has an invalid month" in {
+          val test = form.bind(DataMap.date(startDate)("1", "13", "2017"))
+          test.errors must contain(FormError(startDate, s"$errorContext.invalid"))
+        }
+        "it has an invalid year" in {
+          val test = form.bind(DataMap.date(startDate)("1", "1", "invalid"))
+          test.errors must contain(FormError(startDate, s"$errorContext.invalid"))
+        }
+        "it has multiple invalid fields" in {
+          val test = form.bind(DataMap.date(startDate)("0", "0", "2017"))
+          test.errors must contain(FormError(startDate, s"$errorContext.invalid"))
         }
       }
     }
