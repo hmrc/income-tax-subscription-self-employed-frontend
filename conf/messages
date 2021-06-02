@@ -28,15 +28,16 @@ business.start_date.line_1                                      = If you have mu
 business.start_date.exampleStartDate                            = For example, 1 4 2018
 
 # Date errors
-error.date.empty                                                = Enter the date your business started trading
-error.day.empty                                                 = The date must include a day
-error.month.empty                                               = The date must include a month
-error.year.empty                                                = The date must include a year
-error.day_month.empty                                           = The date must include a day and a month
-error.day_year.empty                                            = The date must include a day and a year
-error.month_year.empty                                          = The date must include a month and a year
+error.business_start_date.date.empty                            = Enter the date your business started trading
+error.business_start_date.day.empty                             = The date must include a day
+error.business_start_date.month.empty                           = The date must include a month
+error.business_start_date.year.empty                            = The date must include a year
+error.business_start_date.day_month.empty                       = The date must include a day and a month
+error.business_start_date.day_year.empty                        = The date must include a day and a year
+error.business_start_date.month_year.empty                      = The date must include a month and a year
 error.business_start_date.maxStartDate                          = The date your business started trading must be the same as or before {0}
 error.business_start_date.minStartDate                          = The date your business started must be on or after {0}
+error.business_start_date.invalid                               = The date must be a real date
 
 # Business Name
 business.name.title                                             = What is the name of your sole trader business?
@@ -111,15 +112,16 @@ business.agent.start_date.heading                               = When did your 
 business.agent.start_date.exampleStartDate                      = For example, 1 8 2014
 
 # Agent Date errors
-error.agent.date.empty                                          = Enter the date your client’s business started trading
-error.agent.day.empty                                           = The date must include a day
-error.agent.month.empty                                         = The date must include a month
-error.agent.year.empty                                          = The date must include a year
-error.agent.day_month.empty                                     = The date must include a day and a month
-error.agent.day_year.empty                                      = The date must include a day and a year
-error.agent.month_year.empty                                    = The date must include a month and a year
+error.agent.business_start_date.date.empty                      = Enter the date your client’s business started trading
+error.agent.business_start_date.day.empty                       = The date must include a day
+error.agent.business_start_date.month.empty                     = The date must include a month
+error.agent.business_start_date.year.empty                      = The date must include a year
+error.agent.business_start_date.day_month.empty                 = The date must include a day and a month
+error.agent.business_start_date.day_year.empty                  = The date must include a day and a year
+error.agent.business_start_date.month_year.empty                = The date must include a month and a year
 error.agent.business_start_date.maxStartDate                    = The date the business started trading must be on or before {0}
 error.agent.business_start_date.minStartDate                    = The date your client’s business started must be on or after {0}
+error.agent.business_start_date.invalid                         = The date must be a real date
 
 # Agent Business Name
 business.agent.name.title                                       = What is the name of your client’s sole trader business?

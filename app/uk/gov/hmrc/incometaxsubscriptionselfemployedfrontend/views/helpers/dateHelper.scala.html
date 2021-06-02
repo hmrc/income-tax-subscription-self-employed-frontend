@@ -83,7 +83,8 @@
                 maxLength = Some(2),
                 isNumeric = true,
                 showErrors = false,
-                isPageHeading = false
+                isPageHeading = false,
+                forceError = parentForm.error(field.name).isDefined
             )
             @inputHelper(
                 field(month),
@@ -93,7 +94,8 @@
                 maxLength = Some(2),
                 isNumeric = true,
                 showErrors = false,
-                isPageHeading = false
+                isPageHeading = false,
+                forceError = parentForm.error(field.name).isDefined
             )
             @inputHelper(
                 field(year),
@@ -103,7 +105,8 @@
                 maxLength = Some(4),
                 isNumeric = true,
                 showErrors = false,
-                isPageHeading = false
+                isPageHeading = false,
+                forceError = parentForm.error(field.name).isDefined
             )
         </div>
     </fieldset>

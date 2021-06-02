@@ -16,16 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
-import java.time.LocalDate
-
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import play.api.data.validation.{Constraint, Invalid, Valid, ValidationResult}
+import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping.dateModelMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
 
-import scala.util.Try
+import java.time.LocalDate
 
 object BusinessStartDateForm {
 
@@ -35,17 +33,11 @@ object BusinessStartDateForm {
 
   val startDate: String = "startDate"
 
-  val isValidDate: Constraint[DateModel] = constraint[DateModel] { dateModel =>
-    lazy val invalidDate = Invalid("error.agent.date.empty")
-    Try[ValidationResult] {
-      dateModel.toLocalDate
-      Valid
-    }.getOrElse(invalidDate)
-  }
+  val errorContext: String = "business_start_date"
 
   def startBeforeTwoYears(date: String): Constraint[DateModel] = constraint[DateModel] { dateModel =>
     if (DateModel.dateConvert(dateModel).isAfter(maxStartDate)) {
-      Invalid("error.agent.business_start_date.maxStartDate", date)
+      Invalid(s"error.agent.$errorContext.maxStartDate", date)
     } else {
       Valid
     }
@@ -54,7 +46,7 @@ object BusinessStartDateForm {
   def earliestStartDate(date: String): Constraint[DateModel] = constraint[DateModel] { dateModel =>
     val earliestAllowedYear: Int = minStartDate.getYear
     if (dateModel.year.toInt < earliestAllowedYear) {
-      Invalid("error.agent.business_start_date.minStartDate", date)
+      Invalid(s"error.agent.$errorContext.minStartDate", date)
     } else {
       Valid
     }
@@ -62,8 +54,8 @@ object BusinessStartDateForm {
 
   def businessStartDateForm(minStartDate: String, maxStartDate: String): Form[BusinessStartDate] = Form(
     mapping(
-      startDate -> dateModelMapping(isAgent = true).verifying(
-        isValidDate andThen startBeforeTwoYears(maxStartDate) andThen earliestStartDate(minStartDate)
+      startDate -> dateModelMapping(isAgent = true, errorContext = errorContext).verifying(
+        startBeforeTwoYears(maxStartDate) andThen earliestStartDate(minStartDate)
       )
     )(BusinessStartDate.apply)(BusinessStartDate.unapply)
   )

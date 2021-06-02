@@ -27,15 +27,16 @@ business.start_date.line_1                                      = Os oes gennych
 business.start_date.exampleStartDate                            = Er enghraifft, 1 8 2014
 
 # Date errors
-error.date.empty                                                = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu
-error.day.empty                                                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod
-error.month.empty                                               = Mae’n rhaid i’r dyddiad gynnwys mis
-error.year.empty                                                = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
-error.day_month.empty                                           = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
-error.day_year.empty                                            = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
-error.month_year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
+error.business_start_date.date.empty                            = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu
+error.business_start_date.day.empty                             = Mae’n rhaid i’r dyddiad gynnwys diwrnod
+error.business_start_date.month.empty                           = Mae’n rhaid i’r dyddiad gynnwys mis
+error.business_start_date.year.empty                            = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
+error.business_start_date.day_month.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
+error.business_start_date.day_year.empty                        = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
+error.business_start_date.month_year.empty                      = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
 error.business_start_date.maxStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
 error.business_start_date.minStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}
+error.business_start_date.invalid                               = Rhaid i’r dyddiad fod yn ddyddiad go iawn
 
 # Business Name
 business.name.title                                             = Beth yw enw’ch busnes fel unig fasnachwr?
@@ -110,15 +111,16 @@ business.agent.start_date.heading                               = Pryd y dechreu
 business.agent.start_date.exampleStartDate                      = Er enghraifft, 1 8 2014
 
 # Agent Date errors
-error.agent.date.empty                                          = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
-error.agent.day.empty                                           = Mae’n rhaid i’r dyddiad gynnwys diwrnod
-error.agent.month.empty                                         = Mae’n rhaid i’r dyddiad gynnwys mis
-error.agent.year.empty                                          = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
-error.agent.day_month.empty                                     = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
-error.agent.day_year.empty                                      = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
-error.agent.month_year.empty                                    = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
+error.agent.business_start_date.date.empty                      = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
+error.agent.business_start_date.day.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod
+error.agent.business_start_date.month.empty                     = Mae’n rhaid i’r dyddiad gynnwys mis
+error.agent.business_start_date.year.empty                      = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
+error.agent.business_start_date.day_month.empty                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
+error.agent.business_start_date.day_year.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
+error.agent.business_start_date.month_year.empty                = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
 error.agent.business_start_date.maxStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
 error.agent.business_start_date.minStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}
+error.agent.business_start_date.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
 
 # Agent Business Name
 business.agent.name.title                                       = Beth yw enw busnes eich cleient fel unig fasnachwr?
