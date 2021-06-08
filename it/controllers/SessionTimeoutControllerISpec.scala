@@ -45,7 +45,7 @@ class SessionTimeoutControllerISpec extends ComponentSpecBase with CustomMatcher
 
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI("http://localhost:9025/gg/sign-in?continue=http%3A%2F%2Flocalhost%3A9561%2Freport-quarterly%2Fincome-and-expenses%2Fsign-up&origin=income-tax-subscription-self-employed-frontend")
+          redirectURI("http://localhost:9553/bas-gateway/sign-in?continue_url=http%3A%2F%2Flocalhost%3A9561%2Freport-quarterly%2Fincome-and-expenses%2Fsign-up&origin=income-tax-subscription-self-employed-frontend")
         )
       }
     }
