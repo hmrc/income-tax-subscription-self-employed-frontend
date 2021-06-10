@@ -16,6 +16,8 @@
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut
 
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SignOutController.agentSignOut
+
 @(alternativeText: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
-<a id="sign-out" href="@signOut">@alternativeText.getOrElse(messages("base.sign-out"))</a>
+<a id="sign-out" href="@{if (request.path.contains("/client")) agentSignOut else signOut}">@alternativeText.getOrElse(messages("base.sign-out"))</a>

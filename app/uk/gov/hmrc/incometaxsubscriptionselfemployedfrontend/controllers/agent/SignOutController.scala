@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc._
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -32,14 +32,14 @@ class SignOutController @Inject()(mcc: MessagesControllerComponents,
 
   def signOut: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackFrontendRedirectUrl)))
+      Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackFrontendRedirectUrl + "_A")))
     }
   }
-  
+
 }
 
 object SignOutController {
 
-  def signOut: Call = routes.SignOutController.signOut()
+  def agentSignOut: Call = routes.SignOutController.signOut()
 
 }

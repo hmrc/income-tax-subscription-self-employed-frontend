@@ -33,3 +33,5 @@ GET         /language/:lang                            uk.gov.hmrc.incometaxsubs
 #Session timeout
 GET         /keep-alive                                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.keepAlive
 GET         /timeout                                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.timeout
+
+GET         /logout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SignOutController.signOut

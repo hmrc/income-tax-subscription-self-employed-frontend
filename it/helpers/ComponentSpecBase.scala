@@ -105,6 +105,9 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def signOut: WSResponse = get("/logout")
 
+  def agentSignOut: WSResponse = get("/client/logout")
+
+
   private def buildClient(path: String)(implicit ws: WSClient, portNumber: PortNumber): WSRequest =
     ws.url(s"http://localhost:${portNumber.value}$baseUrl$path").withFollowRedirects(false)
 
