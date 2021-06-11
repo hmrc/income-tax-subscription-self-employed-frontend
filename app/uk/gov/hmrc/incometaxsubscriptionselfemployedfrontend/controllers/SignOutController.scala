@@ -20,7 +20,9 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.affinityGroup
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,8 +33,11 @@ class SignOutController @Inject()(mcc: MessagesControllerComponents,
                                  (implicit ec: ExecutionContext) extends FrontendController(mcc) {
 
   def signOut: Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackFrontendRedirectUrl)))
+    authService.authorised().retrieve(affinityGroup) {
+      case Some(AffinityGroup.Agent) =>
+        Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackFrontendRedirectUrlAgent)))
+      case _ =>
+        Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackFrontendRedirectUrl)))
     }
   }
   
