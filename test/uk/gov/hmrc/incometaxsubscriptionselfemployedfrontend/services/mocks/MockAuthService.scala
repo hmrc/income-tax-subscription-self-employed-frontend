@@ -32,6 +32,18 @@ trait MockAuthService extends BeforeAndAfterEach with MockitoSugar {
 
   val mockAuthService: AuthService = mock[AuthService]
 
+  def mockRetrievalSuccess[T](retrievalValue: T): Unit = {
+    when(mockAuthService.authorised())
+      .thenReturn(
+        new mockAuthService.AuthorisedFunction(EmptyPredicate) {
+          override def retrieve[A](retrieval: Retrieval[A]): mockAuthService.AuthorisedFunctionWithResult[A] =
+            new mockAuthService.AuthorisedFunctionWithResult[A](EmptyPredicate, retrieval) {
+              override def apply[B](body: A => Future[B])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[B] =
+                body.apply(retrievalValue.asInstanceOf[A])
+            }
+        })
+  }
+
   def mockAuthSuccess(): Unit = {
     when(mockAuthService.authorised())
       .thenReturn(new mockAuthService.AuthorisedFunction(EmptyPredicate) {

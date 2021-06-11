@@ -17,24 +17,43 @@
 package controllers
 
 import helpers.ComponentSpecBase
+import helpers.IntegrationTestConstants.{ggSignInURI, ggSignOutURI}
 import helpers.servicemocks.AuthStub
 import play.api.http.Status.SEE_OTHER
 
 class SignOutControllerISpec extends ComponentSpecBase {
 
-  "GET /report-quarterly/income-and-expenses/sign-up/logout" should {
-    "show the logout page" in {
-      Given("I setup the Wiremock stubs")
-      AuthStub.stubAuthSuccess()
+  "GET /report-quarterly/income-and-expenses/sign-up/logout" when {
 
-      When("GET /logout is called")
-      val res = signOut
+    "the user is authenticated" should {
+      "redirect the user to logout" in {
+        Given("I setup the Wiremock stubs")
+        AuthStub.stubAuthSuccess()
 
-      Then("Should return a SEE_OTHER with a redirect location of gg sign in")
-      res must have(
-        httpStatus(SEE_OTHER),
-        redirectURI("/bas-gateway/sign-out-without-state?continue=http://localhost:9514/feedback/ITSU")
-      )
+        When("GET /logout is called")
+        val res = signOut
+
+        Then("Should return a SEE_OTHER with a redirect location of gg sign out")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignOutURI)
+        )
+      }
+    }
+
+    "the user is not authenticate" should {
+      "redirect the user to login" in {
+        AuthStub.stubUnauthorised()
+
+        When("GET /logout is called")
+        val res = signOut
+
+        Then("Should return a SEE_OTHER with a redirect location of gg sign in")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
+        )
+      }
     }
   }
 

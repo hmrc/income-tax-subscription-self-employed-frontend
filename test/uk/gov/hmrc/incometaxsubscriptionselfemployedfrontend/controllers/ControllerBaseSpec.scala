@@ -36,6 +36,8 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
   val controllerName: String
   val authorisedRoutes: Map[String, Action[AnyContent]]
 
+  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+
   final def authorisationTests(): Unit = {
     authorisedRoutes.foreach {
       case (name, call) =>
