@@ -4,11 +4,20 @@ import sbt._
 
 object AppDependencies {
 
+  private val playLanguageVersion = "4.10.0-play-26"
+  private val bootstrapVersion = "5.3.0"
+  private val playJsonJodaVersion = "2.9.2"
+  private val playHmrcFrontendVersion = "0.65.0-play-26"
+  private val govukFrontendVersion = "3.10.2"
+
   val compile = Seq(
     "uk.gov.hmrc" %% "govuk-template" % "5.60.0-play-26",
     "uk.gov.hmrc" %% "play-ui" % "8.19.0-play-26",
-    "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % "5.3.0",
-    "uk.gov.hmrc" %% "play-language" % "4.10.0-play-26"
+    "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % bootstrapVersion,
+    "uk.gov.hmrc" %% "play-language" % playLanguageVersion,
+    "com.typesafe.play" %% "play-json-joda" % playJsonJodaVersion,
+    "uk.gov.hmrc" %% "play-frontend-hmrc" % playHmrcFrontendVersion,
+    "org.webjars.npm" % "govuk-frontend" % govukFrontendVersion
   )
 
   val test = Seq(

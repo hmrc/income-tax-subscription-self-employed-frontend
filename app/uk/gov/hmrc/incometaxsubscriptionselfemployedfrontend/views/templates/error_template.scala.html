@@ -28,13 +28,13 @@
 }
 
 @defaultScriptElem = {
-    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/mtd_itsa_custom.css")">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/mtd_itsa_custom.css")">
     @* append custom scripts *@
     @scriptElem.fold(HtmlFormat.empty)(x => x)
 }
 
 @headStyle = {
-    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/banner-panel.css")">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/banner-panel.css")">
 }
 
 @govuk_wrapper(appConfig = appConfig, title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent)

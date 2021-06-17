@@ -46,6 +46,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
 
   def addressLookupChangeUrl(id: String): String = s"$addressLookupUrl/lookup-address/$id/lookup"
 
+  val serviceIdentifier = "MTDIT"
+
   val contactFormServiceIdentifier = "MTDIT"
   val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")
   val analyticsToken: String = servicesConfig.getString(s"google-analytics.token")
