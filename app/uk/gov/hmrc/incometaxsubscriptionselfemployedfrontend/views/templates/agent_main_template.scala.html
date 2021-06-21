@@ -43,8 +43,8 @@
 * put all all default assets for this service here
 *@
 @defaultScriptElem = {
-    <script type="text/javascript" src="@routes.Assets.at("javascripts/skipMainContent.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.at("javascripts/errorFocus.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/skipMainContent.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/errorFocus.js")"></script>
     @if(enableTimeout) {
         <script id="timeoutScript" role="dialog" tabindex="-1">
                 window.GOVUK.timeoutDialog({
@@ -59,8 +59,8 @@
 }
 
 @headStyle = {
-    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/mtd_itsa_custom.css")">
-    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/banner-panel.css")">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/mtd_itsa_custom.css")">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/banner-panel.css")">
 }
 
 @prefixedTitle = @{

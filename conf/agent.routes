@@ -1,3 +1,7 @@
+#Microservice-specific routes
+->         /govuk-frontend                                                               govuk.Routes
+->         /hmrc-frontend                                                                hmrcfrontend.Routes
+
 # Initialiser
 GET         /details                                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.InitialiseController.initialise
 
