@@ -29,7 +29,7 @@ object BusinessStartDateForm {
 
   def maxStartDate: LocalDate = LocalDate.now().minusYears(2)
 
-  val minStartDate: LocalDate = LocalDate.of(1900, 1, 1)
+  def minStartDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   val startDate: String = "startDate"
 
