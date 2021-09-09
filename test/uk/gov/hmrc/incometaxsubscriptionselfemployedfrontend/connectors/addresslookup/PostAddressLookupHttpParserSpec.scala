@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.address
 
 import org.scalatest.EitherValues
 import play.api.libs.json.Json
-import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, ACCEPTED}
+import play.api.test.Helpers.{ACCEPTED, INTERNAL_SERVER_ERROR}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait

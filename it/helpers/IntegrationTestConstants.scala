@@ -73,7 +73,7 @@ object IntegrationTestConstants {
        |    },
        |    "timeoutConfig": {
        |      "timeoutAmount": 900,
-       |      "timeoutUrl": "http://tax.service.gov.uk/income-tax-subscription-frontend/session-timeout"
+       |      "timeoutUrl": "http://tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    }
        |},
        |    "labels": {
@@ -138,7 +138,7 @@ object IntegrationTestConstants {
        |    },
        |    "timeoutConfig": {
        |      "timeoutAmount": 900,
-       |      "timeoutUrl": "http://tax.service.gov.uk/income-tax-subscription-frontend/session-timeout"
+       |      "timeoutUrl": "http://tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    }
        |},
        |    "labels": {

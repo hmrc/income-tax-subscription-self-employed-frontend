@@ -16,63 +16,59 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import javax.inject.Inject
-import play.api.i18n.Lang
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.{AddressLookupConfig, AppConfig}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents,
                                                authService: AuthService,
                                                addressLookupConnector: AddressLookupConnector,
-                                               addressLookupConfig: AddressLookupConfig,
                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService
                                               )(implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
 
+  private def addressLookupContinueUrl(itsaId: String): String = {
+    appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl + routes.AddressLookupRoutingController.addressLookupRedirect(itsaId, None)
+  }
+
   def initialiseAddressLookupJourney(itsaId: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      implicit val lang: Lang = mcc.messagesApi.preferred(request).lang
-      val continueUrl =
-        appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl + routes.AddressLookupRoutingController.addressLookupRedirect(itsaId, None).url
-      addressLookupConnector.initialiseAddressLookup(addressLookupConfig.config(continueUrl)) map (
-        response =>
-          response match {
-            case Right(PostAddressLookupSuccessResponse(Some(location))) => Redirect(location)
-            case Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(status)) => throw new InternalServerException(
-              s"[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: $status")
-          }
-        )
+      addressLookupConnector.initialiseAddressLookup(
+        continueUrl = addressLookupContinueUrl(itsaId),
+        isAgent = false
+      ) flatMap {
+        case Right(PostAddressLookupSuccessResponse(Some(location))) =>
+          multipleSelfEmploymentsService.saveAddressRedirect(itsaId, location).map(_ => Redirect(location))
+        case Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(status)) =>
+          throw new InternalServerException(s"[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: $status")
+      }
     }
   }
 
   def addressLookupRedirect(itsaId: String, id: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      if (!id.isDefined) {
-        throw new InternalServerException(
-          s"[AddressLookupRoutingController][addressLookupRedirect] - Id not returned from address service")
-      } else {
-        addressLookupConnector.getAddressDetails(id.get) flatMap {
-          addressDetailsResponse =>
-            addressDetailsResponse match {
-              case Right(Some(addressDetails)) =>
-                multipleSelfEmploymentsService.saveBusinessAddress(itsaId, addressDetails).map(_ =>
-                  Redirect(routes.BusinessListCYAController.show()))
-              case Right(None) => throw new InternalServerException(
-                s"[AddressLookupRoutingController][addressLookupRedirect] - No address details found with id: $id")
-              case Left(InvalidJson) => throw new InternalServerException(
-                s"[AddressLookupRoutingController][addressLookupRedirect] - Invalid json response")
-              case Left(GetAddressLookupDetailsHttpParser.UnexpectedStatusFailure(status)) => throw new InternalServerException(
-                s"[AddressLookupRoutingController][addressLookupRedirect] - Unexpected response, status: $status")
-            }
-        }
+      id match {
+        case None =>
+          throw new InternalServerException(s"[AddressLookupRoutingController][addressLookupRedirect] - Id not returned from address service")
+        case Some(addressId) =>
+          addressLookupConnector.getAddressDetails(addressId) flatMap {
+            case Right(Some(addressDetails)) =>
+              multipleSelfEmploymentsService.saveBusinessAddress(itsaId, addressDetails).map(_ => Redirect(routes.BusinessListCYAController.show()))
+            case Right(None) =>
+              throw new InternalServerException(s"[AddressLookupRoutingController][addressLookupRedirect] - No address details found with id: $addressId")
+            case Left(InvalidJson) =>
+              throw new InternalServerException(s"[AddressLookupRoutingController][addressLookupRedirect] - Invalid json response")
+            case Left(GetAddressLookupDetailsHttpParser.UnexpectedStatusFailure(status)) =>
+              throw new InternalServerException(s"[AddressLookupRoutingController][addressLookupRedirect] - Unexpected response, status: $status")
+          }
       }
     }
   }

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
@@ -26,6 +25,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SelfEmployme
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -64,8 +64,17 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
   }
 
   def saveBusinessAddress(businessId: String, businessAddress: BusinessAddressModel)
-                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
+                         (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
     saveData(businessId, _.copy(businessAddress = Some(businessAddress)))
+  }
+
+  def fetchAddressRedirect(businessId: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[String]]] = {
+    findData[String](businessId, _.addressRedirect)
+  }
+
+  def saveAddressRedirect(businessId: String, addressRedirect: String)
+                         (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
+    saveData(businessId, _.copy(addressRedirect = Some(addressRedirect)))
   }
 
   def fetchAllBusinesses(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Seq[SelfEmploymentData]]] = {
