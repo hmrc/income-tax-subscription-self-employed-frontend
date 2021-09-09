@@ -17,17 +17,17 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
 import play.api.i18n.Lang
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import play.api.libs.json.JsValue
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.{AddressLookupConfig, AppConfig}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.GetAddressLookupDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupResponse
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressLookupConnector @Inject()(appConfig: AppConfig,
+                                       addressLookupConfig: AddressLookupConfig,
                                        http: HttpClient)(implicit ec: ExecutionContext) {
 
   def addressLookupInitializeUrl: String = {
@@ -38,9 +38,11 @@ class AddressLookupConnector @Inject()(appConfig: AppConfig,
     s"${appConfig.addressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
-  def initialiseAddressLookup(data: String)
-                             (implicit hc: HeaderCarrier, language: Lang): Future[PostAddressLookupResponse] = {
-    http.POST[JsValue, PostAddressLookupResponse](addressLookupInitializeUrl, Json.parse(data))
+  def initialiseAddressLookup(continueUrl: String, isAgent: Boolean)(implicit hc: HeaderCarrier): Future[PostAddressLookupResponse] = {
+    http.POST[JsValue, PostAddressLookupResponse](
+      url = addressLookupInitializeUrl,
+      body = if (isAgent) addressLookupConfig.agentConfig(continueUrl) else addressLookupConfig.config(continueUrl)
+    )
   }
 
   def getAddressDetails(id: String)(implicit hc: HeaderCarrier): Future[GetAddressLookupDetailsResponse] = {

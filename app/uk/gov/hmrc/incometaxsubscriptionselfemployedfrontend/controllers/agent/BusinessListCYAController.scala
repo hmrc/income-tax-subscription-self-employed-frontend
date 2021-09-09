@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -31,16 +30,18 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AddAnotherB
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.check_your_answers
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class BusinessListCYAController @Inject()(authService: AuthService,
                                           incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                           mcc: MessagesControllerComponents)
-                                         (implicit val ec: ExecutionContext, val appConfig: AppConfig, dateFormatter: ImplicitDateFormatterImpl)
-  extends FrontendController(mcc) with I18nSupport {
+                                         (implicit val ec: ExecutionContext,
+                                          val appConfig: AppConfig,
+                                          dateFormatter: ImplicitDateFormatterImpl) extends FrontendController(mcc) with I18nSupport {
 
   def view(addAnotherBusinessForm: Form[AddAnotherBusinessModel], businesses: Seq[SelfEmploymentData])(implicit request: Request[AnyContent]): Html = {
     check_your_answers(

@@ -71,11 +71,11 @@
     summaryRow(question, answer, Some(ChangeLink(changeUrl, messages("agent.check_your_answers.business_trade.change"))))
 }
 
-@businessAddress(businessAddress: BusinessAddressModel, addressId: String) = @{
+@businessAddress(businessAddress: BusinessAddressModel, addressChangeLink: Option[String]) = @{
     val question: String = messages("agent.check_your_answers.business_address")
     val answer: String = businessAddress.address.toString
-    val changeUrl: String = appConfig.addressLookupChangeUrl(addressId)
-    summaryRow(question, answer, Some(ChangeLink(changeUrl, messages("agent.check_your_answers.business_address.change"))))
+    val changeLink: Option[ChangeLink] = addressChangeLink.map(url => ChangeLink(url, messages("agent.check_your_answers.business_address.change")))
+    summaryRow(question, answer, changeLink)
 }
 
 @businessTable(business: SelfEmploymentData, businessNumber: Int) = {
@@ -84,7 +84,7 @@
         @business.businessStartDate.map(startDate => tradingStartDate(startDate, business.id))
         @business.businessName.map(name => businessName(name, business.id))
         @business.businessTradeName.map(trade => businessTrade(trade, business.id))
-        @business.businessAddress.map(address => businessAddress(address, address.auditRef))
+        @business.businessAddress.map(address => businessAddress(address, business.addressRedirect))
     </dl>
     <div class="form-group">
         <a id="remove-business-@businessNumber" href="@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.RemoveBusinessController.show(business.id).url">@messages("agent.check_your_answers.remove_business", businessNumber)</a>

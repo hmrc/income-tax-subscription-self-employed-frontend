@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppar
 
 import play.api.http.Status._
 import play.api.libs.json.JsSuccess
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HttpReads
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessAddressModel
 
 
@@ -26,21 +26,21 @@ object GetAddressLookupDetailsHttpParser {
 
   type GetAddressLookupDetailsResponse = Either[GetAddressLookupDetailsFailure, Option[BusinessAddressModel]]
 
-  implicit def getAddressLookupDetailsHttpReads: HttpReads[GetAddressLookupDetailsResponse] =
-    new HttpReads[GetAddressLookupDetailsResponse] {
-      override def read(method: String, url: String, response: HttpResponse): GetAddressLookupDetailsResponse = {
-        response.status match {
-          case OK => response.json.validate[BusinessAddressModel] match {
-            case JsSuccess(value, _) => Right(Some(value))
-            case _ => Left(InvalidJson)
-          }
-          case NOT_FOUND => Right(None)
-          case status => Left(UnexpectedStatusFailure(status))
-        }
+  implicit def getAddressLookupDetailsHttpReads: HttpReads[GetAddressLookupDetailsResponse] = HttpReads { (_, _, response) =>
+    response.status match {
+      case OK => response.json.validate[BusinessAddressModel] match {
+        case JsSuccess(value, _) => Right(Some(value))
+        case _ => Left(InvalidJson)
       }
+      case NOT_FOUND => Right(None)
+      case status => Left(UnexpectedStatusFailure(status))
     }
+  }
 
   sealed trait GetAddressLookupDetailsFailure
+
   case object InvalidJson extends GetAddressLookupDetailsFailure
+
   case class UnexpectedStatusFailure(status: Int) extends GetAddressLookupDetailsFailure
+
 }

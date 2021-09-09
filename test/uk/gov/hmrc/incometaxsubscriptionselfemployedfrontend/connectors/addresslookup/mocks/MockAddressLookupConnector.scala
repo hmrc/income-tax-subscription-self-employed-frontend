@@ -42,9 +42,11 @@ trait MockAddressLookupConnector extends UnitTestTrait with MockitoSugar with Be
       ArgumentMatchers.eq(id))(ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 
-  def mockInitialiseAddressLookup(data: String)
+  def mockInitialiseAddressLookup(continueUrl: String, isAgent: Boolean)
                                  (response: PostAddressLookupResponse): OngoingStubbing[Future[PostAddressLookupResponse]] = {
     when(mockAddressLookupConnector.initialiseAddressLookup(
-      ArgumentMatchers.eq(data))(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
+      ArgumentMatchers.eq(continueUrl),
+      ArgumentMatchers.eq(isAgent)
+    )(ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 }

@@ -97,4 +97,14 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
       )(ArgumentMatchers.any())
     ).thenReturn(Future.successful(response))
   }
+
+  def mockSaveAddressRedirect(businessId: String, addressRedirect: String)
+                             (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+    when(
+      mockMultipleSelfEmploymentsService.saveAddressRedirect(
+        ArgumentMatchers.eq(businessId),
+        ArgumentMatchers.eq(addressRedirect)
+      )(ArgumentMatchers.any())
+    ).thenReturn(Future.successful(response))
+  }
 }

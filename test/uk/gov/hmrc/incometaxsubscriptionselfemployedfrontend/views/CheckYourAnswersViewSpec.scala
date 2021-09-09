@@ -58,7 +58,8 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
     businessName = Some(BusinessNameModel(s"ABC Limited $id")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing $id")),
-    businessAddress = Some(BusinessAddressModel(s"AuditRefId$id", Address(Seq(s"line$id", "line9", "line99"), "TF3 4NT")))
+    businessAddress = Some(BusinessAddressModel(s"AuditRefId$id", Address(Seq(s"line$id", "line9", "line99"), "TF3 4NT"))),
+    addressRedirect = Some(s"test address redirect $id")
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -154,7 +155,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
             changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
             changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-            changeLink.attr("href") mustBe appConfig.addressLookupChangeUrl("AuditRefId1")
+            changeLink.attr("href") mustBe "test address redirect 1"
           }
         }
 
@@ -230,7 +231,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-              changeLink.attr("href") mustBe appConfig.addressLookupChangeUrl("AuditRefId1")
+              changeLink.attr("href") mustBe "test address redirect 1"
             }
           }
 
@@ -304,7 +305,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-              changeLink.attr("href") mustBe appConfig.addressLookupChangeUrl("AuditRefId2")
+              changeLink.attr("href") mustBe "test address redirect 2"
             }
           }
 

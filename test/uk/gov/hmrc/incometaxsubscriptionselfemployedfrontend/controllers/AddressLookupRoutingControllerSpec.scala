@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AddressLookupConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks.MockAddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser
@@ -34,45 +31,44 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector with MockMultipleSelfEmploymentsService {
 
   val itsaId = "testId1"
-  val mockAddressLookupConfig: AddressLookupConfig = mock[AddressLookupConfig]
 
   override val controllerName: String = "AddressLookupRoutingController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
     "initialiseAddressLookupJourney" -> TestAddressLookupRoutingController.initialiseAddressLookupJourney(itsaId),
     "addressLookupRedirect" -> TestAddressLookupRoutingController.addressLookupRedirect(itsaId, None)
   )
-  
+
   object TestAddressLookupRoutingController extends AddressLookupRoutingController(
     mockMessagesControllerComponents,
     mockAuthService,
     mockAddressLookupConnector,
-    mockAddressLookupConfig,
     mockMultipleSelfEmploymentsService
   )
 
-
   val continueUrl = s"http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/details/address-lookup/$itsaId"
+  val redirectUrl = "http://testLocation?id=12345"
+
   "initialiseAddressLookupJourney" should {
 
     "return ok (200)" when {
       "the connector returns data" in {
         mockAuthSuccess()
-        when(mockAddressLookupConfig.config(
-          ArgumentMatchers.eq(continueUrl))(ArgumentMatchers.any())).thenReturn(testAddressLookupConfig(continueUrl))
-        mockInitialiseAddressLookup(testAddressLookupConfig(continueUrl))(Right(PostAddressLookupSuccessResponse(Some("http://testLocation?id=12345"))))
+        mockInitialiseAddressLookup(continueUrl, isAgent = false)(
+          Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
+        )
+        mockSaveAddressRedirect(itsaId, redirectUrl)(Right(PostSelfEmploymentsSuccessResponse))
 
         val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(itsaId)(FakeRequest())
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some("http://testLocation?id=12345")
+        redirectLocation(result) mustBe Some(redirectUrl)
       }
     }
     "Throw an internal exception" when {
       "there is an unexpected status failure" in {
         mockAuthSuccess()
-        when(mockAddressLookupConfig.config(
-          ArgumentMatchers.eq(continueUrl))(ArgumentMatchers.any())).thenReturn(testAddressLookupConfig(continueUrl))
-        mockInitialiseAddressLookup(
-          testAddressLookupConfig(continueUrl))(Left(UnexpectedStatusFailure(500)))
+        mockInitialiseAddressLookup(continueUrl, isAgent = false)(
+          Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
 
         val result = intercept[InternalServerException](await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(itsaId)(FakeRequest())))
         result.message mustBe ("[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: 500")

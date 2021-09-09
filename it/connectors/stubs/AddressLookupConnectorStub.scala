@@ -22,6 +22,7 @@ import play.api.libs.json.{JsValue, Json}
 object AddressLookupConnectorStub extends WireMockMethods {
 
   private def addressLookupInitializeUrl = s"/api/v2/init"
+
   private def getAddressDetailsUrl(id: String) = s"/api/v2/confirmed\\?id=$id"
 
   def stubGetAddressLookupDetails(id: String)(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
@@ -32,10 +33,10 @@ object AddressLookupConnectorStub extends WireMockMethods {
   }
 
   def stubInitializeAddressLookup(body: JsValue = Json.obj())(locationHeader: String, responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
-    when (
+    when(
       method = POST,
       uri = addressLookupInitializeUrl,
       body = body
-    ) thenReturn (responseStatus, Map("Location" -> locationHeader), responseBody)
+    ) thenReturn(responseStatus, Map("Location" -> locationHeader), responseBody)
   }
 }
