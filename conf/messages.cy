@@ -55,7 +55,7 @@ business.trade_name.hint                                        = Er enghraifft:
 
 # Business trade name errors
 error.business_trade_name.empty                                 = Nodwch fasnach eich busnes
-error.business_trade_name.maxLength                             = Mae’n rhaid i fasnach y busnes fod yn 160 o gymeriadau neu lai
+error.business_trade_name.maxLength                             = Mae’n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai
 error.business_trade_name.duplicate                             = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
 error.business_trade_name.invalid                               = Mae’n rhaid i fasnach y busnes gynnwys y llythrennau a i z, cysylltnodau, bylchau a chollnodau yn unig
 
@@ -138,7 +138,7 @@ business.agent.trade_name.hint                                  = Er enghraifft:
 
 #Agent Trade Name errors
 error.agent.business_trade_name.empty                           = Nodwch fasnach busnes eich cleient
-error.agent.business_trade_name.maxLength                       = Mae‘n rhaid i fasnach y busnes fod yn 160 o gymeriadau neu lai
+error.agent.business_trade_name.maxLength                       = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai
 error.agent.business_trade_name.invalid                         = Ni all enw‘r busnes gynnwys !, “ “ , * na ?
 error.agent.business_trade_name.duplicate                       = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
 

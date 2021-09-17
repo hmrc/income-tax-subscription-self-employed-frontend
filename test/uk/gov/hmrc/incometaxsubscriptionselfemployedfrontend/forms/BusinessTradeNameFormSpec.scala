@@ -54,7 +54,7 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
     "when testing the validation" should {
 
-      val maxLength = 160
+      val maxLength = 35
 
       val empty = "error.business_trade_name.empty"
       val maxLen = "error.business_trade_name.maxLength"
@@ -94,7 +94,7 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       "the name be max characters and acceptable" in {
         val withinLimitInput = DataMap.businessTradeNameMap("a" * maxLength)
         val withinLimitTest = businessTradeForm().bind(withinLimitInput)
-        withinLimitTest.value mustNot contain(maxLen)
+        withinLimitTest.errors mustNot contain(FormError(businessTradeName, maxLen))
       }
 
       "invalidate a business trade which is in the list of excluded business trade" in {
