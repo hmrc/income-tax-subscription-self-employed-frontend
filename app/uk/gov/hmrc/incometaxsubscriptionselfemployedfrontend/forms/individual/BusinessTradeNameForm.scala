@@ -28,7 +28,7 @@ object BusinessTradeNameForm {
 
   val businessTradeName: String = "businessTradeName"
 
-  val businessTradeNameMaxLength = 160
+  val businessTradeNameMaxLength = 35
 
   val tradeNameEmpty: Constraint[String] = nonEmpty("error.business_trade_name.empty")
   val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.business_trade_name.maxLength")

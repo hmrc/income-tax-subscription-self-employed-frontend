@@ -56,7 +56,7 @@ business.trade_name.hint                                        = For example: p
 
 # Business trade name errors
 error.business_trade_name.empty                                 = Enter the trade of your business
-error.business_trade_name.maxLength                             = Business trade must be 160 characters or fewer
+error.business_trade_name.maxLength                             = Business trade must be 35 characters or fewer
 error.business_trade_name.duplicate                             = You cannot enter the same trade and same business name
 error.business_trade_name.invalid                               = Business trade must only include letters a to z, hyphens, spaces and apostrophes
 
@@ -139,7 +139,7 @@ business.agent.trade_name.hint                                  = For example: p
 
 #Agent Trade Name errors
 error.agent.business_trade_name.empty                           = Enter the trade of your client’s business
-error.agent.business_trade_name.maxLength                       = Business trade must be 160 characters or fewer
+error.agent.business_trade_name.maxLength                       = Business trade must be 35 characters or fewer
 error.agent.business_trade_name.invalid                         = Business trade must only include letters a to z, hyphens, spaces and apostrophes
 error.agent.business_trade_name.duplicate                       = You cannot enter the same trade and same business name
 
