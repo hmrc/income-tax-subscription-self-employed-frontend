@@ -116,13 +116,20 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
     def getErrorSummary: Elements = element.select("#error-summary-display")
 
+    def getErrorSummaryByNewGovUkClass: Elements = element.select(".govuk-error-summary")
+
     def getSubmitButton: Elements = element.select("button[type=submit]")
 
+    def getButtonByClass: String = element.select(s"""[class=govuk-button]""").text()
+
     def getHintText: String = element.select(s"""[class=form-hint]""").text()
+
+    def getHintTextByClass: String = element.select(s"""[class=govuk-hint]""").text()
 
     def getForm: Elements = element.select("form")
 
     def getBackLink: Elements = element.select(s"a[class=link-back]")
+    def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
     def getParagraphNth(index: Int = 0): String = {
       element.select("p").get(index).text()
@@ -198,6 +205,15 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
       element.getErrorSummary.select("h2").attr("id") mustBe "error-summary-heading"
       element.getErrorSummary.select("h2").text mustBe "There is a problem"
       element.getErrorSummary.select("ul > li").text mustBe errors.mkString(" ")
+    }
+
+    def mustHaveErrorSummaryByNewGovUkClass(errors: List[String]): Assertion = {
+      element.getErrorSummaryByNewGovUkClass.attr("role") mustBe "alert"
+      element.getErrorSummaryByNewGovUkClass.attr("aria-labelledby") mustBe "error-summary-title"
+      element.getErrorSummaryByNewGovUkClass.attr("tabindex") mustBe "-1"
+      element.getErrorSummaryByNewGovUkClass.select("h2").attr("id") mustBe "error-summary-title"
+      element.getErrorSummaryByNewGovUkClass.select("h2").text mustBe "There is a problem"
+      element.getErrorSummaryByNewGovUkClass.select("ul > li").text mustBe errors.mkString(" ")
     }
 
     def mustHaveErrorNotificationMessage(error: String): Assertion = {
