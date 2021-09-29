@@ -28,8 +28,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.AddAnotherBusinessForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AddAnotherBusinessModel, No, SelfEmploymentData, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.check_your_answers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.CheckYourAnswers
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -37,18 +36,16 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class BusinessListCYAController @Inject()(authService: AuthService,
+                                          checkYourAnswers: CheckYourAnswers,
                                           incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                           mcc: MessagesControllerComponents)
-                                         (implicit val ec: ExecutionContext,
-                                          val appConfig: AppConfig,
-                                          dateFormatter: ImplicitDateFormatterImpl) extends FrontendController(mcc) with I18nSupport {
+                                         (implicit val appConfig: AppConfig, val ec: ExecutionContext) extends FrontendController(mcc) with I18nSupport {
 
   def view(addAnotherBusinessForm: Form[AddAnotherBusinessModel], businesses: Seq[SelfEmploymentData])(implicit request: Request[AnyContent]): Html = {
-    check_your_answers(
+    checkYourAnswers(
       addAnotherBusinessForm = addAnotherBusinessForm,
       answers = businesses,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.submit(),
-      implicitDateFormatter = dateFormatter
+      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.submit()
     )
   }
 
@@ -56,7 +53,7 @@ class BusinessListCYAController @Inject()(authService: AuthService,
     authService.authorised() {
       incomeTaxSubscriptionConnector.getSelfEmployments[Seq[SelfEmploymentData]](businessesKey).map {
         case Right(Some(businesses)) if businesses.exists(_.isComplete) =>
-          Ok(view(addAnotherBusinessForm(businesses.size, appConfig.limitOnNumberOfBusinesses), businesses.filter(_.isComplete)))
+          Ok(view(addAnotherBusinessForm(businesses.count(_.isComplete), appConfig.limitOnNumberOfBusinesses), businesses.filter(_.isComplete)))
         case Right(_) => Redirect(routes.InitialiseController.initialise())
         case Left(UnexpectedStatusFailure(status)) =>
           throw new InternalServerException(s"[BusinessListCYAController][show] - getSelfEmployments connection failure, status: $status")

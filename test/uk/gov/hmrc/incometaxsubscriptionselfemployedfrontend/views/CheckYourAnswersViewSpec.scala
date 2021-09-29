@@ -18,21 +18,19 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.AddAnotherBusinessForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.check_your_answers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.CheckYourAnswers
 
 class CheckYourAnswersViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
-    val title = "Check your answers"
-    val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
-    val heading: String = title
+    val heading = "Check your answers"
 
     def subHeading(businessNumber: Int): String = s"Business $businessNumber"
 
@@ -63,24 +61,46 @@ class CheckYourAnswersViewSpec extends ViewSpec {
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
+
+  val checkYourAnswers: CheckYourAnswers = app.injector.instanceOf[CheckYourAnswers]
+
   val maxBusinesses: Int = 5
 
   class Setup(addAnotherForm: Form[AddAnotherBusinessModel] = AddAnotherBusinessForm.addAnotherBusinessForm(1, maxBusinesses),
               businesses: Seq[SelfEmploymentData] = Seq(selfEmploymentData("1"))) {
-    val page: HtmlFormat.Appendable = check_your_answers(
+    val page: HtmlFormat.Appendable = checkYourAnswers(
       addAnotherForm,
       businesses,
-      testCall,
-      implicitDateFormatter
-    )(FakeRequest(), implicitly, appConfig)
+      testCall
+    )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
   }
 
+  val testError: FormError = FormError(AddAnotherBusinessForm.addAnotherBusiness, "test error message")
+
   "Check Your Answers" must {
 
-    "have a title" in new Setup {
-      document.title mustBe CheckYourAnswersMessages.title + CheckYourAnswersMessages.titleSuffix
+    "have the correct template details" when {
+      "there is no error" in new TemplateViewTest(
+        view = checkYourAnswers(
+          AddAnotherBusinessForm.addAnotherBusinessForm(1, maxBusinesses),
+          Seq(selfEmploymentData("1")),
+          testCall
+        )(FakeRequest(), implicitly),
+        title = CheckYourAnswersMessages.heading,
+        hasSignOutLink = true
+      )
+      "there is an error" in new TemplateViewTest(
+        view = checkYourAnswers(
+          AddAnotherBusinessForm.addAnotherBusinessForm(1, maxBusinesses).withError(testError),
+          Seq(selfEmploymentData("1")),
+          testCall
+        )(FakeRequest(), implicitly),
+        title = CheckYourAnswersMessages.heading,
+        hasSignOutLink = true,
+        error = Some(testError)
+      )
     }
 
     "have a heading" in new Setup {
@@ -109,7 +129,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           "has a change link with correct content" in new Setup {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectHead("a")
             changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-            changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
+            changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
             changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "1", isEditMode = true).url
           }
         }
@@ -124,7 +144,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           "has a change link" in new Setup {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
             changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-            changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
+            changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
             changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "1", isEditMode = true).url
           }
         }
@@ -139,7 +159,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           "has a change link" in new Setup {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectHead("a")
             changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-            changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
+            changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
             changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1", isEditMode = true).url
           }
         }
@@ -154,7 +174,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
           "has a change link" in new Setup {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
             changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-            changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
+            changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
             changeLink.attr("href") mustBe "test address redirect 1"
           }
         }
@@ -185,7 +205,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
               changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "1", isEditMode = true).url
             }
           }
@@ -200,7 +220,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
               changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "1", isEditMode = true).url
             }
           }
@@ -215,7 +235,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
               changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "1", isEditMode = true).url
             }
           }
@@ -230,7 +250,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
               changeLink.attr("href") mustBe "test address redirect 1"
             }
           }
@@ -259,7 +279,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(1).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
               changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "2", isEditMode = true).url
             }
           }
@@ -274,7 +294,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(2).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
               changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "2", isEditMode = true).url
             }
           }
@@ -289,7 +309,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(3).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
               changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "2", isEditMode = true).url
             }
           }
@@ -304,7 +324,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             "has a change link" in new Setup(businesses = Seq(selfEmploymentData("1"), selfEmploymentData("2"))) {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=visuallyhidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
+              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
               changeLink.attr("href") mustBe "test address redirect 2"
             }
           }
@@ -321,14 +341,14 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     }
 
     "has a heading to add another sole trader business" in new Setup {
-      document.selectHead("legend").getH2Element().text mustBe CheckYourAnswersMessages.addAnotherBusinessHeading
+      document.selectHead("legend").text mustBe CheckYourAnswersMessages.addAnotherBusinessHeading
     }
 
     "have a radioset" which {
       lazy val radioset = new Setup().document.select("fieldset")
 
       "has only two options" in {
-        radioset.select("div.multiple-choice").size() mustBe 2
+        radioset.select("div.govuk-radios__item").size() mustBe 2
       }
 
       "has a yes option" which {
@@ -355,7 +375,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     }
 
     "have a continue button" in new Setup {
-      document.getSubmitButton.text mustBe CheckYourAnswersMessages.continue
+      document.selectHead("button").text mustBe CheckYourAnswersMessages.continue
     }
 
   }
