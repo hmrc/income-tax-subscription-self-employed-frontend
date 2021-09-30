@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping.dateModelMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.NewDateModelMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
 
@@ -54,7 +54,7 @@ object BusinessStartDateForm {
 
   def businessStartDateForm(minStartDate: String, maxStartDate: String): Form[BusinessStartDate] = Form(
     mapping(
-      startDate -> dateModelMapping(errorContext = errorContext).verifying(
+      startDate -> NewDateModelMapping.dateModelMapping(errorContext = errorContext).verifying(
         startBeforeTwoYears(maxStartDate) andThen earliestStartDate(minStartDate)
       )
     )(BusinessStartDate.apply)(BusinessStartDate.unapply)

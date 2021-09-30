@@ -17,10 +17,9 @@
 package controllers
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
-import helpers.{ComponentSpecBase, ViewSpec}
 import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
-import org.jsoup.Jsoup
+import helpers.{ComponentSpecBase, ViewSpec}
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
@@ -55,11 +54,6 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec {
           httpStatus(OK),
           pageTitle("When did your sole trader business start trading?" + titleSuffix)
         )
-
-        Then("should contain language selector")
-        val doc = Jsoup.parse(res.body)
-        doc.selectFirst("""nav[class="hmrc-language-select"]""")
-          .selectOptionally("""a[href="/report-quarterly/income-and-expenses/sign-up/self-employments/language/cymraeg"]""").isDefined mustBe true
       }
     }
 
@@ -73,10 +67,11 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec {
         val res = getBusinessStartDate(businessId)
 
         Then("should return an OK with the BusinessStartDatePage")
+
         res must have(
           httpStatus(OK),
           pageTitle("When did your sole trader business start trading?" + titleSuffix),
-          dateField("startDate", testValidStartDate)
+          dateField("startDate", testValidStartDate, "-")
         )
       }
     }
