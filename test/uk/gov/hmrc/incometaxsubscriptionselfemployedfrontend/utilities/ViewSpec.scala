@@ -116,13 +116,19 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
     def getErrorSummary: Elements = element.select("#error-summary-display")
 
+    def getErrorSummaryByNewGovUkClass: Elements = element.select(".govuk-error-summary")
+
     def getSubmitButton: Elements = element.select("button[type=submit]")
+
+    def getButtonByClass: String = element.select(s"""[class=govuk-button]""").text()
 
     def getHintText: String = element.select(s"""[class=form-hint]""").text()
 
     def getForm: Elements = element.select("form")
 
     def getBackLink: Elements = element.select(s"a[class=link-back]")
+
+    def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
     def getParagraphNth(index: Int = 0): String = {
       element.select("p").get(index).text()
@@ -131,6 +137,8 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
     def getBulletPointNth(index: Int = 0): String = element.select("ul[class=bullets] li").get(index).text()
 
     def getRadioButtonByIndex(index: Int = 0): Element = element.select("div .multiple-choice").get(index)
+
+    def getGovukRadioButtonByIndex(index: Int = 0): Element = element.select(".govuk-radios__item").get(index)
 
     def getSpan(id: String): Elements = element.select(s"""span[id=$id]""")
 
@@ -200,8 +208,21 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
       element.getErrorSummary.select("ul > li").text mustBe errors.mkString(" ")
     }
 
+    def mustHaveErrorSummaryByNewGovUkClass(errors: List[String]): Assertion = {
+      element.getErrorSummaryByNewGovUkClass.attr("role") mustBe "alert"
+      element.getErrorSummaryByNewGovUkClass.attr("aria-labelledby") mustBe "error-summary-title"
+      element.getErrorSummaryByNewGovUkClass.attr("tabindex") mustBe "-1"
+      element.getErrorSummaryByNewGovUkClass.select("h2").attr("id") mustBe "error-summary-title"
+      element.getErrorSummaryByNewGovUkClass.select("h2").text mustBe "There is a problem"
+      element.getErrorSummaryByNewGovUkClass.select("ul > li").text mustBe errors.mkString(" ")
+    }
+
     def mustHaveErrorNotificationMessage(error: String): Assertion = {
       element.selectHead(s"div.error-notification").text mustBe s"Error: $error"
+    }
+
+    def mustHaveGovUkErrorNotificationMessage(error: String): Assertion = {
+      element.selectHead(s".govuk-error-message").text mustBe s"Error: $error"
     }
 
 

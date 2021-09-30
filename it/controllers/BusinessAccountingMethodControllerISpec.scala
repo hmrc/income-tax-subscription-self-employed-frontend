@@ -55,14 +55,15 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod()
 
-          val expectedText = removeHtmlMarkup(messages("business.accounting_method.cash"))
+          val expectedLabel = removeHtmlMarkup(messages("business.accounting_method.cash.label"))
+          val expectedHint = removeHtmlMarkup(messages("business.accounting_method.cash.hint"))
 
           Then("should return an OK with the BusinessAccountingMethodPage")
           res must have(
             httpStatus(OK),
             pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
             elementTextByID(id = "continue-button")("Continue"),
-            radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
+            govukRadioButtonSet(id = "businessAccountingMethod", expectedLabel, expectedHint)
           )
         }
       }
@@ -76,14 +77,15 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod(true)
 
-          val expectedText = removeHtmlMarkup(messages("business.accounting_method.cash"))
+          val expectedLabel = removeHtmlMarkup(messages("business.accounting_method.cash.label"))
+          val expectedHint = removeHtmlMarkup(messages("business.accounting_method.cash.hint"))
 
           Then("should return an OK with the BusinessAccountingMethodPage")
           res must have(
             httpStatus(OK),
             pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
             elementTextByID(id = "continue-button")("Update"),
-            radioButtonSet(id = "businessAccountingMethod", selectedRadioButton = Some(expectedText))
+            govukRadioButtonSet(id = "businessAccountingMethod", expectedLabel, expectedHint)
           )
         }
       }

@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
@@ -27,6 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.Mo
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
 
 class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   with MockIncomeTaxSubscriptionConnector {
@@ -37,7 +41,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "submit" -> TestBusinessAccountingMethodController.submit(isEditMode = false)
   )
 
-  object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
+  private object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
+    mock[BusinessAccountingMethod],
     mockMessagesControllerComponents,
     mockIncomeTaxSubscriptionConnector,
     mockAuthService
@@ -50,35 +55,35 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   "Show" should {
 
     "return ok (200)" when {
-      "the connector returns data" in {
+      "the connector returns data" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(
           Right(Some(testAccountingMethodModel))
         )
-        val result = TestBusinessAccountingMethodController.show(false)(FakeRequest())
+        val result = controller.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
-      "the connector returns no data" in {
+      "the connector returns no data" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Right(None))
-        val result = TestBusinessAccountingMethodController.show(false)(FakeRequest())
+        val result = controller.show(false)(FakeRequest())
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
     }
     "Throw an internal exception" when {
-      "there is an unexpected status failure" in {
+      "there is an unexpected status failure" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show(false)(FakeRequest())))
+        val response = intercept[InternalServerException](await(controller.show(false)(FakeRequest())))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Unexpected status: 500")
       }
 
-      "there is an invalid Json" in {
+      "there is an invalid Json" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(InvalidJson))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController.show(false)(FakeRequest())))
+        val response = intercept[InternalServerException](await(controller.show(false)(FakeRequest())))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Invalid Json")
       }
     }
@@ -90,10 +95,10 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER)" when {
       "the user submits valid data" when {
         "not in edit mode" should {
-          "redirect to sign up front end rerouting page" in {
+          "redirect to sign up front end rerouting page" in withController { controller =>
             mockAuthSuccess()
             mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
-            val result = TestBusinessAccountingMethodController.submit(false)(
+            val result = controller.submit(false)(
               FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
             )
             status(result) mustBe SEE_OTHER
@@ -103,10 +108,10 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         }
 
         "in edit mode" should {
-          "redirect to sign up front end check your answer page" in {
+          "redirect to sign up front end check your answer page" in withController { controller =>
             mockAuthSuccess()
             mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
-            val result = TestBusinessAccountingMethodController.submit(true)(
+            val result = controller.submit(true)(
               FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
             )
             status(result) mustBe SEE_OTHER
@@ -117,10 +122,10 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       }
     }
     "return 400, SEE_OTHER)" when {
-      "the user submits invalid data" in {
+      "the user submits invalid data" in withController { controller =>
         mockAuthSuccess()
         mockSaveSelfEmployments(businessAccountingMethodKey, "invalid")(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController.submit(false)(FakeRequest())
+        val result = controller.submit(false)(FakeRequest())
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
@@ -129,18 +134,33 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "not in edit mode" should {
-      "return a url for the business list CYA page" in {
+      "return a url for the business list CYA page" in withController { controller =>
         mockAuthSuccess()
-        TestBusinessAccountingMethodController.backUrl(false) mustBe routes.BusinessListCYAController.show().url
+        controller.backUrl(false) mustBe routes.BusinessListCYAController.show().url
       }
     }
     "in edit mode" should {
-      "return a url for the sign up front end final CYA page" in {
+      "return a url for the sign up front end final CYA page" in withController { controller =>
         mockAuthSuccess()
-        TestBusinessAccountingMethodController.backUrl(true) mustBe appConfig.subscriptionFrontendFinalCYAController
+        controller.backUrl(true) mustBe appConfig.subscriptionFrontendFinalCYAController
       }
     }
   }
   authorisationTests()
 
+  private def withController(testCode: BusinessAccountingMethodController => Any): Unit = {
+    val businessAccountingMethodView = mock[BusinessAccountingMethod]
+
+    when(businessAccountingMethodView(any(), any(), any(), any())(any(), any(), any()))
+      .thenReturn(HtmlFormat.empty)
+
+    val controller = new BusinessAccountingMethodController(
+      businessAccountingMethodView,
+      mockMessagesControllerComponents,
+      mockIncomeTaxSubscriptionConnector,
+      mockAuthService
+    )
+
+    testCode(controller)
+  }
 }
