@@ -157,6 +157,45 @@ trait CustomMatchers {
       }
     }
 
+  def govukRadioButtonSet(id: String, expectedLabel: String, expectedHint: String): HavePropertyMatcher[WSResponse, String] =
+    new HavePropertyMatcher[WSResponse, String] {
+      def apply(response: WSResponse): HavePropertyMatchResult[String] = {
+        val body = Jsoup.parse(response.body)
+        val radios = body.select(s"input[id^=$id]")
+        val checkedAttr = "checked"
+
+        def labelForSelectedButton(idForSelectedRadio: String) =
+          if (idForSelectedRadio.isEmpty) ""
+          else body.select(s"label[for=$idForSelectedRadio]").text()
+
+        def hintForSelectedButton(idForSelectedRadio: String) =
+          if (idForSelectedRadio.isEmpty) ""
+          else body.select(s"#$idForSelectedRadio-item-hint").text()
+
+        val idForSelectedRadio = radios.select(s"input[checked]").attr("id")
+        val matchCondition =
+          labelForSelectedButton(idForSelectedRadio) == expectedLabel && hintForSelectedButton(idForSelectedRadio) == expectedHint
+
+        HavePropertyMatchResult(
+          matches = matchCondition,
+          propertyName = "radioButton",
+          expectedValue = s"$expectedLabel $expectedHint",
+          actualValue = {
+            val selected = radios.select("input[checked]")
+            selected.size() match {
+              case 0 =>
+                "no radio button is selected"
+              case 1 =>
+                val idForSelectedRadio = selected.attr("id")
+                s"${labelForSelectedButton(idForSelectedRadio)} ${hintForSelectedButton(idForSelectedRadio)}"
+              case _ =>
+                s"multiple radio buttons are selected: [$radios]"
+            }
+          }
+        )
+      }
+    }
+
   def redirectURI(expectedValue: String): HavePropertyMatcher[WSResponse, String] = new HavePropertyMatcher[WSResponse, String] {
     def apply(response: WSResponse): HavePropertyMatchResult[String] = {
       val redirectLocation: Option[String] = response.header("Location")

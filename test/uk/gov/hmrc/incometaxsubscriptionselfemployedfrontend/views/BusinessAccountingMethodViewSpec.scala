@@ -25,7 +25,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_accounting_method
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
 
 class BusinessAccountingMethodViewSpec extends ViewSpec {
   val backUrl: String = testBackUrl
@@ -50,105 +50,109 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     val backLink = "Back"
   }
 
-  class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
-              isEditMode: Boolean = false) {
-    val page: HtmlFormat.Appendable = business_accounting_method(
+  private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
+
+  "Business Accounting Method Page" must {
+
+    "have a title" in {
+      document().title mustBe BusinessAccountingMethodMessages.title + BusinessAccountingMethodMessages.titleSuffix
+    }
+
+    "have a backlink" in {
+      document().getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
+      document().getBackLinkByClass.attr("href") mustBe testBackUrl
+    }
+
+    "have a heading" in {
+      document().getH1Element.text mustBe BusinessAccountingMethodMessages.heading
+    }
+
+    "have a paragraph" in {
+      document().getParagraphNth(2) mustBe BusinessAccountingMethodMessages.line_1
+    }
+
+    "have an accordion summary" in {
+      document().select(".govuk-details__summary-text").text() mustBe BusinessAccountingMethodMessages.accordion
+    }
+
+    "have an accordion heading" in {
+      document().getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
+    }
+
+    "have an accordion bullets list 1" in {
+      document().getBulletPointNth() mustBe BusinessAccountingMethodMessages.accordionBullet_1
+    }
+
+    "have an accordion bullets list 2" in {
+      document().getBulletPointNth(1) mustBe BusinessAccountingMethodMessages.accordionBullet_2
+    }
+
+    //radio button test
+    "have a radio button for cash accounting" in {
+      document().getGovukRadioButtonByIndex().select("#businessAccountingMethod-Cash").size() mustBe 1
+    }
+
+    "have a cash accounting heading for the radio button" in {
+      document().getGovukRadioButtonByIndex().select("label").text() mustBe BusinessAccountingMethodMessages.cash
+    }
+
+    "have the correct description for the cash accounting radio button" in {
+      val startIndex: Int = 16
+      document().getGovukRadioButtonByIndex().select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.cashDescription
+    }
+
+    "have a radio button for standard accounting" in {
+      document().getGovukRadioButtonByIndex(1).select("#businessAccountingMethod-Standard").size() mustBe 1
+    }
+
+    "have a standard accounting heading for the radio button" in {
+      document().getGovukRadioButtonByIndex(1).select("label").text() mustBe BusinessAccountingMethodMessages.accruals
+    }
+
+    "have the correct description for the standard accounting radio button" in {
+      val startIndex: Int = 20
+      document().getGovukRadioButtonByIndex(1).select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.accrualsDescription
+    }
+
+    "have a Form" in {
+      document().getForm.attr("method") mustBe testCall.method
+      document().getForm.attr("action") mustBe testCall.url
+    }
+
+    "have a continue button when it is not in edit mode" in {
+      document().getButtonByClass mustBe BusinessAccountingMethodMessages.continue
+    }
+
+    "have an update button when it is in edit mode" in {
+      document(BusinessAccountingMethodForm.businessAccountingMethodForm, isEditMode = true).getButtonByClass mustBe BusinessAccountingMethodMessages.update
+    }
+
+  }
+
+  "must display empty form error summary when submit with an empty form" in {
+    document(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)).mustHaveErrorSummaryByNewGovUkClass(List[String](emptyError))
+  }
+
+  "must display empty form error message when submit with an empty form" in {
+    document(
+      BusinessAccountingMethodForm
+        .businessAccountingMethodForm
+        .withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)
+    ).mustHaveGovUkErrorNotificationMessage(emptyError)
+  }
+
+  private def page(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean) = {
+    businessAccountingMethodView(
       businessAccountingMethodForm,
       testCall,
       isEditMode,
       testBackUrl
     )(FakeRequest(), implicitly, appConfig)
-
-    val document: Document = Jsoup.parse(page.body)
   }
 
-  "Business Accounting Method Page" must {
-
-    "have a title" in new Setup {
-      document.title mustBe BusinessAccountingMethodMessages.title + BusinessAccountingMethodMessages.titleSuffix
-    }
-
-    "have a backlink" in new Setup {
-      document.getBackLink.text mustBe BusinessAccountingMethodMessages.backLink
-      document.getBackLink.attr("href") mustBe testBackUrl
-    }
-
-    "have a heading" in new Setup {
-      document.getH1Element.text mustBe BusinessAccountingMethodMessages.heading
-    }
-
-    "have a paragraph" in new Setup {
-      document.getParagraphNth(2) mustBe BusinessAccountingMethodMessages.line_1
-    }
-
-    "have an accordion summary" in new Setup {
-      document.select("details summary span.summary").text() mustBe BusinessAccountingMethodMessages.accordion
-    }
-
-    "have an accordion heading" in new Setup {
-      document.getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
-    }
-
-    "have an accordion bullets list 1" in new Setup {
-      document.getBulletPointNth() mustBe BusinessAccountingMethodMessages.accordionBullet_1
-    }
-
-    "have an accordion bullets list 2" in new Setup {
-      document.getBulletPointNth(1) mustBe BusinessAccountingMethodMessages.accordionBullet_2
-    }
-
-    //radio button test
-    "have a radio button for cash accounting" in new Setup {
-      document.getRadioButtonByIndex().select("#businessAccountingMethod-Cash").size() mustBe 1
-    }
-
-    "have a cash accounting heading for the radio button" in new Setup {
-      document.getRadioButtonByIndex().select("label span").text() mustBe BusinessAccountingMethodMessages.cash
-    }
-
-    "have the correct description for the cash accounting radio button" in new Setup {
-      val startIndex: Int = 16
-      document.getRadioButtonByIndex().select("label").text().substring(startIndex) mustBe BusinessAccountingMethodMessages.cashDescription
-    }
-
-    "have a radio button for standard accounting" in new Setup {
-      document.getRadioButtonByIndex(1).select("#businessAccountingMethod-Standard").size() mustBe 1
-    }
-
-    "have a standard accounting heading for the radio button" in new Setup {
-      document.getRadioButtonByIndex(1).select("label span").text() mustBe BusinessAccountingMethodMessages.accruals
-    }
-
-    "have the correct description for the standard accounting radio button" in new Setup {
-      val startIndex: Int = 20
-      document.getRadioButtonByIndex(1).select("label").text().substring(startIndex) mustBe BusinessAccountingMethodMessages.accrualsDescription
-    }
-
-    "have a Form" in new Setup {
-      document.getForm.attr("method") mustBe testCall.method
-      document.getForm.attr("action") mustBe testCall.url
-    }
-
-    "have a continue button when it is not in edit mode" in new Setup {
-      document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.continue
-    }
-
-    "have an update button when it is in edit mode" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm, true) {
-      document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.update
-    }
-
+  private def document(
+                        businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
+                        isEditMode: Boolean = false): Document = {
+    Jsoup.parse(page(businessAccountingMethodForm, isEditMode).body)
   }
-
-  "must display empty form error summary when submit with an empty form" in new Setup(
-    BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)
-  ) {
-    document.mustHaveErrorSummary(List[String](emptyError))
-  }
-
-  "must display empty form error message when submit with an empty form" in new Setup(
-    BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)
-  ) {
-    document.mustHaveErrorNotificationMessage(emptyError)
-  }
-
 }

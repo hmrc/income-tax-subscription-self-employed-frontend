@@ -72,7 +72,11 @@ business.accounting_method.accordion.line_1                     = Gwnaethoch gre
 business.accounting_method.accordion.bullet_1                   = mis Mai 2017, rydych yn defnyddio ‘cyfrifyddu arian parod’
 business.accounting_method.accordion.bullet_2                   = mis Mawrth 2017, rydych yn defnyddio ‘cyfrifyddu safonol’
 business.accounting_method.cash                                 = <span class="heading-small">Cyfrifyddu arian parod</span><br>Rydych yn cofnodi naill ai ar y dyddiad yr ydych yn cael taliad gan eich tenantiaid i mewn i’ch cyfrif banc, neu ar y dyddiad yr ydych yn talu bil, er enghraifft ar gyfer atgyweirio a chynnal a chadw. Mae’r rhan fwyaf o fusnesau bach yn defnyddio’r dull hwn.
+business.accounting_method.cash.label                           = Cyfrifyddu arian parod
+business.accounting_method.cash.hint                            = Rydych yn cofnodi naill ai ar y dyddiad yr ydych yn cael taliad gan eich tenantiaid i mewn i’ch cyfrif banc, neu ar y dyddiad yr ydych yn talu bil, er enghraifft ar gyfer atgyweirio a chynnal a chadw. Mae’r rhan fwyaf o fusnesau bach yn defnyddio’r dull hwn.
 business.accounting_method.accruals                             = <span class="heading-small">Cyfrifyddu safonol</span><br>Rydych yn cofnodi ar y dyddiad yr ydych yn anfon anfoneb at eich tenantiaid, neu’n gofyn am daliad ganddynt, hyd yn oed os nad ydych yn cael nac yn talu unrhyw arian. Rydych yn cofnodi ar y dyddiad yr ydych yn cael anfoneb ar gyfer atgyweirio neu gynnal a chadw. Mae hwn hefyd yn cael ei alw yn ‘cyfrifyddu croniadau’ neu ‘cyfrifyddu traddodiadol’.
+business.accounting_method.accruals.label                       = Cyfrifyddu safonol
+business.accounting_method.accruals.hint                        = Rydych yn cofnodi ar y dyddiad yr ydych yn anfon anfoneb at eich tenantiaid, neu’n gofyn am daliad ganddynt, hyd yn oed os nad ydych yn cael nac yn talu unrhyw arian. Rydych yn cofnodi ar y dyddiad yr ydych yn cael anfoneb ar gyfer atgyweirio neu gynnal a chadw. Mae hwn hefyd yn cael ei alw yn ‘cyfrifyddu croniadau’ neu ‘cyfrifyddu traddodiadol’.
 
 # Check your answers
 check_your_answers.title                                        = Gwiriwch eich atebion
