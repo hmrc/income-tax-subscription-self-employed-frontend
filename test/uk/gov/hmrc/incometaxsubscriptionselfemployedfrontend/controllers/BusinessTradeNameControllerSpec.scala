@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
@@ -26,6 +29,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessTradeName
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService {
@@ -33,16 +37,23 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   val id: String = "testId"
 
   override val controllerName: String = "BusinessTradeNameController"
-  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessTradeNameController.show(id, isEditMode = false),
-    "submit" -> TestBusinessTradeNameController.submit(id, isEditMode = false)
-  )
+  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
 
-  object TestBusinessTradeNameController extends BusinessTradeNameController(
-    mockMessagesControllerComponents,
-    mockMultipleSelfEmploymentsService,
-    mockAuthService
-  )
+  private def withController(testCode: BusinessTradeNameController => Any): Unit = {
+    val businessTradeNameView = mock[BusinessTradeName]
+
+    when(businessTradeNameView(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+    (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
+
+    val controller = new BusinessTradeNameController(
+      mockMessagesControllerComponents,
+      businessTradeNameView,
+      mockMultipleSelfEmploymentsService,
+      mockAuthService
+    )
+
+    testCode(controller)
+  }
 
   def modelToFormData(businessTradeNameModel: BusinessTradeNameModel): Seq[(String, String)] = {
     BusinessTradeNameForm.businessTradeNameValidationForm(Nil).fill(businessTradeNameModel).data.toSeq
@@ -59,75 +70,90 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   "Show" should {
 
     "return ok (200)" when {
-      "the connector returns data" in {
+      "the connector returns data" in withController { controller =>
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
 
-        val result = TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())
+        val result = controller.show(id, isEditMode = false)(FakeRequest())
 
-
-        status(result) mustBe OK
-        contentType(result) mustBe Some("text/html")
-      }
-      "the connector returns data for the current business but with no trade" in {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
-
-        val result = TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())
 
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
     }
+
+    "the connector returns data for the current business but with no trade" in withController { controller => {
+      mockAuthSuccess()
+      mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
+
+
+      val result = controller.show(id, isEditMode = false)(FakeRequest())
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some("text/html")
+    }
+    }
+
     "return see other (303)" when {
-      "the connector returns data for the current business but the name is not present" in {
+      "the connector returns data for the current business but the name is not present" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None))))
 
-        val result = TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())
+
+        val result = controller.show(id, isEditMode = false)(FakeRequest())
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessNameController.show(id).url)
       }
+      }
     }
-    "Throw an internal exception error" when {
-      "the connector returns an error" in {
+
+    "throw an internal exception error" when {
+      "the connector returns an error" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        intercept[InternalServerException](await(TestBusinessTradeNameController.show(id, isEditMode = false)(FakeRequest())))
+
+        intercept[InternalServerException](await(controller.show(id, isEditMode = false)(FakeRequest())))
+      }
       }
     }
+
   }
 
   "Submit - it is not in edit mode" should {
 
     "return 303, SEE_OTHER" when {
-      "the user submits valid data" in {
+      "the user submits valid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
         mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
 
-        val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(
+
+        val result = controller.submit(id, isEditMode = false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
       }
+      }
     }
+
     "return 400, SEE_OTHER)" when {
-      "the user submits invalid data" in {
+      "the user submits invalid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
         mockSaveBusinessTrade(id, testInvalidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
 
-        val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(FakeRequest())
+
+        val result = controller.submit(id, isEditMode = false)(FakeRequest())
 
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
-      "the user submits a trade which causes a duplicate business name/trade combo" in {
+      }
+      "the user submits a trade which causes a duplicate business name/trade combo" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(
           selfEmploymentData.copy(
@@ -141,12 +167,14 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
             businessTradeName = None
           ))))
 
-        val result = TestBusinessTradeNameController.submit("idTwo", isEditMode = false)(
+
+        val result = controller.submit("idTwo", isEditMode = false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(BusinessTradeNameModel("tradeOne")): _*)
         )
 
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
+      }
       }
     }
   }
@@ -154,29 +182,34 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   "Submit - it is in edit mode" should {
 
     s"return a redirect to '${routes.BusinessListCYAController.show().url}" when {
-      "the user submits valid data" in {
+      "the user submits valid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
         mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
 
-        val result = TestBusinessTradeNameController.submit(id, isEditMode = true)(
+
+        val result = controller.submit(id, isEditMode = true)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
       }
-      "the user does not update their trade" in {
+      }
+      "the user does not update their trade" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(
           Right(Seq(selfEmploymentData))
         )
         mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessTradeNameController.submit(id, isEditMode = true)(
+        val result = controller.submit(id, isEditMode = true)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
+
+
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+      }
       }
     }
   }
@@ -184,46 +217,53 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   "Submit - it is not in edit mode" should {
 
     "return a redirect to address look up" when {
-      "the user submits valid data" in {
+      "the user submits valid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
         mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
 
-        val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(
+
+        val result = controller.submit(id, isEditMode = false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
       }
-      "the user does not update their trade" in {
+      }
+      "the user does not update their trade" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(
           Right(Seq(selfEmploymentData))
         )
         mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessTradeNameController.submit(id, isEditMode = false)(
+        val result = controller.submit(id, isEditMode = false)(
           FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
+
+
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+      }
       }
     }
   }
 
   "The back url" when {
     "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
-        TestBusinessTradeNameController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      s"redirect to ${routes.BusinessListCYAController.show().url}" in withController { controller => {
+        controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
       }
-    }
-    "not in edit mode" should {
-      s"redirect to ${routes.BusinessNameController.show(id).url}" in {
-        TestBusinessTradeNameController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
       }
+      "not in edit mode" should {
+        s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller => {
+          controller.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+        }
+        }
+      }
+
+      authorisationTests()
+
     }
   }
-
-  authorisationTests()
-
 }

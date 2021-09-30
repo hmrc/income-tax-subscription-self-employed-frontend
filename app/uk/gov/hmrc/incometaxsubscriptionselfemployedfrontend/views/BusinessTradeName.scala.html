@@ -18,32 +18,32 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm._
 @import uk.gov.hmrc.play.views.html.helpers.form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.main_template
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.ContinueButton
+
+@this(
+    mainTemplate: PrincipalMainTemplate,
+    form: FormWithCSRF,
+    textInputHelper: TextInputHelper,
+    continueButton: ContinueButton
+)
 
 @(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call,isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = messages("business.trade_name.title"), form = Some(businessTradeNameForm)) {
+@mainTemplate(title = messages("business.trade_name.title"), optForm = Some(businessTradeNameForm), backLink = Some(backUrl)) {
 
-    @back_link(backUrl)
-
-    @summaryErrorHelper(businessTradeNameForm)
 
     @form(action = postAction) {
-        @inputHelper(
+        @textInputHelper(
             field = businessTradeNameForm(businessTradeName),
             label = messages("business.trade_name.heading"),
-            formHint = Some(messages("business.trade_name.hint")),
-            maxLength = Some(businessTradeNameMaxLength),
-            parentForm = businessTradeNameForm
+            hint = Some(messages("business.trade_name.hint")),
+            classes = Some("govuk-!-width-one-half")
+
         )
 
-        @if(isEditMode) {
-            @continueButton(Some(messages("base.update")))
-        } else {
-            @continueButton()
-        }
+    @continueButton(isEditMode = isEditMode)
     }
 }

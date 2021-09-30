@@ -124,9 +124,12 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
 
     def getHintText: String = element.select(s"""[class=form-hint]""").text()
 
+    def getHintTextByClass: String = element.select(s"""[class=govuk-hint]""").text()
+
     def getForm: Elements = element.select("form")
 
     def getBackLink: Elements = element.select(s"a[class=link-back]")
+    def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
     def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
