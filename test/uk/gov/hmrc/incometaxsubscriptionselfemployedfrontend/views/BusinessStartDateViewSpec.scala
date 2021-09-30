@@ -18,6 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -25,7 +26,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_start_date
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
 
 class BusinessStartDateViewSpec extends ViewSpec {
 
@@ -45,9 +46,11 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val taxYearEnd: Int = 2020
   val testError: FormError = FormError("startDate", "testError")
 
+  val businessStartDateView : DateOfCommencement = app.injector.instanceOf[DateOfCommencement]
+
   class Setup(isEditMode: Boolean = false,
               businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError")) {
-    val page: HtmlFormat.Appendable = business_start_date(
+    val page: HtmlFormat.Appendable = businessStartDateView(
       businessStartDateForm,
       testCall,
       isEditMode,
@@ -67,31 +70,43 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.getH1Element.text mustBe BusinessStartDateMessages.heading
     }
     "have a paragraph" in new Setup {
-      document.select("article p").text mustBe BusinessStartDateMessages.line_1
+      document.select("p[class=govuk-body]").text mustBe BusinessStartDateMessages.line_1
     }
     "have a Form" in new Setup {
       document.getForm.attr("method") mustBe testCall.method
       document.getForm.attr("action") mustBe testCall.url
     }
     "have a fieldset with dateInputs" in new Setup {
-      document.mustHaveDateField("startDate", BusinessStartDateMessages.heading, BusinessStartDateMessages.exampleStartDate)
+      val fieldset = document.selectFirst("fieldset")
+      fieldset.select("div[id=startDate]").attr("class") mustBe "govuk-date-input"
+      fieldset.attr("aria-describedby") mustBe s"startDate-hint"
+      fieldset.selectHead("legend").text mustBe BusinessStartDateMessages.heading
+      fieldset.selectHead("div[id=startDate-hint]").text mustBe BusinessStartDateMessages.exampleStartDate
+      fieldset.select("div label[for=startDate-dateDay]").text() mustBe "Day"
+      fieldset.select("div label[for=startDate-dateMonth]").text() mustBe "Month"
+      fieldset.select("div label[for=startDate-dateYear]").text() mustBe "Year"
     }
+
     "have a continue button when not in edit mode" in new Setup {
-      document.getSubmitButton.text mustBe BusinessStartDateMessages.continue
+      document.select("button[id=continue-button]").text mustBe BusinessStartDateMessages.continue
     }
+
     "have update button when in edit mode" in new Setup(true) {
-      document.getSubmitButton.text mustBe BusinessStartDateMessages.update
+      document.select("button[id=continue-button]").text mustBe BusinessStartDateMessages.update
     }
+
     "have a backlink " in new Setup {
-      document.getBackLink.text mustBe BusinessStartDateMessages.backLink
-      document.getBackLink.attr("href") mustBe testBackUrl
+      private val backLink: Elements = document.select("a[id=back-link]")
+      backLink.text mustBe BusinessStartDateMessages.backLink
+      backLink.attr("href") mustBe testBackUrl
     }
     "must display form error on page" in new Setup(
       isEditMode = false,
       businessStartDateForm = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").withError(testError)
     ) {
-      document.mustHaveErrorSummary(List[String](testError.message))
-      document.mustHaveDateField("startDate", BusinessStartDateMessages.heading, BusinessStartDateMessages.exampleStartDate, Some(testError.message))
+      document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+      document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
+      document.select("span[id=startDate-Error]").text() mustBe "Error: testError"
     }
 
   }

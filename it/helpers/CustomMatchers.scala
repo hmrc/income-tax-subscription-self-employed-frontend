@@ -87,14 +87,14 @@ trait CustomMatchers {
       }
     }
 
-  def dateField(id: String, expectedValue: DateModel): HavePropertyMatcher[WSResponse, String] =
+  def dateField(id: String, expectedValue: DateModel, separator: String = "."): HavePropertyMatcher[WSResponse, String] =
     new HavePropertyMatcher[WSResponse, String] {
 
       def apply(response: WSResponse): HavePropertyMatchResult[String] = {
         val body = Jsoup.parse(response.body)
-        val day = body.getElementById(id + ".dateDay").`val`()
-        val month = body.getElementById(id + ".dateMonth").`val`()
-        val year = body.getElementById(id + ".dateYear").`val`()
+        val day = body.getElementById(id + separator + "dateDay").`val`()
+        val month = body.getElementById(id + separator + "dateMonth").`val`()
+        val year = body.getElementById(id + separator + "dateYear").`val`()
         HavePropertyMatchResult(
           day == expectedValue.day && month == expectedValue.month && year == expectedValue.year,
           "day",

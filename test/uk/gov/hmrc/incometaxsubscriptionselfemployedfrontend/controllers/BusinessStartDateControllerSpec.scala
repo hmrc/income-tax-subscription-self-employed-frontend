@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
@@ -26,22 +29,30 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testBusinessStartDateModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService {
 
   val id: String = "testId"
 
+  val businessStartDate = mock[DateOfCommencement]
+  when(businessStartDate(any(), any(), any(), any())(any(), any(), any()))
+    .thenReturn(HtmlFormat.empty)
+
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessStartDateController.show(id, isEditMode = false),
-    "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false)
+  "show" -> TestBusinessStartDateController.show(id, isEditMode = false),
+  "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false)
   )
+
 
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
-    mockAuthService, mockLanguageUtils
+    mockAuthService,
+    mockLanguageUtils,
+    businessStartDate
   )
 
   def modelToFormData(businessStartDateModel: BusinessStartDate): Seq[(String, String)] = {

@@ -18,7 +18,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.t
 
 import play.api.data.validation._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.AddAnotherBusinessForm.addAnotherBusinessForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{AddAnotherBusinessForm, BusinessAccountingMethodForm}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil._
@@ -34,8 +33,8 @@ object DataMap {
 
     def DataMap(elems: (String, String)*): DataMap = Map(elems: _*)
 
-    def date(prefix: String)(day: String, month: String, year: String): DataMap =
-      Map(s"$prefix.${DateModelMapping.day}" -> day, s"$prefix.${DateModelMapping.month}" -> month, s"$prefix.${DateModelMapping.year}" -> year)
+    def date(prefix: String, separator: String = ".")(day: String, month: String, year: String): DataMap =
+      Map(s"$prefix$separator${DateModelMapping.day}" -> day, s"$prefix$separator${DateModelMapping.month}" -> month, s"$prefix$separator${DateModelMapping.year}" -> year)
 
     val emptyDate: String => DataMap = (prefix: String) => date(prefix)("", "", "")
 
