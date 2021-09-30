@@ -131,8 +131,6 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
     def getBackLink: Elements = element.select(s"a[class=link-back]")
     def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
-    def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
-
     def getParagraphNth(index: Int = 0): String = {
       element.select("p").get(index).text()
     }
