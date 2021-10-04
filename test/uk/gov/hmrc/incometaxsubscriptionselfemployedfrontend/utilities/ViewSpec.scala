@@ -175,6 +175,31 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
       element.select(s"label[for=$name]").text() mustBe label
     }
 
+    def mustHaveTextInput(name: String,
+                          label: String,
+                          hint: Option[String] = None,
+                          error: Option[FormError] = None,
+                          autoComplete: Option[String] = None): Assertion = {
+      val textInput: Element = element.selectHead(s"input[name=$name]")
+      val textInputLabel: Element = element.selectHead(s"label[for=$name]")
+
+      textInputLabel.text mustBe label
+
+      autoComplete.foreach(value => textInput.attr("autocomplete") mustBe value)
+
+      hint.foreach { value =>
+        element.selectHead(s"#$name-hint").text mustBe value
+        textInput.attr("aria-describedby").contains(s"$name-hint") mustBe true
+      }
+
+      error.foreach { value =>
+        element.selectHead(s"#${value.key}-error").text mustBe s"Error: ${value.message}"
+        textInput.attr("aria-describedby").contains(s"${value.key}-error") mustBe true
+      }
+
+      textInput.attr("type") mustBe "text"
+    }
+
     def listErrorMessages(errors: List[String]): Assertion = {
       errors.zipWithIndex.map {
         case (error, index) => element.selectHead(s"div.error-notification:nth-of-type(${index + 1})").text mustBe s"Error: $error"
