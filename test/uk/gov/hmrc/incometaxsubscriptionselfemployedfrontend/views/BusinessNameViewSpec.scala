@@ -25,7 +25,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.business_name
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
 
 class BusinessNameViewSpec extends ViewSpec {
 
@@ -44,9 +44,10 @@ class BusinessNameViewSpec extends ViewSpec {
   val action: Call = testCall
   val testError: FormError = FormError("businessName", "testError")
   val testError2: FormError = FormError("businessName", "testError2")
+  val businessName = app.injector.instanceOf[BusinessName]
 
   class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
-    val page: HtmlFormat.Appendable = business_name(
+    val page: HtmlFormat.Appendable = businessName(
       businessNameForm,
       testCall,
       isEditMode = isEditMode,
@@ -57,43 +58,73 @@ class BusinessNameViewSpec extends ViewSpec {
   }
 
   "Business Name Page" must {
-    "have a title" in new Setup() {
-      document.title mustBe BusinessNameMessages.title + BusinessNameMessages.titleSuffix
+    "have the correct template" when {
+      "there is an error" in new TemplateViewTest(
+        view = businessName(
+          businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError),
+          testCall,
+          isEditMode = false,
+          testBackUrl
+        )(FakeRequest(), implicitly, appConfig),
+        title = BusinessNameMessages.title,
+        backLink = Some(testBackUrl),
+        hasSignOutLink = true,
+        error = Some(testError)
+      )
+
+      "there is no error" in new TemplateViewTest(
+        view = businessName(
+          businessNameForm = BusinessNameForm.businessNameValidationForm(Nil),
+          testCall,
+          isEditMode = false,
+          testBackUrl
+        )(FakeRequest(), implicitly, appConfig),
+        title = BusinessNameMessages.title,
+        backLink = Some(testBackUrl),
+        hasSignOutLink = true,
+        error = None
+      )
     }
+
     "have a heading" in new Setup() {
       document.getH1Element.text mustBe BusinessNameMessages.heading
 
     }
-
-    "have a paragraph" in new Setup() {
-      document.select("article p").text mustBe BusinessNameMessages.line1
-
-    }
-
 
     "have a Form" in new Setup() {
       document.getForm.attr("method") mustBe testCall.method
       document.getForm.attr("action") mustBe testCall.url
     }
 
+    "have a text input field with hint" when {
+      "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError)){
+        document.mustHaveTextInput(
+          name = BusinessNameForm.businessName,
+          label = BusinessNameMessages.heading,
+          hint = Some(BusinessNameMessages.line1),
+          error= Some(testError)
+        )
+      }
+
+      "there is no error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil)){
+        document.mustHaveTextInput(
+          name = BusinessNameForm.businessName,
+          label = BusinessNameMessages.heading,
+          hint = Some(BusinessNameMessages.line1),
+          error= None
+        )
+      }
+
+    }
+
     "have a continue button when not in edit mode" in new Setup() {
-      document.getSubmitButton.text mustBe BusinessNameMessages.continue
+      document.selectHead("button").text mustBe BusinessNameMessages.continue
     }
 
     "have update button when in edit mode" in new Setup(true) {
-      document.getSubmitButton.text mustBe BusinessNameMessages.update
+      document.selectHead("button").text mustBe BusinessNameMessages.update
     }
 
-  }
-
-  "have a backlink" in new Setup() {
-    document.getBackLink.text mustBe BusinessNameMessages.backLink
-    document.getBackLink.attr("href") mustBe testBackUrl
-  }
-
-  "must display form error on page" in new Setup(false, BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
-    document.mustHaveErrorSummary(List[String](testError.message))
-    document.mustHaveErrorNotificationMessage(testError.message)
   }
 
 }
