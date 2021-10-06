@@ -23,6 +23,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
@@ -32,15 +34,20 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService {
+  with MockMultipleSelfEmploymentsService with FeatureSwitching {
 
   val id: String = "testId"
 
   override val controllerName: String = "BusinessNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
 
+  override def beforeEach(): Unit = {
+    disable(SaveAndRetrieve)
+    super.beforeEach()
+  }
+
   val businessName = mock[BusinessName]
-  when(businessName(any(), any(), any(), any())(any(), any(), any()))
+  when(businessName(any(), any(), any(), any(), any())(any(), any(), any()))
     .thenReturn(HtmlFormat.empty)
 
   object TestBusinessNameController extends BusinessNameController(
@@ -183,9 +190,34 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       }
     }
 
+    "when save and retrieve feature switch is enabled" should {
+      s"return $SEE_OTHER and redirect to business start date page" when {
+        "the users answer is updated correctly" in {
+          enable(SaveAndRetrieve)
+          mockAuthSuccess()
+          mockFetchAllBusinesses(
+            Right(Seq(selfEmploymentData))
+          )
+          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          val result = TestBusinessNameController.submit(id, isEditMode = true)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
+
+        }
+      }
+    }
+
   }
 
   "The back url" when {
+    "save and retrieve feature switch is enabled" should {
+      s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
+        enable(SaveAndRetrieve)
+        TestBusinessNameController.backUrl(id, isEditMode = false) must include("/report-quarterly/income-and-expenses/sign-up/details/income-receive")
+      }
+    }
     "in edit mode" should {
       s"redirect to ${routes.BusinessListCYAController.show().url}" in {
         TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url

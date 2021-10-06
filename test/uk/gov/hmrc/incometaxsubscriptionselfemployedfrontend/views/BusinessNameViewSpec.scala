@@ -35,6 +35,7 @@ class BusinessNameViewSpec extends ViewSpec {
     val heading: String = title
     val continue = "Continue"
     val update = "Update"
+    val saveAndContinueButton = "Save and continue"
     val backLink = "Back"
     val line1 = "This is the business name you used to register for Self Assessment. If your business does not have a separate name, enter your own first and last name."
     val emptyError = "Enter your name or the name of your business"
@@ -46,12 +47,13 @@ class BusinessNameViewSpec extends ViewSpec {
   val testError2: FormError = FormError("businessName", "testError2")
   val businessName = app.injector.instanceOf[BusinessName]
 
-  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
+  class Setup(isSaveAndRetrieve: Boolean = false, isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = businessName(
       businessNameForm,
       testCall,
       isEditMode = isEditMode,
-      testBackUrl
+      testBackUrl,
+      isSaveAndRetrieve = isSaveAndRetrieve
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
@@ -64,7 +66,8 @@ class BusinessNameViewSpec extends ViewSpec {
           businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError),
           testCall,
           isEditMode = false,
-          testBackUrl
+          testBackUrl,
+          isSaveAndRetrieve = false
         )(FakeRequest(), implicitly, appConfig),
         title = BusinessNameMessages.title,
         backLink = Some(testBackUrl),
@@ -77,7 +80,8 @@ class BusinessNameViewSpec extends ViewSpec {
           businessNameForm = BusinessNameForm.businessNameValidationForm(Nil),
           testCall,
           isEditMode = false,
-          testBackUrl
+          testBackUrl,
+          isSaveAndRetrieve = false
         )(FakeRequest(), implicitly, appConfig),
         title = BusinessNameMessages.title,
         backLink = Some(testBackUrl),
@@ -97,33 +101,38 @@ class BusinessNameViewSpec extends ViewSpec {
     }
 
     "have a text input field with hint" when {
-      "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError)){
+      "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
         document.mustHaveTextInput(
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
           hint = Some(BusinessNameMessages.line1),
-          error= Some(testError)
+          error = Some(testError)
         )
       }
 
-      "there is no error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil)){
+      "there is no error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil)) {
         document.mustHaveTextInput(
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
           hint = Some(BusinessNameMessages.line1),
-          error= None
+          error = None
         )
       }
 
     }
 
-    "have a continue button when not in edit mode" in new Setup() {
-      document.selectHead("button").text mustBe BusinessNameMessages.continue
+    "have a continue button when not in edit mode" in new Setup(isEditMode = false) {
+      document.selectHead(".govuk-button").text mustBe BusinessNameMessages.continue
     }
 
-    "have update button when in edit mode" in new Setup(true) {
+    "have update button when in edit mode" in new Setup(isEditMode = true) {
       document.selectHead("button").text mustBe BusinessNameMessages.update
     }
+
+    "have a save and continue button when in save and retrieve feature switch is enabled" in new Setup(isSaveAndRetrieve = true) {
+      document.selectHead("button").text mustBe BusinessNameMessages.saveAndContinueButton
+    }
+
 
   }
 

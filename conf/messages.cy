@@ -197,3 +197,6 @@ agent_base.title.error                                          = Gwall: {0} - D
 ## Language switching
 language-selector.change-to-language                            = Change the language to English
 language-selector.nav-label                                     = Cyfnewidydd iaith
+
+#Save and retrieve
+save-and-continue-button                                        = Cadw ac yn eich blaen
