@@ -23,9 +23,16 @@ import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, SelfEmploymentData}
 
-class BusinessNameControllerISpec extends ComponentSpecBase {
+class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    disable(SaveAndRetrieve)
+    super.beforeEach()
+  }
 
   val businessId: String = "testId"
 
@@ -120,6 +127,24 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         )
       }
     }
+
+    "save and retrieve feature switch is enabled" when {
+      "the form data is valid and is stored successfully and redirected to Business Start Date page" in {
+        Given("I setup the Wiremock stubs")
+        enable(SaveAndRetrieve)
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+
+        When("Post /details/business-name is called")
+        val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
+
+        Then("should return a SEE_OTHER")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(BusinessStartDateUri)
+        )
+      }
+    }
   }
 }
-

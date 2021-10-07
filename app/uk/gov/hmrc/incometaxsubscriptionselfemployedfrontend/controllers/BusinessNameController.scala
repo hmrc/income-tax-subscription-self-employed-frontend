@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
@@ -30,6 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthServi
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -37,14 +39,16 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                        businessName: BusinessName,
                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                        authService: AuthService)
-                                      (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) with I18nSupport {
+                                      (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
+  with I18nSupport with FeatureSwitching {
 
-  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)(implicit request: Request[AnyContent]): Html =
     businessName(
       businessNameForm = businessNameForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
-      backUrl = backUrl(id, isEditMode)
+      backUrl = backUrl(id, isEditMode),
+      isSaveAndRetrieve = isSaveAndRetrieve
     )
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
@@ -53,7 +57,12 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
         val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
         val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
         Future.successful(Ok(
-          view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode)
+          if (isEnabled(SaveAndRetrieve)) {
+            view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode, isSaveAndRetrieve = true)
+          }
+          else {
+            view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode, isSaveAndRetrieve = false)
+          }
         ))
       }
     }
@@ -65,14 +74,20 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
         val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
         businessNameValidationForm(excludedBusinessNames).bindFromRequest.fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode, isEnabled(SaveAndRetrieve)))),
           businessNameData =>
             multipleSelfEmploymentsService.saveBusinessName(id, businessNameData).map(_ =>
-              if (isEditMode) {
-                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
-              } else {
-                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id))
+              if (isEnabled(SaveAndRetrieve)) {
+                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id))
               }
+              else {
+                if (isEditMode) {
+                  Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
+                } else {
+                  Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id))
+                }
+              }
+
             )
         )
       }
@@ -95,9 +110,16 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
   }
 
   def backUrl(id: String, isEditMode: Boolean): String =
-    if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
-    } else {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id).url
+    if (isEnabled(SaveAndRetrieve)) {
+      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
     }
+
+    else {
+      if (isEditMode) {
+        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
+      } else {
+        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id).url
+      }
+    }
+
 }
