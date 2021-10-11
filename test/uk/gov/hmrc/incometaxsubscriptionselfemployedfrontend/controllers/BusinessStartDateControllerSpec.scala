@@ -23,6 +23,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
@@ -32,12 +34,17 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService {
+  with MockMultipleSelfEmploymentsService with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    disable(SaveAndRetrieve)
+    super.beforeEach()
+  }
 
   val id: String = "testId"
 
   val businessStartDate = mock[DateOfCommencement]
-  when(businessStartDate(any(), any(), any(), any())(any(), any(), any()))
+  when(businessStartDate(any(), any(), any(), any(), any())(any(), any(), any()))
     .thenReturn(HtmlFormat.empty)
 
   override val controllerName: String = "BusinessStartDateController"
@@ -114,6 +121,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     "when it is in edit mode" should {
       "return 303, SEE_OTHER)" when {
         "the user submits valid data" in {
+          isEnabled(SaveAndRetrieve)
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
           val result = TestBusinessStartDateController.submit(id, isEditMode = true)(
@@ -121,6 +129,20 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url)
+        }
+      }
+    }
+    "when it is in SaveAndRetrieve mode" should {
+      "return 303, SEE_OTHER)" when {
+        "the user submits valid data" in {
+          enable(SaveAndRetrieve)
+          mockAuthSuccess()
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id).url)
         }
       }
     }
@@ -139,12 +161,18 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   "The back url" should {
     "go to the check your answers page" when {
       "in edit mode" in {
-        TestBusinessStartDateController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
       }
+    }
+    "go to the business name page" when{
+        "in SaveAndRetrieve mode" in {
+          enable(SaveAndRetrieve)
+          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+        }
     }
     "go to the income source page" when {
       "not in edit mode" in {
-        TestBusinessStartDateController.backUrl(isEditMode = false) must include("/report-quarterly/income-and-expenses/sign-up/details/income-receive")
+        TestBusinessStartDateController.backUrl(id, isEditMode = false) must include("/report-quarterly/income-and-expenses/sign-up/details/income-receive")
       }
     }
   }

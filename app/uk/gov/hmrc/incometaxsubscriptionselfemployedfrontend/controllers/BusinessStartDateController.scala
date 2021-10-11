@@ -31,6 +31,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitD
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,16 +45,16 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             val languageUtils: LanguageUtils,
                                             businessStartDateView: DateOfCommencement)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
-  with I18nSupport with ImplicitDateFormatter {
+  with I18nSupport with ImplicitDateFormatter with FeatureSwitching {
 
-  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
+  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)
           (implicit request: Request[AnyContent]): Html = {
-
     businessStartDateView(
       businessStartDateForm = businessStartDateForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
-      backUrl = backUrl(isEditMode)
+      isSaveAndRetrieve = isEnabled(SaveAndRetrieve),
+      backUrl = backUrl(id, isEditMode)
     )
   }
 
@@ -60,7 +62,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       multipleSelfEmploymentsService.fetchBusinessStartDate(id).map {
-        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
+        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode, isEnabled(SaveAndRetrieve)))
         case Left(error) => throw new InternalServerException(error.toString)
       }
     }
@@ -71,11 +73,14 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     authService.authorised() {
       form.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest(view(formWithErrors, id, isEditMode)))
+          Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isEnabled(SaveAndRetrieve))))
         },
         businessStartDateData =>
           multipleSelfEmploymentsService.saveBusinessStartDate(id, businessStartDateData).map(_ =>
-            if (isEditMode) {
+            if (isEnabled(SaveAndRetrieve)) {
+              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id))
+            }
+            else if (isEditMode) {
               Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
             } else {
               Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id))
@@ -85,8 +90,11 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(isEditMode: Boolean): String = {
-    if (isEditMode) {
+  def backUrl(id: String, isEditMode: Boolean): String = {
+    if(isEnabled(SaveAndRetrieve)){
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
+    }
+    else if (isEditMode) {
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
     } else {
       appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"

@@ -18,21 +18,18 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.ContinueButton
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.DateHelper
 
 @this(
 mainTemplate: PrincipalMainTemplate,
 continueButton: ContinueButton,
+buttonHelper: ButtonHelper,
 dateHelper: DateHelper,
 form: FormWithCSRF
 )
-@(businessStartDateForm: Form[BusinessStartDate], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
-
-@inputContent = {
-    <p>@messages("business.start_date.line_1")</p>
-}
+@(businessStartDateForm: Form[BusinessStartDate], postAction: Call, isEditMode: Boolean, isSaveAndRetrieve: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = messages("business.start_date.title"), optForm = Some(businessStartDateForm), backLink = Some(backUrl)) {
 
@@ -48,7 +45,10 @@ form: FormWithCSRF
             isPageHeading = false
         )
 
-        @if(isEditMode) {
+        @if(isSaveAndRetrieve) {
+            @buttonHelper(buttonText = messages("save-and-continue-button"))
+            @buttonHelper(classes=Some("govuk-button govuk-button--secondary"), messages("save-and-come-back-later"), href=Some(appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"))
+        } else if(isEditMode) {
             @continueButton(Some(messages("base.update")))
         } else {
             @continueButton()
