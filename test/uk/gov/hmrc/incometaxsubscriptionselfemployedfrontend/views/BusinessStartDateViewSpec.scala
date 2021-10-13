@@ -23,6 +23,8 @@ import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
@@ -39,6 +41,8 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val continue = "Continue"
     val backLink = "Back"
     val update = "Update"
+    val saveAndContinue = "Save and continue"
+    val saveAndComeBack = "Save and come back later"
   }
 
   val backUrl: String = testBackUrl
@@ -49,11 +53,13 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val businessStartDateView : DateOfCommencement = app.injector.instanceOf[DateOfCommencement]
 
   class Setup(isEditMode: Boolean = false,
+              isSaveAndRetrieve: Boolean = false,
               businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError")) {
     val page: HtmlFormat.Appendable = businessStartDateView(
       businessStartDateForm,
       testCall,
       isEditMode,
+      isSaveAndRetrieve = isSaveAndRetrieve,
       testBackUrl
     )(FakeRequest(), implicitly, appConfig)
 
@@ -93,6 +99,14 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
     "have update button when in edit mode" in new Setup(true) {
       document.select("button[id=continue-button]").text mustBe BusinessStartDateMessages.update
+    }
+
+    "have a continue button with alternate text when in SaveAndRetrieve mode" in new Setup(false, true) {
+      document.select("button").text mustBe BusinessStartDateMessages.saveAndContinue
+    }
+
+    "have a SaveAndComeBack button when in SaveAndRetrieve mode" in new Setup(false, true) {
+      document.select(s"a[href=${appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"}]").text mustBe BusinessStartDateMessages.saveAndComeBack
     }
 
     "have a backlink " in new Setup {

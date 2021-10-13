@@ -200,3 +200,4 @@ language-selector.nav-label                                     = Cyfnewidydd ia
 
 #Save and retrieve
 save-and-continue-button                                        = Cadw ac yn eich blaen
+save-and-come-back-later                                        = Cadw a dod yn ôl yn nes ymlaen

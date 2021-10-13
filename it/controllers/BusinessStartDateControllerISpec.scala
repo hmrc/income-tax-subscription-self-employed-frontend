@@ -24,10 +24,17 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 import java.time.LocalDate
 
-class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec {
+class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    disable(SaveAndRetrieve)
+    super.beforeEach()
+  }
 
   val businessId: String = "testId"
 
@@ -130,6 +137,29 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec {
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(BusinessListCYAUri)
+        )
+      }
+    }
+
+    "in SaveAndRetrieve mode" when {
+      "the form data is valid and connector stores it successfully and is redirected to businessTradeName" in {
+        Given("I setup the Wiremock stubs")
+        enable(SaveAndRetrieve)
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessesKey)(
+          responseStatus = OK,
+          responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
+        )
+        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+
+        When("POST /business-start-date is called")
+        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
+
+
+        Then("Should return a SEE_OTHER with a redirect location of check your answers")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(BusinessTradeNameUri)
         )
       }
     }
