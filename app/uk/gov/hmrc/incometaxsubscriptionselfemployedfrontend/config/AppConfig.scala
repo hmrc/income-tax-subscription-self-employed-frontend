@@ -35,7 +35,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val incomeTaxSubscriptionSelfEmployedFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-self-employed-frontend.url")
   lazy val feedbackUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/feedback"
   lazy val howDoYouReceiveYourIncomeUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
+  lazy val whatIncomeSourceToSignUpUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/details/income-source"
   lazy val subscriptionFrontendRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/routing"
+  lazy val taskListUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/task-list"
   lazy val subscriptionFrontendFinalCYAController: String = incomeTaxSubscriptionFrontendBaseUrl + "/check-your-answers"
   lazy val subscriptionFrontendClientRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/routing"
   lazy val subscriptionFrontendProgressSavedUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"

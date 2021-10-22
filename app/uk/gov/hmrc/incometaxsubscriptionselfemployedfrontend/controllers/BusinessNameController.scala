@@ -42,6 +42,8 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                       (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
   with I18nSupport with FeatureSwitching {
 
+  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
+
   def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)(implicit request: Request[AnyContent]): Html =
     businessName(
       businessNameForm = businessNameForm,
@@ -109,17 +111,14 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean): String =
-    if (isEnabled(SaveAndRetrieve)) {
-      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
+  def backUrl(id: String, isEditMode: Boolean): String = {
+    (isEditMode, isSaveAndRetrieve) match {
+      // TODO: change following URL to the new Sole Trader - Check your answers Page
+      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
+      case (false, true) => appConfig.whatIncomeSourceToSignUpUrl
+      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
+      case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id).url
     }
-
-    else {
-      if (isEditMode) {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
-      } else {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id).url
-      }
-    }
+  }
 
 }
