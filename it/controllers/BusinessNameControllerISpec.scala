@@ -142,7 +142,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
         Then("should return a SEE_OTHER")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(BusinessStartDateUri)
+          redirectURI(BusinessStartDateUri),
+
         )
       }
     }

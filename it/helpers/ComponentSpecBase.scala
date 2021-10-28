@@ -173,6 +173,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getInitialise: WSResponse = get(s"/details")
+
   def getBusinessName(id: String): WSResponse = get(s"/details/business-name?id=$id")
 
   def submitBusinessName(id: String, inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {
