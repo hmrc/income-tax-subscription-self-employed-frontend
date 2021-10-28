@@ -17,7 +17,9 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 
 import java.util.UUID
+import javax.inject.Singleton
 
+@Singleton
 class UUIDGenerator {
   def generateId: String = UUID.randomUUID().toString
 }

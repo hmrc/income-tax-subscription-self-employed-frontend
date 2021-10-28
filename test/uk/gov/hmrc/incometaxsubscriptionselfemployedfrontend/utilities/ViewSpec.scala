@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
-import org.scalatest.{Assertion, MustMatchers, WordSpec}
+import org.scalatest.{Assertion, BeforeAndAfterEach, MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
@@ -31,7 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
 import scala.collection.JavaConversions._
 
-trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite {
+trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with BeforeAndAfterEach {
 
   implicit val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 

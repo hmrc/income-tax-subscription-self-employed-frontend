@@ -26,9 +26,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents,
                                                authService: AuthService,
                                                addressLookupConnector: AddressLookupConnector,

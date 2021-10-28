@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.i18n.MessagesApi
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 
 import scala.concurrent.Future
 
+@Singleton
 class ErrorHandler @Inject()(val appConfig: AppConfig,
                              val messagesApi: MessagesApi,
                              val config: Configuration,

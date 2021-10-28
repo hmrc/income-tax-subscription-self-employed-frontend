@@ -19,8 +19,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{JsObject, Json}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
 
   //scalastyle:off

@@ -17,8 +17,7 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import java.util.UUID
-
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
@@ -26,9 +25,9 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents, authService: AuthService)
                                     (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
-
 
   val initialise: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {

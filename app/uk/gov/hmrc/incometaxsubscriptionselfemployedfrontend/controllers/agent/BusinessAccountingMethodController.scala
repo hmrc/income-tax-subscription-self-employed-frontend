@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
@@ -34,7 +33,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.bu
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
-
 
 @Singleton
 class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerComponents,

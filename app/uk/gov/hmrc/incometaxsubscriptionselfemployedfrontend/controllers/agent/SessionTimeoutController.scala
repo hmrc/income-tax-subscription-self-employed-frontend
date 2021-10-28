@@ -26,8 +26,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class
-SessionTimeoutController @Inject()(mcc: MessagesControllerComponents, val config: Configuration, val env: Environment)
+class SessionTimeoutController @Inject()(mcc: MessagesControllerComponents, val config: Configuration, val env: Environment)
                                         (implicit appConfig: AppConfig) extends FrontendController(mcc) with AuthRedirects {
 
   val keepAlive: Action[AnyContent] = Action.async { implicit request =>

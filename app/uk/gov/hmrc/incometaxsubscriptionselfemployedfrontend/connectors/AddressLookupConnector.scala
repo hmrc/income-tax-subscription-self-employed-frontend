@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
-import play.api.i18n.Lang
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.{AddressLookupConfig, AppConfig}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.GetAddressLookupDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupResponse
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class AddressLookupConnector @Inject()(appConfig: AppConfig,
                                        addressLookupConfig: AddressLookupConfig,
                                        http: HttpClient)(implicit ec: ExecutionContext) {
