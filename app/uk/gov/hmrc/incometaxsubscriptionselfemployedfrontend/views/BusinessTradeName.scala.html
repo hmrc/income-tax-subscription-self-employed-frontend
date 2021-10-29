@@ -16,26 +16,30 @@
 
 @import play.api.data.Form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm._
-@import uk.gov.hmrc.play.views.html.helpers.form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.ContinueButton
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
 
 @this(
-    mainTemplate: PrincipalMainTemplate,
-    form: FormWithCSRF,
-    textInputHelper: TextInputHelper,
-    continueButton: ContinueButton
+        mainTemplate: PrincipalMainTemplate,
+        form: FormWithCSRF,
+        textInputHelper: TextInputHelper,
+        continueButton: ContinueButton,
+        saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+        featureSwitches: FeatureSwitchingImpl
 )
 
 @(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call,isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = messages("business.trade_name.title"), optForm = Some(businessTradeNameForm), backLink = Some(backUrl)) {
 
-
     @form(action = postAction) {
+
         @textInputHelper(
             field = businessTradeNameForm(businessTradeName),
             label = messages("business.trade_name.heading"),
@@ -44,6 +48,11 @@
 
         )
 
-    @continueButton(isEditMode = isEditMode)
+        @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
+            @saveAndContinueButtonHelper()
+        } else {
+            @continueButton(isEditMode = isEditMode)
+        }
+
     }
 }

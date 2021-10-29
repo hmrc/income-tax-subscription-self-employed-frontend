@@ -38,6 +38,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val subscriptionFrontendRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/routing"
   lazy val subscriptionFrontendFinalCYAController: String = incomeTaxSubscriptionFrontendBaseUrl + "/check-your-answers"
   lazy val subscriptionFrontendClientRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/routing"
+  lazy val subscriptionFrontendProgressSavedUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
   lazy val limitOnNumberOfBusinesses: Int = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
   lazy val addressLookupUrl: String = servicesConfig.baseUrl("address-lookup-frontend")

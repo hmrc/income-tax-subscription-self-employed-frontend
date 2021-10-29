@@ -24,9 +24,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents, authService: AuthService, uuidGen: UUIDGenerator)
                                     (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) with FeatureSwitching {
 

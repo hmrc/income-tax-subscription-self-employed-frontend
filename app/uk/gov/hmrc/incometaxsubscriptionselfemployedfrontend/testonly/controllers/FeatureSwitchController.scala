@@ -25,9 +25,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.testonly.views.html.FeatureSwitchView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 
+@Singleton
 class FeatureSwitchController @Inject()(featureSwitchView: FeatureSwitchView)
                                        (implicit mcc: MessagesControllerComponents,
                                         val appConfig: AppConfig)

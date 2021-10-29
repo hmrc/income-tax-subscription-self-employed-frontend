@@ -22,6 +22,9 @@ import play.api.mvc._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 
+import javax.inject.Singleton
+
+@Singleton
 class AgentLanguageSwitchController @Inject()(appConfig: AppConfig,
                                               languageUtils: LanguageUtils,
                                               controllerComponents: ControllerComponents)

@@ -17,17 +17,24 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
 import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessTradeName
 
-class BusinessTradeNameViewSpec extends ViewSpec {
+class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(SaveAndRetrieve)
+  }
 
   val businessTradeName: BusinessTradeName = app.injector.instanceOf[BusinessTradeName]
 
@@ -39,6 +46,8 @@ class BusinessTradeNameViewSpec extends ViewSpec {
     val continue = "Continue"
     val update = "Update"
     val backLink = "Back"
+    val saveAndContinue = "Save and continue"
+    val saveAndComeBackLater = "Save and come back later"
   }
 
   val backUrl: String = testBackUrl
@@ -47,8 +56,11 @@ class BusinessTradeNameViewSpec extends ViewSpec {
   val testError: FormError = FormError("businessTradeName", "testError")
   val id: String = "testId"
 
-  class Setup(isEditMode: Boolean = false,
+  class Setup(isEditMode: Boolean = false, saveAndRetrieveEnabled: Boolean = false,
               businessTradeNameForm: Form[BusinessTradeNameModel] = BusinessTradeNameForm.businessTradeNameValidationForm(Nil)) {
+
+    if(saveAndRetrieveEnabled) enable(SaveAndRetrieve)
+
     val page: HtmlFormat.Appendable = businessTradeName(
       businessTradeNameForm,
       testCall,
@@ -83,12 +95,24 @@ class BusinessTradeNameViewSpec extends ViewSpec {
     "have update button when in edit mode" in new Setup(true) {
       document.getButtonByClass mustBe BusinessTradeNameMessages.update
     }
+    "have a save and continue button" when {
+      "the save and retrieve feature switch is enabled" in new Setup(false, true) {
+        document.selectHead("button").text mustBe BusinessTradeNameMessages.saveAndContinue
+      }
+    }
+    "have a save and come back later link" when {
+      "the save and retrieve feature switch is enabled" in new Setup(false, true) {
+        val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
+        saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
+        saveAndComeBackLink.attr("href") mustBe appConfig.subscriptionFrontendProgressSavedUrl
+      }
+    }
     "have a backlink " in new Setup {
       document.getBackLinkByClass.text mustBe BusinessTradeNameMessages.backLink
       document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
     "must display form error on page along with textInput and hintText" in
-      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
+      new Setup(false, false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
         document.mustHaveErrorSummaryByNewGovUkClass(List[String](testError.message))
         document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
         document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText

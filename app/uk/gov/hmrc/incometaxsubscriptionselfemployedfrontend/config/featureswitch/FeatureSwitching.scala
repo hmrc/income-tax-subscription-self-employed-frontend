@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch
 
+import javax.inject.Singleton
+
 trait FeatureSwitching {
+
   val FEATURE_SWITCH_ON = "true"
   val FEATURE_SWITCH_OFF = "false"
 
@@ -28,4 +31,8 @@ trait FeatureSwitching {
 
   def disable(featureSwitch: FeatureSwitch): Unit =
     sys.props += featureSwitch.name -> FEATURE_SWITCH_OFF
+
 }
+
+@Singleton
+class FeatureSwitchingImpl extends FeatureSwitching
