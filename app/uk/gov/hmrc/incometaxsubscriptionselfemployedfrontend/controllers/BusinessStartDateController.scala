@@ -22,6 +22,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
@@ -31,8 +33,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitD
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,6 +46,8 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             businessStartDateView: DateOfCommencement)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
   with I18nSupport with ImplicitDateFormatter with FeatureSwitching {
+
+  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
 
   def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)
           (implicit request: Request[AnyContent]): Html = {
@@ -90,14 +92,13 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
+
   def backUrl(id: String, isEditMode: Boolean): String = {
-    if(isEnabled(SaveAndRetrieve)){
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
-    }
-    else if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
-    } else {
-      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
+    (isEditMode, isSaveAndRetrieve) match {
+      case (true, true) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/task-list"
+      case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
+      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
+      case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
     }
   }
 

@@ -158,21 +158,31 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     }
   }
 
-  "The back url" should {
-    "go to the check your answers page" when {
-      "in edit mode" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+  "The back url" when {
+    "in edit mode" when {
+      "save and retrieve feature switch is enabled" should {
+        s"redirect to task list page" in {
+          enable(SaveAndRetrieve)
+          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/task-list"
+        }
+      }
+      "save and retrieve feature switch is disabled" should {
+        "redirect to business check your answer page" in {
+          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        }
       }
     }
-    "go to the business name page" when{
-        "in SaveAndRetrieve mode" in {
+    "not in edit mode" when {
+      "save and retrieve feature switch is enabled" should {
+        "redirect to business name page" in {
           enable(SaveAndRetrieve)
-          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
         }
-    }
-    "go to the income source page" when {
-      "not in edit mode" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = false) must include("/report-quarterly/income-and-expenses/sign-up/details/income-receive")
+      }
+      "save and retrieve feature switch is disabled" should {
+        "redirect to business start date page" in {
+          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
+        }
       }
     }
   }

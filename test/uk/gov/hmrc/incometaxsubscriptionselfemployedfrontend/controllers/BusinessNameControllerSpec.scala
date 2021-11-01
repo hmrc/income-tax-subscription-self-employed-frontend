@@ -212,20 +212,30 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" when {
-    "save and retrieve feature switch is enabled" should {
-      s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
-        enable(SaveAndRetrieve)
-        TestBusinessNameController.backUrl(id, isEditMode = false) must include("/report-quarterly/income-and-expenses/sign-up/details/income-receive")
+    "in edit mode" when {
+      "save and retrieve feature switch is enabled" should {
+        s"redirect to task list page" in {
+          enable(SaveAndRetrieve)
+          TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        }
+      }
+      "save and retrieve feature switch is disabled" should {
+        "redirect to business check your answer page" in {
+          TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        }
       }
     }
-    "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
-        TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+    "not in edit mode" when {
+      "save and retrieve feature switch is enabled" should {
+        "redirect to add business page" in {
+          enable(SaveAndRetrieve)
+          TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-source"
+        }
       }
-    }
-    "not in edit mode" should {
-      s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
-        TestBusinessNameController.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
+      "save and retrieve feature switch is disabled" should {
+        "redirect to business start date page" in {
+          TestBusinessNameController.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
+        }
       }
     }
   }
