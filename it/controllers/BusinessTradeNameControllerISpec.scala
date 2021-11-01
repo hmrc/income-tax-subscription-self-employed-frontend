@@ -23,9 +23,16 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, DateModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
-class BusinessTradeNameControllerISpec extends ComponentSpecBase {
+class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    disable(SaveAndRetrieve)
+    super.beforeEach()
+  }
 
   val businessId: String = "testId"
 
@@ -100,20 +107,45 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
     "not in edit mode" when {
-      "the form data is valid and connector stores it successfully" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-        stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+      "save and retrieve feature switch is enabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Business Address Look Up page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            enable(SaveAndRetrieve)
+            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
-        When("POST /details/business-trade is called")
-        val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
+            When("POST /details/business-trade is called")
+            val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
 
-        Then("Should return a SEE_OTHER")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(businessAddressInitialiseUri(businessId))
-        )
+            Then("Should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(businessAddressInitialiseUri(businessId))
+            )
+          }
+        }
+      }
+
+      "save and retrieve feature switch is disabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Business Address Look Up page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+
+            When("POST /details/business-trade is called")
+            val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
+
+            Then("Should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(businessAddressInitialiseUri(businessId))
+            )
+          }
+        }
       }
 
       "the form data is valid but is a duplicate submission" in {
@@ -152,21 +184,46 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
 
     }
     "in edit mode" when {
-      "the form data is valid and connector stores it successfully" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
-        stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+      "save and retrieve feature switch is enabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Self-employment Check Your Answer page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            enable(SaveAndRetrieve)
+            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
+            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
-        When("POST /details/business-trade is called")
-        val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testValidBusinessTradeNameModel))
+            When("POST /details/business-trade is called")
+            val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testValidBusinessTradeNameModel))
 
-        Then(s"Should return a $SEE_OTHER with a redirect location of check your answers")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(businessAddressInitialiseUri(businessId))
-        )
+            Then(s"Should return a $SEE_OTHER with a redirect location of check your answers")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessCYAUri)
+            )
+          }
+        }
       }
+      "save and retrieve feature switch is disabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Business Check Your Answer page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
+            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+
+            When("POST /details/business-trade is called")
+            val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testValidBusinessTradeNameModel))
+
+            Then(s"Should return a $SEE_OTHER with a redirect location of check your answers")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessListCYAUri)
+            )
+          }
+        }
+      }
+
     }
   }
 }

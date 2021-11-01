@@ -78,15 +78,15 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isEnabled(SaveAndRetrieve))))
         },
         businessStartDateData =>
-          multipleSelfEmploymentsService.saveBusinessStartDate(id, businessStartDateData).map(_ =>
-            if (isEnabled(SaveAndRetrieve)) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id))
+          multipleSelfEmploymentsService.saveBusinessStartDate(id, businessStartDateData).map(_ => {
+            val call = (isEditMode, isSaveAndRetrieve) match {
+              case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
+              case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
+              case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show()
+              case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id)
             }
-            else if (isEditMode) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show())
-            } else {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id))
-            }
+            Redirect(call)
+          }
           )
       )
     }
@@ -95,7 +95,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def backUrl(id: String, isEditMode: Boolean): String = {
     (isEditMode, isSaveAndRetrieve) match {
-      case (true, true) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/task-list"
+      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url
       case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
       case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
       case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"

@@ -190,7 +190,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getBusinessTradeName(id: String): WSResponse = get(s"/details/business-trade?id=$id")
 
   def submitBusinessTradeName(id: String, inEditMode: Boolean, request: Option[BusinessTradeNameModel]): WSResponse = {
-    val uri = s"/details/business-trade?id=$id&editMode=$inEditMode"
+    val uri = s"/details/business-trade?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
