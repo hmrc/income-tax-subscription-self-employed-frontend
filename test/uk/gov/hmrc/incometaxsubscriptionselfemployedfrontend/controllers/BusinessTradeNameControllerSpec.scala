@@ -23,6 +23,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
@@ -32,7 +34,12 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessTradeName
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService {
+  with MockMultipleSelfEmploymentsService with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(SaveAndRetrieve)
+  }
 
   val id: String = "testId"
 
@@ -255,15 +262,24 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
       }
       }
-      "not in edit mode" should {
-        s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller => {
-          controller.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+      "not in edit mode" when {
+        "save and retrive is enabled" should {
+          s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller =>
+            enable(SaveAndRetrieve)
+            controller.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
+          }
         }
+
+        "save and retrive is disabled" should {
+          s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller =>
+            controller.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+          }
         }
       }
 
-      authorisationTests()
-
     }
   }
+
+  authorisationTests()
+
 }
