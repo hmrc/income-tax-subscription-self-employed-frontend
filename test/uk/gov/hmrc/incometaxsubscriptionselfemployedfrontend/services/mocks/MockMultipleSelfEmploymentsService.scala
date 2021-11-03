@@ -58,6 +58,11 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
       .thenReturn(Future.successful(response))
   }
 
+  def mockFetchBusiness(businessId: String)(response: Either[GetSelfEmploymentsFailure, Option[SelfEmploymentData]]): Unit = {
+    when(mockMultipleSelfEmploymentsService.fetchBusiness(ArgumentMatchers.eq(businessId))(ArgumentMatchers.any()))
+      .thenReturn(Future.successful(response))
+  }
+
   def mockSaveBusinessStartDate(businessId: String, businessStartDate: BusinessStartDate)
                                (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
     when(
@@ -107,4 +112,14 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
       )(ArgumentMatchers.any())
     ).thenReturn(Future.successful(response))
   }
+
+  def mockConfirmBusiness(businessId: String)
+                         (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+    when(
+      mockMultipleSelfEmploymentsService.confirmBusiness(
+        ArgumentMatchers.eq(businessId)
+      )(ArgumentMatchers.any())
+    ).thenReturn(Future.successful(response))
+  }
+
 }

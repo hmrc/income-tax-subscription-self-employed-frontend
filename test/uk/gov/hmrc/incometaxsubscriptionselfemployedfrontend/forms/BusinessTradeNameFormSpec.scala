@@ -35,6 +35,7 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   def testSelfEmploymentData(id: String, businessName: String, businessTrade: String): SelfEmploymentData = SelfEmploymentData(
     id,
+    confirmed = false,
     Some(BusinessStartDate(DateModel("1", "1", "1"))),
     Some(BusinessNameModel(businessName)),
     Some(BusinessTradeNameModel(businessTrade))

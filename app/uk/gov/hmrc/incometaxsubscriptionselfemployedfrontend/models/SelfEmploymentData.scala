@@ -20,6 +20,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 import play.api.libs.json._
 
 case class SelfEmploymentData(id: String,
+                              confirmed: Boolean = false,
                               businessStartDate: Option[BusinessStartDate] = None,
                               businessName: Option[BusinessNameModel] = None,
                               businessTradeName: Option[BusinessTradeNameModel] = None,
