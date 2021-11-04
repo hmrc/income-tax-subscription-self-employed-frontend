@@ -80,19 +80,45 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-name" when {
     "not in edit mode" when {
-      "the form data is valid and is stored successfully" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+      "save and retrieve feature switch is enabled" when {
+        "the form data is valid and is stored successfully" should {
+          "redirect to Business Start Date page " in {
+            enable(SaveAndRetrieve)
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-        When("Post /details/business-name is called")
-        val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
+            When("Post /details/business-name is called")
+            val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
 
-        Then("should return a SEE_OTHER")
-        res must have(
-          httpStatus(SEE_OTHER)
-        )
+            Then("should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessStartDateUri)
+            )
+          }
+        }
+      }
+
+      "save and retrieve feature switch is disabled" when {
+        "the form data is valid and is stored successfully" should {
+          "redirect to Business Trade Name page " in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+
+            When("Post /details/business-name is called")
+            val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
+
+            Then("should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessTradeNameUri)
+            )
+          }
+        }
       }
 
       "the form data is invalid" in {
@@ -110,42 +136,50 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
         )
       }
     }
+
     "in edit mode" when {
-      "the form data is valid and is stored successfully and redirected to Check Your Answers" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+      "save and retrieve feature switch is enabled" when {
+        "the form data is valid and is stored successfully" should {
+          " redirect to Self-employment Check Your Answers" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            enable(SaveAndRetrieve)
+            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-        When("Post /details/business-name is called")
-        val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
+            When("Post /details/business-name is called")
+            val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
 
-        Then("should return a SEE_OTHER")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(BusinessListCYAUri)
-        )
+            Then("should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessCYAUri)
+            )
+          }
+        }
       }
+
+      "save and retrieve feature switch is disabled" when {
+        "the form data is valid and is stored successfully" should {
+          " redirect to Business Check Your Answers" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+
+            When("Post /details/business-name is called")
+            val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
+
+            Then("should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessListCYAUri)
+            )
+          }
+        }
+      }
+
     }
 
-    "save and retrieve feature switch is enabled" when {
-      "the form data is valid and is stored successfully and redirected to Business Start Date page" in {
-        Given("I setup the Wiremock stubs")
-        enable(SaveAndRetrieve)
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
-
-        When("Post /details/business-name is called")
-        val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
-
-        Then("should return a SEE_OTHER")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(BusinessStartDateUri),
-
-        )
-      }
-    }
   }
 }

@@ -36,12 +36,12 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.Business
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with FeatureSwitching {
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(SaveAndRetrieve)
-  }
-
   val id: String = "testId"
+
+  override def beforeEach(): Unit = {
+    disable(SaveAndRetrieve)
+    super.beforeEach()
+  }
 
   override val controllerName: String = "BusinessTradeNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
@@ -128,22 +128,46 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   }
 
-  "Submit - it is not in edit mode" should {
+  "Submit - it is not in edit mode" when {
 
-    "return 303, SEE_OTHER" when {
-      "the user submits valid data" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+    "save and retrieve feature switch is enabled" should {
+
+      "return 303, SEE_OTHER and redirect to Business Address Look Up Page" when {
+        "the user submits valid data" in withController { controller => {
+          enable(SaveAndRetrieve)
+          mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
 
 
-        val result = controller.submit(id, isEditMode = false)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
+          val result = controller.submit(id, isEditMode = false)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        }
+        }
       }
+    }
+
+    "save and retrieve feature switch is disabled" should {
+
+      "return 303, SEE_OTHER and redirect to Business Address Look Up Page" when {
+        "the user submits valid data" in withController { controller => {
+          mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+
+
+          val result = controller.submit(id, isEditMode = false)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        }
+        }
       }
     }
 
@@ -186,81 +210,80 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
     }
   }
 
-  "Submit - it is in edit mode" should {
+  "Submit - it is in edit mode" when {
 
-    s"return a redirect to '${routes.BusinessListCYAController.show().url}" when {
-      "the user submits valid data" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+    "save and retrieve feature switch is enabled" should {
 
-
-        val result = controller.submit(id, isEditMode = true)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
-      }
-      }
-      "the user does not update their trade" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData))
-        )
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = controller.submit(id, isEditMode = true)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
+      s"return a redirect to Self-employment Check Your Answer page" when {
+        "the user submits valid data" in withController { controller => {
+          enable(SaveAndRetrieve)
+          mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
 
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
-      }
+          val result = controller.submit(id, isEditMode = true)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id).url)
+        }
+        }
       }
     }
-  }
 
-  "Submit - it is not in edit mode" should {
+    "save and retrieve feature switch is disabled" should {
 
-    "return a redirect to address look up" when {
-      "the user submits valid data" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+      s"return a redirect to '${routes.BusinessListCYAController.show().url}" when {
+        "the user submits valid data" in withController { controller => {
+          mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
 
 
-        val result = controller.submit(id, isEditMode = false)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
+          val result = controller.submit(id, isEditMode = true)(
+            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        }
+        }
       }
-      }
-      "the user does not update their trade" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData))
-        )
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
-        val result = controller.submit(id, isEditMode = false)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
+    }
+
+    "the user does not update their trade" in withController { controller => {
+      mockAuthSuccess()
+      mockFetchAllBusinesses(
+        Right(Seq(selfEmploymentData))
+      )
+      mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+      val result = controller.submit(id, isEditMode = true)(
+        FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+      )
 
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
-      }
-      }
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+    }
     }
   }
 
   "The back url" when {
-    "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show().url}" in withController { controller => {
-        controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+    "in edit mode" when {
+      "save and retrieve is enabled" should {
+        s"redirect to ${routes.SelfEmployedCYAController.show(id).url}" in withController { controller => {
+          enable(SaveAndRetrieve)
+          controller.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id).url
+        }
+        }
       }
+      "save and retrieve is disabled" should {
+        s"redirect to ${routes.BusinessListCYAController.show().url}" in withController { controller => {
+          controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        }
+        }
       }
       "not in edit mode" when {
         "save and retrieve is enabled" should {

@@ -23,9 +23,9 @@ import helpers.{ComponentSpecBase, ViewSpec}
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel, SelfEmploymentData}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel, SelfEmploymentData}
 
 import java.time.LocalDate
 
@@ -87,20 +87,45 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-start-date" when {
     "not in edit mode" when {
-      "the form data is valid and connector stores it successfully" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+      "save and retrieve feature switch is enabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Business Trade Name page" in {
+            Given("I setup the Wiremock stubs")
+            enable(SaveAndRetrieve)
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-        When("POST /business-start-date is called")
-        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
+            When("POST /business-start-date is called")
+            val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
 
-        Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(BusinessNameUri)
-        )
+            Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessTradeNameUri)
+            )
+          }
+        }
+      }
+
+      "save and retrieve feature switch is disabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Business Name page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+
+            When("POST /business-start-date is called")
+            val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
+
+            Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessNameUri)
+            )
+          }
+        }
       }
 
       "the form data is invalid" in {
@@ -120,49 +145,54 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
     }
 
     "in edit mode" when {
-      "the form data is valid and connector stores it successfully" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(
-          responseStatus = OK,
-          responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
-        )
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+      "save and retrieve feature switch is enabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Self-employment Check Your Answer page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            enable(SaveAndRetrieve)
+            stubGetSelfEmployments(businessesKey)(
+              responseStatus = OK,
+              responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
+            )
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-        When("POST /business-start-date is called")
-        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId, inEditMode = true)
+            When("POST /business-start-date is called")
+            val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId, inEditMode = true)
 
 
-        Then("Should return a SEE_OTHER with a redirect location of check your answers")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(BusinessListCYAUri)
-        )
+            Then("Should return a SEE_OTHER with a redirect location of check your answers")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessCYAUri)
+            )
+          }
+        }
       }
-    }
+      "save and retrieve feature switch is disabled" when {
+        "the form data is valid and connector stores it successfully" should {
+          "redirect to Business Check Your Answer page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSelfEmployments(businessesKey)(
+              responseStatus = OK,
+              responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
+            )
+            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
 
-    "in SaveAndRetrieve mode" when {
-      "the form data is valid and connector stores it successfully and is redirected to businessTradeName" in {
-        Given("I setup the Wiremock stubs")
-        enable(SaveAndRetrieve)
-        stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(
-          responseStatus = OK,
-          responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
-        )
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
-
-        When("POST /business-start-date is called")
-        val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
+            When("POST /business-start-date is called")
+            val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId, inEditMode = true)
 
 
-        Then("Should return a SEE_OTHER with a redirect location of check your answers")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(BusinessTradeNameUri)
-        )
+            Then("Should return a SEE_OTHER with a redirect location of check your answers")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessListCYAUri)
+            )
+          }
+        }
       }
+
     }
   }
 }
-
