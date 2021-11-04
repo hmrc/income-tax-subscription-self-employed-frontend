@@ -77,11 +77,22 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     saveData(businessId, _.copy(addressRedirect = Some(addressRedirect)))
   }
 
+  def confirmBusiness(businessId: String)(implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
+    saveData(businessId, _.copy(confirmed = true))
+  }
+
   def fetchAllBusinesses(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Seq[SelfEmploymentData]]] = {
     incomeTaxSubscriptionConnector.getSelfEmployments[Seq[SelfEmploymentData]](businessesKey) map {
       case Right(Some(data)) => Right(data)
       case Right(None) => Right(Seq.empty[SelfEmploymentData])
       case Left(error) => Left(error)
+    }
+  }
+
+  def fetchBusiness(id: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[SelfEmploymentData]]] = {
+    fetchAllBusinesses.map {
+      case Left(value) => Left(value)
+      case Right(value) => Right(value.find(_.id == id))
     }
   }
 
@@ -99,7 +110,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     def updateBusinessList(businesses: Seq[SelfEmploymentData]): Seq[SelfEmploymentData] = {
       if (businesses.exists(_.id == businessId)) {
         businesses map {
-          case business if business.id == businessId => businessUpdate(business)
+          case business if business.id == businessId => businessUpdate(business).copy(confirmed = false)
           case business => business
         }
       } else {

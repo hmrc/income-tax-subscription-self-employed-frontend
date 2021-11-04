@@ -263,14 +263,14 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       }
       }
       "not in edit mode" when {
-        "save and retrive is enabled" should {
-          s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller =>
+        "save and retrieve is enabled" should {
+          s"redirect to ${routes.BusinessStartDateController.show(id).url}" in withController { controller =>
             enable(SaveAndRetrieve)
             controller.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
           }
         }
 
-        "save and retrive is disabled" should {
+        "save and retrieve is disabled" should {
           s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller =>
             controller.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
           }

@@ -15,6 +15,7 @@ base.change                                                     = Change
 base.update                                                     = Update
 base.yes                                                        = Yes
 base.no                                                         = No
+base.incomplete                                                 = Incomplete
 
 error-notification.prefix                                       = Error:
 
@@ -201,3 +202,23 @@ language-selector.nav-label                                     = Language switc
 #Save and retrieve
 save-and-continue-button                                        = Save and continue
 save-and-come-back-later                                        = Save and come back later
+
+#Self Employed CYA
+self_employed_cya.trading_start_date                            = Business trading start date
+self_employed_cya.trading_start_date.change                     = Change Business trading start date
+self_employed_cya.trading_start_date.add                        = Add Business trading start date
+self_employed_cya.business_name                                 = Business name
+self_employed_cya.business_name.change                          = Change Business name
+self_employed_cya.business_name.add                             = Add Business name
+self_employed_cya.business_trade                                = Type of trade
+self_employed_cya.business_trade.change                         = Change type of trade
+self_employed_cya.business_trade.add                            = Add type of trade
+self_employed_cya.business_address                              = Business address
+self_employed_cya.business_address.change                       = Change Business address
+self_employed_cya.business_address.add                          = Add Business address
+self_employed_cya.accounting_method                             = Accounting method for sole trader income
+self_employed_cya.accounting_method.change                      = Change Accounting method for sole trader income
+self_employed_cya.accounting_method.add                         = Add Accounting method for sole trader income
+self_employed_cya.accounting_method.cash                        = Cash accounting
+self_employed_cya.accounting_method.accruals                    = Standard accounting
+self_employed_cya.heading                                       = Check your details

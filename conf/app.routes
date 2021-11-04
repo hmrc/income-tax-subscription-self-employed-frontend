@@ -25,6 +25,9 @@ POST       /details/business-list               uk.gov.hmrc.incometaxsubscriptio
 
 GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.RemoveBusinessController.show(id: String)
 
+GET        /details/business-check-your-answers uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-check-your-answers uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SelfEmployedCYAController.submit(id: String)
+
 GET        /address-lookup-initialise/:itsaId   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.initialiseAddressLookupJourney(itsaId: String)
 GET        /details/address-lookup/:itsaId      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.addressLookupRedirect(itsaId: String, id: Option[String] ?= None)
 

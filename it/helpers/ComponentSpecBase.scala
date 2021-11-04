@@ -256,6 +256,12 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getBusinessCheckYourAnswers(id: String, isEditMode: Boolean): WSResponse = get(s"/details/business-check-your-answers?id=$id,isEditMode=$isEditMode")
+
+  def submitBusinessCheckYourAnswers(id: String): WSResponse = {
+    post(s"/details/business-check-your-answers?id=$id")(Map.empty)
+  }
+
   def getClientCheckYourAnswers(id: String): WSResponse = get(s"/client/details/business-list?id=$id")
 
   def submitClientCheckYourAnswers(request: Option[AddAnotherBusinessModel],
