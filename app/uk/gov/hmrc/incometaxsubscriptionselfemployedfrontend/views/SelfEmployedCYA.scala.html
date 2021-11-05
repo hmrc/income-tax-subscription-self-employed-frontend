@@ -25,6 +25,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.RadioHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney
 
 @this(
   mainTemplate: PrincipalMainTemplate,
@@ -86,14 +87,24 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@businessAddress(businessAddress: Option[BusinessAddressModel], addressChangeLink: Option[String]) = @{
+@businessAddress(businessAddress: Option[BusinessAddressModel], addressChangeLink: Option[String], businessId: String) = @{
     val question: String = messages("self_employed_cya.business_address")
     val answer: Option[String] = businessAddress.map(_.address.toString)
-    val changeLink: Option[ChangeLink] = addressChangeLink.map { addressChangeUrl =>
-        ChangeLink(
-            url = addressChangeUrl,
-            hiddenContent = if(answer.isDefined) messages("self_employed_cya.business_address.change") else messages("self_employed_cya.business_address.add")
-        )
+
+    val changeLink = if(addressChangeLink.isEmpty) {
+        val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId).url
+            Some(ChangeLink(
+                    url = changeUrl,
+                    hiddenContent = if(answer.isDefined) messages("self_employed_cya.business_address.change") else messages("self_employed_cya.business_address.add")
+                )
+            )
+    } else {
+        addressChangeLink.map { addressChangeUrl =>
+            ChangeLink(
+                url = addressChangeUrl,
+                hiddenContent = if(answer.isDefined) messages("self_employed_cya.business_address.change") else messages("self_employed_cya.business_address.add")
+            )
+        }
     }
     summaryRow(question, answer, changeLink)
 }
@@ -120,7 +131,7 @@
     @businessName(business.businessName, business.id)
     @tradingStartDate(business.businessStartDate, business.id)
     @businessTrade(business.businessTradeName, business.id)
-    @businessAddress(business.businessAddress, business.businessAddressRedirect)
+    @businessAddress(business.businessAddress, business.businessAddressRedirect, business.id)
     @accountingMethod(business.accountingMethod, business.id)
 </dl>
 
