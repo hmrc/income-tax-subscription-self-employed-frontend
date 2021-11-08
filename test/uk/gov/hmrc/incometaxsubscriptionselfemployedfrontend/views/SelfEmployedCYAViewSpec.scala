@@ -202,7 +202,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
-              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(isEditMode = true).url
+              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = Some("testId"), isEditMode = true).url
             }
           }
 
@@ -299,7 +299,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.incomplete
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addAccountingMethod
-              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(isEditMode = true).url
+              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = Some("testId"), isEditMode = true).url
             }
           }
 
