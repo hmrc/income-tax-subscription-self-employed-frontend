@@ -212,8 +212,13 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getBusinessAccountingMethod(inEditMode: Boolean = false): WSResponse = get(s"/details/business-accounting-method?isEditMode=$inEditMode")
 
   def submitBusinessAccountingMethod(request: Option[AccountingMethodModel],
-                                     inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/details/business-accounting-method?isEditMode=$inEditMode"
+                                     inEditMode: Boolean = false,
+                                     id: Option[String] = None
+                                    ): WSResponse = {
+    val uri = id
+      .fold(s"/details/business-accounting-method?isEditMode=$inEditMode")(
+        id => s"/details/business-accounting-method?isEditMode=$inEditMode&id=$id"
+      )
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>

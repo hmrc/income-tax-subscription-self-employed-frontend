@@ -23,8 +23,10 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
-class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
+class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with FeatureSwitching {
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 
     "the Connector receives no content" should {
@@ -96,42 +98,85 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
     "the form data is valid and connector stores it successfully" when {
-      "not in edit mode" should {
-        "redirect to sign up frontend business routing controller" in {
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-          stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+      "not in edit mode" when {
+        "save and retrieve is enabled" should {
+          "redirect to self employed check your answer page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            And("save and retrieve is enabled")
+            enable(SaveAndRetrieve)
 
-          When("POST /details/business-accounting-method is called")
-          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel))
+            When("POST /details/business-accounting-method is called")
+            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), id = Some("testId"))
 
+            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessCYAUri)
+            )
+          }
+        }
 
-          Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
-          )
+        "save and retrieve is disabled" should {
+          "redirect to sign up frontend business routing controller" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            And("save and retrieve is disabled")
+            disable(SaveAndRetrieve)
+
+            When("POST /details/business-accounting-method is called")
+            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel))
+
+            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
+            )
+          }
         }
       }
 
-      "in edit mode" should {
-        "redirect to sign up frontend final check your answer page" in {
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-          stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+      "in edit mode" when {
+        "save and retrieve is enabled" should {
+          "redirect to self employed check your answer page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            And("save and retrieve is enabled")
+            enable(SaveAndRetrieve)
 
-          When("POST /details/business-accounting-method is called")
-          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), true)
+            When("POST /details/business-accounting-method is called")
+            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true, id = Some("testId"))
 
+            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessCYAUri)
+            )
+          }
+        }
 
-          Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/check-your-answers")
-          )
+        "save and retrieve is disabled" should {
+          "redirect to sign up frontend final check your answer page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            And("save and retrieve is disabled")
+            disable(SaveAndRetrieve)
+
+            When("POST /details/business-accounting-method is called")
+            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), true)
+
+            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/check-your-answers")
+            )
+          }
         }
       }
-
     }
 
     "the form data is invalid and connector stores it unsuccessfully" in {
@@ -148,6 +193,5 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         pageTitle("Error: What accounting method do you use for your sole trader business?" + titleSuffix)
       )
     }
-
   }
 }

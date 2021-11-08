@@ -17,17 +17,18 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
 
-class BusinessAccountingMethodViewSpec extends ViewSpec {
+class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
   val backUrl: String = testBackUrl
   val action: Call = testCall
   val emptyError = "Select if you use cash accounting or standard accounting"
@@ -47,6 +48,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     val accrualsDescription = "You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’."
     val continue = "Continue"
     val update = "Update"
+    val saveAndContinue = "Save and continue"
+    val saveAndComeBackLater = "Save and come back later"
     val backLink = "Back"
   }
 
@@ -61,6 +64,10 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     "have a backlink" in {
       document().getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
       document().getBackLinkByClass.attr("href") mustBe testBackUrl
+    }
+
+    "not have a backlink" in {
+      document(backLink = None).getBackLinkByClass.isEmpty mustBe true
     }
 
     "have a heading" in {
@@ -119,14 +126,39 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
       document().getForm.attr("action") mustBe testCall.url
     }
 
-    "have a continue button when it is not in edit mode" in {
-      document().getButtonByClass mustBe BusinessAccountingMethodMessages.continue
+    "have a continue button" when {
+      "not in edit mode" when {
+        "the save and retrieve feature switch is disabled" in {
+          disable(SaveAndRetrieve)
+          document().getButtonByClass mustBe BusinessAccountingMethodMessages.continue
+        }
+      }
     }
 
-    "have an update button when it is in edit mode" in {
-      document(BusinessAccountingMethodForm.businessAccountingMethodForm, isEditMode = true).getButtonByClass mustBe BusinessAccountingMethodMessages.update
+    "have an update button" when {
+      "in edit mode" when {
+        "the save and retrieve feature switch is disabled" in {
+          disable(SaveAndRetrieve)
+          document(BusinessAccountingMethodForm.businessAccountingMethodForm, isEditMode = true).getButtonByClass mustBe BusinessAccountingMethodMessages.update
+        }
+      }
     }
 
+    "have a save and continue button" when {
+      "the save and retrieve feature switch is enabled" in {
+        enable(SaveAndRetrieve)
+        document(BusinessAccountingMethodForm.businessAccountingMethodForm).selectHead("button").text mustBe BusinessAccountingMethodMessages.saveAndContinue
+      }
+    }
+
+    "have a save and come back later link" when {
+      "the save and retrieve feature switch is enabled" in {
+        enable(SaveAndRetrieve)
+        val saveAndComeBackLink: Element = document(BusinessAccountingMethodForm.businessAccountingMethodForm).selectHead("a[role=button]")
+        saveAndComeBackLink.text mustBe BusinessAccountingMethodMessages.saveAndComeBackLater
+        saveAndComeBackLink.attr("href") mustBe appConfig.subscriptionFrontendProgressSavedUrl
+      }
+    }
   }
 
   "must display empty form error summary when submit with an empty form" in {
@@ -141,18 +173,20 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     ).mustHaveGovUkErrorNotificationMessage(emptyError)
   }
 
-  private def page(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean) = {
+  private def page(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean, backLink: Option[String]) = {
     businessAccountingMethodView(
       businessAccountingMethodForm,
       testCall,
       isEditMode,
-      testBackUrl
+      backLink
     )(FakeRequest(), implicitly, appConfig)
   }
 
   private def document(
                         businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
-                        isEditMode: Boolean = false): Document = {
-    Jsoup.parse(page(businessAccountingMethodForm, isEditMode).body)
+                        isEditMode: Boolean = false,
+                        backLink: Option[String] = Some(testBackUrl)
+                      ): Document = {
+    Jsoup.parse(page(businessAccountingMethodForm, isEditMode, backLink).body)
   }
 }

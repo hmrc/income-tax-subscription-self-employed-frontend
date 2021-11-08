@@ -22,14 +22,19 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
 @import uk.gov.hmrc.govukfrontend.views.html.components.{Radios, Fieldset, Legend, Text, RadioItem}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 
 @this(
         mainTemplate: PrincipalMainTemplate,
         form: FormWithCSRF,
         continueButton: ContinueButton,
-        govukRadios: GovukRadios
+        saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+        govukRadios: GovukRadios,
+        featureSwitches: FeatureSwitchingImpl
 )
-@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @helpInfo = {
   <p>@Messages("business.accounting_method.accordion.line_1")</p>
@@ -57,7 +62,7 @@
   <span class="govuk-!-font-size-19 govuk-!-font-weight-bold">@content</span>
 }
 
-@mainTemplate(title = messages("business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = backUrl) {
 
   @form(action = postAction) {
 
@@ -88,10 +93,10 @@
       )
     ).withFormField(businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod)))
 
-    @if(isEditMode) {
-      @continueButton(Some(messages("base.update")))
+    @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
+      @saveAndContinueButtonHelper()
     } else {
-      @continueButton()
+      @continueButton(isEditMode = isEditMode)
     }
   }
 
