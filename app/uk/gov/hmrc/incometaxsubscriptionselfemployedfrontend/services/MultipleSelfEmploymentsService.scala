@@ -38,7 +38,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
 
   def saveBusinessStartDate(businessId: String, businessStartDate: BusinessStartDate)
                            (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
-    saveData(businessId, _.copy(businessStartDate = Some(businessStartDate)))
+    saveData(businessId, _.copy(businessStartDate = Some(businessStartDate), confirmed = false))
   }
 
   def fetchBusinessName(businessId: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessNameModel]]] = {
@@ -47,7 +47,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
 
   def saveBusinessName(businessId: String, businessName: BusinessNameModel)
                       (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
-    saveData(businessId, _.copy(businessName = Some(businessName)))
+    saveData(businessId, _.copy(businessName = Some(businessName), confirmed = false))
   }
 
   def fetchBusinessTrade(businessId: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessTradeNameModel]]] = {
@@ -56,7 +56,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
 
   def saveBusinessTrade(businessId: String, businessTrade: BusinessTradeNameModel)
                        (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
-    saveData(businessId, _.copy(businessTradeName = Some(businessTrade)))
+    saveData(businessId, _.copy(businessTradeName = Some(businessTrade), confirmed = false))
   }
 
   def fetchBusinessAddress(businessId: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessAddressModel]]] = {
@@ -65,7 +65,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
 
   def saveBusinessAddress(businessId: String, businessAddress: BusinessAddressModel)
                          (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
-    saveData(businessId, _.copy(businessAddress = Some(businessAddress)))
+    saveData(businessId, _.copy(businessAddress = Some(businessAddress), confirmed = false))
   }
 
   def fetchAddressRedirect(businessId: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[String]]] = {
@@ -74,7 +74,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
 
   def saveAddressRedirect(businessId: String, addressRedirect: String)
                          (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
-    saveData(businessId, _.copy(addressRedirect = Some(addressRedirect)))
+    saveData(businessId, _.copy(addressRedirect = Some(addressRedirect), confirmed = false))
   }
 
   def confirmBusiness(businessId: String)(implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]] = {
@@ -110,7 +110,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     def updateBusinessList(businesses: Seq[SelfEmploymentData]): Seq[SelfEmploymentData] = {
       if (businesses.exists(_.id == businessId)) {
         businesses map {
-          case business if business.id == businessId => businessUpdate(business).copy(confirmed = false)
+          case business if business.id == businessId => businessUpdate(business)
           case business => business
         }
       } else {
