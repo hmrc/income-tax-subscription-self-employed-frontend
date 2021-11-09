@@ -39,7 +39,4 @@ object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
     ) thenReturn (responseStatus, responseBody)
   }
 
-
-
-
 }

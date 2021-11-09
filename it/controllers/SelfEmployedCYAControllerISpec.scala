@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub.stubGetSelfEmployments
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubGetSelfEmployments, stubSaveSelfEmployments}
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.{BusinessCYAUri, taskListURI, testAccountingMethodModel}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
@@ -54,6 +54,15 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       "testId",
       businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel)
+    ))
+
+  val testConfirmedBusinesses: Seq[SelfEmploymentData] = Seq(
+    SelfEmploymentData(
+      "testId",
+      confirmed = true,
+      businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessTradeName = Some(testValidBusinessTradeNameModel),
+      businessAddress = Some(testBusinessAddressModel)
     ))
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-check-your-answers" should {
@@ -134,13 +143,14 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       stubAuthSuccess()
       stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
       stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+      stubSaveSelfEmployments(businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
       And("save & retrieve feature switch is enabled")
       enable(SaveAndRetrieve)
 
       When("GET /details/business-check-your-answers is called")
       val res = submitBusinessCheckYourAnswers(businessId)
 
-      Then("Should return a SEE_OTHER with a redirect location of confirmation")
+      Then("Should return a SEE_OTHER with a redirect location of task list page")
       res must have(
         httpStatus(SEE_OTHER),
         redirectURI(taskListURI)
@@ -158,7 +168,7 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       When("GET /details/business-check-your-answers is called")
       val res = submitBusinessCheckYourAnswers(businessId)
 
-      Then("Should return a SEE_OTHER with a redirect location of confirmation")
+      Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
       res must have(
         httpStatus(SEE_OTHER),
         redirectURI(BusinessCYAUri)
@@ -202,6 +212,24 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        And("save & retrieve feature switch is enabled")
+        enable(SaveAndRetrieve)
+
+        When("GET /details/business-check-your-answers is called")
+        val res = submitBusinessCheckYourAnswers(businessId)
+
+        Then("Should return INTERNAL_SERVER_ERROR")
+        res must have(
+          httpStatus(INTERNAL_SERVER_ERROR)
+        )
+      }
+
+      "self employment data cannot be saved" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubSaveSelfEmployments(businessesKey, Json.toJson(testConfirmedBusinesses))(INTERNAL_SERVER_ERROR)
         And("save & retrieve feature switch is enabled")
         enable(SaveAndRetrieve)
 
