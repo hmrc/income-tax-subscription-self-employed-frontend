@@ -48,7 +48,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val accrualsDescription = "You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’."
     val continue = "Continue"
     val update = "Update"
-    val saveAndContinue = "Save and continue"
+    val saveAndContinue = "Confirm and continue"
     val saveAndComeBackLater = "Save and come back later"
     val backLink = "Back"
   }

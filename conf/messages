@@ -202,6 +202,7 @@ language-selector.nav-label                                     = Language switc
 #Save and retrieve
 save-and-continue-button                                        = Save and continue
 save-and-come-back-later                                        = Save and come back later
+confirm-and-continue                                            = Confirm and continue
 
 #Self Employed CYA
 self_employed_cya.trading_start_date                            = Business trading start date

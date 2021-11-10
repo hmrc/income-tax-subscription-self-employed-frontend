@@ -31,7 +31,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val heading = "Check your details"
-    val saveAndContinue = "Save and continue"
+    val saveAndContinue = "Confirm and continue"
     val saveAndBack = "Save and come back later"
     val change = "Change"
     val back = "Back"
