@@ -202,6 +202,7 @@ language-selector.nav-label                                     = Cyfnewidydd ia
 #Save and retrieve
 save-and-continue-button                                        = Cadw ac yn eich blaen
 save-and-come-back-later                                        = Cadw a dod yn ôl yn nes ymlaen
+confirm-and-continue                                            = Cadarnhau ac yn eich blaen
 
 #Self Employed CYA
 self_employed_cya.trading_start_date                            = Dyddiad dechrau masnachu’r busnes
@@ -210,15 +211,15 @@ self_employed_cya.trading_start_date.add                        = Ychwanegu dydd
 self_employed_cya.business_name                                 = Enw’r busnes
 self_employed_cya.business_name.change                          = Newid enw’r busnes
 self_employed_cya.business_name.add                             = Ychwanegu enw’r busnes
-self_employed_cya.business_trade                                = ???
-self_employed_cya.business_trade.change                         = ???
+self_employed_cya.business_trade                                = Math o fasnach
+self_employed_cya.business_trade.change                         = Newid y math o fasnach
 self_employed_cya.business_trade.add                            = Ychwanegu'r math o fasnach
 self_employed_cya.business_address                              = Cyfeiriad y busnes
 self_employed_cya.business_address.change                       = Newid cyfeiriad y busnes
 self_employed_cya.business_address.add                          = Ychwanegu cyfeiriad y busnes
-self_employed_cya.accounting_method                             = ???
-self_employed_cya.accounting_method.change                      = ???
+self_employed_cya.accounting_method                             = Dull cyfrifyddu ar gyfer incwm unig fasnachwr
+self_employed_cya.accounting_method.change                      = Newid y dull cyfrifyddu ar gyfer incwm unig fasnachwr
 self_employed_cya.accounting_method.add                         = Ychwanegu’r dull cyfrifyddu ar gyfer incwm unig fasnachwr
 self_employed_cya.accounting_method.cash                        = Cyfrifyddu arian parod
 self_employed_cya.accounting_method.accruals                    = Cyfrifyddu safonol
-self_employed_cya.heading                                       = ???
+self_employed_cya.heading                                       = Gwirio’ch manylion

@@ -46,7 +46,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val continue = "Continue"
     val update = "Update"
     val backLink = "Back"
-    val saveAndContinue = "Save and continue"
+    val saveAndContinue = "Confirm and continue"
     val saveAndComeBackLater = "Save and come back later"
   }
 
