@@ -147,6 +147,6 @@
     @contentTable(answers)
 
     @form(action = postAction) {
-        @saveAndContinueButton(disabled = !answers.isComplete)
+        @saveAndContinueButton(saveAndContinueText = Some(messages("confirm-and-continue")), disabled = !answers.isComplete)
     }
 }

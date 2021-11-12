@@ -22,10 +22,10 @@
         appConfig: AppConfig
 )
 
-@(hasSaveAndReturnLink: Boolean = true, disabled: Boolean = false)(implicit messages: Messages)
+@(saveAndContinueText: Option[String] = None, hasSaveAndReturnLink: Boolean = true, disabled: Boolean = false)(implicit messages: Messages)
 
 @buttonHelper(
-    buttonText = messages("confirm-and-continue"),
+    buttonText = saveAndContinueText.getOrElse(messages("save-and-continue-button")),
     disabled = disabled
 )
 
