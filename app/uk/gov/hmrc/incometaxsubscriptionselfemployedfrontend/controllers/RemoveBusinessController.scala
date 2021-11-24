@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.InternalServerException
@@ -24,38 +23,40 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataK
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SelfEmploymentData
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RemoveBusinessController @Inject()(authService: AuthService,
-                                         incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
+                                         val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                          mcc: MessagesControllerComponents)
                                         (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      incomeTaxSubscriptionConnector.getSelfEmployments[Seq[SelfEmploymentData]](businessesKey).flatMap {
-        case Right(Some(businesses)) if businesses.exists(_.isComplete) => {
-          val updatedBusinesses: Seq[SelfEmploymentData] = businesses.filter(_.isComplete).filterNot(_.id == id)
-          incomeTaxSubscriptionConnector.saveSelfEmployments(businessesKey, updatedBusinesses) map {
-            case Right(_) => {
-              if(updatedBusinesses.size == 0) Redirect(appConfig.howDoYouReceiveYourIncomeUrl)
-              else Redirect(routes.BusinessListCYAController.show())
+      withReference { reference =>
+        incomeTaxSubscriptionConnector.getSubscriptionDetails[Seq[SelfEmploymentData]](reference, businessesKey).flatMap {
+          case Right(Some(businesses)) if businesses.exists(_.isComplete) =>
+            val updatedBusinesses: Seq[SelfEmploymentData] = businesses.filter(_.isComplete).filterNot(_.id == id)
+            incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessesKey, updatedBusinesses) map {
+              case Right(_) =>
+                if (updatedBusinesses.isEmpty) Redirect(appConfig.howDoYouReceiveYourIncomeUrl)
+                else Redirect(routes.BusinessListCYAController.show())
+              case Left(error) => throw new InternalServerException(
+                s"[RemoveBusinessController][show] - saveSelfEmployments failure, error: ${error.toString}")
             }
-            case Left(error) => throw new InternalServerException(
-              s"[RemoveBusinessController][show] - saveSelfEmployments failure, error: ${error.toString}")
-          }
+          case Right(_) => Future.successful(Redirect(routes.InitialiseController.initialise()))
+          case Left(UnexpectedStatusFailure(status)) =>
+            throw new InternalServerException(s"[RemoveBusinessController][show] - getSelfEmployments connection failure, status: $status")
+          case Left(InvalidJson) =>
+            throw new InternalServerException("[RemoveBusinessController][show] - Invalid Json")
         }
-        case Right(_) => Future.successful(Redirect(routes.InitialiseController.initialise()))
-        case Left(UnexpectedStatusFailure(status)) =>
-          throw new InternalServerException(s"[RemoveBusinessController][show] - getSelfEmployments connection failure, status: $status")
-        case Left(InvalidJson) =>
-          throw new InternalServerException("[RemoveBusinessController][show] - Invalid Json")
       }
     }
   }

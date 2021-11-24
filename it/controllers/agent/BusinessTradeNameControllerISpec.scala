@@ -23,9 +23,10 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, DateModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 class BusinessTradeNameControllerISpec extends ComponentSpecBase {
+
   val businessId: String = "testId"
   val testValidBusinessTradeName: String = "Plumbing"
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
@@ -45,7 +46,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "redirect to the business name page" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessName = None, businessTradeName = None))))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessName = None, businessTradeName = None))))
 
         When("GET /client/details/business-trade is called")
         val res = getClientTradeName(businessId)
@@ -62,7 +63,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
 
         When("GET /client/details/business-trade is called")
         val res = getClientTradeName(businessId)
@@ -80,7 +81,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "show the current trade name page with value entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness)))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness)))
 
         When("GET /client/details/business-trade is called")
         val res = getClientTradeName(businessId)
@@ -99,8 +100,8 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-        stubSaveSelfEmployments("BusinessTradeName", Json.toJson(testValidBusinessTradeNameModel))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubSaveSubscriptionData(reference, "BusinessTradeName", Json.toJson(testValidBusinessTradeNameModel))(OK)
 
         When("POST /client/details/business-trade is called")
         val res = submitClientTradeName(businessId, Some(testValidBusinessTradeNameModel))
@@ -115,7 +116,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is valid but is a duplicate submission" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(
           testBusiness.copy(id = "idOne"),
           testBusiness.copy(id = "idTwo", businessTradeName = None)
         )))
@@ -134,7 +135,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is invalid and connector stores it unsuccessfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
 
         When("POST /client/details/business-trade is called")
         val res = submitClientTradeName(businessId, Some(testInvalidBusinessTradeNameModel))
@@ -149,11 +150,11 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusiness))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusiness))(OK)
 
         When("POST /client/details/business-trade is called")
-        val res = submitClientTradeName(businessId, Some(testValidBusinessTradeNameModel), true)
+        val res = submitClientTradeName(businessId, Some(testValidBusinessTradeNameModel), inEditMode = true)
 
         Then("Should return a SEE_OTHER with a redirect location of Business Trade name")
         res must have(
@@ -165,11 +166,11 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is invalid and connector stores it unsuccessfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-        stubSaveSelfEmployments("BusinessTradeName", Json.toJson(testInvalidBusinessTradeNameModel))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubSaveSubscriptionData(reference, "BusinessTradeName", Json.toJson(testInvalidBusinessTradeNameModel))(OK)
 
         When("POST /client/details/business-trade is called")
-        val res = submitClientTradeName(businessId, Some(testInvalidBusinessTradeNameModel), true)
+        val res = submitClientTradeName(businessId, Some(testInvalidBusinessTradeNameModel), inEditMode = true)
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(

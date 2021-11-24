@@ -55,7 +55,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("GET /details/business-list is called")
         val res = getCheckYourAnswers
@@ -71,7 +71,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
       "show check your answers page" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /details/business-list is called")
         val res = getCheckYourAnswers
@@ -89,7 +89,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
     "return SEE_OTHER when selecting yes" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("POST /details/business-list is called")
       val result = submitCheckYourAnswers(Some(AddAnotherBusinessModel(Yes)),1, 5)
@@ -106,7 +106,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
     "return SEE_OTHER when selecting No" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("POST /details/business-list is called")
       val result = submitCheckYourAnswers(Some(AddAnotherBusinessModel(No)),1, 5)
@@ -123,7 +123,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
     "return BAD_REQUEST when no Answer is given" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("POST /details/business-list is called")
       val result = submitCheckYourAnswers(None,1, 5)

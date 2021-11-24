@@ -43,7 +43,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(businessId)
@@ -59,7 +59,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "show the current date of commencement page with date values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(businessId)
@@ -80,8 +80,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
         When("POST /client/details/business-start-date is called")
         val res = submitClientBusinessStartDate(businessId, Some(testValidBusinessStartDateModel))
@@ -96,7 +96,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "the form data is invalid and connector stores it unsuccessfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("POST /client/details/business-start-date is called")
         val res = submitClientBusinessStartDate(businessId, Some(testBusinessStartDateModel))
@@ -112,10 +112,10 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(responseStatus = OK,
+        stubGetSubscriptionData(reference, businessesKey)(responseStatus = OK,
           responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
         )
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
         When("POST /client/business/start-date is called")
         val res = submitClientBusinessStartDate(businessId, Some(testValidBusinessStartDateModel), true)

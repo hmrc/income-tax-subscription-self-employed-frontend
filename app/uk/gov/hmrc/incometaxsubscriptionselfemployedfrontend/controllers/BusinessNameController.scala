@@ -24,6 +24,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
@@ -37,14 +39,16 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                        businessName: BusinessName,
+                                       val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                        authService: AuthService)
                                       (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
-  with I18nSupport with FeatureSwitching {
+  with I18nSupport with FeatureSwitching with ReferenceRetrieval {
 
   private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
 
-  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)
+          (implicit request: Request[AnyContent]): Html =
     businessName(
       businessNameForm = businessNameForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.submit(id, isEditMode = isEditMode),
@@ -55,40 +59,43 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withAllBusinesses { businesses =>
-        val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
-        val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
-        Future.successful(Ok(
-          if (isEnabled(SaveAndRetrieve)) {
-            view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode, isSaveAndRetrieve = true)
-          }
-          else {
-            view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode, isSaveAndRetrieve = false)
-          }
-        ))
+      withReference { reference =>
+        withAllBusinesses(reference) { businesses =>
+          val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
+          val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
+          Future.successful(Ok(
+            if (isEnabled(SaveAndRetrieve)) {
+              view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode, isSaveAndRetrieve = true)
+            }
+            else {
+              view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode, isSaveAndRetrieve = false)
+            }
+          ))
+        }
       }
     }
   }
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withAllBusinesses { businesses =>
-        val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
-        businessNameValidationForm(excludedBusinessNames).bindFromRequest.fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode, isEnabled(SaveAndRetrieve)))),
-          businessNameData =>
-            multipleSelfEmploymentsService.saveBusinessName(id, businessNameData).map(_ => {
-              val call = (isEditMode, isSaveAndRetrieve) match {
-                case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
-                case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id)
-                case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show()
-                case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
+      withReference { reference =>
+        withAllBusinesses(reference) { businesses =>
+          val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
+          businessNameValidationForm(excludedBusinessNames).bindFromRequest.fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode, isEnabled(SaveAndRetrieve)))),
+            businessNameData =>
+              multipleSelfEmploymentsService.saveBusinessName(reference, id, businessNameData).map { _ =>
+                val call = (isEditMode, isSaveAndRetrieve) match {
+                  case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
+                  case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id)
+                  case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show()
+                  case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
+                }
+                Redirect(call)
               }
-              Redirect(call)
-            }
-            )
-        )
+          )
+        }
       }
     }
   }
@@ -101,8 +108,8 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }.flatMap(_.businessName)
   }
 
-  private def withAllBusinesses(f: Seq[SelfEmploymentData] => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
-    multipleSelfEmploymentsService.fetchAllBusinesses.flatMap {
+  private def withAllBusinesses(reference: String)(f: Seq[SelfEmploymentData] => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
+    multipleSelfEmploymentsService.fetchAllBusinesses(reference).flatMap {
       case Right(businesses) => f(businesses)
       case Left(error) => throw new InternalServerException(s"[BusinessNameController][withAllBusinesses] - Error retrieving businesses, error: $error")
     }

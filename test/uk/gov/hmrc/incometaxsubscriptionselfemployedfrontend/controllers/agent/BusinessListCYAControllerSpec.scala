@@ -64,7 +64,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           businessData
         ))))
 
-        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.show()(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -75,7 +75,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(None))
 
-        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.show()(fakeRequest)
         status(result) mustBe 303
         redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
       }
@@ -85,7 +85,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           businessData.copy(businessName = None)
         ))))
 
-        val result: Future[Result] = TestBusinessListCYAController.show()(FakeRequest())
+        val result: Future[Result] = TestBusinessListCYAController.show()(fakeRequest)
         status(result) mustBe 303
         redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
       }
@@ -96,7 +96,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(fakeRequest)))
         response.message mustBe "[BusinessListCYAController][show] - getSelfEmployments connection failure, status: 500"
       }
 
@@ -104,7 +104,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(InvalidJson))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.show()(fakeRequest)))
         response.message mustBe ("[BusinessListCYAController][show] - Invalid Json")
       }
     }
@@ -119,7 +119,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           businessData
         ))))
 
-        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+        val result: Future[Result] = TestBusinessListCYAController.submit()(fakeRequest
           .withFormUrlEncodedBody(AddAnotherBusinessAgentForm.addAnotherBusiness -> YesNoMapping.option_yes))
 
         status(result) mustBe SEE_OTHER
@@ -133,7 +133,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           businessData
         ))))
 
-        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+        val result: Future[Result] = TestBusinessListCYAController.submit()(fakeRequest
           .withFormUrlEncodedBody(AddAnotherBusinessAgentForm.addAnotherBusiness -> YesNoMapping.option_no))
 
         status(result) mustBe SEE_OTHER
@@ -147,7 +147,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(None))
 
-        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+        val result: Future[Result] = TestBusinessListCYAController.submit()(fakeRequest
           .withFormUrlEncodedBody(AddAnotherBusinessAgentForm.addAnotherBusiness -> YesNoMapping.option_no))
         status(result) mustBe 303
         redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
@@ -158,7 +158,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           businessData.copy(businessName = None)
         ))))
 
-        val result: Future[Result] = TestBusinessListCYAController.submit()(FakeRequest()
+        val result: Future[Result] = TestBusinessListCYAController.submit()(fakeRequest
           .withFormUrlEncodedBody(AddAnotherBusinessAgentForm.addAnotherBusiness -> YesNoMapping.option_no))
         status(result) mustBe 303
         redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
@@ -169,7 +169,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.submit()(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.submit()(fakeRequest)))
         response.message mustBe "[BusinessListCYAController][submit] - getSelfEmployments connection failure, status: 500"
       }
 
@@ -177,7 +177,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(InvalidJson))
 
-        val response = intercept[InternalServerException](await(TestBusinessListCYAController.submit()(FakeRequest()
+        val response = intercept[InternalServerException](await(TestBusinessListCYAController.submit()(fakeRequest
           .withFormUrlEncodedBody(AddAnotherBusinessAgentForm.addAnotherBusiness -> YesNoMapping.option_yes))))
         response.message mustBe ("[BusinessListCYAController][submit] - Invalid Json")
       }

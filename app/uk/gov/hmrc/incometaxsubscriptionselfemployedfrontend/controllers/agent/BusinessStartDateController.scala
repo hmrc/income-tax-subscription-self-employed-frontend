@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
@@ -30,18 +31,20 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.date_of_commencement
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
+                                            val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService,
                                             val languageUtils: LanguageUtils)
-                                           (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
-  with I18nSupport with ImplicitDateFormatter {
+                                           (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+  extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with ReferenceRetrieval {
 
   def view(dateOfCommencementForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
     date_of_commencement(
@@ -54,27 +57,31 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      multipleSelfEmploymentsService.fetchBusinessStartDate(id).map {
-        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
-        case Left(error) => throw new InternalServerException(error.toString)
+      withReference { reference =>
+        multipleSelfEmploymentsService.fetchBusinessStartDate(reference, id).map {
+          case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
+          case Left(error) => throw new InternalServerException(error.toString)
+        }
       }
     }
   }
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      form.bindFromRequest.fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
-        businessStartDateData =>
-          multipleSelfEmploymentsService.saveBusinessStartDate(id, businessStartDateData).map(_ =>
-            if (isEditMode) {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show())
-            } else {
-              Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id))
-            }
-          )
-      )
+      withReference { reference =>
+        form.bindFromRequest.fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
+          businessStartDateData =>
+            multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData).map(_ =>
+              if (isEditMode) {
+                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show())
+              } else {
+                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id))
+              }
+            )
+        )
+      }
     }
   }
 

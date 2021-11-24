@@ -51,7 +51,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("GET /business-start-date is called")
         val res = getBusinessStartDate(businessId)
@@ -68,7 +68,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
       "show the current date of commencement page with date values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /business-start-date is called")
         val res = getBusinessStartDate(businessId)
@@ -93,8 +93,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
             Given("I setup the Wiremock stubs")
             enable(SaveAndRetrieve)
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("POST /business-start-date is called")
             val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
@@ -113,8 +113,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           "redirect to Business Name page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("POST /business-start-date is called")
             val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId)
@@ -131,7 +131,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
       "the form data is invalid" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("POST /business-start-date is called")
         val res = submitBusinessStartDate(Some(testBusinessStartDateModel), businessId)
@@ -151,11 +151,11 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
             enable(SaveAndRetrieve)
-            stubGetSelfEmployments(businessesKey)(
+            stubGetSubscriptionData(reference, businessesKey)(
               responseStatus = OK,
               responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
             )
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("POST /business-start-date is called")
             val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId, inEditMode = true)
@@ -174,11 +174,11 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           "redirect to Business Check Your Answer page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(
+            stubGetSubscriptionData(reference, businessesKey)(
               responseStatus = OK,
               responseBody = Json.toJson(testBusinesses.map(_.copy(businessStartDate = Some(BusinessStartDate(DateModel("9", "9", "9"))))))
             )
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("POST /business-start-date is called")
             val res = submitBusinessStartDate(Some(testValidBusinessStartDateModel), businessId, inEditMode = true)

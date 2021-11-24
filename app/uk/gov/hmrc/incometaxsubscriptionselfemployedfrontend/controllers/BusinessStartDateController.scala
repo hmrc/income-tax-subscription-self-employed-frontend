@@ -24,6 +24,8 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
@@ -43,13 +45,14 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                             authService: AuthService,
                                             val languageUtils: LanguageUtils,
-                                            businessStartDateView: DateOfCommencement)
+                                            businessStartDateView: DateOfCommencement,
+                                            val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
-  with I18nSupport with ImplicitDateFormatter with FeatureSwitching {
+  with I18nSupport with ImplicitDateFormatter with FeatureSwitching with ReferenceRetrieval {
 
   private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
 
-  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)
+  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html = {
     businessStartDateView(
       businessStartDateForm = businessStartDateForm,
@@ -63,9 +66,11 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      multipleSelfEmploymentsService.fetchBusinessStartDate(id).map {
-        case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode, isEnabled(SaveAndRetrieve)))
-        case Left(error) => throw new InternalServerException(error.toString)
+      withReference { reference =>
+        multipleSelfEmploymentsService.fetchBusinessStartDate(reference, id).map {
+          case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
+          case Left(error) => throw new InternalServerException(error.toString)
+        }
       }
     }
   }
@@ -73,22 +78,24 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      form.bindFromRequest.fold(
-        formWithErrors => {
-          Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isEnabled(SaveAndRetrieve))))
-        },
-        businessStartDateData =>
-          multipleSelfEmploymentsService.saveBusinessStartDate(id, businessStartDateData).map(_ => {
-            val call = (isEditMode, isSaveAndRetrieve) match {
-              case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
-              case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
-              case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show()
-              case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id)
+      withReference { reference =>
+        form.bindFromRequest.fold(
+          formWithErrors => {
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode)))
+          },
+          businessStartDateData =>
+            multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData).map(_ => {
+              val call = (isEditMode, isSaveAndRetrieve) match {
+                case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
+                case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
+                case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show()
+                case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id)
+              }
+              Redirect(call)
             }
-            Redirect(call)
-          }
-          )
-      )
+            )
+        )
+      }
     }
   }
 

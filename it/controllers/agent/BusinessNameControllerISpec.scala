@@ -42,7 +42,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("GET /client/details/business-name is called")
         val res = getClientBusinessName(businessId)
@@ -58,7 +58,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "show the current date of commencement page with date values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /client/business/start-date is called")
         val res = getClientBusinessName(businessId)
@@ -78,8 +78,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(businessId, false, Some(testBusinessNameModel))
@@ -94,8 +94,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "the form data is invalid" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testEmptyBusinesses))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testEmptyBusinesses))(OK)
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(businessId, false, Some(testEmptyBusinessNameModel))
@@ -110,8 +110,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(businessId, true, Some(testBusinessNameModel))
@@ -126,8 +126,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
       "the form data is invalid" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testEmptyBusinesses))(OK)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testEmptyBusinesses))(OK)
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(businessId, true, Some(testEmptyBusinessNameModel))

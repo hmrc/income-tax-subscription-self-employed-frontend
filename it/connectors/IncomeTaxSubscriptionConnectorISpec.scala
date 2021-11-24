@@ -23,9 +23,8 @@ import play.api.libs.json.{JsObject, Json, OFormat}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
-
 
 class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
 
@@ -42,33 +41,33 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
     "Return Some DummyModel" in {
       val successfulResponseBody: JsObject = Json.obj("body" -> "Test Body")
 
-      stubGetSelfEmployments(id)(OK, successfulResponseBody)
+      stubGetSubscriptionData(reference, id)(OK, successfulResponseBody)
 
-      val res = connector.getSelfEmployments[DummyModel](id)
+      val res = connector.getSubscriptionDetails[DummyModel](reference, id)
 
       await(res) mustBe Right(Some(DummyModel(body = "Test Body")))
     }
 
     "Return InvalidJson" in {
-      stubGetSelfEmployments(id)(OK, Json.obj())
+      stubGetSubscriptionData(reference, id)(OK, Json.obj())
 
-      val res = connector.getSelfEmployments[DummyModel](id)
+      val res = connector.getSubscriptionDetails[DummyModel](reference, id)
 
       await(res) mustBe Left(GetSelfEmploymentsHttpParser.InvalidJson)
     }
 
     "Return None" in {
-      stubGetSelfEmployments(id)(NO_CONTENT, Json.obj())
+      stubGetSubscriptionData(reference, id)(NO_CONTENT, Json.obj())
 
-      val res = connector.getSelfEmployments[DummyModel](id)
+      val res = connector.getSubscriptionDetails[DummyModel](reference, id)
 
       await(res) mustBe Right(None)
 
     }
     "Return UnexpectedStatusFailure" in {
-      stubGetSelfEmployments(id)(INTERNAL_SERVER_ERROR, Json.obj())
+      stubGetSubscriptionData(reference, id)(INTERNAL_SERVER_ERROR, Json.obj())
 
-      val res = connector.getSelfEmployments[DummyModel](id)
+      val res = connector.getSubscriptionDetails[DummyModel](reference, id)
 
       await(res) mustBe Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
 
@@ -76,20 +75,20 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
   }
 
   "SaveSelfEmployments" should {
-    "Return PostSelfEmploymentsSuccessResponse" in {
+    "Return PostSubscriptionDetailsSuccessResponse" in {
       val dummyModel: DummyModel = DummyModel(body = "Test Body")
-      stubSaveSelfEmployments(id, body = Json.toJson(dummyModel))(OK)
+      stubSaveSubscriptionData(reference, id, body = Json.toJson(dummyModel))(OK)
 
-      val res = connector.saveSelfEmployments[DummyModel](id, dummyModel)
+      val res = connector.saveSubscriptionDetails[DummyModel](reference, id, dummyModel)
 
-      await(res) mustBe Right(PostSelfEmploymentsSuccessResponse)
+      await(res) mustBe Right(PostSubscriptionDetailsSuccessResponse)
     }
 
     "Return UnexpectedStatusFailure(status)" in {
       val dummyModel: DummyModel = DummyModel(body = "Test Body")
-      stubSaveSelfEmployments(id, body = Json.toJson(dummyModel))(INTERNAL_SERVER_ERROR)
+      stubSaveSubscriptionData(reference, id, body = Json.toJson(dummyModel))(INTERNAL_SERVER_ERROR)
 
-      val res = connector.saveSelfEmployments[DummyModel](id, dummyModel)
+      val res = connector.saveSubscriptionDetails[DummyModel](reference, id, dummyModel)
 
       await(res) mustBe Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
     }

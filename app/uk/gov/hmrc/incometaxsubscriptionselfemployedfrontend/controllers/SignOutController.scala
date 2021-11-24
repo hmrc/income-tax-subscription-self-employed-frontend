@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import javax.inject.{Inject, Singleton}
 import play.api.mvc._
+import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.affinityGroup
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.affinityGroup
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -40,7 +40,7 @@ class SignOutController @Inject()(mcc: MessagesControllerComponents,
         Future.successful(Redirect(appConfig.ggSignOutUrl(appConfig.feedbackFrontendRedirectUrl)))
     }
   }
-  
+
 }
 
 object SignOutController {

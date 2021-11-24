@@ -17,13 +17,14 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks
 
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccess
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessAddressModel, BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccess
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 
@@ -39,86 +40,92 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
   }
 
   def mockFetchBusinessStartDate(businessId: String)(response: Either[GetSelfEmploymentsFailure, Option[BusinessStartDate]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchBusinessStartDate(ArgumentMatchers.eq(businessId))(ArgumentMatchers.any()))
+    when(mockMultipleSelfEmploymentsService.fetchBusinessStartDate(any(), ArgumentMatchers.eq(businessId))(any()))
       .thenReturn(Future.successful(response))
   }
 
   def mockFetchBusinessName(businessId: String)(response: Either[GetSelfEmploymentsFailure, Option[BusinessNameModel]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchBusinessName(ArgumentMatchers.eq(businessId))(ArgumentMatchers.any()))
+    when(mockMultipleSelfEmploymentsService.fetchBusinessName(any(), ArgumentMatchers.eq(businessId))(any()))
       .thenReturn(Future.successful(response))
   }
 
   def mockFetchBusinessTrade(businessId: String)(response: Either[GetSelfEmploymentsFailure, Option[BusinessTradeNameModel]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchBusinessTrade(ArgumentMatchers.eq(businessId))(ArgumentMatchers.any()))
+    when(mockMultipleSelfEmploymentsService.fetchBusinessTrade(any(), ArgumentMatchers.eq(businessId))(any()))
       .thenReturn(Future.successful(response))
   }
 
   def mockFetchAllBusinesses(response: Either[GetSelfEmploymentsFailure, Seq[SelfEmploymentData]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchAllBusinesses(ArgumentMatchers.any()))
+    when(mockMultipleSelfEmploymentsService.fetchAllBusinesses(any())(any()))
       .thenReturn(Future.successful(response))
   }
 
   def mockFetchBusiness(businessId: String)(response: Either[GetSelfEmploymentsFailure, Option[SelfEmploymentData]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchBusiness(ArgumentMatchers.eq(businessId))(ArgumentMatchers.any()))
+    when(mockMultipleSelfEmploymentsService.fetchBusiness(any(), ArgumentMatchers.eq(businessId))(any()))
       .thenReturn(Future.successful(response))
   }
 
   def mockSaveBusinessStartDate(businessId: String, businessStartDate: BusinessStartDate)
-                               (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+                               (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
     when(
       mockMultipleSelfEmploymentsService.saveBusinessStartDate(
+        any(),
         ArgumentMatchers.eq(businessId),
         ArgumentMatchers.eq(businessStartDate)
-      )(ArgumentMatchers.any())
+      )(any())
     ).thenReturn(Future.successful(response))
   }
 
   def mockSaveBusinessName(businessId: String, businessName: BusinessNameModel)
-                          (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+                          (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
     when(
       mockMultipleSelfEmploymentsService.saveBusinessName(
+        any(),
         ArgumentMatchers.eq(businessId),
         ArgumentMatchers.eq(businessName)
-      )(ArgumentMatchers.any())
+      )(any())
     ).thenReturn(Future.successful(response))
   }
 
   def mockSaveBusinessTrade(businessId: String, businessTrade: BusinessTradeNameModel)
-                           (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+                           (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
     when(
       mockMultipleSelfEmploymentsService.saveBusinessTrade(
+        any(),
         ArgumentMatchers.eq(businessId),
         ArgumentMatchers.eq(businessTrade)
-      )(ArgumentMatchers.any())
+      )(any())
     ).thenReturn(Future.successful(response))
   }
 
   def mockSaveBusinessAddress(businessId: String, businessAddress: BusinessAddressModel)
-                          (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+                             (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
     when(
       mockMultipleSelfEmploymentsService.saveBusinessAddress(
+        any(),
         ArgumentMatchers.eq(businessId),
         ArgumentMatchers.eq(businessAddress)
-      )(ArgumentMatchers.any())
+      )(any())
     ).thenReturn(Future.successful(response))
   }
 
   def mockSaveAddressRedirect(businessId: String, addressRedirect: String)
-                             (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+                             (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
     when(
       mockMultipleSelfEmploymentsService.saveAddressRedirect(
+        any(),
         ArgumentMatchers.eq(businessId),
         ArgumentMatchers.eq(addressRedirect)
-      )(ArgumentMatchers.any())
+      )(any())
     ).thenReturn(Future.successful(response))
   }
 
   def mockConfirmBusiness(businessId: String)
-                         (response: Either[SaveSelfEmploymentDataFailure.type, PostSelfEmploymentsSuccess]): Unit = {
+                         (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
     when(
       mockMultipleSelfEmploymentsService.confirmBusiness(
+        any(),
         ArgumentMatchers.eq(businessId)
-      )(ArgumentMatchers.any())
+      )(any())
     ).thenReturn(Future.successful(response))
   }
 

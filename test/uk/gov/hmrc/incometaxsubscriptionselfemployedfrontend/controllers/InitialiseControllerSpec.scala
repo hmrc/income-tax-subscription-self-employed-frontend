@@ -53,7 +53,7 @@ class InitialiseControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         enable(SaveAndRetrieve)
 
-        val result = TestInitialiseController.initialise(FakeRequest())
+        val result = TestInitialiseController.initialise(fakeRequest)
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessNameController.show("testId").url)
       }
@@ -63,7 +63,7 @@ class InitialiseControllerSpec extends ControllerBaseSpec
       s"return $SEE_OTHER and redirect to Business Start Date page" in {
 
         mockAuthSuccess()
-        val result = TestInitialiseController.initialise(FakeRequest())
+        val result = TestInitialiseController.initialise(fakeRequest)
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show("testId").url)
       }

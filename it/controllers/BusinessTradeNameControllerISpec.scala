@@ -54,7 +54,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
       "redirect to the business name page" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessName = None, businessTradeName = None))))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessName = None, businessTradeName = None))))
 
         When("GET /details/business-trade is called")
         val res = getBusinessTradeName(businessId)
@@ -71,7 +71,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
 
         When("GET /details/business-trade is called")
         val res = getBusinessTradeName(businessId)
@@ -89,7 +89,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
       "show the current business trade name page with name values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness)))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness)))
 
         When("GET /details/business-trade is called")
         val res = getBusinessTradeName(businessId)
@@ -113,8 +113,8 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
             enable(SaveAndRetrieve)
-            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
             When("POST /details/business-trade is called")
             val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
@@ -133,8 +133,8 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
           "redirect to Business Address Look Up page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
             When("POST /details/business-trade is called")
             val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
@@ -151,7 +151,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
       "the form data is valid but is a duplicate submission" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(
           testBusiness.copy(id = "idOne"),
           testBusiness.copy(id = "idTwo", businessTradeName = None)
         )))
@@ -170,7 +170,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
       "the form data is invalid and connector stores it unsuccessfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
 
         When("POST /details/business-trade is called")
         val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testInvalidBusinessTradeNameModel))
@@ -190,8 +190,8 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
             enable(SaveAndRetrieve)
-            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
-            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
             When("POST /details/business-trade is called")
             val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testValidBusinessTradeNameModel))
@@ -209,8 +209,8 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
           "redirect to Business Check Your Answer page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
-            stubSaveSelfEmployments(businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = Some(BusinessTradeNameModel("test trade"))))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
             When("POST /details/business-trade is called")
             val res = submitBusinessTradeName(businessId, inEditMode = true, Some(testValidBusinessTradeNameModel))

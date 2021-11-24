@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -26,6 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.{AddressLookupConnector, IncomeTaxSubscriptionConnector}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, BusinessAddressModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -37,9 +38,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents,
                                                authService: AuthService,
                                                addressLookupConnector: AddressLookupConnector,
-                                               incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
+                                               val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService
-                                              )(implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) with FeatureSwitching {
+                                              )(implicit val ec: ExecutionContext, val appConfig: AppConfig)
+  extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
 
   private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
 
@@ -63,23 +65,25 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
 
   def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      for {
-        addressDetails <- fetchAddress(addressId)
-        accountingMethod <- fetchAccountMethod
-        _ <- multipleSelfEmploymentsService.saveBusinessAddress(businessId, addressDetails)
-      } yield {
-        (isEditMode, isSaveAndRetrieve) match {
-          case (false, true) if accountingMethod.isDefined => Redirect(routes.SelfEmployedCYAController.show(businessId))
-          case (false, true) => Redirect(routes.BusinessAccountingMethodController.show(Some(businessId)))
-          case (true, true) => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
-          case (_, false) => Redirect(routes.BusinessListCYAController.show())
+      withReference { reference =>
+        for {
+          addressDetails <- fetchAddress(addressId)
+          accountingMethod <- fetchAccountMethod(reference)
+          _ <- multipleSelfEmploymentsService.saveBusinessAddress(reference, businessId, addressDetails)
+        } yield {
+          (isEditMode, isSaveAndRetrieve) match {
+            case (false, true) if accountingMethod.isDefined => Redirect(routes.SelfEmployedCYAController.show(businessId))
+            case (false, true) => Redirect(routes.BusinessAccountingMethodController.show(Some(businessId)))
+            case (true, true) => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
+            case (_, false) => Redirect(routes.BusinessListCYAController.show())
+          }
         }
       }
     }
   }
 
-  private def fetchAccountMethod()(implicit hc: HeaderCarrier): Future[Option[AccountingMethodModel]] = {
-    incomeTaxSubscriptionConnector.getSelfEmployments[AccountingMethodModel](SelfEmploymentDataKeys.businessAccountingMethodKey) map {
+  private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier): Future[Option[AccountingMethodModel]] = {
+    incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey) map {
       case Left(_) =>
         throw new InternalServerException("[AddressLookupRoutingController][fetchAccountMethod] - Failure retrieving accounting method")
       case Right(accountingMethod) => accountingMethod

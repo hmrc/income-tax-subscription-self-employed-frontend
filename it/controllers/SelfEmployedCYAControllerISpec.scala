@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubGetSelfEmployments, stubSaveSelfEmployments}
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.{BusinessCYAUri, taskListURI, testAccountingMethodModel}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
@@ -70,8 +70,8 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       "the save & retrieve feature switch is enabled" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
         And("save & retrieve feature switch is enabled")
         enable(SaveAndRetrieve)
 
@@ -122,7 +122,7 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       "self employment data cannot be retrieved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
         And("save & retrieve feature switch is enabled")
         enable(SaveAndRetrieve)
 
@@ -141,9 +141,9 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
     "redirect to the task list page" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
-      stubSaveSelfEmployments(businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
+      stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
+      stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
       And("save & retrieve feature switch is enabled")
       enable(SaveAndRetrieve)
 
@@ -160,8 +160,8 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
     "redirect to the self employed CYA page" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
+      stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
       And("save & retrieve feature switch is enabled")
       enable(SaveAndRetrieve)
 
@@ -211,7 +211,7 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       "self employment data cannot be retrieved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
         And("save & retrieve feature switch is enabled")
         enable(SaveAndRetrieve)
 
@@ -227,9 +227,9 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       "self employment data cannot be saved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
-        stubSaveSelfEmployments(businessesKey, Json.toJson(testConfirmedBusinesses))(INTERNAL_SERVER_ERROR)
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(INTERNAL_SERVER_ERROR)
         And("save & retrieve feature switch is enabled")
         enable(SaveAndRetrieve)
 

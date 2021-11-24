@@ -22,6 +22,7 @@ import org.scalatestplus.play.{PlaySpec, PortNumber}
 import play.api.http.HeaderNames
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.crypto.DefaultCookieSigner
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -29,10 +30,10 @@ import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnotherBusinessAgentForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
 
 trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
-  with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen {
-
+  with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen with SessionCookieBaker {
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
@@ -43,13 +44,15 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
   val agentTitleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
-
+  val reference: String = "test-reference"
 
   val mockHost: String = WiremockHelper.wiremockHost
   val mockPort: String = WiremockHelper.wiremockPort.toString
   val mockUrl: String = s"http://$mockHost:$mockPort"
 
   implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+
+  override lazy val cookieSigner: DefaultCookieSigner = app.injector.instanceOf[DefaultCookieSigner]
 
   def config: Map[String, String] = Map(
     "auditing.enabled" -> "false",
@@ -80,8 +83,12 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     super.beforeEach()
   }
 
-  def get[T](uri: String)(implicit ws: WSClient, portNumber: PortNumber): WSResponse = {
-    await(buildClient(uri).get)
+  def get[T](uri: String, additionalCookies: Map[String, String] = Map.empty)(implicit ws: WSClient, portNumber: PortNumber): WSResponse = {
+    await(
+      buildClient(uri)
+        .withHttpHeaders(HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies))
+        .get
+    )
   }
 
   def getWithHeaders(uri: String, headers: (String, String)*): WSResponse = {
@@ -92,14 +99,13 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def post[T](uri: String)(body: Map[String, Seq[String]]): WSResponse = {
+  def post[T](uri: String, additionalCookies: Map[String, String] = Map.empty)(body: Map[String, Seq[String]]): WSResponse = {
     await(
       buildClient(uri)
-        .withHttpHeaders("Csrf-Token" -> "nocheck")
+        .withHttpHeaders(HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies), "Csrf-Token" -> "nocheck")
         .post(body)
     )
   }
-
 
   val baseUrl: String = "/report-quarterly/income-and-expenses/sign-up/self-employments"
 
@@ -203,9 +209,11 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   }
 
   def getTimeout: WSResponse = get(uri = "/timeout")
+
   def getClientTimeout: WSResponse = get(uri = "/client/timeout")
 
   def getKeepAlive: WSResponse = get(uri = "/keep-alive")
+
   def getClientKeepAlive: WSResponse = get(uri = "/client/keep-alive")
 
 

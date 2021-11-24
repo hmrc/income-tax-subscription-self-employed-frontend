@@ -17,7 +17,7 @@
 package controllers.agent
 
 import connectors.stubs.AddressLookupConnectorStub._
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub.stubSaveSelfEmployments
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.stubSaveSubscriptionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
@@ -75,7 +75,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
       stubAuthSuccess()
 
       stubGetAddressLookupDetails("testId1")(OK, Json.toJson(testBusinessAddressModel))
-      stubSaveSelfEmployments("BusinessAddress", Json.toJson(testBusinessAddressModel))(OK)
+      stubSaveSubscriptionData(reference, "BusinessAddress", Json.toJson(testBusinessAddressModel))(OK)
 
       When("GET /client/details/address-lookup/12345 is called")
       val res = getClientAddressLookup("12345", "testId1")

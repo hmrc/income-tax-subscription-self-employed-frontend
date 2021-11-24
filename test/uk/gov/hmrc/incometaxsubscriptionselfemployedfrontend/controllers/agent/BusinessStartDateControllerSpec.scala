@@ -21,14 +21,16 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 
-class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultipleSelfEmploymentsService {
+class BusinessStartDateControllerSpec extends ControllerBaseSpec
+  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector {
 
   val id: String = "testId"
 
@@ -41,7 +43,9 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
-    mockAuthService, mockLanguageUtils
+    mockIncomeTaxSubscriptionConnector,
+    mockAuthService,
+    mockLanguageUtils
   )
 
   def modelToFormData(businessStartDateModel: BusinessStartDate): Seq[(String, String)] = {
@@ -64,7 +68,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
           Right(Some(BusinessStartDate(DateModel("01", "01", "2000"))))
         )
 
-        val result = TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())
+        val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
@@ -73,7 +77,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(None))
 
-        val result = TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())
+        val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
@@ -83,7 +87,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
       "the connector returns an error fetching the business start date" in {
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false)(FakeRequest())))
+        intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)))
       }
     }
 
@@ -94,10 +98,10 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
       "return 303, SEE_OTHER" when {
         "the user submits valid data" in {
           mockAuthSuccess()
-          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -108,9 +112,9 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
       "return 400, SEE_OTHER" when {
         "the user submits invalid data" in {
           mockAuthSuccess()
-          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessStartDateController.submit(id, isEditMode = false)(FakeRequest())
+          val result = TestBusinessStartDateController.submit(id, isEditMode = false)(fakeRequest)
 
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
@@ -121,10 +125,10 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
       "return 303, SEE_OTHER" when {
         "the user submits valid data" in {
           mockAuthSuccess()
-          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = true)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -135,9 +139,9 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec with MockMultip
       "return 400, SEE_OTHER" when {
         "the user submits invalid data" in {
           mockAuthSuccess()
-          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessStartDateController.submit(id, isEditMode = true)(FakeRequest())
+          val result = TestBusinessStartDateController.submit(id, isEditMode = true)(fakeRequest)
 
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
