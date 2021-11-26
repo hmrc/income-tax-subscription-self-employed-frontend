@@ -187,7 +187,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-              changeLink.attr("href") mustBe "test address redirect"
+              changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
             }
           }
 
@@ -284,7 +284,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-              changeLink.attr("href") mustBe "test address redirect"
+              changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
             }
           }
 

@@ -36,30 +36,30 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 
 @this(
-        mainTemplate: PrincipalMainTemplate,
-        form: FormWithCSRF,
-        radioHelper: RadioHelper,
-        continueButton: ContinueButton,
-        implicitDateFormatter: ImplicitDateFormatterImpl
+    mainTemplate: PrincipalMainTemplate,
+    form: FormWithCSRF,
+    radioHelper: RadioHelper,
+    continueButton: ContinueButton,
+    implicitDateFormatter: ImplicitDateFormatterImpl
 )(
-        implicit appConfig: AppConfig
+implicit appConfig: AppConfig
 )
 
 @(addAnotherBusinessForm: Form[AddAnotherBusinessModel], answers: Seq[SelfEmploymentData], postAction: Call)(implicit request: Request[_], messages: Messages)
 
 @summaryRow(question: String, answer: String, changeUrl: Option[ChangeLink]) = {
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">@question</dt>
-        <dd class="govuk-summary-list__value">@answer</dd>
-        <dd class="govuk-summary-list__actions">
+<div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">@question</dt>
+    <dd class="govuk-summary-list__value">@answer</dd>
+    <dd class="govuk-summary-list__actions">
         @changeUrl.map { link =>
-            <a class="govuk-link" href="@link.url">
-                <span aria-hidden="true">@messages("base.change")</span>
-                <span class="govuk-visually-hidden">@link.hiddenContent</span>
-            </a>
+        <a class="govuk-link" href="@link.url">
+            <span aria-hidden="true">@messages("base.change")</span>
+            <span class="govuk-visually-hidden">@link.hiddenContent</span>
+        </a>
         }
-        </dd>
-    </div>
+    </dd>
+</div>
 }
 
 @tradingStartDate(businessStartDate: BusinessStartDate, businessId: String) = @{
@@ -84,25 +84,27 @@
     summaryRow(question, answer, Some(ChangeLink(changeUrl, messages("check_your_answers.business_trade.change"))))
 }
 
-@businessAddress(businessAddress: BusinessAddressModel, addressChangeLink: Option[String]) = @{
+@businessAddress(businessAddress: BusinessAddressModel, businessId: String) = @{
     val question: String = messages("check_your_answers.business_address")
     val answer: String = businessAddress.address.toString
-    val changeLink: Option[ChangeLink] = addressChangeLink.map(url => ChangeLink(url, messages("check_your_answers.business_address.change")))
-    summaryRow(question, answer, changeLink)
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url
+    summaryRow(question, answer, Some(ChangeLink(changeUrl, messages("check_your_answers.business_address.change"))))
 }
 
 @businessTable(business: SelfEmploymentData, businessNumber: Int) = {
 
-    <h2 class="govuk-heading-m">@messages("check_your_answers.sub_heading", businessNumber)</h2>
-    <dl class="govuk-summary-list">
-        @business.businessStartDate.map(startDate => tradingStartDate(startDate, business.id))
-        @business.businessName.map(name => businessName(name, business.id))
-        @business.businessTradeName.map(trade => businessTrade(trade, business.id))
-        @business.businessAddress.map(address => businessAddress(address, business.addressRedirect))
-    </dl>
-    <div class="govuk-form-group">
-        <a id="remove-business-@businessNumber" class="govuk-link" href="@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.RemoveBusinessController.show(business.id).url">@messages("check_your_answers.remove_business", businessNumber)</a>
-    </div>
+<h2 class="govuk-heading-m">@messages("check_your_answers.sub_heading", businessNumber)</h2>
+<dl class="govuk-summary-list">
+    @business.businessStartDate.map(startDate => tradingStartDate(startDate, business.id))
+    @business.businessName.map(name => businessName(name, business.id))
+    @business.businessTradeName.map(trade => businessTrade(trade, business.id))
+    @business.businessAddress.map(address => businessAddress(address, business.id))
+</dl>
+<div class="govuk-form-group">
+    <a id="remove-business-@businessNumber" class="govuk-link"
+       href="@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.RemoveBusinessController.show(business.id).url">@messages("check_your_answers.remove_business",
+        businessNumber)</a>
+</div>
 
 }
 
@@ -111,37 +113,36 @@
     optForm = Some(addAnotherBusinessForm)
 ) {
 
-    <h1 class="govuk-heading-l">@messages("check_your_answers.heading")</h1>
+<h1 class="govuk-heading-l">@messages("check_your_answers.heading")</h1>
 
-    @answers.zip(1 to answers.length).map { case (business, businessNumber) =>
+@answers.zip(1 to answers.length).map { case (business, businessNumber) =>
 
-        @businessTable(business, businessNumber)
+@businessTable(business, businessNumber)
 
-    }
+}
 
-    @form(action = postAction) {
+@form(action = postAction) {
 
-        @radioHelper(
-            field = addAnotherBusinessForm(AddAnotherBusinessForm.addAnotherBusiness),
-            legend = messages("check_your_answers.add_another_business_heading"),
-            isPageHeading = false,
-            customHeadingClass = Some("govuk-fieldset__legend--m"),
-            inline = true,
-            radioItems = Seq(
-                RadioItem(
-                    content = Text(Yes.toMessageString),
-                    value = Some(YesNoMapping.option_yes)
-                ),
-                RadioItem(
-                    content = Text(No.toMessageString),
-                    value = Some(YesNoMapping.option_no)
-                )
-            )
+@radioHelper(
+    field = addAnotherBusinessForm(AddAnotherBusinessForm.addAnotherBusiness),
+    legend = messages("check_your_answers.add_another_business_heading"),
+    isPageHeading = false,
+    customHeadingClass = Some("govuk-fieldset__legend--m"),
+    inline = true,
+    radioItems = Seq(
+    RadioItem(
+        content = Text(Yes.toMessageString),
+        value = Some(YesNoMapping.option_yes)
+        ),
+    RadioItem(
+        content = Text(No.toMessageString),
+        value = Some(YesNoMapping.option_no)
         )
+    )
+)
 
-        @continueButton()
+@continueButton()
 
-    }
-
+}
 
 }

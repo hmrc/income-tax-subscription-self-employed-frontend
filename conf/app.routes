@@ -28,8 +28,8 @@ GET        /details/remove-business             uk.gov.hmrc.incometaxsubscriptio
 GET        /details/business-check-your-answers uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false)
 POST       /details/business-check-your-answers uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SelfEmployedCYAController.submit(id: String)
 
-GET        /address-lookup-initialise/:itsaId   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.initialiseAddressLookupJourney(itsaId: String)
-GET        /details/address-lookup/:itsaId      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.addressLookupRedirect(itsaId: String, id: Option[String] ?= None)
+GET        /address-lookup-initialise/:businessId   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
+GET        /details/address-lookup/:businessId      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false)
 
 GET        /language/:lang                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
 

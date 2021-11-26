@@ -281,9 +281,9 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getAddressLookupInitialise(itsaId: String): WSResponse = get(s"/address-lookup-initialise/$itsaId")
+  def getAddressLookupInitialise(businessId: String): WSResponse = get(s"/address-lookup-initialise/$businessId")
 
-  def getAddressLookup(itsaId: String, id: String): WSResponse = get(s"/details/address-lookup/$itsaId?id=$id")
+  def getAddressLookup(businessId: String, id: String, isEditMode : Boolean = false): WSResponse = get(s"/details/address-lookup/$businessId?id=$id&isEditMode=$isEditMode")
 
   def getClientAddressLookupInitialise(itsaId: String): WSResponse = get(s"/client/address-lookup-initialise/$itsaId")
 

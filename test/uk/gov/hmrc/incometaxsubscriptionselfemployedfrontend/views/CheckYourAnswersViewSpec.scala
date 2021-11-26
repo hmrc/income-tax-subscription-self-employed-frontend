@@ -175,7 +175,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
             val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
             changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
             changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-            changeLink.attr("href") mustBe "test address redirect 1"
+            changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "1", isEditMode = true).url
           }
         }
 
@@ -251,7 +251,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-              changeLink.attr("href") mustBe "test address redirect 1"
+              changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "1", isEditMode = true).url
             }
           }
 
@@ -325,7 +325,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList(2).getSummaryListRow(4).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-              changeLink.attr("href") mustBe "test address redirect 2"
+              changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "2", isEditMode = true).url
             }
           }
 
