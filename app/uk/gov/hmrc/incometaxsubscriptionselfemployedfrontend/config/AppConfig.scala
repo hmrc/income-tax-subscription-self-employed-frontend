@@ -27,9 +27,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   private val assetsUrl = servicesConfig.getString("assets.url")
 
   protected lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
-  protected lazy val protectedMicroServiceUrl: String = servicesConfig.baseUrl("income-tax-subscription")
 
-  lazy val selfEmployedUrl = s"$protectedMicroServiceUrl/income-tax-subscription/self-employments/id"
+  lazy val protectedMicroServiceUrl: String = servicesConfig.baseUrl("income-tax-subscription")
   lazy val allSelfEmployedUrl = s"$protectedMicroServiceUrl/income-tax-subscription/self-employments/all"
   lazy val incomeTaxSubscriptionFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-frontend.url")
   lazy val incomeTaxSubscriptionSelfEmployedFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-self-employed-frontend.url")

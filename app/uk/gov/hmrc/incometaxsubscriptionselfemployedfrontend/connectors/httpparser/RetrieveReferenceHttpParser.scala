@@ -17,30 +17,28 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser
 
 import play.api.http.Status._
-import play.api.libs.json.{JsSuccess, Reads}
+import play.api.libs.json.JsSuccess
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
+object RetrieveReferenceHttpParser {
 
-object GetSelfEmploymentsHttpParser {
+  type RetrieveReferenceResponse = Either[RetrieveReferenceFailure, String]
 
-  type GetSelfEmploymentsResponse[T] = Either[GetSelfEmploymentsFailure, Option[T]]
-
-  implicit def getSelfEmploymentsHttpReads[T](implicit reads: Reads[T]): HttpReads[GetSelfEmploymentsResponse[T]] =
+  implicit def retrieveReferenceHttpReads: HttpReads[RetrieveReferenceResponse] =
     (_: String, _: String, response: HttpResponse) => {
       response.status match {
-        case OK => response.json.validate[T] match {
-          case JsSuccess(value, _) => Right(Some(value))
-          case _ => Left(InvalidJson)
+        case OK => (response.json \ "reference").validate[String] match {
+          case JsSuccess(value, _) => Right(value)
+          case _ => Left(InvalidJsonFailure)
         }
-        case NO_CONTENT => Right(None)
         case status => Left(UnexpectedStatusFailure(status))
       }
     }
 
-  sealed trait GetSelfEmploymentsFailure
+  sealed trait RetrieveReferenceFailure
 
-  case object InvalidJson extends GetSelfEmploymentsFailure
+  case object InvalidJsonFailure extends RetrieveReferenceFailure
 
-  case class UnexpectedStatusFailure(status: Int) extends GetSelfEmploymentsFailure
+  case class UnexpectedStatusFailure(status: Int) extends RetrieveReferenceFailure
 
 }

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -25,21 +24,24 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.businessAccountingMethodKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.business_accounting_method
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerComponents,
-                                                   incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
+                                                   val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                    authService: AuthService)
                                                   (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
 
   def view(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     business_accounting_method(
@@ -51,27 +53,31 @@ class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerCompon
 
   def show(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      incomeTaxSubscriptionConnector.getSelfEmployments[AccountingMethodModel](BusinessAccountingMethodController.businessAccountingMethodKey).map {
-        case Right(accountingMethod) =>
-          Ok(view(businessAccountingMethodForm.fill(accountingMethod), isEditMode))
-        case Left(UnexpectedStatusFailure(_@status)) =>
-          throw new InternalServerException(s"[BusinessAccountingMethodController][show] - Unexpected status: $status")
-        case Left(InvalidJson) =>
-          throw new InternalServerException("[BusinessAccountingMethodController][show] - Invalid Json")
+      withReference { reference =>
+        incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey).map {
+          case Right(accountingMethod) =>
+            Ok(view(businessAccountingMethodForm.fill(accountingMethod), isEditMode))
+          case Left(UnexpectedStatusFailure(_@status)) =>
+            throw new InternalServerException(s"[BusinessAccountingMethodController][show] - Unexpected status: $status")
+          case Left(InvalidJson) =>
+            throw new InternalServerException("[BusinessAccountingMethodController][show] - Invalid Json")
+        }
       }
     }
   }
 
   def submit(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      businessAccountingMethodForm.bindFromRequest.fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, isEditMode))),
-        businessAccountingMethod =>
-          incomeTaxSubscriptionConnector.saveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey, businessAccountingMethod) map (_ =>
-            Redirect(s"${appConfig.subscriptionFrontendClientRoutingController}?editMode=$isEditMode")
-            )
-      )
+      withReference { reference =>
+        businessAccountingMethodForm.bindFromRequest.fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, isEditMode))),
+          businessAccountingMethod =>
+            incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessAccountingMethodKey, businessAccountingMethod) map { _ =>
+              Redirect(s"${appConfig.subscriptionFrontendClientRoutingController}?editMode=$isEditMode")
+            }
+        )
+      }
     }
   }
 

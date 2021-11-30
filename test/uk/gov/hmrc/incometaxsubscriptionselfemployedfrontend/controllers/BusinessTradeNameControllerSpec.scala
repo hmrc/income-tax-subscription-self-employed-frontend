@@ -26,7 +26,8 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
@@ -34,7 +35,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessTradeName
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with FeatureSwitching {
+  with MockMultipleSelfEmploymentsService with FeatureSwitching with MockIncomeTaxSubscriptionConnector {
 
   val id: String = "testId"
 
@@ -56,6 +57,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       mockMessagesControllerComponents,
       businessTradeNameView,
       mockMultipleSelfEmploymentsService,
+      mockIncomeTaxSubscriptionConnector,
       mockAuthService
     )
 
@@ -81,7 +83,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
 
-        val result = controller.show(id, isEditMode = false)(FakeRequest())
+        val result = controller.show(id, isEditMode = false)(fakeRequest)
 
 
         status(result) mustBe OK
@@ -94,7 +96,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
 
 
-      val result = controller.show(id, isEditMode = false)(FakeRequest())
+      val result = controller.show(id, isEditMode = false)(fakeRequest)
 
       status(result) mustBe OK
       contentType(result) mustBe Some("text/html")
@@ -107,7 +109,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None))))
 
 
-        val result = controller.show(id, isEditMode = false)(FakeRequest())
+        val result = controller.show(id, isEditMode = false)(fakeRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.BusinessNameController.show(id).url)
@@ -121,7 +123,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
 
-        intercept[InternalServerException](await(controller.show(id, isEditMode = false)(FakeRequest())))
+        intercept[InternalServerException](await(controller.show(id, isEditMode = false)(fakeRequest)))
       }
       }
     }
@@ -137,11 +139,11 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           enable(SaveAndRetrieve)
           mockAuthSuccess()
           mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
-          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
 
           val result = controller.submit(id, isEditMode = false)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -157,11 +159,11 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         "the user submits valid data" in withController { controller => {
           mockAuthSuccess()
           mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
-          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
 
           val result = controller.submit(id, isEditMode = false)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -175,10 +177,10 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       "the user submits invalid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
-        mockSaveBusinessTrade(id, testInvalidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+        mockSaveBusinessTrade(id, testInvalidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
 
-        val result = controller.submit(id, isEditMode = false)(FakeRequest())
+        val result = controller.submit(id, isEditMode = false)(fakeRequest)
 
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
@@ -200,7 +202,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
 
         val result = controller.submit("idTwo", isEditMode = false)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(BusinessTradeNameModel("tradeOne")): _*)
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(BusinessTradeNameModel("tradeOne")): _*)
         )
 
         status(result) mustBe BAD_REQUEST
@@ -219,11 +221,11 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           enable(SaveAndRetrieve)
           mockAuthSuccess()
           mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
-          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
 
           val result = controller.submit(id, isEditMode = true)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -239,11 +241,11 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         "the user submits valid data" in withController { controller => {
           mockAuthSuccess()
           mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
-          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
 
           val result = controller.submit(id, isEditMode = true)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -258,9 +260,9 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       mockFetchAllBusinesses(
         Right(Seq(selfEmploymentData))
       )
-      mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+      mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
       val result = controller.submit(id, isEditMode = true)(
-        FakeRequest().withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+        fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
       )
 
 

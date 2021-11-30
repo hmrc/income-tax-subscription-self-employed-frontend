@@ -21,7 +21,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
@@ -55,14 +55,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(
           Right(Some(testAccountingMethodModel))
         )
-        val result = TestBusinessAccountingMethodController$.show(false)(FakeRequest())
+        val result = TestBusinessAccountingMethodController$.show(false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Right(None))
-        val result = TestBusinessAccountingMethodController$.show(false)(FakeRequest())
+        val result = TestBusinessAccountingMethodController$.show(false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -71,14 +71,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       "there is an unexpected status failure" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show(false)(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show(false)(fakeRequest)))
         response.message mustBe("[BusinessAccountingMethodController][show] - Unexpected status: 500")
       }
 
       "there is an invalid Json" in {
         mockAuthSuccess()
         mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(InvalidJson))
-        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show(false)(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestBusinessAccountingMethodController$.show(false)(fakeRequest)))
         response.message mustBe("[BusinessAccountingMethodController][show] - Invalid Json")
       }
     }
@@ -91,9 +91,9 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       "the user submits valid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
+          testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
         val result = TestBusinessAccountingMethodController$.submit(false)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
@@ -104,9 +104,9 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       "the user submits valid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          testAccountingMethodModel)(Right(PostSelfEmploymentsSuccessResponse))
+          testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
         val result = TestBusinessAccountingMethodController$.submit(true)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
@@ -117,8 +117,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       "the user submits invalid data" in {
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          "invalid")(Right(PostSelfEmploymentsSuccessResponse))
-        val result = TestBusinessAccountingMethodController$.submit(false)(FakeRequest())
+          "invalid")(Right(PostSubscriptionDetailsSuccessResponse))
+        val result = TestBusinessAccountingMethodController$.submit(false)(fakeRequest)
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }

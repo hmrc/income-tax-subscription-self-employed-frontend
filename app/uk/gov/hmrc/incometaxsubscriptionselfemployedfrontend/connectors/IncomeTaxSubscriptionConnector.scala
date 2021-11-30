@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
-import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsValue, Json, Reads, Writes}
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.libs.json.{JsObject, JsValue, Json, Reads, Writes}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsResponse
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.RetrieveReferenceResponse
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -31,15 +31,25 @@ class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
                                                http: HttpClient)
                                               (implicit ec: ExecutionContext) {
 
-  def selfEmployedURL(id: String): String = {
-    appConfig.selfEmployedUrl + s"/$id"
+  def subscriptionURL(reference: String, id: String): String = {
+    appConfig.protectedMicroServiceUrl + s"/income-tax-subscription/subscription-data/$reference/id/$id"
   }
 
-  def saveSelfEmployments[T](id: String, data: T)(implicit hc: HeaderCarrier, writes: Writes[T]): Future[PostSelfEmploymentsResponse] = {
-    http.POST[JsValue, PostSelfEmploymentsResponse](selfEmployedURL(id), Json.toJson(data))
+  def retrieveReferenceUrl: String = {
+    appConfig.protectedMicroServiceUrl + "/income-tax-subscription/subscription-data"
   }
 
-  def getSelfEmployments[T](id: String)(implicit hc: HeaderCarrier, reads: Reads[T]): Future[GetSelfEmploymentsResponse[T]] = {
-    http.GET[GetSelfEmploymentsResponse[T]](selfEmployedURL(id))
+  def saveSubscriptionDetails[T](reference: String, id: String, data: T)
+                                (implicit hc: HeaderCarrier, writes: Writes[T]): Future[PostSubscriptionDetailsResponse] = {
+    http.POST[JsValue, PostSubscriptionDetailsResponse](subscriptionURL(reference, id), Json.toJson(data))
   }
+
+  def getSubscriptionDetails[T](reference: String, id: String)(implicit hc: HeaderCarrier, reads: Reads[T]): Future[GetSelfEmploymentsResponse[T]] = {
+    http.GET[GetSelfEmploymentsResponse[T]](subscriptionURL(reference, id))
+  }
+
+  def retrieveReference(utr: String)(implicit hc: HeaderCarrier): Future[RetrieveReferenceResponse] = {
+    http.POST[JsObject, RetrieveReferenceResponse](retrieveReferenceUrl, Json.obj("utr" -> utr))
+  }
+
 }

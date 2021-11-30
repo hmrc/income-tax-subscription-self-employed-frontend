@@ -47,7 +47,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("GET /details/business-name is called")
         val res = getBusinessName(businessId)
@@ -63,7 +63,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
       "show the current business name page with the name value entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /details/business-name is called")
         val res = getBusinessName(businessId)
@@ -86,8 +86,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
             enable(SaveAndRetrieve)
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("Post /details/business-name is called")
             val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
@@ -106,8 +106,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
           "redirect to Business Trade Name page " in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(NO_CONTENT)
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("Post /details/business-name is called")
             val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
@@ -124,7 +124,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
       "the form data is invalid" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("POST /details/business-name")
         val res = submitBusinessName(businessId, inEditMode = false, Some(testEmptyBusinessNameModel))
@@ -144,8 +144,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
             enable(SaveAndRetrieve)
-            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("Post /details/business-name is called")
             val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
@@ -164,8 +164,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
           " redirect to Business Check Your Answers" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
-            stubSaveSelfEmployments(businessesKey, Json.toJson(testBusinesses))(OK)
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
             When("Post /details/business-name is called")
             val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))

@@ -22,21 +22,21 @@ import play.api.libs.json.{JsValue, Json}
 
 object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
 
-  private def selfEmploymentsUri(id: String) = s"/income-tax-subscription/self-employments/id/$id"
+  private def subscriptionDataUri(reference: String, id: String) = s"/income-tax-subscription/subscription-data/$reference/id/$id"
 
-  def stubGetSelfEmployments(id: String)(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
+  def stubGetSubscriptionData(reference: String, id: String)(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
     when(
       method = GET,
-      uri = selfEmploymentsUri(id)
+      uri = subscriptionDataUri(reference, id)
     ) thenReturn(responseStatus, responseBody)
   }
 
-  def stubSaveSelfEmployments(id: String, body: JsValue = Json.obj())(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
-    when (
+  def stubSaveSubscriptionData(reference: String, id: String, body: JsValue = Json.obj())(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
+    when(
       method = POST,
-      uri = selfEmploymentsUri(id),
+      uri = subscriptionDataUri(reference, id),
       body = body
-    ) thenReturn (responseStatus, responseBody)
+    ) thenReturn(responseStatus, responseBody)
   }
 
 }

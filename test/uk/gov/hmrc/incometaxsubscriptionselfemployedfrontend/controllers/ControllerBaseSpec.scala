@@ -25,7 +25,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.auth.core.{AuthorisationException, InvalidBearerToken}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockAuthService
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ITSASessionKeys, UnitTestTrait}
 
 
 trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
@@ -36,7 +36,10 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
   val controllerName: String
   val authorisedRoutes: Map[String, Action[AnyContent]]
 
-  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(
+    ITSASessionKeys.UTR -> "1234567890",
+    ITSASessionKeys.REFERENCE -> "test-reference"
+  )
 
   final def authorisationTests(): Unit = {
     authorisedRoutes.foreach {

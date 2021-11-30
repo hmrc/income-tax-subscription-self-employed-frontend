@@ -79,7 +79,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
 
   "Initialise AddressLookup journey" when {
     "the user is an agent" should {
-      "Return PostSelfEmploymentsSuccessResponse" in {
+      "Return PostSubscriptionDetailsSuccessResponse" in {
         stubInitializeAddressLookup(Json.parse(testAddressLookupConfigClient("testUrl")))("testLocation", ACCEPTED)
 
         val res = connector.initialiseAddressLookup("testUrl", isAgent = true)
@@ -96,7 +96,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
       }
     }
     "the user is individual" should {
-      "Return PostSelfEmploymentsSuccessResponse" in {
+      "Return PostSubscriptionDetailsSuccessResponse" in {
         stubInitializeAddressLookup(Json.parse(testAddressLookupConfig("testUrl")))("testLocation", ACCEPTED)
 
         val res = connector.initialiseAddressLookup("testUrl", isAgent = false)

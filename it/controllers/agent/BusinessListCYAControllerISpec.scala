@@ -16,8 +16,6 @@
 
 package controllers.agent
 
-import java.time.LocalDate
-
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
@@ -29,7 +27,10 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
+import java.time.LocalDate
+
 class BusinessListCYAControllerISpec extends ComponentSpecBase {
+
   val businessId: String = "testId"
   val testBusinessName: String = "businessName"
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
@@ -53,7 +54,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When("GET /client/details/business-list is called")
         val res = getClientCheckYourAnswers(businessId)
@@ -69,7 +70,7 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
       "show check your answers page" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /client/details/business-list is called")
         val res = getClientCheckYourAnswers(businessId)
@@ -87,10 +88,10 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
     "return SEE_OTHER when clicking on continue" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("POST /client/details/business-list is called")
-      val result = submitClientCheckYourAnswers(Some(AddAnotherBusinessModel(No)),1, 5)
+      val result = submitClientCheckYourAnswers(Some(AddAnotherBusinessModel(No)), 1, 5)
 
       Then("should return SEE_OTHER with InitialiseURI")
 
@@ -104,10 +105,10 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
     "return BAD_REQUEST when no Answer is given" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSelfEmployments(businessesKey)(OK, Json.toJson(testBusinesses))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("POST /details/business-list is called")
-      val result = submitClientCheckYourAnswers(None,1, 5)
+      val result = submitClientCheckYourAnswers(None, 1, 5)
       val doc: Document = Jsoup.parse(result.body)
 
       Then("should return an BAD_REQUEST")

@@ -21,7 +21,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm
@@ -29,7 +29,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.mockBusinessNameModel
 
-class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSelfEmploymentsService {
+class BusinessNameControllerSpec extends ControllerBaseSpec
+  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector {
 
   val id: String = "testId"
 
@@ -42,6 +43,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
   object TestBusinessNameController extends BusinessNameController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
+    mockIncomeTaxSubscriptionConnector,
     mockAuthService
   )
 
@@ -64,7 +66,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
         mockFetchAllBusinesses(
           Right(Seq(selfEmploymentData))
         )
-        val result = TestBusinessNameController.show(id,isEditMode = false)(FakeRequest())
+        val result = TestBusinessNameController.show(id,isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -74,7 +76,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
           Right(Seq(selfEmploymentData.copy(businessName = None)))
         )
 
-        val result = TestBusinessNameController.show(id,isEditMode = false)(FakeRequest())
+        val result = TestBusinessNameController.show(id,isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -85,7 +87,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
         mockFetchAllBusinesses(
           Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
-        intercept[InternalServerException](await(TestBusinessNameController.show(id,isEditMode = false)(FakeRequest())))
+        intercept[InternalServerException](await(TestBusinessNameController.show(id,isEditMode = false)(fakeRequest)))
       }
     }
 
@@ -99,10 +101,10 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
           mockFetchAllBusinesses(
             Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
           )
-          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result = TestBusinessNameController.submit(id,isEditMode = false)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
@@ -114,7 +116,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
           mockFetchAllBusinesses(
             Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
           )
-          val result = TestBusinessNameController.submit(id,isEditMode = false)(FakeRequest())
+          val result = TestBusinessNameController.submit(id,isEditMode = false)(fakeRequest)
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
         }
@@ -136,7 +138,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
           ))
         )
         val result = TestBusinessNameController.submit("idTwo", isEditMode = false)(
-          FakeRequest().withFormUrlEncodedBody(modelToFormData(BusinessNameModel("nameOne")): _*)
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(BusinessNameModel("nameOne")): _*)
         )
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
@@ -148,7 +150,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
             Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
           )
 
-          intercept[InternalServerException](await(TestBusinessNameController.submit(id, isEditMode = false)(FakeRequest())))
+          intercept[InternalServerException](await(TestBusinessNameController.submit(id, isEditMode = false)(fakeRequest)))
         }
       }
     }
@@ -159,9 +161,9 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
           mockFetchAllBusinesses(
             Right(Seq(selfEmploymentData.copy(businessName = Some(BusinessNameModel("nameOne")))))
           )
-          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
           val result = TestBusinessNameController.submit(id,isEditMode = true)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
@@ -172,9 +174,9 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
           mockFetchAllBusinesses(
             Right(Seq(selfEmploymentData))
           )
-          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSelfEmploymentsSuccessResponse))
+          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
           val result = TestBusinessNameController.submit(id, isEditMode = true)(
-            FakeRequest().withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
@@ -186,7 +188,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec with MockMultipleSel
           mockFetchAllBusinesses(
             Right(Seq(selfEmploymentData))
           )
-          val result = TestBusinessNameController.submit(id,isEditMode = true)(FakeRequest())
+          val result = TestBusinessNameController.submit(id,isEditMode = true)(fakeRequest)
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some("text/html")
         }

@@ -21,21 +21,22 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object PostSelfEmploymentsHttpParser {
 
-  type PostSelfEmploymentsResponse = Either[PostSelfEmploymentsFailure, PostSelfEmploymentsSuccess]
+  type PostSubscriptionDetailsResponse = Either[PostSubscriptionDetailsFailure, PostSubscriptionDetailsSuccess]
 
-  implicit def postSelfEmploymentsHttpReads: HttpReads[PostSelfEmploymentsResponse] =
-    new HttpReads[PostSelfEmploymentsResponse] {
-      override def read(method: String, url: String, response: HttpResponse): PostSelfEmploymentsResponse = {
-        response.status match {
-          case OK => Right(PostSelfEmploymentsSuccessResponse)
-          case status => Left(UnexpectedStatusFailure(status))
-        }
+  implicit def postSelfEmploymentsHttpReads: HttpReads[PostSubscriptionDetailsResponse] =
+    (_: String, _: String, response: HttpResponse) => {
+      response.status match {
+        case OK => Right(PostSubscriptionDetailsSuccessResponse)
+        case status => Left(UnexpectedStatusFailure(status))
       }
     }
-  sealed trait PostSelfEmploymentsSuccess
-  case object PostSelfEmploymentsSuccessResponse extends PostSelfEmploymentsSuccess
 
-  sealed trait PostSelfEmploymentsFailure
-  case class UnexpectedStatusFailure(status: Int) extends PostSelfEmploymentsFailure
+  sealed trait PostSubscriptionDetailsSuccess
+
+  case object PostSubscriptionDetailsSuccessResponse extends PostSubscriptionDetailsSuccess
+
+  sealed trait PostSubscriptionDetailsFailure
+
+  case class UnexpectedStatusFailure(status: Int) extends PostSubscriptionDetailsFailure
 
 }

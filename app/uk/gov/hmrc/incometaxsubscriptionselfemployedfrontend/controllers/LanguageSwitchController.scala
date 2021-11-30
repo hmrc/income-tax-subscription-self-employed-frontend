@@ -30,7 +30,8 @@ class LanguageSwitchController @Inject()(appConfig: AppConfig,
                                          controllerComponents: ControllerComponents)
   extends LanguageController(languageUtils, controllerComponents) {
 
-    override def languageMap: Map[String, Lang] = appConfig.languageMap
+  override def languageMap: Map[String, Lang] = appConfig.languageMap
 
-    override def fallbackURL: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.InitialiseController.initialise().url
-  }
+  override def fallbackURL: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.InitialiseController.initialise().url
+
+}

@@ -33,7 +33,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(businessAccountingMethodKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
         When("GET /details/business-accounting-method is called")
         val res = getBusinessAccountingMethod()
@@ -52,7 +52,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
         "show the current business accounting method page with previously selected option and a continue button" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
-          stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+          stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod()
@@ -74,7 +74,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
         "show the current business accounting method page with previously selected option and an update button" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
-          stubGetSelfEmployments(businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+          stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod(true)
@@ -103,7 +103,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           "redirect to self employed check your answer page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
             And("save and retrieve is enabled")
             enable(SaveAndRetrieve)
 
@@ -122,7 +122,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           "redirect to sign up frontend business routing controller" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
             And("save and retrieve is disabled")
             disable(SaveAndRetrieve)
 
@@ -143,7 +143,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           "redirect to self employed check your answer page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
             And("save and retrieve is enabled")
             enable(SaveAndRetrieve)
 
@@ -162,7 +162,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           "redirect to sign up frontend final check your answer page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
+            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
             And("save and retrieve is disabled")
             disable(SaveAndRetrieve)
 
@@ -182,7 +182,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
     "the form data is invalid and connector stores it unsuccessfully" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubSaveSelfEmployments(businessAccountingMethodKey, Json.toJson("invalid"))(OK)
+      stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson("invalid"))(OK)
 
       When("POST /details/business-accounting-method is called")
       val res = submitBusinessAccountingMethod(None)

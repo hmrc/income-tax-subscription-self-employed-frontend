@@ -22,7 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
 
@@ -32,7 +32,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       "return the page with no prepopulated fields" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
         When("GET /client/details/business-accounting-method is called")
         val res = getClientBusinessAccountingMethod()
@@ -46,13 +46,11 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       }
     }
 
-
     "Connector returns a previously selected Accounting method option" should {
       "show the current business accounting method page with previously selected option" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(OK,
-          Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
         When("GET /client/details/business-accounting-method is called")
         val res = getClientBusinessAccountingMethod()
@@ -75,8 +73,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          Json.toJson(testAccountingMethodModel))(OK)
+        stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
 
         When("POST /client/details/business-accounting-method is called")
         val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel))
@@ -92,8 +89,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       "the form data is invalid and connector stores it unsuccessfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          Json.toJson("invalid"))(OK)
+        stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson("invalid"))(OK)
 
         When("POST /client/details/business-accounting-method is called")
         val res = submitClientBusinessAccountingMethod(None)
@@ -109,11 +105,11 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+        stubSaveSubscriptionData(reference, businessAccountingMethodKey,
           Json.toJson(testAccountingMethodModel))(OK)
 
         When("POST /client/details/business-accounting-method?isEditMode=true is called")
-        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel), true)
+        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true)
 
 
         Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
@@ -126,8 +122,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
       "the form data is invalid and connector stores it unsuccessfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
-          Json.toJson("invalid"))(OK)
+        stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson("invalid"))(OK)
 
         When("POST /client/details/business-accounting-method is called")
         val res = submitClientBusinessAccountingMethod(None)

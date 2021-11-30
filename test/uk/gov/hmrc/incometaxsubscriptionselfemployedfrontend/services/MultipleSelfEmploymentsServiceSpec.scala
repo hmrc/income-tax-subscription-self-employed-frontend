@@ -45,6 +45,8 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
     businessAddress = Some(businessAddress(id))
   )
 
+  val testReference: String = "test-reference"
+
   "findData[T]" must {
     "return the specified data" when {
       "the searched business is present in the returned businesses and has the required data" in new Setup {
@@ -55,8 +57,8 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           )))
         )
 
-        await(service.findData[BusinessNameModel]("1", _.businessName)) mustBe Right(Some(businessName("1")))
-        await(service.findData[BusinessNameModel]("2", _.businessName)) mustBe Right(Some(businessName("2")))
+        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(Some(businessName("1")))
+        await(service.findData[BusinessNameModel](testReference, "2", _.businessName)) mustBe Right(Some(businessName("2")))
       }
     }
     "return no data" when {
@@ -67,7 +69,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           )))
         )
 
-        await(service.findData[BusinessNameModel]("1", _.businessName)) mustBe Right(None)
+        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(None)
       }
       "the searched business is not present in the returned businesses" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
@@ -76,14 +78,14 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           )))
         )
 
-        await(service.findData[BusinessNameModel]("2", _.businessName)) mustBe Right(None)
+        await(service.findData[BusinessNameModel](testReference, "2", _.businessName)) mustBe Right(None)
       }
       "no data for the user was returned" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(None)
         )
 
-        await(service.findData[BusinessNameModel]("1", _.businessName)) mustBe Right(None)
+        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(None)
       }
     }
     "return a failure" when {
@@ -92,7 +94,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           response = Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
-        await(service.findData[BusinessNameModel]("1", _.businessName)) mustBe Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
       }
     }
   }
@@ -106,7 +108,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           )))
         )
 
-        await(service.findData[BusinessStartDate]("1", _.businessStartDate)) mustBe Right(Some(businessStartDate("1")))
+        await(service.findData[BusinessStartDate](testReference, "1", _.businessStartDate)) mustBe Right(Some(businessStartDate("1")))
       }
     }
   }
@@ -120,7 +122,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           )))
         )
 
-        await(service.findData[BusinessNameModel]("1", _.businessName)) mustBe Right(Some(businessName("1")))
+        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(Some(businessName("1")))
       }
     }
   }
@@ -134,7 +136,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           )))
         )
 
-        await(service.findData[BusinessTradeNameModel]("1", _.businessTradeName)) mustBe Right(Some(businessTrade("1")))
+        await(service.findData[BusinessTradeNameModel](testReference, "1", _.businessTradeName)) mustBe Right(Some(businessTrade("1")))
       }
     }
   }
@@ -148,7 +150,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           )))
         )
 
-        await(service.findData[BusinessAddressModel]("1", _.businessAddress)) mustBe Right(Some(businessAddress("1")))
+        await(service.findData[BusinessAddressModel](testReference, "1", _.businessAddress)) mustBe Right(Some(businessAddress("1")))
       }
     }
   }
@@ -164,10 +166,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(fullSelfEmploymentData("1").copy(businessName = Some(businessName("2"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessName = Some(businessName("2"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("2"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "the business is returned with no data for the field being saved" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
@@ -178,10 +180,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(fullSelfEmploymentData("1"))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessName = Some(businessName("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "no business matches the business id to save against" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
@@ -192,10 +194,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(fullSelfEmploymentData("2"), SelfEmploymentData("1", businessName = Some(businessName("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessName = Some(businessName("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "there are no businesses currently saved" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
@@ -204,10 +206,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessName = Some(businessName("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
     "return a failure" when {
@@ -220,14 +222,14 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1"))))
         )(Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        await(service.saveData("1", _.copy(businessName = Some(businessName("1"))))) mustBe
+        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
       "a failure is returned from the fetch" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
-        await(service.saveData("1", _.copy(businessName = Some(businessName("1"))))) mustBe
+        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
     }
@@ -242,10 +244,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(SelfEmploymentData("1", businessStartDate = Some(businessStartDate("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessStartDate = Some(businessStartDate("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessStartDate = Some(businessStartDate("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
   }
@@ -259,10 +261,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessName = Some(businessName("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
   }
@@ -276,10 +278,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(SelfEmploymentData("1", businessTradeName = Some(businessTrade("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessTradeName = Some(businessTrade("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessTradeName = Some(businessTrade("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
   }
@@ -293,10 +295,10 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(SelfEmploymentData("1", businessAddress = Some(businessAddress("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData("1", _.copy(businessAddress = Some(businessAddress("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse)
+        await(service.saveData(testReference, "1", _.copy(businessAddress = Some(businessAddress("1"))))) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
   }

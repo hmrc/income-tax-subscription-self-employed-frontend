@@ -23,7 +23,8 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSelfEmploymentsResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.RetrieveReferenceResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
 import scala.concurrent.Future
@@ -37,17 +38,23 @@ trait MockIncomeTaxSubscriptionConnector extends UnitTestTrait with MockitoSugar
     reset(mockIncomeTaxSubscriptionConnector)
   }
 
+  def mockRetrieveReference(utr: String)(response: RetrieveReferenceResponse): OngoingStubbing[Future[RetrieveReferenceResponse]] = {
+    when(mockIncomeTaxSubscriptionConnector.retrieveReference(ArgumentMatchers.eq(utr))(ArgumentMatchers.any()))
+      .thenReturn(Future.successful(response))
+  }
+
   def mockGetSelfEmployments[T](id: String)
                                (response: GetSelfEmploymentsResponse[T]): OngoingStubbing[Future[GetSelfEmploymentsResponse[T]]] = {
-    when(mockIncomeTaxSubscriptionConnector.getSelfEmployments[T](
+    when(mockIncomeTaxSubscriptionConnector.getSubscriptionDetails[T](
+      ArgumentMatchers.any(),
       ArgumentMatchers.eq(id)
     )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 
   def mockSaveSelfEmployments[T](id: String, value: T)
-                                (response: PostSelfEmploymentsResponse): OngoingStubbing[Future[PostSelfEmploymentsResponse]] = {
-    when(mockIncomeTaxSubscriptionConnector.saveSelfEmployments[T](
-      ArgumentMatchers.eq(id), ArgumentMatchers.eq(value)
+                                (response: PostSubscriptionDetailsResponse): OngoingStubbing[Future[PostSubscriptionDetailsResponse]] = {
+    when(mockIncomeTaxSubscriptionConnector.saveSubscriptionDetails[T](
+      ArgumentMatchers.any(), ArgumentMatchers.eq(id), ArgumentMatchers.eq(value)
     )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 

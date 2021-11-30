@@ -61,9 +61,9 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq(businessData.copy(id = "testId2"))
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        val result: Future[Result] = TestRemoveBusinessController.show(id)(FakeRequest())
+        val result: Future[Result] = TestRemoveBusinessController.show(id)(fakeRequest)
         status(result) mustBe 303
         redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
       }
@@ -78,9 +78,9 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
           value = Seq()
-        )(Right(PostSelfEmploymentsHttpParser.PostSelfEmploymentsSuccessResponse))
+        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        val result: Future[Result] = TestRemoveBusinessController.show(id)(FakeRequest())
+        val result: Future[Result] = TestRemoveBusinessController.show(id)(fakeRequest)
         status(result) mustBe 303
         redirectLocation(result).get must include("/report-quarterly/income-and-expenses/sign-up/details/income-receive")
       }
@@ -91,7 +91,7 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(None))
 
-        val result: Future[Result] = TestRemoveBusinessController.show(id)(FakeRequest())
+        val result: Future[Result] = TestRemoveBusinessController.show(id)(fakeRequest)
         status(result) mustBe 303
         redirectLocation(result).get must include("/report-quarterly/income-and-expenses/sign-up/self-employments/details")
       }
@@ -101,7 +101,7 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
           businessData.copy(businessName = None)
         ))))
 
-        val result: Future[Result] = TestRemoveBusinessController.show(id)(FakeRequest())
+        val result: Future[Result] = TestRemoveBusinessController.show(id)(fakeRequest)
         status(result) mustBe 303
         redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
       }
@@ -112,7 +112,7 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(TestRemoveBusinessController.show(id)(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestRemoveBusinessController.show(id)(fakeRequest)))
         response.message mustBe "[RemoveBusinessController][show] - getSelfEmployments connection failure, status: 500"
       }
 
@@ -126,7 +126,7 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
           value = Seq()
         )(Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(TestRemoveBusinessController.show(id)(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestRemoveBusinessController.show(id)(fakeRequest)))
         response.message mustBe "[RemoveBusinessController][show] - saveSelfEmployments failure, error: UnexpectedStatusFailure(500)"
       }
 
@@ -134,7 +134,7 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
         mockAuthSuccess()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Left(InvalidJson))
 
-        val response = intercept[InternalServerException](await(TestRemoveBusinessController.show(id)(FakeRequest())))
+        val response = intercept[InternalServerException](await(TestRemoveBusinessController.show(id)(fakeRequest)))
         response.message mustBe ("[RemoveBusinessController][show] - Invalid Json")
       }
     }
