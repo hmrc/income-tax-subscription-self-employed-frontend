@@ -111,7 +111,6 @@ addressLookup.confirmPage.title                                 = Cadarnhau cyfe
 addressLookup.confirmPage.heading                               = Cadarnhau cyfeiriad busnes
 
 # Agent Business start date
-business.agent.start_date.title                                 = Pryd y dechreuodd busnes unig fasnachwr eich cleient fasnachu?
 business.agent.start_date.heading                               = Pryd y dechreuodd busnes unig fasnachwr eich cleient fasnachu?
 business.agent.start_date.exampleStartDate                      = Er enghraifft, 1 8 2014
 

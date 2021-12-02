@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUti
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.date_of_commencement
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
@@ -42,13 +42,14 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                             val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService,
-                                            val languageUtils: LanguageUtils)
+                                            val languageUtils: LanguageUtils,
+                                            businessStartDate: BusinessStartDateView)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
   extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with ReferenceRetrieval {
 
-  def view(dateOfCommencementForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
-    date_of_commencement(
-      dateOfCommencementForm = dateOfCommencementForm,
+  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
+    businessStartDate(
+      startDateForm = businessStartDateForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
       backUrl = backUrl(isEditMode)

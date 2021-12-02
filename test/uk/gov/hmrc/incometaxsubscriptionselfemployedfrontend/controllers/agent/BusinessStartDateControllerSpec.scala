@@ -16,56 +16,92 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{reset, when}
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, Call}
 import play.api.test.Helpers._
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.{ControllerBaseSpec, agent}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, BusinessStartDate => BusinessStartDateModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
+import uk.gov.hmrc.play.language.LanguageUtils
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector {
+  with MockMultipleSelfEmploymentsService
+  with MockIncomeTaxSubscriptionConnector
+  with ImplicitDateFormatter {
 
+  val businessStartDate: BusinessStartDate = mock[BusinessStartDate]
   val id: String = "testId"
 
+  override val languageUtils: LanguageUtils = app.injector.instanceOf[LanguageUtils]
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
     "show" -> TestBusinessStartDateController.show(id, isEditMode = false),
     "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false)
   )
 
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(businessStartDate)
+  }
+
+  def mockBusinessStartDate(form: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String): Unit = {
+    when(businessStartDate(
+      ArgumentMatchers.any(),
+      ArgumentMatchers.any(),
+      ArgumentMatchers.eq(isEditMode),
+      ArgumentMatchers.eq(backUrl)
+    )(any(), any())) thenReturn HtmlFormat.empty
+  }
+
+  def businessStartDateForm(fill: Option[BusinessStartDateModel] = None, bind: Option[Map[String, String]] = None): Form[BusinessStartDateModel] = {
+    val filledForm = BusinessStartDateForm.businessStartDateForm(
+      minStartDate = BusinessStartDateForm.minStartDate.toLongDate,
+      maxStartDate = BusinessStartDateForm.maxStartDate.toLongDate
+    ).fill(fill)
+    bind match {
+      case Some(data) => filledForm.bind(data)
+      case None => filledForm
+    }
+  }
+
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
     mockIncomeTaxSubscriptionConnector,
     mockAuthService,
-    mockLanguageUtils
+    mockLanguageUtils,
+    businessStartDate
   )
 
-  def modelToFormData(businessStartDateModel: BusinessStartDate): Seq[(String, String)] = {
-    BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").fill(businessStartDateModel).data.toSeq
+  def modelToFormData(model: BusinessStartDateModel): Seq[(String, String)] = {
+    BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").fill(model).data.toSeq
   }
-
-  def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
-    id = id,
-    businessStartDate = Some(BusinessStartDate(DateModel("8", "8", "2016"))),
-    businessName = Some(BusinessNameModel("testBusinessName")),
-    businessTradeName = Some(BusinessTradeNameModel("testTrade")),
-    businessAddress = Some(BusinessAddressModel("12345", Address(Seq("line1"), "TF3 4NT")))
-  )
 
   "Show" should {
     "return ok (200)" when {
       "the connector returns data" in {
+        val returnedModel: BusinessStartDateModel = BusinessStartDateModel(DateModel("01", "01", "2000"))
+
         mockAuthSuccess()
-        mockFetchBusinessStartDate(id)(
-          Right(Some(BusinessStartDate(DateModel("01", "01", "2000"))))
+        mockFetchBusinessStartDate(id)(Right(Some(returnedModel)))
+        mockBusinessStartDate(
+          form = businessStartDateForm(fill = Some(returnedModel)),
+          postAction = agent.routes.BusinessStartDateController.submit(id),
+          isEditMode = false,
+          backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
         )
 
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
@@ -76,11 +112,29 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "the connector returns no data" in {
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(None))
+        mockBusinessStartDate(
+          form = businessStartDateForm(),
+          postAction = agent.routes.BusinessStartDateController.submit(id),
+          isEditMode = false,
+          backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+        )
 
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
+      }
+      "the page is in edit mode" in {
+        val returnedModel: BusinessStartDateModel = BusinessStartDateModel(DateModel("01", "01", "2000"))
+
+        mockAuthSuccess()
+        mockFetchBusinessStartDate(id)(Right(Some(returnedModel)))
+        mockBusinessStartDate(
+          form = businessStartDateForm(fill = Some(returnedModel)),
+          postAction = agent.routes.BusinessStartDateController.submit(id),
+          isEditMode = true,
+          backUrl = agent.routes.BusinessListCYAController.show().url
+        )
       }
     }
     "Throw an internal exception error" when {
@@ -106,13 +160,19 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id).url)
+            Some(agent.routes.BusinessNameController.show(id).url)
         }
       }
       "return 400, SEE_OTHER" when {
         "the user submits invalid data" in {
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+          mockBusinessStartDate(
+            form = businessStartDateForm(bind = None),
+            postAction = agent.routes.BusinessStartDateController.submit(id),
+            isEditMode = false,
+            backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+          )
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = false)(fakeRequest)
 
@@ -133,13 +193,19 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url)
+            Some(agent.routes.BusinessListCYAController.show().url)
         }
       }
       "return 400, SEE_OTHER" when {
         "the user submits invalid data" in {
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+          mockBusinessStartDate(
+            form = businessStartDateForm(bind = None),
+            postAction = agent.routes.BusinessListCYAController.submit(),
+            isEditMode = true,
+            backUrl = agent.routes.BusinessListCYAController.show().url
+          )
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = true)(fakeRequest)
 

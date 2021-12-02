@@ -74,7 +74,7 @@ object NewDateModelMapping {
 
   def dateModelFormatter(isAgent: Boolean = false, errorContext: String): Formatter[DateModel] = new Formatter[DateModel] {
 
-    def errorKey(error: String): String = if (isAgent) s"agent.error.$errorContext.$error" else s"error.$errorContext.$error"
+    def errorKey(error: String): String = if (isAgent) s"error.agent.$errorContext.$error" else s"error.$errorContext.$error"
 
     def totalDayKey(key: String): String = s"$key-$day"
 

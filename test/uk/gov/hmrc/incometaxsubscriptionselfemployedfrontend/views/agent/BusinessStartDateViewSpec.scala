@@ -17,79 +17,99 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.agent
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import play.api.data.{Form, FormError}
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
+import org.jsoup.nodes.{Document, Element}
+import play.api.data.FormError
+import play.twirl.api.Html
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.date_of_commencement
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 
 class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
-    val title = "When did your client’s sole trader business start trading?"
-    val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
-    val heading: String = title
+    val heading: String = "When did your client’s sole trader business start trading?"
     val exampleStartDate = "For example, 1 8 2014"
     val continue = "Continue"
-    val backLink = "Back"
     val update = "Update"
   }
 
-  val backUrl: String = testBackUrl
-  val action: Call = testCall
   val taxYearEnd: Int = 2020
-  val testError: FormError = FormError("startDate", "testError")
 
-  class Setup(isEditMode: Boolean = false,
-              dateOfCommencementForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm(
-                "minStartDateError", "maxStartDateError"
-              )) {
-    val page: HtmlFormat.Appendable = date_of_commencement(
-      dateOfCommencementForm,
-      testCall,
-      isEditMode,
-      testBackUrl
-    )(FakeRequest(), implicitly, appConfig)
+  val businessStartDateView: BusinessStartDate = app.injector.instanceOf[BusinessStartDate]
 
-    val document: Document = Jsoup.parse(page.body)
+  def page(isEditMode: Boolean = false, error: Option[FormError] = None): Html = {
+    val form = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError")
+    businessStartDateView(
+      startDateForm = error match {
+        case Some(value) => form.withError(value)
+        case None => form
+      },
+      postAction = testCall,
+      isEditMode = isEditMode,
+      backUrl = testBackUrl
+    )(fakeTestRequest, implicitly)
   }
 
-  "Date of Commencement" must {
+  def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document = Jsoup.parse(page(isEditMode, error).body)
 
-    "have a title" in new Setup {
-      document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
+  val testError: FormError = FormError(BusinessStartDateForm.startDate, "test error message")
+
+  "BusinessStartDate" must {
+    "have the correct template details" when {
+      "there is no error on the page" in new TemplateViewTest(
+        view = page(),
+        title = BusinessStartDateMessages.heading,
+        isAgent = true,
+        backLink = Some(testBackUrl),
+        hasSignOutLink = true
+      )
+      "there is an error on the page" in new TemplateViewTest(
+        view = page(error = Some(testError)),
+        title = BusinessStartDateMessages.heading,
+        isAgent = true,
+        backLink = Some(testBackUrl),
+        hasSignOutLink = true,
+        error = Some(testError)
+      )
     }
-    "have a heading" in new Setup {
-      document.getH1Element.text mustBe BusinessStartDateMessages.heading
+
+    "have a form" which {
+
+      "has the correct action and method assigned" in {
+        val form: Element = document().getForm
+        form.attr("method") mustBe testCall.method
+        form.attr("action") mustBe testCall.url
+      }
+
+      "has a correct date input field with the legend as the page heading" when {
+        "there is no error on the page" in {
+          document().getForm.mustHaveDateInput(
+            name = BusinessStartDateForm.startDate,
+            label = BusinessStartDateMessages.heading,
+            hint = Some(BusinessStartDateMessages.exampleStartDate)
+          )
+        }
+        "there is an error on the page" in {
+          document(error = Some(testError)).getForm.mustHaveDateInput(
+            name = BusinessStartDateForm.startDate,
+            label = BusinessStartDateMessages.heading,
+            hint = Some(BusinessStartDateMessages.exampleStartDate),
+            error = Some(testError)
+          )
+        }
+      }
+
+      "has a button to continue" when {
+        "not in edit mode" in {
+          document().getForm.getGovukButton.text mustBe BusinessStartDateMessages.continue
+        }
+        "in edit mode" in {
+          document(isEditMode = true).getForm.getGovukButton.text mustBe BusinessStartDateMessages.update
+        }
+      }
+
     }
-    "have a Form" in new Setup {
-      document.getForm.attr("method") mustBe testCall.method
-      document.getForm.attr("action") mustBe testCall.url
-    }
-    "have a fieldset with dateInputs" in new Setup {
-      document.mustHaveDateField("startDate", BusinessStartDateMessages.heading, BusinessStartDateMessages.exampleStartDate)
-    }
-    "have a continue button when not in edit mode" in new Setup {
-      document.getSubmitButton.text mustBe BusinessStartDateMessages.continue
-    }
-    "have update button when in edit mode" in new Setup(true) {
-      document.getSubmitButton.text mustBe BusinessStartDateMessages.update
-    }
-    "have a backlink " in new Setup {
-      document.getBackLink.text mustBe BusinessStartDateMessages.backLink
-      document.getBackLink.attr("href") mustBe testBackUrl
-    }
-    "must display form error on page" in new Setup(
-      isEditMode = false,
-      dateOfCommencementForm = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").withError(testError)
-    ) {
-      document.mustHaveErrorSummary(List[String](testError.message))
-      document.mustHaveDateField("startDate", BusinessStartDateMessages.heading, BusinessStartDateMessages.exampleStartDate, Some(testError.message))
-    }
+
 
   }
 

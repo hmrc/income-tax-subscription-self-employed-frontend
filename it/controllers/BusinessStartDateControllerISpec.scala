@@ -59,7 +59,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your sole trader business start trading?" + titleSuffix)
+          pageTitle("When did your sole trader business start trading?" + titleSuffix),
+          dateField("startDate", DateModel("", "", ""))
         )
       }
     }
@@ -78,7 +79,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
         res must have(
           httpStatus(OK),
           pageTitle("When did your sole trader business start trading?" + titleSuffix),
-          dateField("startDate", testValidStartDate, "-")
+          dateField("startDate", testValidStartDate)
         )
       }
     }

@@ -98,7 +98,13 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
       element.select(selector).headOption
     }
 
+    def selectNth(selector: String, nth: Int): Element = {
+      element.selectHead(s"$selector:nth-of-type($nth)")
+    }
+
     def content: Element = element.getElementsByTag("article").head
+
+    def mainContent: Element = element.selectHead("main")
 
     def getParagraphs: Elements = element.getElementsByTag("p")
 
@@ -120,13 +126,15 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
 
     def getSubmitButton: Elements = element.select("button[type=submit]")
 
+    def getGovukButton: Element = element.selectHead("button[class=govuk-button]")
+
     def getButtonByClass: String = element.select(s"""[class=govuk-button]""").text()
 
     def getHintText: String = element.select(s"""[class=form-hint]""").text()
 
     def getHintTextByClass: String = element.select(s"""[class=govuk-hint]""").text()
 
-    def getForm: Elements = element.select("form")
+    def getForm: Element = element.selectHead("form")
 
     def getBackLink: Elements = element.select(s"a[class=link-back]")
     def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
@@ -206,18 +214,60 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
       } forall (_ == succeed) mustBe true
     }
 
-    def mustHaveDateField(id: String, legend: String, exampleDate: String, error: Option[String] = None): Assertion = {
-      val ele = element.getElementById(id)
-      ele.attr("aria-describedby") mustBe s"$id-hint${error.map(_ => s" $id-error").getOrElse("")}"
-      ele.selectHead("legend").text mustBe legend
-      ele.selectHead(s"div.form-hint[id=$id-hint]").text mustBe exampleDate
-      ele.tag().toString mustBe "fieldset"
-      mustHaveTextField(s"$id.dateDay", "Day")
-      mustHaveTextField(s"$id.dateMonth", "Month")
-      mustHaveTextField(s"$id.dateYear", "Year")
-      error.map { message =>
-        ele.selectHead(s"div[id=$id-error]").text mustBe s"Error: $message"
-      }.getOrElse(succeed)
+    def mustHaveDateInput(name: String,
+                          label: String,
+                          isPageHeading: Boolean = true,
+                          hint: Option[String] = None,
+                          error: Option[FormError] = None,
+                          isDateOfBirth: Boolean = false): Assertion = {
+
+      val fieldset: Element = element.selectHead("fieldset")
+      val legend: Element = element.selectHead("legend")
+
+      if(isPageHeading) legend.selectHead("h1").text mustBe label
+      else legend.text mustBe label
+
+      hint.foreach { value =>
+        element.selectHead(s"#$name-hint").text mustBe value
+        fieldset.attr("aria-describedby").contains(s"$name-hint") mustBe true
+      }
+
+      error.foreach { value =>
+        element.selectHead(s"#${value.key}-error").text mustBe s"Error: ${value.message}"
+        fieldset.attr("aria-describedby").contains(s"${value.key}-error") mustBe true
+      }
+
+      val dayInput: Element = fieldset.selectNth(".govuk-date-input__item", 1).selectHead("input")
+      val dayLabel: Element = fieldset.selectNth(".govuk-date-input__item", 1).selectHead("label")
+      val monthInput: Element = fieldset.selectNth(".govuk-date-input__item", 2).selectHead("input")
+      val monthLabel: Element = fieldset.selectNth(".govuk-date-input__item", 2).selectHead("label")
+      val yearInput: Element = fieldset.selectNth(".govuk-date-input__item", 3).selectHead("input")
+      val yearLabel: Element = fieldset.selectNth(".govuk-date-input__item", 3).selectHead("label")
+
+      dayInput.attr("name") mustBe s"$name-dateDay"
+      dayInput.attr("type") mustBe "text"
+      dayInput.attr("pattern") mustBe "[0-9]*"
+      dayInput.attr("inputmode") mustBe "numeric"
+      if (isDateOfBirth) dayInput.attr("autocomplete") mustBe "bday-day"
+      dayLabel.text mustBe "Day"
+      dayLabel.attr("for") mustBe s"$name-dateDay"
+
+      monthInput.attr("name") mustBe s"$name-dateMonth"
+      monthInput.attr("type") mustBe "text"
+      monthInput.attr("pattern") mustBe "[0-9]*"
+      monthInput.attr("inputmode") mustBe "numeric"
+      if (isDateOfBirth) monthInput.attr("autocomplete") mustBe "bday-month"
+      monthLabel.text mustBe "Month"
+      monthLabel.attr("for") mustBe s"$name-dateMonth"
+
+      yearInput.attr("name") mustBe s"$name-dateYear"
+      yearInput.attr("type") mustBe "text"
+      yearInput.attr("pattern") mustBe "[0-9]*"
+      yearInput.attr("inputmode") mustBe "numeric"
+      if (isDateOfBirth) yearInput.attr("autocomplete") mustBe "bday-year"
+      yearLabel.text mustBe "Year"
+      yearLabel.attr("for") mustBe s"$name-dateYear"
+
     }
 
     def mustHavePara(paragraph: String): Assertion = {
