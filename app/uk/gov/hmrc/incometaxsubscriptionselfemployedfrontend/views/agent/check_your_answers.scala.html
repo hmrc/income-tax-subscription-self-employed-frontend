@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.helpers.RadioOption
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SelfEmploymentData
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessAddressModel
@@ -49,7 +49,7 @@
     </div>
 }
 
-@tradingStartDate(businessStartDate: BusinessStartDate, businessId: String) = @{
+@tradingStartDate(businessStartDate: BusinessStartDateModel, businessId: String) = @{
     import implicitDateFormatter.LongDate
     val question: String = messages("agent.check_your_answers.trading_start_date")
     val answer: String = businessStartDate.startDate.toLocalDate.toLongDate

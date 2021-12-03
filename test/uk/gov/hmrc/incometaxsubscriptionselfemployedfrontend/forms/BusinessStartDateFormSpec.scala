@@ -72,7 +72,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         }
         "it is within 2 years" in {
           val oneYearAgo: LocalDate = LocalDate.now.minusYears(1)
-          val maxTest = form.bind(DataMap.date(startDate,"-")(
+          val maxTest = form.bind(DataMap.date(startDate)(
             oneYearAgo.getDayOfMonth.toString,
             oneYearAgo.getMonthValue.toString,
             oneYearAgo.getYear.toString
@@ -80,40 +80,40 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
           maxTest.errors must contain(FormError(startDate, beforeMax, Seq(BusinessStartDateForm.maxStartDate.toString)))
         }
         "it is before 1900" in {
-          val minTest = form.bind(DataMap.date(startDate,"-")("31", "12", "1899"))
+          val minTest = form.bind(DataMap.date(startDate)("31", "12", "1899"))
           minTest.errors must contain(FormError(startDate, beforeMin, Seq(BusinessStartDateForm.minStartDate.toString)))
         }
         "it is missing the day" in {
-          val map = DataMap.date(startDate, "-")("", "4", "2017")
+          val map = DataMap.date(startDate)("", "4", "2017")
           val test = form.bind(map)
           test.errors must contain(FormError(dayKeyError, s"$errorContext.day.empty"))
         }
         "it is missing the month" in {
-          val test = form.bind(DataMap.date(startDate,"-")("1", "", "2017"))
+          val test = form.bind(DataMap.date(startDate)("1", "", "2017"))
           test.errors must contain(FormError(monthKeyError, s"$errorContext.month.empty"))
         }
         "it is missing the year" in {
-          val test = form.bind(DataMap.date(startDate,"-")("1", "1", ""))
+          val test = form.bind(DataMap.date(startDate)("1", "1", ""))
           test.errors must contain(FormError(yearKeyError, s"$errorContext.year.empty"))
         }
         "it is missing multiple fields" in {
-          val test = form.bind(DataMap.date(startDate,"-")("", "", "2017"))
+          val test = form.bind(DataMap.date(startDate)("", "", "2017"))
           test.errors must contain(FormError(startDate, s"$errorContext.day_month.empty"))
         }
         "it has an invalid day" in {
-          val test = form.bind(DataMap.date(startDate,"-")("0", "1", "2017"))
+          val test = form.bind(DataMap.date(startDate)("0", "1", "2017"))
           test.errors must contain(FormError(dayKeyError, s"$errorContext.invalid"))
         }
         "it has an invalid month" in {
-          val test = form.bind(DataMap.date(startDate,"-")("1", "13", "2017"))
+          val test = form.bind(DataMap.date(startDate)("1", "13", "2017"))
           test.errors must contain(FormError(startDate, s"$errorContext.invalid"))
         }
         "it has an invalid year" in {
-          val test = form.bind(DataMap.date(startDate,"-")("1", "1", "invalid"))
+          val test = form.bind(DataMap.date(startDate)("1", "1", "invalid"))
           test.errors must contain(FormError(startDate, s"$errorContext.invalid"))
         }
         "it has multiple invalid fields" in {
-          val test = form.bind(DataMap.date(startDate,"-")("0", "0", "2017"))
+          val test = form.bind(DataMap.date(startDate)("0", "0", "2017"))
           test.errors must contain(FormError(startDate, s"$errorContext.invalid"))
         }
       }
@@ -122,7 +122,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "accept a valid date" when {
       "the date is exactly two years ago" in {
         val twoYearsAgo: LocalDate = LocalDate.now.minusYears(2)
-        val testData = DataMap.date(startDate,"-")(
+        val testData = DataMap.date(startDate)(
           day = twoYearsAgo.getDayOfMonth.toString,
           month = twoYearsAgo.getMonthValue.toString,
           year = twoYearsAgo.getYear.toString
@@ -133,7 +133,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       }
       "the date is the first of january 1900" in {
         val earliestAllowedDate: LocalDate = LocalDate.of(1900, 1, 1)
-        val testData = DataMap.date(startDate,"-")(
+        val testData = DataMap.date(startDate)(
           day = earliestAllowedDate.getDayOfMonth.toString,
           month = earliestAllowedDate.getMonthValue.toString,
           year = earliestAllowedDate.getYear.toString

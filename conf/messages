@@ -112,7 +112,6 @@ addressLookup.confirmPage.title                                 = Confirm busine
 addressLookup.confirmPage.heading                               = Confirm business address
 
 # Agent Business start date
-business.agent.start_date.title                                 = When did your client’s sole trader business start trading?
 business.agent.start_date.heading                               = When did your client’s sole trader business start trading?
 business.agent.start_date.exampleStartDate                      = For example, 1 8 2014
 

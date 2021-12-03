@@ -48,9 +48,11 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(businessId)
 
-        Then("should return an OK with the DateOfCommencement Page")
+        Then("should return an OK with the business start date page")
         res must have(
-          httpStatus(OK)
+          httpStatus(OK),
+          pageTitle("When did your client’s sole trader business start trading?" + agentTitleSuffix),
+          dateField("startDate", DateModel("", "", ""))
         )
       }
     }
@@ -64,7 +66,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(businessId)
 
-        Then("should return an OK with the DateOfCommencement Page")
+        Then("should return an OK with the business start date page")
         res must have(
           httpStatus(OK),
           pageTitle("When did your client’s sole trader business start trading?" + agentTitleSuffix),

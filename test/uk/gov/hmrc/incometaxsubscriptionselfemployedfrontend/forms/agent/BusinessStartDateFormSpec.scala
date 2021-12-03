@@ -41,7 +41,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       val testDateYear = "2017"
 
       val testInput = Map(
-        s"$startDate.$day" -> testDateDay, s"$startDate.$month" -> testDateMonth, s"$startDate.$year" -> testDateYear
+        s"$startDate-$day" -> testDateDay, s"$startDate-$month" -> testDateMonth, s"$startDate-$year" -> testDateYear
       )
 
       val expected = BusinessStartDate(
@@ -60,9 +60,9 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val beforeMax = "error.agent.business_start_date.maxStartDate"
         val beforeMin = "error.agent.business_start_date.minStartDate"
 
-        val dayKeyError: String = s"$startDate.$day"
-        val monthKeyError: String = s"$startDate.$month"
-        val yearKeyError: String = s"$startDate.$year"
+        val dayKeyError: String = s"$startDate-$day"
+        val monthKeyError: String = s"$startDate-$month"
+        val yearKeyError: String = s"$startDate-$year"
 
         val errorContext: String = "error.agent.business_start_date"
 
