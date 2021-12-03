@@ -18,37 +18,34 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
 @import uk.gov.hmrc.play.views.html.helpers.form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.ContinueButton
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.agent_main_template
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers._
+
+@this(
+    mainTemplate: AgentMainTemplate,
+    form: FormWithCSRF,
+    textInputHelper: TextInputHelper,
+    continueButton: ContinueButton
+)
 
 @(businessNameForm: Form[BusinessNameModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@inputContent = {
-    <p>@Messages("business.agent.name.line_1")</p>
-}
-
-@agent_main_template(title = Messages("business.agent.name.title"), form = Some(businessNameForm)) {
-    @back_link(backUrl)
-
-    @summaryErrorHelper(businessNameForm)
+@mainTemplate(title = messages("business.agent.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
 
     @form(action = postAction) {
 
-        @inputHelper(
+        @textInputHelper(
             field = businessNameForm(businessName),
             label = messages("business.agent.name.heading"),
-            content = Some(inputContent),
-            parentForm = businessNameForm
+            hint = Some(messages("business.agent.name.line_1")),
+            classes = Some("govuk-!-width-one-half")
         )
 
-
-        @if(isEditMode) {
-            @continueButton(Some(messages("base.update")))
-        } else {
-            @continueButton()
-        }
+    @continueButton(isEditMode = isEditMode)
 
     }
 }

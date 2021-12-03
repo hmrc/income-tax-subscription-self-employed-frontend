@@ -18,6 +18,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import play.twirl.api.HtmlFormat
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
@@ -28,6 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.mockBusinessNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector {
@@ -35,16 +39,18 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   val id: String = "testId"
 
   override val controllerName: String = "BusinessNameController"
-  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessNameController.show(id, isEditMode = false),
-    "submit" -> TestBusinessNameController.submit(id, isEditMode = false)
-  )
+  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
+
+  val businessName = mock[BusinessName]
+  when(businessName(any(), any(), any(), any())(any(), any(), any()))
+    .thenReturn(HtmlFormat.empty)
 
   object TestBusinessNameController extends BusinessNameController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
     mockIncomeTaxSubscriptionConnector,
-    mockAuthService
+    mockAuthService,
+    businessName
   )
 
   val selfEmploymentData: SelfEmploymentData = SelfEmploymentData(
