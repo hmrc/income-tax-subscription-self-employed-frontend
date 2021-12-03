@@ -25,14 +25,12 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.business_accounting_method
-
-
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 
 
 class BusinessAccountingMethodViewSpec extends ViewSpec {
 
-  val backUrl: String = testBackUrl
+  val backUrl: Option[String] = Some("/test-back-url")
   val action: Call = testCall
   val emptyError = "Select if your client uses cash accounting or standard accounting"
 
@@ -47,13 +45,15 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     val backLink = "Back"
   }
 
+  private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
+
   class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
-              isEditMode: Boolean = false) {
-    val page: HtmlFormat.Appendable = business_accounting_method(
+              isEditMode: Boolean = false, backLink: Option[String] = Some(testBackUrl)) {
+    val page: HtmlFormat.Appendable = businessAccountingMethodView(
       businessAccountingMethodForm,
       testCall,
-      testBackUrl,
-      isEditMode
+      isEditMode,
+      backUrl = backLink
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
@@ -66,8 +66,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     }
 
     "have a backlink" in new Setup {
-      document.getBackLink.text mustBe BusinessAccountingMethodMessages.backLink
-      document.getBackLink.attr("href") mustBe testBackUrl
+      document.getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
+      document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
 
     "have a heading" in new Setup {
@@ -75,11 +75,14 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
 
     }
     "have a radio button for cash accounting" in new Setup {
-      document.getRadioButtonByIndex(0).select("#businessAccountingMethod-Cash").size() mustBe 1
+      document.getGovukRadioButtonByIndex(0).select("#businessAccountingMethod-Cash").size() mustBe 1
+      document.getGovukRadioButtonByIndex(0).select("label").text() mustBe BusinessAccountingMethodMessages.cash
     }
 
     "have a radio button for standard accounting" in new Setup {
-      document.getRadioButtonByIndex(1).select("#businessAccountingMethod-Standard").size() mustBe 1
+
+      document.getGovukRadioButtonByIndex(1).select("#businessAccountingMethod-Standard").size() mustBe 1
+      document.getGovukRadioButtonByIndex(1).select("label").text() mustBe BusinessAccountingMethodMessages.accruals
     }
 
     "have a Form" in new Setup {
@@ -88,20 +91,20 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     }
 
     "have a continue button when not in edit mode" in new Setup {
-      document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.continue
+      document.getButtonByClass mustBe BusinessAccountingMethodMessages.continue
     }
 
     "have a update button when in edit mode" in new Setup(isEditMode = true) {
-      document.getSubmitButton.text mustBe BusinessAccountingMethodMessages.update
+      document.getButtonByClass mustBe BusinessAccountingMethodMessages.update
     }
 
     "must display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {
-      document.mustHaveErrorSummary(List[String](emptyError))
+      document.mustHaveErrorSummaryByNewGovUkClass(List[String](emptyError))
     }
 
     "must display empty form error message when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)) {
 
-      document.listErrorMessages(List[String](emptyError))
+      document.mustHaveGovUkErrorNotificationMessage(emptyError)
     }
   }
 }
