@@ -29,20 +29,21 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUti
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 
 @Singleton
 class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                        val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
-                                       authService: AuthService)
+                                       authService: AuthService,
+                                       businessName: BusinessName)
                                       (implicit val ec: ExecutionContext, val appConfig: AppConfig)
   extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
 
   def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.business_name(
+    businessName(
       businessNameForm = businessNameForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
