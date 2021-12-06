@@ -22,12 +22,15 @@ import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.business_trade_name
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 
-class BusinessTradeNameViewSpec extends ViewSpec {
+class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
+
+  val businessTradeName: BusinessTradeName = app.injector.instanceOf[BusinessTradeName]
 
   object BusinessTradeNameMessages {
     val title = "What is the trade of your client’s sole trader business?"
@@ -47,7 +50,8 @@ class BusinessTradeNameViewSpec extends ViewSpec {
 
   class Setup(isEditMode: Boolean = false,
               businessTradeNameForm: Form[BusinessTradeNameModel] = BusinessTradeNameForm.businessTradeNameValidationForm(Nil)) {
-    val page: HtmlFormat.Appendable = business_trade_name(
+
+    val page: HtmlFormat.Appendable = businessTradeName(
       businessTradeNameForm,
       testCall,
       isEditMode = isEditMode,
@@ -73,23 +77,25 @@ class BusinessTradeNameViewSpec extends ViewSpec {
       document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
     }
     "have a hint text for textInput" in new Setup {
-      document.mustHavePara(BusinessTradeNameMessages.hintText)
+      document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
     }
     "have a continue button when not in edit mode" in new Setup {
-      document.getSubmitButton.text mustBe BusinessTradeNameMessages.continue
+      document.getButtonByClass mustBe BusinessTradeNameMessages.continue
     }
     "have update button when in edit mode" in new Setup(true) {
-      document.getSubmitButton.text mustBe BusinessTradeNameMessages.update
+      document.getButtonByClass mustBe BusinessTradeNameMessages.update
     }
+
     "have a backlink " in new Setup {
-      document.getBackLink.text mustBe BusinessTradeNameMessages.backLink
-      document.getBackLink.attr("href") mustBe testBackUrl
+      document.getBackLinkByClass.text mustBe BusinessTradeNameMessages.backLink
+      document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
+
     "must display form error on page along with textInput and hintText" in
       new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
-        document.mustHaveErrorSummary(List[String](testError.message))
+        document.mustHaveErrorSummaryByNewGovUkClass(List[String](testError.message))
         document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
-        document.mustHavePara(BusinessTradeNameMessages.hintText)
+        document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
       }
 
   }
