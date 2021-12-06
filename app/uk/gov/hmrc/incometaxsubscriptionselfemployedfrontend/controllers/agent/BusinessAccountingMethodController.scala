@@ -30,24 +30,25 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.business_accounting_method
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessAccountingMethodController @Inject()(mcc: MessagesControllerComponents,
+class BusinessAccountingMethodController @Inject()(businessAccountingMethod: BusinessAccountingMethod,
+                                                   mcc: MessagesControllerComponents,
                                                    val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                    authService: AuthService)
                                                   (implicit val ec: ExecutionContext, val appConfig: AppConfig)
   extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
 
   def view(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
-    business_accounting_method(
+    businessAccountingMethod(
       businessAccountingMethodForm = businessAccountingMethodForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.submit(isEditMode),
-      backUrl = backUrl(isEditMode),
+      backUrl = Some(backUrl(isEditMode)),
       isEditMode = isEditMode
     )
 
