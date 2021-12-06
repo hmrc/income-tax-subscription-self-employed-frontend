@@ -28,7 +28,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.business_trade_name
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -36,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
+                                            businessTradeName: BusinessTradeName,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                             val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService)
@@ -43,7 +44,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
   extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
 
   def view(businessTradeNameForm: Form[BusinessTradeNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
-    business_trade_name(
+    businessTradeName(
       businessTradeNameForm = businessTradeNameForm,
       postAction = routes.BusinessTradeNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
