@@ -47,7 +47,7 @@ class BusinessListCYAController @Inject()(authService: AuthService,
     checkYourAnswers(
       addAnotherBusinessForm = addAnotherBusinessForm,
       answers = businesses,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.submit()
+      postAction = routes.BusinessListCYAController.submit()
     )
   }
 

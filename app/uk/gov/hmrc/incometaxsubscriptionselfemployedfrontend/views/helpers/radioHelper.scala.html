@@ -64,7 +64,7 @@
 @errorNotification = {
     @field.error.map { error =>
         <div class="error-notification" id="@field.name-error">
-            <span class="visuallyhidden">@messages("error-notification.prefix")</span> @messages(error.message, error.args: _*)
+            <span class="govuk-visually-hidden">@messages("error-notification.prefix")</span> @messages(error.message, error.args: _*)
         </div>
     }
 }
@@ -82,7 +82,7 @@
 
         <legend>
             @if(isPageHeading) {
-                <h1 class="heading-large">@legend</h1>
+                <h1 class="govuk-heading-l">@legend</h1>
             } else {
                 @legend
             }
