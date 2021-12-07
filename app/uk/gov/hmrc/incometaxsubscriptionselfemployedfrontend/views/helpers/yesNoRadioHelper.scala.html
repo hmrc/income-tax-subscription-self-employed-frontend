@@ -17,6 +17,7 @@
 @import play.api.data.{Field, Form}
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.helpers.RadioOption
+
 @(field: Field,
     legend: String,
     options: Seq[RadioOption],
@@ -61,7 +62,7 @@
 @errorNotification = {
     @field.error.map { error =>
         <div class="error-notification" id="@field.name-error">
-            <span class="visuallyhidden">@messages("error-notification.prefix")</span> @messages(error.message, error.args: _*)
+            <span class="govuk-visually-hidden">@messages("error-notification.prefix")</span> @messages(error.message, error.args: _*)
         </div>
     }
 }
@@ -77,7 +78,7 @@
     <fieldset @fieldSetClassValue @ariaDescribedBy>
 
         <legend>
-            <h2 class="heading-medium">
+            <h2 class="govuk-heading-m">
                 @legend
             </h2>
         </legend>
@@ -86,7 +87,7 @@
 
         <div class="multiple-choice" @dataTarget(options(0))>
             <input id="yes-no" type="radio" name="@field.name" value="@valueAttr(options(0))" @isSelected(options(0).optionName)>
-            <label @options(0).classes.fold("")(x => s"""class="$x"""") for="yes-no">@Html(options(0).message)</label>
+            <label class="govuk-body" @options(0).classes.fold("")(x => s"""class="$x"""") for="yes-no">@Html(options(0).message)</label>
         </div>
         @options(0).conditionalContent.map{content =>
             <div id="@options(0).optionName" class="panel panel-indent panel-border-narrow js-hidden">
@@ -95,7 +96,7 @@
         }
         <div class="multiple-choice" @dataTarget(options(1))>
             <input id="yes-no-2" type="radio" name="@field.name" value="@valueAttr(options(1))" @isSelected(options(1).optionName)>
-            <label @options(1).classes.fold("")(x => s"""class="$x"""") for="yes-no-2">@Html(options(1).message)</label>
+            <label class="govuk-body" @options(1).classes.fold("")(x => s"""class="$x"""") for="yes-no-2">@Html(options(1).message)</label>
         </div>
         @options(1).conditionalContent.map{content =>
         <div id="@options(1).optionName" class="panel panel-indent panel-border-narrow js-hidden">

@@ -27,10 +27,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnot
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.agent.MockCheckYourAnswers
 
 import scala.concurrent.Future
 
-class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTaxSubscriptionConnector {
+class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTaxSubscriptionConnector with MockCheckYourAnswers {
 
   implicit val mockImplicitDateFormatter: ImplicitDateFormatterImpl = new ImplicitDateFormatterImpl(mockLanguageUtils)
 
@@ -43,6 +44,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
 
   object TestBusinessListCYAController extends BusinessListCYAController(
     mockAuthService,
+    checkYourAnswers,
     mockIncomeTaxSubscriptionConnector,
     mockMessagesControllerComponents
   )
@@ -60,6 +62,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
     "return OK (200)" when {
       "the connector returns successful json" in {
         mockAuthSuccess()
+        mockCheckYourAnswers()
         mockGetSelfEmployments[Seq[SelfEmploymentData]]("Businesses")(Right(Some(Seq(
           businessData
         ))))

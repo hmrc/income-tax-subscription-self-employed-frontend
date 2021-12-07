@@ -113,36 +113,32 @@ implicit appConfig: AppConfig
     optForm = Some(addAnotherBusinessForm)
 ) {
 
-<h1 class="govuk-heading-l">@messages("check_your_answers.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("check_your_answers.heading")</h1>
 
-@answers.zip(1 to answers.length).map { case (business, businessNumber) =>
+    @answers.zip(1 to answers.length).map { case (business, businessNumber) =>
+        @businessTable(business, businessNumber)
+    }
 
-@businessTable(business, businessNumber)
+    @form(action = postAction) {
 
-}
-
-@form(action = postAction) {
-
-@radioHelper(
-    field = addAnotherBusinessForm(AddAnotherBusinessForm.addAnotherBusiness),
-    legend = messages("check_your_answers.add_another_business_heading"),
-    isPageHeading = false,
-    customHeadingClass = Some("govuk-fieldset__legend--m"),
-    inline = true,
-    radioItems = Seq(
-    RadioItem(
-        content = Text(Yes.toMessageString),
-        value = Some(YesNoMapping.option_yes)
-        ),
-    RadioItem(
-        content = Text(No.toMessageString),
-        value = Some(YesNoMapping.option_no)
+        @radioHelper(
+            field = addAnotherBusinessForm(AddAnotherBusinessForm.addAnotherBusiness),
+            legend = messages("check_your_answers.add_another_business_heading"),
+            isPageHeading = false,
+            customHeadingClass = Some("govuk-fieldset__legend--m"),
+            inline = true,
+            radioItems = Seq(
+            RadioItem(
+                content = Text(Yes.toMessageString),
+                value = Some(YesNoMapping.option_yes)
+                ),
+            RadioItem(
+                content = Text(No.toMessageString),
+                value = Some(YesNoMapping.option_no)
+                )
+            )
         )
-    )
-)
 
-@continueButton()
-
-}
-
+        @continueButton()
+    }
 }
