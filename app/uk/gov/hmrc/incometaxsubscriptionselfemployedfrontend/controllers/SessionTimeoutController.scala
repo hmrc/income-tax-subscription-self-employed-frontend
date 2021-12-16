@@ -33,7 +33,7 @@ class SessionTimeoutController @Inject()(mcc: MessagesControllerComponents, val 
     Future.successful(Ok.withSession(request.session))
   }
 
-  val timeout: Action[AnyContent] = Action.async { implicit request =>
+  val timeout: Action[AnyContent] = Action.async { _ =>
     Future.successful(toGGLogin(appConfig.incomeTaxSubscriptionFrontendBaseUrl).withNewSession)
   }
 }

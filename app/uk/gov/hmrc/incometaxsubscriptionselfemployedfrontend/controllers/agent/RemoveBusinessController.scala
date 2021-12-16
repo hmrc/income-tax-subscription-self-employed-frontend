@@ -46,12 +46,12 @@ class RemoveBusinessController @Inject()(authService: AuthService,
             val updatedBusinesses: Seq[SelfEmploymentData] = businesses.filter(_.isComplete).filterNot(_.id == id)
             incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessesKey, updatedBusinesses) map {
               case Right(_) =>
-                if (updatedBusinesses.isEmpty) Redirect(routes.InitialiseController.initialise())
-                else Redirect(routes.BusinessListCYAController.show())
+                if (updatedBusinesses.isEmpty) Redirect(routes.InitialiseController.initialise)
+                else Redirect(routes.BusinessListCYAController.show)
               case Left(error) => throw new InternalServerException(
                 s"[RemoveBusinessController][show] - saveSelfEmployments failure, error: ${error.toString}")
             }
-          case Right(_) => Future.successful(Redirect(routes.InitialiseController.initialise()))
+          case Right(_) => Future.successful(Redirect(routes.InitialiseController.initialise))
           case Left(UnexpectedStatusFailure(status)) =>
             throw new InternalServerException(s"[RemoveBusinessController][show] - getSelfEmployments connection failure, status: $status")
           case Left(InvalidJson) =>

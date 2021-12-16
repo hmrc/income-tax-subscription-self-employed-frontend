@@ -16,10 +16,9 @@
 
 package controllers
 
-import controllers.Assets.SEE_OTHER
 import helpers.{ComponentSpecBase, CustomMatchers}
 import helpers.servicemocks.AuthStub
-import play.api.http.Status.OK
+import play.api.http.Status.{OK, SEE_OTHER}
 
 class SessionTimeoutControllerISpec extends ComponentSpecBase with CustomMatchers {
 
@@ -28,7 +27,6 @@ class SessionTimeoutControllerISpec extends ComponentSpecBase with CustomMatcher
       "return an OK and keep the session" in {
 
         val res = getKeepAlive
-        val serviceNameGovUk = " - Use software to send Income Tax updates - GOV.UK"
         Then("Should return a OK")
         res must have(
           httpStatus(OK)

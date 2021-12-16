@@ -28,8 +28,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.play.language.LanguageUtils
 
-import scala.concurrent.ExecutionContextExecutor
-
 trait UnitTestTrait extends PlaySpec with GuiceOneServerPerSuite with I18nSupport {
 
   implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global

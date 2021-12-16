@@ -17,7 +17,6 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import org.mockito.Mockito
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
@@ -31,7 +30,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ITSASess
 trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
 
   implicit val system: ActorSystem = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   val controllerName: String
   val authorisedRoutes: Map[String, Action[AnyContent]]

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks.MockAddressLookupConnector

@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsSuccess, Json}
 
 class BusinessAddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
 

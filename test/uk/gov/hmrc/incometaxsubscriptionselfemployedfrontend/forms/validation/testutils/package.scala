@@ -19,8 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation
 import org.scalatest.Matchers._
 import play.api.data.Form
 import play.api.data.validation.Invalid
-import play.api.i18n.Messages
-import play.api.test.FakeRequest
 
 package object testutils {
 
@@ -50,17 +48,11 @@ package object testutils {
       validated.hasErrors shouldBe false
       validated.hasGlobalErrors shouldBe false
     }
-
-    def isValidFor(request: FakeRequest[_]): Unit = {
-      val validated = testForm.bindFromRequest()(request)
-      validated.hasErrors shouldBe false
-      validated.hasGlobalErrors shouldBe false
-    }
   }
 
   implicit class InvalidUtil(invalid: Invalid) {
 
-    def errorTextIs(expectedText: String)(implicit messages: Messages): Unit =
+    def errorTextIs(expectedText: String): Unit =
       invalid.errors.head.message shouldBe expectedText
   }
 

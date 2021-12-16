@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
@@ -162,7 +161,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
               fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
             )
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url)
+            redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url)
           }
         }
       }
@@ -204,7 +203,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       }
       "save and retrieve feature switch is disabled" should {
         "redirect to business check your answer page" in {
-          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
         }
       }
     }

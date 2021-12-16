@@ -97,7 +97,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
       case (Some(id), true, true) => Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url)
       case (_, false, true) => None
       case (_, true, false) => Some(appConfig.subscriptionFrontendFinalCYAController)
-      case _ => Some(routes.BusinessListCYAController.show().url)
+      case _ => Some(routes.BusinessListCYAController.show.url)
     }
   }
 

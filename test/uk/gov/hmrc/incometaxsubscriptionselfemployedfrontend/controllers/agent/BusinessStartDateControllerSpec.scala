@@ -133,7 +133,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           form = businessStartDateForm(fill = Some(returnedModel)),
           postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = true,
-          backUrl = agent.routes.BusinessListCYAController.show().url
+          backUrl = agent.routes.BusinessListCYAController.show.url
         )
       }
     }
@@ -193,7 +193,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(agent.routes.BusinessListCYAController.show().url)
+            Some(agent.routes.BusinessListCYAController.show.url)
         }
       }
       "return 400, SEE_OTHER" when {
@@ -202,9 +202,9 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
           mockBusinessStartDate(
             form = businessStartDateForm(bind = None),
-            postAction = agent.routes.BusinessListCYAController.submit(),
+            postAction = agent.routes.BusinessListCYAController.submit,
             isEditMode = true,
-            backUrl = agent.routes.BusinessListCYAController.show().url
+            backUrl = agent.routes.BusinessListCYAController.show.url
           )
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = true)(fakeRequest)
@@ -218,8 +218,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show().url}" in {
-        TestBusinessStartDateController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      s"redirect to ${routes.BusinessListCYAController.show.url}" in {
+        TestBusinessStartDateController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show.url
       }
     }
     "not in edit mode" should {

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.twirl.api.HtmlFormat
@@ -173,7 +172,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url)
+            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show.url)
         }
         "the user does not update their answer" in {
           mockAuthSuccess()
@@ -185,7 +184,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
             fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+          redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
         }
       }
       "return 400, SEE_OTHER)" when {
@@ -203,8 +202,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
 
     "The back url" when {
       "in edit mode" should {
-        s"redirect to ${routes.BusinessListCYAController.show().url}" in {
-          TestBusinessNameController.backUrl(id,isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        s"redirect to ${routes.BusinessListCYAController.show.url}" in {
+          TestBusinessNameController.backUrl(id,isEditMode = true) mustBe routes.BusinessListCYAController.show.url
         }
       }
       "not in edit mode" should {

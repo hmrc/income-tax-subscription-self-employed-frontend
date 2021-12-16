@@ -133,7 +133,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "not in edit mode" when {
       "return a url for the business trade name page" in withController { controller =>
         mockAuthSuccess()
-        controller.backUrl(false) mustBe routes.BusinessListCYAController.show().url
+        controller.backUrl(false) mustBe routes.BusinessListCYAController.show.url
       }
     }
     "in edit mode" when {

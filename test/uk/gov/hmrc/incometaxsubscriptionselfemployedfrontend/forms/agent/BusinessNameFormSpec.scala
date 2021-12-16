@@ -79,7 +79,6 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
     "invalidate a business name which is in the list of excluded business names" in {
       val testInput = Map(businessName -> "nameOne")
-      val expected = BusinessNameModel(testNameValid)
       val actual = form(excludedBusinessNames = Seq(
         BusinessNameModel("nameOne"), BusinessNameModel("nameTwo")
       )).bind(testInput)

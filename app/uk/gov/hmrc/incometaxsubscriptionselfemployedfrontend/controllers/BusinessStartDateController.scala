@@ -88,7 +88,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
               val call = (isEditMode, isSaveAndRetrieve) match {
                 case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
                 case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
-                case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show()
+                case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show
                 case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id)
               }
               Redirect(call)
@@ -104,7 +104,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     (isEditMode, isSaveAndRetrieve) match {
       case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url
       case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
-      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url
+      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url
       case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
     }
   }

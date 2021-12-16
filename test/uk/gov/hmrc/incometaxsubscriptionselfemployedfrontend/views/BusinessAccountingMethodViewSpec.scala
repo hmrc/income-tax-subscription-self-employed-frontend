@@ -104,7 +104,6 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have the correct description for the cash accounting radio button" in {
-      val startIndex: Int = 16
       document().getGovukRadioButtonByIndex().select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.cashDescription
     }
 
@@ -117,7 +116,6 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have the correct description for the standard accounting radio button" in {
-      val startIndex: Int = 20
       document().getGovukRadioButtonByIndex(1).select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.accrualsDescription
     }
 

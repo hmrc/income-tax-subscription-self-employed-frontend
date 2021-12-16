@@ -17,7 +17,6 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
@@ -165,7 +164,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
             val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some("12345"), isEditMode = true)(fakeRequest)
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe
-              Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url)
+              Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url)
           }
         }
       }
@@ -181,7 +180,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
             val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some("12345"), isEditMode = false)(fakeRequest)
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe
-              Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show().url)
+              Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url)
           }
         }
 

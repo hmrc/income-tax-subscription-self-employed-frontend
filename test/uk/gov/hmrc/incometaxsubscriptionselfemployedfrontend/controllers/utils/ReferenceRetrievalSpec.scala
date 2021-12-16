@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils
 
-import controllers.Assets.{INTERNAL_SERVER_ERROR, OK}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.mvc.{AnyContent, Request, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout, status}

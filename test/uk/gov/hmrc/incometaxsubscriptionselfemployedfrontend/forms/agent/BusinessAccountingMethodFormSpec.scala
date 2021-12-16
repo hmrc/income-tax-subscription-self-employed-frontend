@@ -41,9 +41,6 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
     }
 
     "when testing the validation" should {
-
-      val maxLength = 160
-
       val empty = "agent.error.business_accounting_method.empty"
       val invalid = "agent.error.business_accounting_method.invalid"
 

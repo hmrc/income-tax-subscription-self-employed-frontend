@@ -73,13 +73,13 @@
     pageTitle = Some(title),
     headBlock = Some(hmrcHead(
         headBlock = if(showSignOutLink) {
-            Some(hmrcTimeoutDialogHelper(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut().url))
+            Some(hmrcTimeoutDialogHelper(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url))
         } else None
     )),
     headerBlock = Some(hmrcStandardHeader(
         serviceName = Some(serviceName),
         serviceUrl = None,
-        signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut().url) else None,
+        signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
         phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl)),
         displayHmrcBanner = true
     )),

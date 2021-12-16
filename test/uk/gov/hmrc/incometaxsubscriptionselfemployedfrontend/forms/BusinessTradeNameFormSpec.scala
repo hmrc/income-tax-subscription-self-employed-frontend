@@ -100,11 +100,10 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       "invalidate a business trade which is in the list of excluded business trade" in {
         val testInput = Map(businessTradeName -> "nameOne")
-        val expected = BusinessNameModel(testValidBusinessTradeName)
         val actual = businessTradeForm(excludedBusinessTradeNames = Seq(
           BusinessTradeNameModel("nameOne"), BusinessTradeNameModel("nameTwo")
         )).bind(testInput)
-        actual.errors must contain(FormError(businessTradeName, "error.business_trade_name.duplicate"))
+        actual.errors must contain(FormError(businessTradeName, duplicate))
       }
 
       "The following submission should be valid" when {

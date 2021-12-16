@@ -35,7 +35,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
   "GetAddressLookupDetailsHttpReads" when {
     "read" should {
       "parse a correctly formatted OK response and return the data in a model" in {
-        val httpResponse = HttpResponse(OK, Some(testValidJson))
+        val httpResponse = HttpResponse(OK, json = testValidJson, headers = Map.empty)
 
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
@@ -43,7 +43,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
           Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))))
       }
       "parse an incorrectly formatted Ok response as an invalid Json" in {
-        val httpResponse = HttpResponse(OK, Some(Json.obj()))
+        val httpResponse = HttpResponse(OK, json = Json.obj(), headers = Map.empty)
 
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
@@ -51,7 +51,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
       }
 
       "parse an 404 NOT_FOUND response as None" in {
-        val httpResponse = HttpResponse(NOT_FOUND)
+        val httpResponse = HttpResponse(NOT_FOUND, body = "")
 
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
@@ -59,7 +59,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
       }
 
       "parse any other http status as a UnexpectedStatusFailure" in {
-        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR)
+        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR, body = "")
 
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
