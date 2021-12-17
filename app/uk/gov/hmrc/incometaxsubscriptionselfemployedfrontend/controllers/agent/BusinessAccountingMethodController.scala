@@ -87,7 +87,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     if (isEditMode) {
       s"${appConfig.subscriptionFrontendClientRoutingController}"
     } else {
-      routes.BusinessListCYAController.show().url
+      routes.BusinessListCYAController.show.url
     }
   }
 

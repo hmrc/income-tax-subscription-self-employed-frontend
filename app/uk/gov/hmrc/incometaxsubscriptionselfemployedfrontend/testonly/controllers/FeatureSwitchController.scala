@@ -37,7 +37,7 @@ class FeatureSwitchController @Inject()(featureSwitchView: FeatureSwitchView)
   private def view(switchNames: Map[FeatureSwitch, Boolean])(implicit request: Request[_]): Html = {
     featureSwitchView(
       switchNames = switchNames,
-      routes.FeatureSwitchController.submit()
+      routes.FeatureSwitchController.submit
     )
   }
 
@@ -60,7 +60,7 @@ class FeatureSwitchController @Inject()(featureSwitchView: FeatureSwitchView)
       else disable(fs)
     )
 
-    Redirect(routes.FeatureSwitchController.show())
+    Redirect(routes.FeatureSwitchController.show)
   }
 
 }

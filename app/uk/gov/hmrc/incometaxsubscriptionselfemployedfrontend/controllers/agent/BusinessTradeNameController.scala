@@ -78,7 +78,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
             businessTradeNameData =>
               multipleSelfEmploymentsService.saveBusinessTrade(reference, id, businessTradeNameData).map(_ =>
                 if (isEditMode) {
-                  Redirect(routes.BusinessListCYAController.show())
+                  Redirect(routes.BusinessListCYAController.show)
                 } else {
                   Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id))
                 }
@@ -106,7 +106,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
 
   def backUrl(id: String, isEditMode: Boolean): String = {
     if (isEditMode) {
-      routes.BusinessListCYAController.show().url
+      routes.BusinessListCYAController.show.url
     } else {
       routes.BusinessNameController.show(id).url
     }

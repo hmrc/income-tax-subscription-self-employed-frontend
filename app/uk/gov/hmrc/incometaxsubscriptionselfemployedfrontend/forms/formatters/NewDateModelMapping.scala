@@ -91,7 +91,7 @@ object NewDateModelMapping {
         case (Some(_), Some(_), None) => Left(FormError(totalYearKey(key), errorKey("year.empty")))
         case (None, Some(_), Some(_)) => Left(FormError(totalDayKey(key), errorKey("day.empty")))
         case (Some(_), None, Some(_)) => Left(FormError(totalMonthKey(key), errorKey("month.empty")))
-        case (Some(dayValue), Some(monthValue), Some(yearValue)) => Right(dayValue, monthValue, yearValue)
+        case (Some(dayValue), Some(monthValue), Some(yearValue)) => Right((dayValue, monthValue, yearValue))
       }
     }
 

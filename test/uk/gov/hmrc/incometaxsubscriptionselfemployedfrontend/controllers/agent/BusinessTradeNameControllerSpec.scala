@@ -194,7 +194,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
         )
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
 
       }
       }
@@ -210,7 +210,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
       }
       }
     }
@@ -278,8 +278,8 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show().url}" in withController { controller => {
-        controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+      s"redirect to ${routes.BusinessListCYAController.show.url}" in withController { controller => {
+        controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
       }
       }
     }

@@ -32,6 +32,6 @@ class LanguageSwitchController @Inject()(appConfig: AppConfig,
 
   override def languageMap: Map[String, Lang] = appConfig.languageMap
 
-  override def fallbackURL: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.InitialiseController.initialise().url
+  override def fallbackURL: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.InitialiseController.initialise.url
 
 }

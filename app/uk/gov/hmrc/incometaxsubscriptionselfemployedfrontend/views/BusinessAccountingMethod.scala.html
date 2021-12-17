@@ -58,10 +58,6 @@
   </details>
 }
 
-@heading(content: String) = {
-  <span class="govuk-!-font-size-19 govuk-!-font-weight-bold">@content</span>
-}
-
 @mainTemplate(title = messages("business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = backUrl) {
 
   @form(action = postAction) {

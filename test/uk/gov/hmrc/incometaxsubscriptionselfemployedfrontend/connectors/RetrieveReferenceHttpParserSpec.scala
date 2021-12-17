@@ -57,7 +57,7 @@ class RetrieveReferenceHttpParserSpec extends PlaySpec with MustMatchers {
       }
 
       "parse any other http status as a UnexpectedStatusFailure" in {
-        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR)
+        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR, body = "")
 
         val res = retrieveReferenceHttpReads.read(testHttpVerb, testUri, httpResponse)
 

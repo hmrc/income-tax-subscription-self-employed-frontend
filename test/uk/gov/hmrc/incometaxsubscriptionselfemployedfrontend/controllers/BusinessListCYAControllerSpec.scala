@@ -17,7 +17,6 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, Result}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
@@ -79,7 +78,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
 
         val result: Future[Result] = TestBusinessListCYAController.show()(fakeRequest)
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise.url)
       }
       "no complete businesses are returned" in {
         mockAuthSuccess()
@@ -89,7 +88,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
 
         val result: Future[Result] = TestBusinessListCYAController.show()(fakeRequest)
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise.url)
       }
     }
 
@@ -125,7 +124,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
           .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_yes))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise.url)
 
       }
 
@@ -152,7 +151,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         val result: Future[Result] = TestBusinessListCYAController.submit()(fakeRequest
           .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_no))
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise.url)
       }
       "no complete businesses are returned" in {
         mockAuthSuccess()
@@ -163,7 +162,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
         val result: Future[Result] = TestBusinessListCYAController.submit()(fakeRequest
           .withFormUrlEncodedBody(AddAnotherBusinessForm.addAnotherBusiness -> YesNoMapping.option_no))
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise.url)
       }
     }
 

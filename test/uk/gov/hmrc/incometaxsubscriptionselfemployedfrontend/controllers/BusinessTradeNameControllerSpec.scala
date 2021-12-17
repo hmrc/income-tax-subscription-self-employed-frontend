@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
@@ -237,7 +236,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
     "save and retrieve feature switch is disabled" should {
 
-      s"return a redirect to '${routes.BusinessListCYAController.show().url}" when {
+      s"return a redirect to '${routes.BusinessListCYAController.show.url}" when {
         "the user submits valid data" in withController { controller => {
           mockAuthSuccess()
           mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
@@ -249,7 +248,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           )
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+          redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
         }
         }
       }
@@ -267,7 +266,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+      redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
     }
     }
   }
@@ -282,8 +281,8 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         }
       }
       "save and retrieve is disabled" should {
-        s"redirect to ${routes.BusinessListCYAController.show().url}" in withController { controller => {
-          controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show().url
+        s"redirect to ${routes.BusinessListCYAController.show.url}" in withController { controller => {
+          controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
         }
         }
       }

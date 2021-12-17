@@ -29,7 +29,7 @@ import play.twirl.api.Html
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with BeforeAndAfterEach {
 
@@ -70,7 +70,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
     if (hasSignOutLink) {
       val signOutLink: Element = document.selectHead(".hmrc-sign-out-nav__link")
       signOutLink.text mustBe "Sign out"
-      signOutLink.attr("href") mustBe routes.SignOutController.signOut().url
+      signOutLink.attr("href") mustBe routes.SignOutController.signOut.url
     } else {
       document.selectOptionally(".hmrc-sign-out-nav__link") mustBe None
     }
@@ -88,21 +88,21 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
   implicit class CustomSelectors(element: Element) {
 
     def selectHead(selector: String): Element = {
-      element.select(selector).headOption match {
+      element.select(selector).asScala.headOption match {
         case Some(element) => element
         case None => fail(s"No elements returned for selector: $selector")
       }
     }
 
     def selectOptionally(selector: String): Option[Element] = {
-      element.select(selector).headOption
+      element.select(selector).asScala.headOption
     }
 
     def selectNth(selector: String, nth: Int): Element = {
       element.selectHead(s"$selector:nth-of-type($nth)")
     }
 
-    def content: Element = element.getElementsByTag("article").head
+    def content: Element = element.getElementsByTag("article").asScala.head
 
     def mainContent: Element = element.selectHead("main")
 
@@ -178,7 +178,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
       val eles = element.select(s"input[name=$name]")
       if (eles.isEmpty) fail(s"$name does not have an input field with name=$name\ncurrent list of inputs:\n[${element.select("input")}]")
       if (eles.size() > 1) fail(s"$name have multiple input fields with name=$name")
-      val ele = eles.head
+      val ele = eles.asScala.head
       ele.attr("type") mustBe "text"
       element.select(s"label[for=$name]").text() mustBe label
     }

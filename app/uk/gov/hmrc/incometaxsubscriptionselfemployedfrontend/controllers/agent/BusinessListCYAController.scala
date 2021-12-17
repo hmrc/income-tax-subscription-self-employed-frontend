@@ -50,7 +50,7 @@ class BusinessListCYAController @Inject()(authService: AuthService,
     checkYourAnswers(
       addAnotherBusinessForm = addAnotherBusinessForm,
       answers = businesses,
-      postAction = routes.BusinessListCYAController.submit(),
+      postAction = routes.BusinessListCYAController.submit,
       implicitDateFormatter = dateFormatter
     )
   }
@@ -61,7 +61,7 @@ class BusinessListCYAController @Inject()(authService: AuthService,
         incomeTaxSubscriptionConnector.getSubscriptionDetails[Seq[SelfEmploymentData]](reference, businessesKey).map {
           case Right(Some(businesses)) if businesses.exists(_.isComplete) =>
             Ok(view(addAnotherBusinessForm(businesses.size, appConfig.limitOnNumberOfBusinesses), businesses.filter(_.isComplete)))
-          case Right(_) => Redirect(routes.InitialiseController.initialise())
+          case Right(_) => Redirect(routes.InitialiseController.initialise)
           case Left(UnexpectedStatusFailure(status)) =>
             throw new InternalServerException(s"[BusinessListCYAController][show] - getSelfEmployments connection failure, status: $status")
           case Left(InvalidJson) =>
@@ -79,11 +79,11 @@ class BusinessListCYAController @Inject()(authService: AuthService,
             addAnotherBusinessForm(businesses.size, appConfig.limitOnNumberOfBusinesses).bindFromRequest.fold(
               formWithErrors => BadRequest(view(formWithErrors, businesses)),
               addAnotherBusinessModel => addAnotherBusinessModel.addAnotherBusiness match {
-                case Yes => Redirect(routes.InitialiseController.initialise())
+                case Yes => Redirect(routes.InitialiseController.initialise)
                 case No => Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.show())
               }
             )
-          case Right(_) => Redirect(routes.InitialiseController.initialise())
+          case Right(_) => Redirect(routes.InitialiseController.initialise)
           case Left(UnexpectedStatusFailure(status)) =>
             throw new InternalServerException(s"[BusinessListCYAController][submit] - getSelfEmployments connection failure, status: $status")
           case Left(InvalidJson) =>

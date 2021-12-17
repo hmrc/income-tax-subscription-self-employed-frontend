@@ -17,7 +17,6 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, Result}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
@@ -65,7 +64,7 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
 
         val result: Future[Result] = TestRemoveBusinessController.show(id)(fakeRequest)
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show().url)
+        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
       }
     }
 
@@ -103,7 +102,7 @@ class RemoveBusinessControllerSpec extends ControllerBaseSpec with MockIncomeTax
 
         val result: Future[Result] = TestRemoveBusinessController.show(id)(fakeRequest)
         status(result) mustBe 303
-        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise().url)
+        redirectLocation(result) mustBe Some(routes.InitialiseController.initialise.url)
       }
     }
 

@@ -19,7 +19,6 @@ package connectors
 import connectors.stubs.AddressLookupConnectorStub._
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
-import play.api.i18n.Lang
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,7 +32,6 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
 
   lazy val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
-  private implicit val lang: Lang = Lang("en")
 
   val businessAddressModel: BusinessAddressModel = BusinessAddressModel(auditRef = "1",
     Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))

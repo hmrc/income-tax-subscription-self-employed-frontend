@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
@@ -175,7 +174,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         "return a url for the business list CYA page" in withController { controller =>
           disable(SaveAndRetrieve)
           mockAuthSuccess()
-          controller.backUrl(id = None, isEditMode = false) mustBe Some(routes.BusinessListCYAController.show().url)
+          controller.backUrl(id = None, isEditMode = false) mustBe Some(routes.BusinessListCYAController.show.url)
         }
       }
 

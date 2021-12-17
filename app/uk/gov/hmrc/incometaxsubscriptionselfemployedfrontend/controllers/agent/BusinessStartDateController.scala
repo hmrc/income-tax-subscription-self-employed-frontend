@@ -76,7 +76,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           businessStartDateData =>
             multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData).map(_ =>
               if (isEditMode) {
-                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show())
+                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show)
               } else {
                 Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id))
               }
@@ -88,7 +88,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def backUrl(isEditMode: Boolean): String = {
     if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show().url
+      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show.url
     } else {
       appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
     }

@@ -31,14 +31,14 @@ class PostAddressLookupHttpParserSpec extends UnitTestTrait with EitherValues {
   "PostAddressLookupHttpReads" when {
     "read" should {
       "parse a correctly formatted OK response as a PostAddressLookupSuccessResponse" in {
-        val httpResponse = HttpResponse(ACCEPTED, Some(Json.obj()), Map("Location" -> Seq("onRampUri")))
+        val httpResponse = HttpResponse(ACCEPTED, json = Json.obj(), Map("Location" -> Seq("onRampUri")))
 
         val res = postAddressLookupHttpReads.read(testHttpVerb, testUri, httpResponse)
 
         res mustBe Right(PostAddressLookupSuccessResponse(Some("onRampUri")))
       }
       "parse any other http status as a UnexpectedStatusFailure" in {
-        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR)
+        val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR, body = "")
 
         val res = postAddressLookupHttpReads.read(testHttpVerb, testUri, httpResponse)
 
