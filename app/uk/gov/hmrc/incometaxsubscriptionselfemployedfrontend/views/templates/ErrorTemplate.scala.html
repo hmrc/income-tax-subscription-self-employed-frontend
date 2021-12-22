@@ -26,16 +26,6 @@
 
 @(pageTitle: String, heading: String, message: String, scriptElem: Option[Html] = None)(implicit request: Request[_], messages: Messages)
 
-@defaultScriptElem = {
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/mtd_itsa_custom.css")">
-    @* append custom scripts *@
-    @scriptElem.fold(HtmlFormat.empty)(x => x)
-}
-
-@headStyle = {
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/banner-panel.css")">
-}
-
 @govukWrapper(title = pageTitle, serviceName = "") {
   <h1 class="govuk-heading-l">@heading</h1>
   <p class="govuk-body">@message</p>
