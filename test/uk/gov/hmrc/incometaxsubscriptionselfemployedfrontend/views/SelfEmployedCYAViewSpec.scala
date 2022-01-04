@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,7 +208,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
         }
         "have a save and continue button" in new SetupComplete {
-          document.selectHead("button").text mustBe CheckYourAnswersMessages.saveAndContinue
+          document.select("button").last.text mustBe CheckYourAnswersMessages.saveAndContinue
         }
 
         "have a save and come back later button" in new SetupComplete {

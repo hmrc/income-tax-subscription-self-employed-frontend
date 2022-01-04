@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     }
     "have a save and continue button" when {
       "the save and retrieve feature switch is enabled" in new Setup(false, true) {
-        document.selectHead("button").text mustBe BusinessTradeNameMessages.saveAndContinue
+        document.select("button").last().text mustBe BusinessTradeNameMessages.saveAndContinue
       }
     }
     "have a save and come back later link" when {
