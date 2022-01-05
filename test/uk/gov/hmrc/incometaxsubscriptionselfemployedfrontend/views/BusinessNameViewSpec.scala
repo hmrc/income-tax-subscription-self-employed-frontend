@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,11 +126,11 @@ class BusinessNameViewSpec extends ViewSpec {
     }
 
     "have update button when in edit mode" in new Setup(isEditMode = true) {
-      document.selectHead("button").text mustBe BusinessNameMessages.update
+      document.select("button").last().text mustBe BusinessNameMessages.update
     }
 
     "have a save and continue button when in save and retrieve feature switch is enabled" in new Setup(isSaveAndRetrieve = true) {
-      document.selectHead("button").text mustBe BusinessNameMessages.saveAndContinueButton
+      document.select("button").last().text mustBe BusinessNameMessages.saveAndContinueButton
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have a paragraph" in {
-      document().getParagraphNth(2) mustBe BusinessAccountingMethodMessages.line_1
+      document().getParagraphNth(1) mustBe BusinessAccountingMethodMessages.line_1
     }
 
     "have an accordion summary" in {
@@ -83,7 +83,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have an accordion heading" in {
-      document().getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
+      document().getParagraphNth(2) mustBe BusinessAccountingMethodMessages.accordionLine_1
     }
 
     "have an accordion bullets list 1" in {
@@ -145,7 +145,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     "have a save and continue button" when {
       "the save and retrieve feature switch is enabled" in {
         enable(SaveAndRetrieve)
-        document(BusinessAccountingMethodForm.businessAccountingMethodForm).selectHead("button").text mustBe BusinessAccountingMethodMessages.saveAndContinue
+        document(BusinessAccountingMethodForm.businessAccountingMethodForm).select("button").last().text mustBe BusinessAccountingMethodMessages.saveAndContinue
       }
     }
 

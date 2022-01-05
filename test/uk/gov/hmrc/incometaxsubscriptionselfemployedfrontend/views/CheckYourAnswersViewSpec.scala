@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -375,7 +375,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
     }
 
     "have a continue button" in new Setup {
-      document.selectHead("button").text mustBe CheckYourAnswersMessages.continue
+      document.select("button").last.text mustBe CheckYourAnswersMessages.continue
     }
 
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   val reportAProblemNonJSUrl: String = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
   val feedbackFrontendRedirectUrl: String = servicesConfig.getString("feedback-frontend.url")
   val feedbackFrontendRedirectUrlAgent: String = servicesConfig.getString("feedback-frontend.agent.url")
+  val urBannerUrl: String = servicesConfig.getString("urBannerUrl.url")
 
   def ggSignOutUrl(redirectionUrl: String = incomeTaxSubscriptionFrontendBaseUrl): String = s"$ggUrl/bas-gateway/sign-out-without-state?continue=$redirectionUrl"
 

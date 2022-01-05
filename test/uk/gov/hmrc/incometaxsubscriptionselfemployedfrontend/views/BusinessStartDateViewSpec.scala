@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     }
 
     "have a continue button with alternate text when in SaveAndRetrieve mode" in new Setup(false, true) {
-      document.select("button").text mustBe BusinessStartDateMessages.saveAndContinue
+      document.select("button").last.text mustBe BusinessStartDateMessages.saveAndContinue
     }
 
     "have a SaveAndComeBack button when in SaveAndRetrieve mode" in new Setup(false, true) {
@@ -108,7 +108,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     }
 
     "have a backlink " in new Setup {
-      private val backLink: Elements = document.select("a[id=back-link]")
+      private val backLink: Elements = document.select(".govuk-back-link")
       backLink.text mustBe BusinessStartDateMessages.backLink
       backLink.attr("href") mustBe testBackUrl
     }

@@ -1,5 +1,5 @@
 @*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 
-@this(
-        govukLayout: GovukLayout,
+@this(  hmrcLayout: HmrcLayout,
         govukBackLink: GovukBackLink,
         govukErrorSummary: GovukErrorSummary,
         hmrcHead: HmrcHead,
@@ -43,13 +43,6 @@
     @hmrcScripts()
 }
 
-@beforeContentBlock = {
-    @hmrcLanguageSelectHelper()
-    @backLink.map { href =>
-        @govukBackLink(BackLink(href = href, content = Text(messages("base.back")), attributes = Map("id" -> "back-link")))
-    }
-}
-
 @content = {
 
     @optForm.map { form =>
@@ -68,22 +61,12 @@
 }
 
 
-
-@govukLayout(
+@hmrcLayout(
     pageTitle = Some(title),
-    headBlock = Some(hmrcHead(
-        headBlock = if(showSignOutLink) {
-            Some(hmrcTimeoutDialogHelper(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url))
-        } else None
-    )),
-    headerBlock = Some(hmrcStandardHeader(
-        serviceName = Some(serviceName),
-        serviceUrl = None,
-        signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
-        phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl)),
-        displayHmrcBanner = true
-    )),
-    beforeContentBlock = Some(beforeContentBlock),
-    scriptsBlock = Some(scripts),
-    footerBlock = Some(hmrcStandardFooter())
-)(content)
+    isWelshTranslationAvailable = true,
+    serviceUrl = None,
+    backLinkUrl = backLink,
+    signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
+    phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl)),
+    userResearchBannerUrl = Some(appConfig.urBannerUrl),
+    nonce = None)(content)
