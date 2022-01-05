@@ -10,7 +10,7 @@ This code is open source software licensed under the [Apache 2.0 License]("http:
 
 1) **Start the service:**
 
-   `sbt 'run 9563 -Dapplication.routes=testOnlyDoNotUseInAppConf.Routes'`
+   `sbt 'run 9563 -Dapplication.router=testOnlyDoNotUseInAppConf.Routes'`
 
     NB: The capitalisation of 'routes' is important.
 

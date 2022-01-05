@@ -31,7 +31,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val heading = "Check your details"
-    val saveAndContinue = "Confirm and continue"
+    val confirmAndContinue = "Confirm and continue"
+    val continue = "Continue"
     val saveAndBack = "Save and come back later"
     val change = "Change"
     val back = "Back"
@@ -87,16 +88,17 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val document: Document = Jsoup.parse(page.body)
   }
 
-  class SetupComplete(answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
-    id = testId,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
-    businessName = Some(BusinessNameModel(s"ABC Limited")),
-    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-    businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), "TF3 4NT"))),
-    confirmed = true,
-    businessAddressRedirect = Some(s"test address redirect"),
-    accountingMethod = Some(AccountingMethodModel(Cash))
-  )) {
+  class SetupComplete(confirmed: Boolean = false) {
+    val answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+      id = testId,
+      businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
+      businessName = Some(BusinessNameModel(s"ABC Limited")),
+      businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
+      businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), "TF3 4NT"))),
+      confirmed = confirmed,
+      businessAddressRedirect = Some(s"test address redirect"),
+      accountingMethod = Some(AccountingMethodModel(Cash))
+    )
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
       testCall,
@@ -207,14 +209,23 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
           }
 
         }
-        "have a save and continue button" in new SetupComplete {
-          document.select("button").last.text mustBe CheckYourAnswersMessages.saveAndContinue
+        "have a confirm and continue button" in new SetupComplete {
+          document.select("button").last.text mustBe CheckYourAnswersMessages.confirmAndContinue
+        }
+
+        "have a continue button if confirmed" in new SetupComplete(true) {
+          document.select("button").last.text mustBe CheckYourAnswersMessages.continue
         }
 
         "have a save and come back later button" in new SetupComplete {
           val buttonLink: Element = document.selectHead(".govuk-button--secondary")
           buttonLink.text mustBe CheckYourAnswersMessages.saveAndBack
           buttonLink.attr("href") mustBe appConfig.subscriptionFrontendProgressSavedUrl
+        }
+
+        "not have a save and come back later button if confirmed" in new SetupComplete(true) {
+          val buttonLink = document.selectOptionally(".govuk-button--secondary")
+          buttonLink mustBe None
         }
 
         "have no back button" in new SetupComplete {
@@ -305,7 +316,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
           "have a disabled save and continue button" in new SetupIncomplete {
             val continueButton = document.selectHead(".govuk-button--disabled")
-            continueButton.text mustBe CheckYourAnswersMessages.saveAndContinue
+            continueButton.text mustBe CheckYourAnswersMessages.confirmAndContinue
           }
 
           "have a save and come back later button" in new SetupIncomplete {
