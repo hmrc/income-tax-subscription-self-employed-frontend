@@ -57,6 +57,8 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
       ) map {
         case Right(PostAddressLookupSuccessResponse(Some(location))) =>
           Redirect(location)
+        case Right(PostAddressLookupSuccessResponse(None)) =>
+          throw new InternalServerException(s"[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, success, but no location returned")
         case Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(status)) =>
           throw new InternalServerException(s"[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: $status")
       }

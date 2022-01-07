@@ -30,14 +30,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.Bu
 class BusinessNameViewSpec extends ViewSpec {
 
   object BusinessNameMessages {
-    val title = "What is the name of your client’s sole trader business?"
+    val title = "What is the name of your client’s business?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
     val continue = "Continue"
     val backLink = "Back"
     val update = "Update"
-    val line1 = "This is the business name they used to register for Self Assessment. If their business does not have a name, enter your client’s name."
-    val emptyError = "Enter your client`s name or the name of their business"
+    val saveAndContinue = "Save and continue"
+    val line1 = "This is the business name they used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name."
+    val emptyError = "Enter your client’s name or the name of their business"
   }
 
   val backUrl: String = testBackUrl
@@ -46,12 +47,13 @@ class BusinessNameViewSpec extends ViewSpec {
   val testError2: FormError = FormError("businessName", "testError2")
   val businessName = app.injector.instanceOf[BusinessName]
 
-  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
+  class Setup(isEditMode: Boolean = false, isSaveAndRetrieve: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = businessName(
       businessNameForm,
       testCall,
       isEditMode = isEditMode,
-      testBackUrl
+      testBackUrl,
+      isSaveAndRetrieve = isSaveAndRetrieve
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
@@ -65,7 +67,8 @@ class BusinessNameViewSpec extends ViewSpec {
           businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError),
           testCall,
           isEditMode = false,
-          testBackUrl
+          testBackUrl,
+          isSaveAndRetrieve = false
         )(FakeRequest(), implicitly, appConfig),
         title = BusinessNameMessages.title,
         isAgent = true,
@@ -79,7 +82,8 @@ class BusinessNameViewSpec extends ViewSpec {
           businessNameForm = BusinessNameForm.businessNameValidationForm(Nil),
           testCall,
           isEditMode = false,
-          testBackUrl
+          testBackUrl,
+          isSaveAndRetrieve = false
         )(FakeRequest(), implicitly, appConfig),
         title = BusinessNameMessages.title,
         isAgent = true,
@@ -110,6 +114,9 @@ class BusinessNameViewSpec extends ViewSpec {
       document.getGovukButton.text mustBe BusinessNameMessages.update
     }
 
+    "have save and continue button when in edit mode and save and retrieve mode" in new Setup(true, isSaveAndRetrieve = true) {
+      document.getGovukButton.text mustBe BusinessNameMessages.saveAndContinue
+    }
 
     "have a text input field with hint" when {
       "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {

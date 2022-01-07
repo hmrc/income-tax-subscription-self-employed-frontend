@@ -46,7 +46,7 @@
             classes = Some("govuk-!-width-one-half")
         )
 
-    @if(isSaveAndRetrieve) {
+        @if(isSaveAndRetrieve) {
             @buttonHelper(messages("save-and-continue-button"))
         } else {
             @continueButton(isEditMode = isEditMode)

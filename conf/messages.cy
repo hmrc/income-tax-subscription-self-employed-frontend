@@ -127,9 +127,9 @@ error.agent.business_start_date.minStartDate                    = Mae’n rhaid 
 error.agent.business_start_date.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
 
 # Agent Business Name
-business.agent.name.title                                       = Beth yw enw busnes eich cleient fel unig fasnachwr?
-business.agent.name.heading                                     = Beth yw enw busnes eich cleient fel unig fasnachwr?
-business.agent.name.line_1                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar ei fusnes, nodwch enw eich cleient.
+business.agent.name.title                                       = Beth yw enw busnes eich cleient?
+business.agent.name.heading                                     = Beth yw enw busnes eich cleient?
+business.agent.name.line_1                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gan ei fusnes unig fasnachwr, nodwch enw eich cleient.
 
 # Agent Business Name errors
 error.agent.business_name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient
