@@ -43,8 +43,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
   lazy val limitOnNumberOfBusinesses: Int = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
   lazy val addressLookupUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
-  lazy val timeoutLength: String = servicesConfig.getString("timeout.length")
-  lazy val countdownLength: String = servicesConfig.getString("timeout.countdown")
+  lazy val timeoutWarningInSeconds: String = servicesConfig.getString("session-timeout.warning")
+  lazy val timeoutInSeconds: String = servicesConfig.getString("session-timeout.seconds")
 
   def addressLookupChangeUrl(id: String): String = s"$addressLookupUrl/lookup-address/$id/lookup"
 
@@ -78,4 +78,5 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   def routeToSwitchAgentLanguage(language: String): Call = {
     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AgentLanguageSwitchController.switchToLanguage(language)
   }
+
 }
