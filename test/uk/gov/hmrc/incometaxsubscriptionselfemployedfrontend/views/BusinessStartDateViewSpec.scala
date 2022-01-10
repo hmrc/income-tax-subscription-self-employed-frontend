@@ -26,7 +26,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 
 class BusinessStartDateViewSpec extends ViewSpec {
 
@@ -48,7 +48,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val taxYearEnd: Int = 2020
   val testError: FormError = FormError("startDate", "testError")
 
-  val businessStartDateView : DateOfCommencement = app.injector.instanceOf[DateOfCommencement]
+  val businessStartDateView : BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
 
   class Setup(isEditMode: Boolean = false,
               isSaveAndRetrieve: Boolean = false,

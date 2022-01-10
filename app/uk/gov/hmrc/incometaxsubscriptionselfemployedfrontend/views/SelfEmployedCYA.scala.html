@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel}
 
 @this(
   mainTemplate: PrincipalMainTemplate,
@@ -60,7 +61,7 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@tradingStartDate(businessStartDate: Option[BusinessStartDate], businessId: String) = @{
+@tradingStartDate(businessStartDate: Option[BusinessStartDateModel], businessId: String) = @{
     import implicitDateFormatter.LongDate
     val question: String = messages("self_employed_cya.trading_start_date")
     val answer: Option[String] = businessStartDate.map(_.startDate.toLocalDate.toLongDate)

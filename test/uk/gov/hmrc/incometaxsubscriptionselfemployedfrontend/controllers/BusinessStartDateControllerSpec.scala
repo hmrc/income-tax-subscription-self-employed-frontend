@@ -31,7 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testBusinessStartDateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with FeatureSwitching with MockIncomeTaxSubscriptionConnector {
@@ -43,7 +43,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   val id: String = "testId"
 
-  val businessStartDate = mock[DateOfCommencement]
+  val businessStartDate = mock[BusinessStartDateView]
   when(businessStartDate(any(), any(), any(), any(), any())(any(), any(), any()))
     .thenReturn(HtmlFormat.empty)
 
@@ -57,10 +57,10 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
+    mockIncomeTaxSubscriptionConnector,
     mockAuthService,
     mockLanguageUtils,
-    businessStartDate,
-    mockIncomeTaxSubscriptionConnector
+    businessStartDate
   )
 
   def modelToFormData(businessStartDateModel: BusinessStartDate): Seq[(String, String)] = {
