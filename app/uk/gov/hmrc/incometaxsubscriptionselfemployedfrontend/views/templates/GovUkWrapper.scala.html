@@ -71,6 +71,7 @@
     signOutUrl = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url))
     } else None,
     isWelshTranslationAvailable = true,
+    serviceName = Some(serviceName),
     serviceUrl = None,
     backLinkUrl = backLink,
     signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
