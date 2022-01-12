@@ -22,6 +22,8 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm._
@@ -41,7 +43,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
                                             val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
+  extends FrontendController(mcc) with I18nSupport with FeatureSwitching with ReferenceRetrieval {
 
   def view(businessTradeNameForm: Form[BusinessTradeNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     businessTradeName(
@@ -77,17 +79,23 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
               Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
             businessTradeNameData =>
               multipleSelfEmploymentsService.saveBusinessTrade(reference, id, businessTradeNameData).map(_ =>
-                if (isEditMode) {
-                  Redirect(routes.BusinessListCYAController.show)
-                } else {
-                  Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id))
-                }
+                next(id, isEditMode)
               )
           )
         }
       }
     }
   }
+
+  //save & retrieve on should have an order of: business name -> business start date -> business trade (this)
+  //save & retrieve off should have an order of: business start date -> business name -> business trade (this)
+  private def next(id: String, isEditMode: Boolean) = Redirect((isEditMode, isSaveAndRetrieve) match {
+    // This will change when we build the equivalent controller for self employed cya, for agents.
+    case (true, true) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)
+    case (false, true) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)
+    case (true, false) => routes.BusinessListCYAController.show
+    case (false, false) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)
+  })
 
   private def getExcludedBusinessTradeNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessTradeNameModel] = {
     val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
@@ -104,11 +112,16 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean): String = {
-    if (isEditMode) {
-      routes.BusinessListCYAController.show.url
-    } else {
-      routes.BusinessNameController.show(id).url
-    }
+  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
+
+  //save & retrieve on should have an order of: business name -> business start date -> business trade (this)
+  //save & retrieve off should have an order of: business start date -> business name -> business trade (this)
+  def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
+    // This will change when we build the equivalent controller for self employed cya, for agents.
+    case (true, true) => routes.BusinessStartDateController.show(id).url
+    case (false, true) => routes.BusinessStartDateController.show(id).url
+    case (true, false) => routes.BusinessListCYAController.show.url
+    case (false, false) => routes.BusinessNameController.show(id).url
   }
+
 }

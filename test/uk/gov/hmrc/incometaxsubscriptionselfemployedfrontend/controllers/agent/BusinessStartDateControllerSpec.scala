@@ -24,6 +24,8 @@ import play.api.mvc.{Action, AnyContent, Call}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
@@ -40,7 +42,8 @@ import uk.gov.hmrc.play.language.LanguageUtils
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService
   with MockIncomeTaxSubscriptionConnector
-  with ImplicitDateFormatter {
+  with ImplicitDateFormatter
+  with FeatureSwitchingSpec {
 
   val businessStartDate: BusinessStartDate = mock[BusinessStartDate]
   val id: String = "testId"
@@ -166,6 +169,20 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           redirectLocation(result) mustBe
             Some(agent.routes.BusinessNameController.show(id).url)
         }
+        "the user submits valid data in S&R mode" in {
+          withFeatureSwitch(SaveAndRetrieve) {
+            mockAuthSuccess()
+            mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+            val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
+              fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+            )
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe
+              Some(agent.routes.BusinessTradeNameController.show(id).url)
+          }
+        }
       }
       "return 400, SEE_OTHER" when {
         "the user submits invalid data" in {
@@ -225,13 +242,30 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   "The back url" when {
     "in edit mode" should {
       s"redirect to ${routes.BusinessListCYAController.show.url}" in {
-        TestBusinessStartDateController.backUrl(isEditMode = true) mustBe routes.BusinessListCYAController.show.url
+        TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
       }
     }
     "not in edit mode" should {
       s"redirect to ${routes.BusinessNameController.show(id).url}" in {
-        TestBusinessStartDateController.backUrl(isEditMode = false) must
+        TestBusinessStartDateController.backUrl(id, isEditMode = false) must
           include("/report-quarterly/income-and-expenses/sign-up/client/income")
+      }
+    }
+  }
+
+  "The save-and-retrieve back url" when {
+    "in edit mode" should {
+      s"redirect to ${routes.BusinessListCYAController.show.url}" in {
+        withFeatureSwitch(SaveAndRetrieve) {
+          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+        }
+      }
+    }
+    "not in edit mode" should {
+      s"redirect to ${routes.BusinessNameController.show(id).url}" in {
+        withFeatureSwitch(SaveAndRetrieve) {
+          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+        }
       }
     }
   }

@@ -55,10 +55,10 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           (implicit request: Request[AnyContent]): Html = {
     businessStartDate(
       businessStartDateForm = businessStartDateForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.submit(id, isEditMode),
+      postAction = routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
       isSaveAndRetrieve = isEnabled(SaveAndRetrieve),
-      backUrl = backUrl(isEditMode)
+      backUrl = backUrl(id, isEditMode)
     )
   }
 
@@ -81,32 +81,33 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessStartDateData =>
             multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData).map(_ =>
-              if (isEditMode) {
-                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show)
-              } else {
-                Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id))
-              }
+              next(id, isEditMode)
             )
         )
       }
     }
   }
 
-  def backUrl(isEditMode: Boolean): String = {
-    if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show.url
-    } else {
-      appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
-    }
-  }
-
-  def backUrl(id: String, isEditMode: Boolean): String = {
+  //save & retrieve on should have an order of: business name -> business start date (this)-> business trade
+  //save & retrieve off should have an order of: business start date (this)-> business name -> business trade
+  private def next(id: String, isEditMode: Boolean) = Redirect(
     (isEditMode, isSaveAndRetrieve) match {
-      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id).url
-      case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id).url
-      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show.url
-      case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
+      // This will change when we build the equivalent controller for self employed cya, for agents.
+      case (true, true) => routes.BusinessListCYAController.show
+      case (false, true) => routes.BusinessTradeNameController.show(id)
+      case (true, false) => routes.BusinessListCYAController.show
+      case (false, false) => routes.BusinessNameController.show(id)
     }
+  )
+
+  //save & retrieve on should have an order of: business name -> business start date (this)-> business trade
+  //save & retrieve off should have an order of: business start date (this)-> business name -> business trade
+  def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
+    // This will change when we build the equivalent controller for self employed cya, for agents.
+    case (true, true) => routes.BusinessNameController.show(id).url
+    case (false, true) => routes.BusinessNameController.show(id).url
+    case (true, false) => routes.BusinessListCYAController.show.url
+    case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {
