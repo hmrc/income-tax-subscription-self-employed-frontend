@@ -32,7 +32,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUti
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.DateOfCommencement
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
@@ -43,18 +43,18 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
+                                            val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService,
                                             val languageUtils: LanguageUtils,
-                                            businessStartDateView: DateOfCommencement,
-                                            val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
-                                           (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc)
-  with I18nSupport with ImplicitDateFormatter with FeatureSwitching with ReferenceRetrieval {
+                                            businessStartDate: BusinessStartDateView)
+                                           (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with FeatureSwitching with ReferenceRetrieval {
 
   private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
 
   def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html = {
-    businessStartDateView(
+    businessStartDate(
       businessStartDateForm = businessStartDateForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
@@ -62,7 +62,6 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
       backUrl = backUrl(id, isEditMode)
     )
   }
-
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
@@ -74,7 +73,6 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
       }
     }
   }
-
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {

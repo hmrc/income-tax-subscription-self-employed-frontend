@@ -40,14 +40,15 @@ class BusinessStartDateViewSpec extends ViewSpec {
   def page(isEditMode: Boolean = false, error: Option[FormError] = None): Html = {
     val form = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError")
     businessStartDateView(
-      startDateForm = error match {
+      businessStartDateForm = error match {
         case Some(value) => form.withError(value)
         case None => form
       },
       postAction = testCall,
       isEditMode = isEditMode,
+      isSaveAndRetrieve = false,
       backUrl = testBackUrl
-    )(fakeTestRequest, implicitly)
+    )(fakeTestRequest, implicitly, appConfig)
   }
 
   def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document = Jsoup.parse(page(isEditMode, error).body)
@@ -86,7 +87,8 @@ class BusinessStartDateViewSpec extends ViewSpec {
           document().getForm.mustHaveDateInput(
             name = BusinessStartDateForm.startDate,
             label = BusinessStartDateMessages.heading,
-            hint = Some(BusinessStartDateMessages.exampleStartDate)
+            hint = Some(BusinessStartDateMessages.exampleStartDate),
+            isPageHeading = false
           )
         }
         "there is an error on the page" in {
@@ -94,7 +96,8 @@ class BusinessStartDateViewSpec extends ViewSpec {
             name = BusinessStartDateForm.startDate,
             label = BusinessStartDateMessages.heading,
             hint = Some(BusinessStartDateMessages.exampleStartDate),
-            error = Some(testError)
+            error = Some(testError),
+            isPageHeading = false
           )
         }
       }

@@ -22,6 +22,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
@@ -45,13 +47,17 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             val languageUtils: LanguageUtils,
                                             businessStartDate: BusinessStartDateView)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with ReferenceRetrieval {
+  extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with FeatureSwitching with ReferenceRetrieval {
 
-  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html = {
+  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
+
+  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
+          (implicit request: Request[AnyContent]): Html = {
     businessStartDate(
-      startDateForm = businessStartDateForm,
+      businessStartDateForm = businessStartDateForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
+      isSaveAndRetrieve = isEnabled(SaveAndRetrieve),
       backUrl = backUrl(isEditMode)
     )
   }
@@ -91,6 +97,15 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show.url
     } else {
       appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+    }
+  }
+
+  def backUrl(id: String, isEditMode: Boolean): String = {
+    (isEditMode, isSaveAndRetrieve) match {
+      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id).url
+      case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(id).url
+      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show.url
+      case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
     }
   }
 

@@ -57,13 +57,14 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     reset(businessStartDate)
   }
 
-  def mockBusinessStartDate(form: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String): Unit = {
+  def mockBusinessStartDate(form: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, isSaveAndRetrieve: Boolean, backUrl: String): Unit = {
     when(businessStartDate(
       ArgumentMatchers.any(),
       ArgumentMatchers.any(),
       ArgumentMatchers.eq(isEditMode),
+      ArgumentMatchers.eq(isSaveAndRetrieve),
       ArgumentMatchers.eq(backUrl)
-    )(any(), any())) thenReturn HtmlFormat.empty
+    )(any(), any(), any())) thenReturn HtmlFormat.empty
   }
 
   def businessStartDateForm(fill: Option[BusinessStartDateModel] = None, bind: Option[Map[String, String]] = None): Form[BusinessStartDateModel] = {
@@ -101,6 +102,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           form = businessStartDateForm(fill = Some(returnedModel)),
           postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = false,
+          isSaveAndRetrieve = false,
           backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
         )
 
@@ -116,6 +118,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           form = businessStartDateForm(),
           postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = false,
+          isSaveAndRetrieve = false,
           backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
         )
 
@@ -133,6 +136,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           form = businessStartDateForm(fill = Some(returnedModel)),
           postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = true,
+          isSaveAndRetrieve = false,
           backUrl = agent.routes.BusinessListCYAController.show.url
         )
       }
@@ -171,6 +175,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
             form = businessStartDateForm(bind = None),
             postAction = agent.routes.BusinessStartDateController.submit(id),
             isEditMode = false,
+            isSaveAndRetrieve = false,
             backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
           )
 
@@ -204,6 +209,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
             form = businessStartDateForm(bind = None),
             postAction = agent.routes.BusinessListCYAController.submit,
             isEditMode = true,
+            isSaveAndRetrieve = false,
             backUrl = agent.routes.BusinessListCYAController.show.url
           )
 

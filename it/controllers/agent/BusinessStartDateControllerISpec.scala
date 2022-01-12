@@ -57,7 +57,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       }
     }
 
-    "Connector returns a previously filled in DateOfCommencement" should {
+    "Connector returns a previously filled in BusinessStartDate" should {
       "show the current date of commencement page with date values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
