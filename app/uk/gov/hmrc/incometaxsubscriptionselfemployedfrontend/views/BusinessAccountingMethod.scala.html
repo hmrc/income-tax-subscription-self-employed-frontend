@@ -90,7 +90,7 @@
     ).withFormField(businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod)))
 
     @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
-      @saveAndContinueButtonHelper()
+      @saveAndContinueButtonHelper(individual = true)
     } else {
       @continueButton(isEditMode = isEditMode)
     }

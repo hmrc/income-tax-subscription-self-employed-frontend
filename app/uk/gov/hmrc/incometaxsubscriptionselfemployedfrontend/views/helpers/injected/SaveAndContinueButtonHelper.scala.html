@@ -22,7 +22,7 @@
         appConfig: AppConfig
 )
 
-@(saveAndContinueText: Option[String] = None, hasSaveAndReturnLink: Boolean = true, disabled: Boolean = false)(implicit messages: Messages)
+@(individual: Boolean, saveAndContinueText: Option[String] = None, hasSaveAndReturnLink: Boolean = true, disabled: Boolean = false)(implicit messages: Messages)
 
 @buttonHelper(
     buttonText = saveAndContinueText.getOrElse(messages("save-and-continue-button")),
@@ -33,6 +33,9 @@
     @buttonHelper(
         buttonText = messages("save-and-come-back-later"),
         classes = Some("govuk-button govuk-button--secondary"),
-        href = Some(appConfig.subscriptionFrontendProgressSavedUrl)
+        href = if(individual)
+          Some(appConfig.subscriptionFrontendProgressSavedUrl)
+        else
+          Some(appConfig.subscriptionFrontendClientProgressSavedUrl)
     )
 }
