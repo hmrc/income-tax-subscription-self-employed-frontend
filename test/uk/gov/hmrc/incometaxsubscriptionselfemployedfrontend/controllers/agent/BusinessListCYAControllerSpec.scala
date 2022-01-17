@@ -26,11 +26,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnot
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.agent.MockCheckYourAnswers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.agent.MockBusinessListCYA
 
 import scala.concurrent.Future
 
-class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTaxSubscriptionConnector with MockCheckYourAnswers {
+class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTaxSubscriptionConnector with MockBusinessListCYA {
 
   implicit val mockImplicitDateFormatter: ImplicitDateFormatterImpl = new ImplicitDateFormatterImpl(mockLanguageUtils)
 

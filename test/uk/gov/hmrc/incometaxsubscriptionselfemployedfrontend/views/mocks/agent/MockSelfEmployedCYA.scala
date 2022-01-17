@@ -22,19 +22,19 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.CheckYourAnswers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 
-trait MockCheckYourAnswers extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
+trait MockSelfEmployedCYA extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
 
-  val checkYourAnswers: CheckYourAnswers = mock[CheckYourAnswers]
+  val selfEmployedCYA: SelfEmployedCYA = mock[SelfEmployedCYA]
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(checkYourAnswers)
+    reset(selfEmployedCYA)
   }
 
-  def mockCheckYourAnswers(): Unit = {
-    when(checkYourAnswers(any(), any(), any(), any())(any(), any(), any())) thenReturn HtmlFormat.empty
+  def mockSelfEmployedCYA(): Unit = {
+    when(selfEmployedCYA(any(), any(), any())(any(), any())) thenReturn HtmlFormat.empty
   }
 
 }

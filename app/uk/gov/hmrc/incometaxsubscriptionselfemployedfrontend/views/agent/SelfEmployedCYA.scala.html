@@ -1,0 +1,145 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel}
+
+@this(
+  mainTemplate: AgentMainTemplate,
+  form: FormWithCSRF,
+  saveAndContinueButton: SaveAndContinueButtonHelper,
+  implicitDateFormatter: ImplicitDateFormatterImpl
+)(
+   implicit appConfig: AppConfig
+)
+
+@(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
+
+@summaryRow(question: String, answer: Option[String], changeUrl: Option[ChangeLink]) = {
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">@question</dt>
+        <dd class="govuk-summary-list__value">@answer.getOrElse("")</dd>
+        <dd class="govuk-summary-list__actions">
+            @changeUrl.map { link =>
+                <a class="govuk-link" href="@link.url">
+                    <span aria-hidden="true">@if(answer.isDefined)(messages("base.change")) else (messages("base.incomplete"))</span>
+                    <span class="govuk-visually-hidden">@link.hiddenContent</span>
+                </a>
+            }
+        </dd>
+    </div>
+}
+
+@businessName(businessName: Option[BusinessNameModel], businessId: String) = @{
+    val question: String = messages("agent.self_employed_cya.business_name")
+    val answer: Option[String] = businessName.map(_.businessName)
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(businessId, isEditMode = true).url
+    val changeLink: ChangeLink = ChangeLink(
+        url = changeUrl,
+        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.business_name.change") else messages("agent.self_employed_cya.business_name.add")
+    )
+    summaryRow(question, answer, Some(changeLink))
+}
+
+@tradingStartDate(businessStartDate: Option[BusinessStartDateModel], businessId: String) = @{
+    import implicitDateFormatter.LongDate
+    val question: String = messages("agent.self_employed_cya.trading_start_date")
+    val answer: Option[String] = businessStartDate.map(_.startDate.toLocalDate.toLongDate)
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
+    val changeLink: ChangeLink = ChangeLink(
+        url = changeUrl,
+        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.trading_start_date.change") else messages("agent.self_employed_cya.trading_start_date.add")
+    )
+    summaryRow(question, answer, Some(changeLink))
+}
+
+@businessTrade(businessTrade: Option[BusinessTradeNameModel], businessId: String) = @{
+    val question: String = messages("agent.self_employed_cya.business_trade")
+    val answer: Option[String] = businessTrade.map(_.businessTradeName)
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
+    val changeLink: ChangeLink = ChangeLink(
+        url = changeUrl,
+        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.business_trade.change") else messages("agent.self_employed_cya.business_trade.add")
+    )
+    summaryRow(question, answer, Some(changeLink))
+}
+
+@businessAddress(businessAddress: Option[BusinessAddressModel],businessId: String) = @{
+    val question: String = messages("agent.self_employed_cya.business_address")
+    val answer: Option[String] = businessAddress.map(_.address.toString)
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url
+    val changeLink: ChangeLink =
+            ChangeLink(
+                    url = changeUrl,
+                    hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.business_address.change") else messages("agent.self_employed_cya.business_address.add")
+                )
+
+
+    summaryRow(question, answer, Some(changeLink))
+}
+
+@accountingMethod(accountingMethod: Option[AccountingMethodModel], businessId: String) = @{
+    val question: String = messages("agent.self_employed_cya.accounting_method")
+    val answer: Option[String] = accountingMethod.map { accountingMethodModel =>
+        accountingMethodModel.accountingMethod match {
+            case Cash => messages("agent.self_employed_cya.accounting_method.cash")
+            case Accruals => messages("agent.self_employed_cya.accounting_method.accruals")
+        }
+    }
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.show(Some(businessId), isEditMode = true).url
+    val changeLink: ChangeLink = ChangeLink(
+        url = changeUrl,
+        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.accounting_method.change") else messages("agent.self_employed_cya.accounting_method.add")
+    )
+    summaryRow(question, answer, Some(changeLink))
+}
+
+@contentTable(business: SelfEmploymentsCYAModel) = {
+
+<dl class="govuk-summary-list">
+    @businessName(business.businessName, business.id)
+    @tradingStartDate(business.businessStartDate, business.id)
+    @businessTrade(business.businessTradeName, business.id)
+    @businessAddress(business.businessAddress, business.id)
+    @accountingMethod(business.accountingMethod, business.id)
+</dl>
+
+}
+
+@mainTemplate(
+    title = messages("agent.self_employed_cya.heading"),
+    backLink = backUrl
+) {
+
+    <h1 class="govuk-heading-l">@messages("agent.self_employed_cya.heading")</h1>
+
+    @contentTable(answers)
+
+    @form(action = postAction) {
+        @saveAndContinueButton(
+            saveAndContinueText = if (!answers.confirmed) Some(messages("confirm-and-continue")) else Some(messages("base.continue")),
+            hasSaveAndReturnLink = (!answers.confirmed),
+            individual = false,
+            disabled = !answers.isComplete)
+    }
+}

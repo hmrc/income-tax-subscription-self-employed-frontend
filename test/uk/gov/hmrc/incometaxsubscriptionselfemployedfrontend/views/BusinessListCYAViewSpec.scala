@@ -25,9 +25,9 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.AddAnotherBusinessForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.CheckYourAnswers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessListCYA => CheckYourAnswers}
 
-class CheckYourAnswersViewSpec extends ViewSpec {
+class BusinessListCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val heading = "Check your answers"

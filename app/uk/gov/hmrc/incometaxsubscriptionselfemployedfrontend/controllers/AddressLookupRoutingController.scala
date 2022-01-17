@@ -39,20 +39,20 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                                authService: AuthService,
                                                addressLookupConnector: AddressLookupConnector,
                                                val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
-                                               multipleSelfEmploymentsService: MultipleSelfEmploymentsService
-                                              )(implicit val ec: ExecutionContext, val appConfig: AppConfig)
+                                               multipleSelfEmploymentsService: MultipleSelfEmploymentsService)
+                                               (implicit val ec: ExecutionContext, val appConfig: AppConfig)
   extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
 
   private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
 
-  private def addressLookupContinueUrl(businessId: String, isEditMode: Boolean): String = {
-    appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl + routes.AddressLookupRoutingController.addressLookupRedirect(businessId, None, isEditMode)
-  }
+  private def addressLookupContinueUrl(businessId: String, id: Option[String], isEditMode: Boolean): String =
+    appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
+      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, id, isEditMode)
 
   def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       addressLookupConnector.initialiseAddressLookup(
-        continueUrl = addressLookupContinueUrl(businessId, isEditMode),
+        continueUrl = addressLookupContinueUrl(businessId, None, isEditMode),
         isAgent = false
       ) map {
         case Right(PostAddressLookupSuccessResponse(Some(location))) =>

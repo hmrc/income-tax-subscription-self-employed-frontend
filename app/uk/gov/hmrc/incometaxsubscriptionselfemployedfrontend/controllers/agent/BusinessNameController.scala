@@ -89,7 +89,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
   //save & retrieve on should have an order of: business name (this) -> business start date -> business trade
   //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
   private def next(id: String, isEditMode: Boolean) = Redirect((isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => routes.BusinessStartDateController.show(id)
+    case (true, true) => routes.SelfEmployedCYAController.show(id)
     case (false, true) => routes.BusinessStartDateController.show(id)
     case (true, false) => routes.BusinessListCYAController.show
     case (false, false) => routes.BusinessTradeNameController.show(id)
@@ -115,7 +115,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
   //save & retrieve on should have an order of: business name (this) -> business start date -> business trade
   //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
   def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+    case (true, true) => routes.SelfEmployedCYAController.show(id).url
     case (false, true) => appConfig.subscriptionFrontendClientIncomeUrl
     case (true, false) => routes.BusinessListCYAController.show.url
     case (false, false) => routes.BusinessStartDateController.show(id).url

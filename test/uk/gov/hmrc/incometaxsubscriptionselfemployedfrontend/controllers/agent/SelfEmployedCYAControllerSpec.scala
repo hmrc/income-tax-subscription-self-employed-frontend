@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
@@ -25,9 +25,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.individual.MockSelfEmployedCYA
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.agent.MockSelfEmployedCYA
 
 import scala.concurrent.Future
 
@@ -94,7 +95,6 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         }
         "there was a problem retrieving the users self employment data" in {
           withFeatureSwitch(SaveAndRetrieve) {
-            mockAuthSuccess()
             mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
             mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
@@ -124,6 +124,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   "submit" when {
     "the save and retrieve feature switch is disabled" should {
       "throw a not found exception" in {
+        mockAuthSuccess()
         intercept[NotFoundException](await(TestSelfEmployedCYAController.submit(id, isEditMode = false)(fakeRequest)))
           .message mustBe "[SelfEmployedCYAController][submit] - The save and retrieve feature switch is disabled"
       }

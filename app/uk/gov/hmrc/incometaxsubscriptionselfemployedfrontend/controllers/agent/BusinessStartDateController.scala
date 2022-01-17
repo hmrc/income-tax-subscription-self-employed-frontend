@@ -91,8 +91,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   //save & retrieve off should have an order of: business start date (this)-> business name -> business trade
   private def next(id: String, isEditMode: Boolean) = Redirect(
     (isEditMode, isSaveAndRetrieve) match {
-      // This will change when we build the equivalent controller for self employed cya, for agents.
-      case (true, true) => routes.BusinessListCYAController.show
+      case (true, true) => routes.SelfEmployedCYAController.show(id)
       case (false, true) => routes.BusinessTradeNameController.show(id)
       case (true, false) => routes.BusinessListCYAController.show
       case (false, false) => routes.BusinessNameController.show(id)
@@ -102,8 +101,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   //save & retrieve on should have an order of: business name -> business start date (this)-> business trade
   //save & retrieve off should have an order of: business start date (this)-> business name -> business trade
   def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
-    // This will change when we build the equivalent controller for self employed cya, for agents.
-    case (true, true) => routes.BusinessNameController.show(id).url
+    case (true, true) => routes.SelfEmployedCYAController.show(id).url
     case (false, true) => routes.BusinessNameController.show(id).url
     case (true, false) => routes.BusinessListCYAController.show.url
     case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"

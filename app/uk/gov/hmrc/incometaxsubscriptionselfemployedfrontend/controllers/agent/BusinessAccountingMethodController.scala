@@ -22,6 +22,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.businessAccountingMethodKey
@@ -42,22 +44,23 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
                                                    val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                    authService: AuthService)
                                                   (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
+  extends FrontendController(mcc) with I18nSupport with FeatureSwitching with ReferenceRetrieval {
 
-  def view(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessAccountingMethodForm: Form[AccountingMethodModel], id: Option[String], isEditMode: Boolean)
+          (implicit request: Request[AnyContent]): Html =
     businessAccountingMethod(
       businessAccountingMethodForm = businessAccountingMethodForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.submit(isEditMode),
-      backUrl = Some(backUrl(isEditMode)),
+      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.submit(id, isEditMode),
+      backUrl = backUrl(id, isEditMode),
       isEditMode = isEditMode
     )
 
-  def show(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
         incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey).map {
           case Right(accountingMethod) =>
-            Ok(view(businessAccountingMethodForm.fill(accountingMethod), isEditMode))
+            Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, isEditMode))
           case Left(UnexpectedStatusFailure(_@status)) =>
             throw new InternalServerException(s"[BusinessAccountingMethodController][show] - Unexpected status: $status")
           case Left(InvalidJson) =>
@@ -67,27 +70,32 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     }
   }
 
-  def submit(isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
         businessAccountingMethodForm.bindFromRequest.fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, isEditMode))),
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessAccountingMethod =>
             incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessAccountingMethodKey, businessAccountingMethod) map { _ =>
-              Redirect(s"${appConfig.subscriptionFrontendClientRoutingController}?editMode=$isEditMode")
+              (id, isEditMode, isEnabled(SaveAndRetrieve)) match {
+                case (Some(id), _, true) =>
+                  Redirect(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode))
+                case _ =>
+                  Redirect(s"${appConfig.subscriptionFrontendClientRoutingController}?editMode=$isEditMode")
+              }
             }
         )
       }
     }
   }
 
-
-  def backUrl(isEditMode: Boolean): String = {
-    if (isEditMode) {
-      s"${appConfig.subscriptionFrontendClientRoutingController}"
-    } else {
-      routes.BusinessListCYAController.show.url
+  def backUrl(id: Option[String], isEditMode: Boolean): Option[String] = {
+    (id, isEditMode, isEnabled(SaveAndRetrieve)) match {
+      case (Some(id), true, true) => Some(routes.SelfEmployedCYAController.show(id).url)
+      case (_, false, true) => None
+      case (_, true, false) => Some(appConfig.subscriptionFrontendFinalCYAController)
+      case _ => Some(routes.BusinessListCYAController.show.url)
     }
   }
 
