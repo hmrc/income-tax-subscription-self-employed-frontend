@@ -22,6 +22,8 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
@@ -33,7 +35,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector {
+  with MockMultipleSelfEmploymentsService with FeatureSwitchingSpec with MockIncomeTaxSubscriptionConnector {
 
   val id: String = "testId"
 
@@ -197,6 +199,21 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
 
       }
+      }
+      "the user submits valid data in S&R mode" in
+        withFeatureSwitch(SaveAndRetrieve) {
+          withController { controller => {
+            mockAuthSuccess()
+            mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
+            mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+            val result = controller.submit(id, isEditMode = false)(
+              fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+            )
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+          }
+        }
       }
       "the user does not update their trade in edit mode" in withController { controller => {
         mockAuthSuccess()

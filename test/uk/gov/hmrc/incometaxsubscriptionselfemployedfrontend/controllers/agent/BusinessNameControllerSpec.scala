@@ -22,6 +22,8 @@ import org.mockito.Mockito.when
 import play.twirl.api.HtmlFormat
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
@@ -33,7 +35,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector {
+  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector with FeatureSwitchingSpec {
 
   val id: String = "testId"
 
@@ -113,6 +115,21 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           )
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
+        }
+        "the user submits valid data in S&R mode and is saved successfully" in {
+          withFeatureSwitch(SaveAndRetrieve) {
+            mockAuthSuccess()
+            mockFetchAllBusinesses(
+              Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
+            )
+            mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+            val result = TestBusinessNameController.submit(id,isEditMode = false)(
+              fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+            )
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
+          }
         }
       }
       "return 400, SEE_OTHER)" when {
@@ -203,12 +220,29 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     "The back url" when {
       "in edit mode" should {
         s"redirect to ${routes.BusinessListCYAController.show.url}" in {
-          TestBusinessNameController.backUrl(id,isEditMode = true) mustBe routes.BusinessListCYAController.show.url
+          TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
         }
       }
       "not in edit mode" should {
         s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
-          TestBusinessNameController.backUrl(id,isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
+          TestBusinessNameController.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
+        }
+      }
+    }
+
+    "The save-and-retrieve back url" when {
+      "in edit mode" should {
+        s"redirect correctly" in {
+          withFeatureSwitch(SaveAndRetrieve) {
+            TestBusinessNameController.backUrl(id, isEditMode = true) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+          }
+        }
+      }
+      "not in edit mode" should {
+        s"redirect correctly" in {
+          withFeatureSwitch(SaveAndRetrieve) {
+            TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+          }
         }
       }
     }
