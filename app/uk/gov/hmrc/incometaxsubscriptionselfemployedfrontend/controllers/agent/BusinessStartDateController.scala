@@ -57,7 +57,6 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
       businessStartDateForm = businessStartDateForm,
       postAction = routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
-      isSaveAndRetrieve = isEnabled(SaveAndRetrieve),
       backUrl = backUrl(id, isEditMode)
     )
   }

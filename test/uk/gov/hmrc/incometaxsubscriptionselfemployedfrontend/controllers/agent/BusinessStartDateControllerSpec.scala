@@ -65,7 +65,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       ArgumentMatchers.any(),
       ArgumentMatchers.any(),
       ArgumentMatchers.eq(isEditMode),
-      ArgumentMatchers.eq(isSaveAndRetrieve),
       ArgumentMatchers.eq(backUrl)
     )(any(), any(), any())) thenReturn HtmlFormat.empty
   }

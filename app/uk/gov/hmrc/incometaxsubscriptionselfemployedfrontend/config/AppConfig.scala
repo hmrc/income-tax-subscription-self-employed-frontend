@@ -33,13 +33,19 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val incomeTaxSubscriptionFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-frontend.url")
   lazy val incomeTaxSubscriptionSelfEmployedFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-self-employed-frontend.url")
   lazy val feedbackUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/feedback"
+
+  //  Individual routes
   lazy val howDoYouReceiveYourIncomeUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
   lazy val whatIncomeSourceToSignUpUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/details/income-source"
   lazy val subscriptionFrontendRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/routing"
   lazy val taskListUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/task-list"
   lazy val subscriptionFrontendFinalCYAController: String = incomeTaxSubscriptionFrontendBaseUrl + "/check-your-answers"
-  lazy val subscriptionFrontendClientRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/routing"
   lazy val subscriptionFrontendProgressSavedUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"
+  //  Agent routes
+  lazy val subscriptionFrontendClientProgressSavedUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/progress-saved"
+  lazy val subscriptionFrontendClientRoutingController: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/routing"
+  lazy val subscriptionFrontendClientIncomeUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
   lazy val limitOnNumberOfBusinesses: Int = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
   lazy val addressLookupUrl: String = servicesConfig.baseUrl("address-lookup-frontend")

@@ -137,6 +137,7 @@
 
     @form(action = postAction) {
         @saveAndContinueButton(
+            individual = true,
             saveAndContinueText = if (!answers.confirmed) Some(messages("confirm-and-continue")) else Some(messages("base.continue")),
             hasSaveAndReturnLink = (!answers.confirmed),
             disabled = !answers.isComplete)

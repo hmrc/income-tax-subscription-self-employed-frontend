@@ -116,7 +116,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
   //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
   def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
     case (true, true) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
-    case (false, true) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+    case (false, true) => appConfig.subscriptionFrontendClientIncomeUrl
     case (true, false) => routes.BusinessListCYAController.show.url
     case (false, false) => routes.BusinessStartDateController.show(id).url
   }

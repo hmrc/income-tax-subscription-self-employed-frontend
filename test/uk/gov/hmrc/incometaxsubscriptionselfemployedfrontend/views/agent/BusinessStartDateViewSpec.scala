@@ -20,16 +20,20 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.FormError
 import play.twirl.api.Html
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 
-class BusinessStartDateViewSpec extends ViewSpec {
+class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
     val heading: String = "When did your client’s sole trader business start trading?"
     val exampleStartDate = "For example, 1 8 2014"
     val continue = "Continue"
+    val saveAndContinue = "Save and continue"
+    val saveAndComeBackLater = "Save and come back later"
     val update = "Update"
   }
 
@@ -46,12 +50,12 @@ class BusinessStartDateViewSpec extends ViewSpec {
       },
       postAction = testCall,
       isEditMode = isEditMode,
-      isSaveAndRetrieve = false,
       backUrl = testBackUrl
     )(fakeTestRequest, implicitly, appConfig)
   }
 
-  def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document = Jsoup.parse(page(isEditMode, error).body)
+  def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document =
+    Jsoup.parse(page(isEditMode, error).body)
 
   val testError: FormError = FormError(BusinessStartDateForm.startDate, "test error message")
 
@@ -75,7 +79,6 @@ class BusinessStartDateViewSpec extends ViewSpec {
     }
 
     "have a form" which {
-
       "has the correct action and method assigned" in {
         val form: Element = document().getForm
         form.attr("method") mustBe testCall.method
@@ -104,16 +107,27 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
       "has a button to continue" when {
         "not in edit mode" in {
+          disable(SaveAndRetrieve)
           document().getForm.getGovukButton.text mustBe BusinessStartDateMessages.continue
         }
         "in edit mode" in {
+          disable(SaveAndRetrieve)
           document(isEditMode = true).getForm.getGovukButton.text mustBe BusinessStartDateMessages.update
         }
       }
 
+      "has save and retrieve buttons" which {
+        "include the save and continue button" in {
+          enable(SaveAndRetrieve)
+          document().getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
+        }
+        "include the save and come back later link" in {
+          enable(SaveAndRetrieve)
+          val saveAndComeBackLink = document().selectHead("a[role=button]")
+          saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBackLater
+          saveAndComeBackLink.attr("href") mustBe appConfig.subscriptionFrontendClientProgressSavedUrl
+        }
+      }
     }
-
-
   }
-
 }
