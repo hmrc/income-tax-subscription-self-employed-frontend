@@ -17,22 +17,17 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import play.api.mvc._
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.{AddressLookupConnector, IncomeTaxSubscriptionConnector}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, BusinessAddressModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.generic.AddressLookupRoutingControllerGeneric
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents,
@@ -41,17 +36,17 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                                val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService)
                                                (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
+  extends FrontendController(mcc) with AddressLookupRoutingControllerGeneric {
 
-  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
+  override val getAddressLookupConnector: AddressLookupConnector = addressLookupConnector
 
-  private def addressLookupContinueUrl(businessId: String, id: Option[String], isEditMode: Boolean): String =
+  def addressLookupContinueUrl(businessId: String, id: Option[String] = None, isEditMode: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
       routes.AddressLookupRoutingController.addressLookupRedirect(businessId, id, isEditMode)
 
-  def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def initialiseAddressLookupJourney(businessId: String, id: Option[String] = None, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      addressLookupConnector.initialiseAddressLookup(
+      getAddressLookupConnector.initialiseAddressLookup(
         continueUrl = addressLookupContinueUrl(businessId, None, isEditMode),
         isAgent = false
       ) map {
@@ -84,28 +79,4 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier): Future[Option[AccountingMethodModel]] = {
-    incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey) map {
-      case Left(_) =>
-        throw new InternalServerException("[AddressLookupRoutingController][fetchAccountMethod] - Failure retrieving accounting method")
-      case Right(accountingMethod) => accountingMethod
-    }
-  }
-
-  private def fetchAddress(id: Option[String])(implicit hc: HeaderCarrier): Future[BusinessAddressModel] = {
-    id match {
-      case None =>
-        throw new InternalServerException(s"[AddressLookupRoutingController][fetchAddress] - Id not returned from address service")
-      case Some(addressId) =>
-        addressLookupConnector.getAddressDetails(addressId) map {
-          case Right(Some(addressDetails)) => addressDetails
-          case Right(None) =>
-            throw new InternalServerException(s"[AddressLookupRoutingController][fetchAddress] - No address details found with id: $addressId")
-          case Left(InvalidJson) =>
-            throw new InternalServerException(s"[AddressLookupRoutingController][fetchAddress] - Invalid json response")
-          case Left(GetAddressLookupDetailsHttpParser.UnexpectedStatusFailure(status)) =>
-            throw new InternalServerException(s"[AddressLookupRoutingController][fetchAddress] - Unexpected response, status: $status")
-        }
-    }
-  }
 }

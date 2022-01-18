@@ -32,7 +32,7 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
   implicit val system: ActorSystem = ActorSystem()
 
   val controllerName: String
-  val authorisedRoutes: Map[String, Action[AnyContent]]
+  def authorisedRoutes: Map[String, Action[AnyContent]]
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(
     ITSASessionKeys.UTR -> "1234567890",
