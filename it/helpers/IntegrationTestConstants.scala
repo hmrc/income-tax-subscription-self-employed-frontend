@@ -36,6 +36,7 @@ object IntegrationTestConstants {
   val ClientBusinessAccountingMethodUri = s"$baseURI/client/details/business-accounting-method"
   val BusinessListCYAUri = s"$baseURI/details/business-list"
   val BusinessCYAUri = s"$baseURI/details/business-check-your-answers"
+  val ClientBusinessCYAUri = s"$baseURI/client/details/business-check-your-answers"
   val taskListURI = s"$incomeTaxSubscriptionFrontendBaseUrl/business/task-list"
   val ClientBusinessListCYAUri = s"$baseURI/client/details/business-list"
   val InitialiseUri = s"$baseURI/details"

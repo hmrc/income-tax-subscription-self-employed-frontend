@@ -26,10 +26,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnot
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnotherBusinessAgentForm.addAnotherBusiness
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.CheckYourAnswers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessListCYA => CheckYourAnswers}
 
 
-class CheckYourAnswersViewSpec extends ViewSpec {
+class BusinessListCYAViewSpec extends ViewSpec {
 
   val emptyError = "Select yes if you want to add another sole trader business"
 

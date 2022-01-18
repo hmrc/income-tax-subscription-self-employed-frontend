@@ -222,3 +222,23 @@ self_employed_cya.accounting_method.add                         = Add Accounting
 self_employed_cya.accounting_method.cash                        = Cash accounting
 self_employed_cya.accounting_method.accruals                    = Standard accounting
 self_employed_cya.heading                                       = Check your details
+
+#Self Employed CYA
+agent.self_employed_cya.trading_start_date                            = Business trading start date
+agent.self_employed_cya.trading_start_date.change                     = Change Business trading start date
+agent.self_employed_cya.trading_start_date.add                        = Add Business trading start date
+agent.self_employed_cya.business_name                                 = Business name
+agent.self_employed_cya.business_name.change                          = Change Business name
+agent.self_employed_cya.business_name.add                             = Add Business name
+agent.self_employed_cya.business_trade                                = Type of trade
+agent.self_employed_cya.business_trade.change                         = Change type of trade
+agent.self_employed_cya.business_trade.add                            = Add type of trade
+agent.self_employed_cya.business_address                              = Business address
+agent.self_employed_cya.business_address.change                       = Change Business address
+agent.self_employed_cya.business_address.add                          = Add Business address
+agent.self_employed_cya.accounting_method                             = Accounting method for sole trader income
+agent.self_employed_cya.accounting_method.change                      = Change Accounting method for sole trader income
+agent.self_employed_cya.accounting_method.add                         = Add Accounting method for sole trader income
+agent.self_employed_cya.accounting_method.cash                        = Cash accounting
+agent.self_employed_cya.accounting_method.accruals                    = Standard accounting
+agent.self_employed_cya.heading                                       = Check your details

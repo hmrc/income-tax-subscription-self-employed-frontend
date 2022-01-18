@@ -38,9 +38,11 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   with FeatureSwitching {
 
   override val controllerName: String = "BusinessAccountingMethodController"
+  private val testId = "testId"
+  private val id: Option[String] = Some(testId)
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessAccountingMethodController.show(id = Some("testId"), isEditMode = false),
-    "submit" -> TestBusinessAccountingMethodController.submit(id = Some("testId"), isEditMode = false)
+    "show" -> TestBusinessAccountingMethodController.show(id = id, isEditMode = false),
+    "submit" -> TestBusinessAccountingMethodController.submit(id = id, isEditMode = false)
   )
 
   private object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
@@ -62,14 +64,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockGetSelfEmployments(businessAccountingMethodKey)(
           Right(Some(testAccountingMethodModel))
         )
-        val result = controller.show(id = Some("testId"), isEditMode = false)(fakeRequest)
+        val result = controller.show(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Right(None))
-        val result = controller.show(id = Some("testId"), isEditMode = false)(fakeRequest)
+        val result = controller.show(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -78,14 +80,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       "there is an unexpected status failure" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        val response = intercept[InternalServerException](await(controller.show(id = Some("testId"), isEditMode = false)(fakeRequest)))
+        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Unexpected status: 500")
       }
 
       "there is an invalid Json" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(InvalidJson))
-        val response = intercept[InternalServerException](await(controller.show(id = Some("testId"), isEditMode = false)(fakeRequest)))
+        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Invalid Json")
       }
     }
@@ -102,12 +104,12 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
               enable(SaveAndRetrieve)
               mockAuthSuccess()
               mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-              val result = controller.submit(id = Some("testId"), isEditMode = false)(
+              val result = controller.submit(id = id, isEditMode = false)(
                 fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
               )
               status(result) mustBe SEE_OTHER
               redirectLocation(result) mustBe
-                Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show("testId").url)
+                Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(testId).url)
             }
           }
 
@@ -132,12 +134,12 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
               enable(SaveAndRetrieve)
               mockAuthSuccess()
               mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-              val result = controller.submit(id = Some("testId"), isEditMode = true)(
+              val result = controller.submit(id = id, isEditMode = true)(
                 fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
               )
               status(result) mustBe SEE_OTHER
               redirectLocation(result) mustBe
-                Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show("testId").url)
+                Some(routes.SelfEmployedCYAController.show(testId).url)
             }
           }
 
@@ -160,8 +162,9 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in withController { controller =>
         mockAuthSuccess()
-        mockSaveSelfEmployments(businessAccountingMethodKey, "invalid")(Right(PostSubscriptionDetailsSuccessResponse))
-        val result = controller.submit(id = Some("testId"), isEditMode = false)(fakeRequest)
+        mockSaveSelfEmployments(businessAccountingMethodKey,
+          "invalid")(Right(PostSubscriptionDetailsSuccessResponse))
+        val result = controller.submit(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
@@ -200,8 +203,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         "return a url for the self employed CYA page" in withController { controller =>
           enable(SaveAndRetrieve)
           mockAuthSuccess()
-          controller.backUrl(id = Some("testId"), isEditMode = true) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show("testId").url)
+          controller.backUrl(id = id, isEditMode = true) mustBe
+            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(testId).url)
         }
       }
     }

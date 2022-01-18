@@ -81,30 +81,31 @@ extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with
           formWithErrors => {
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode)))
           },
-          businessStartDateData =>
-            multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData).map(_ => {
-              val call = (isEditMode, isSaveAndRetrieve) match {
-                case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
-                case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
-                case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show
-                case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id)
-              }
-              Redirect(call)
-            }
-            )
+          businessStartDateData => multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData)
+            .map(_ => next(id, isEditMode))
         )
       }
     }
   }
 
-
-  def backUrl(id: String, isEditMode: Boolean): String = {
+  //save & retrieve on should have an order of: business name -> business start date (this) -> business trade
+  //save & retrieve off should have an order of: business start date (this) -> business name -> business trade
+  private def next(id: String, isEditMode: Boolean) = Redirect(
     (isEditMode, isSaveAndRetrieve) match {
-      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url
-      case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
-      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url
-      case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
+      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
+      case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
+      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show
+      case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id)
     }
+  )
+
+  //save & retrieve on should have an order of: business name -> business start date (this) -> business trade
+  //save & retrieve off should have an order of: business start date (this) -> business name -> business trade
+  def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
+    case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url
+    case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
+    case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url
+    case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {

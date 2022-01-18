@@ -222,3 +222,23 @@ self_employed_cya.accounting_method.add                         = Ychwanegu’r 
 self_employed_cya.accounting_method.cash                        = Cyfrifyddu arian parod
 self_employed_cya.accounting_method.accruals                    = Cyfrifyddu safonol
 self_employed_cya.heading                                       = Gwirio’ch manylion
+
+#Self Employed CYA
+agent.self_employed_cya.trading_start_date                            = Dyddiad dechrau masnachu’r busnes
+agent.self_employed_cya.trading_start_date.change                     = Newid dyddiad dechrau masnachu’r busnes
+agent.self_employed_cya.trading_start_date.add                        = Ychwanegu dyddiad dechrau masnachu’r busnes
+agent.self_employed_cya.business_name                                 = Enw’r busnes
+agent.self_employed_cya.business_name.change                          = Newid enw’r busnes
+agent.self_employed_cya.business_name.add                             = Ychwanegu enw’r busnes
+agent.self_employed_cya.business_trade                                = Math o fasnach
+agent.self_employed_cya.business_trade.change                         = Newid y math o fasnach
+agent.self_employed_cya.business_trade.add                            = Ychwanegu'r math o fasnach
+agent.self_employed_cya.business_address                              = Cyfeiriad y busnes
+agent.self_employed_cya.business_address.change                       = Newid cyfeiriad y busnes
+agent.self_employed_cya.business_address.add                          = Ychwanegu cyfeiriad y busnes
+agent.self_employed_cya.accounting_method                             = Dull cyfrifyddu ar gyfer incwm unig fasnachwr
+agent.self_employed_cya.accounting_method.change                      = Newid y dull cyfrifyddu ar gyfer incwm unig fasnachwr
+agent.self_employed_cya.accounting_method.add                         = Ychwanegu’r dull cyfrifyddu ar gyfer incwm unig fasnachwr
+agent.self_employed_cya.accounting_method.cash                        = Cyfrifyddu arian parod
+agent.self_employed_cya.accounting_method.accruals                    = Cyfrifyddu safonol
+agent.self_employed_cya.heading                                       = Gwirio’ch manylion

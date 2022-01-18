@@ -86,19 +86,24 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
               Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode, isEnabled(SaveAndRetrieve)))),
             businessNameData =>
               multipleSelfEmploymentsService.saveBusinessName(reference, id, businessNameData).map { _ =>
-                val call = (isEditMode, isSaveAndRetrieve) match {
-                  case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
-                  case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id)
-                  case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show
-                  case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
-                }
-                Redirect(call)
+                next(id, isEditMode)
               }
           )
         }
       }
     }
   }
+
+  //save & retrieve on should have an order of: business name (this) -> business start date -> business trade
+  //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
+  private def next(id: String, isEditMode: Boolean) = Redirect(
+    (isEditMode, isSaveAndRetrieve) match {
+      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id)
+      case (false, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id)
+      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show
+      case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id)
+    }
+  )
 
   private def getExcludedBusinessNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessNameModel] = {
     val currentBusinessTrade = businesses.find(_.id == id).flatMap(_.businessTradeName)
@@ -115,13 +120,13 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean): String = {
-    (isEditMode, isSaveAndRetrieve) match {
-      case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url
-      case (false, true) => appConfig.whatIncomeSourceToSignUpUrl
-      case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url
-      case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id).url
-    }
+  //save & retrieve on should have an order of: business name (this) -> business start date -> business trade
+  //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
+  def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
+    case (true, true) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url
+    case (false, true) => appConfig.whatIncomeSourceToSignUpUrl
+    case (true, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url
+    case (false, false) => uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(id).url
   }
 
 }

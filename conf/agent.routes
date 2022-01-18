@@ -17,8 +17,8 @@ GET         /details/business-trade                    uk.gov.hmrc.incometaxsubs
 POST        /details/business-trade                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
 
 #Address Lookup routing
-GET         /address-lookup-initialise/:itsaId         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(itsaId: String)
-GET         /details/address-lookup/:itsaId            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(itsaId: String, id: Option[String] ?= None)
+GET         /address-lookup-initialise/:businessId     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
+GET         /details/address-lookup/:businessId        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false)
 
 #Check your answers
 GET         /details/business-list                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.show
@@ -27,8 +27,11 @@ POST        /details/business-list                     uk.gov.hmrc.incometaxsubs
 # Remove business
 GET         /details/remove-business                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.RemoveBusinessController.show(id: String)
 
-GET         /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show(isEditMode: Boolean ?= false)
-POST        /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit(isEditMode: Boolean ?= false)
+GET         /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show(id: Option[String] ?= None, isEditMode: Boolean ?= false)
+POST        /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit(id: Option[String] ?= None, isEditMode: Boolean ?= false)
+
+GET         /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false)
+POST        /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.submit(id: String, isEditMode: Boolean ?= false)
 
 #Welsh Language
 GET         /language/:lang                            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AgentLanguageSwitchController.switchToLanguage(lang: String)

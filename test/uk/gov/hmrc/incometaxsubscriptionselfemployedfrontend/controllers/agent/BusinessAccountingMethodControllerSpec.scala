@@ -22,25 +22,31 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testAccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 
 class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
-  with MockIncomeTaxSubscriptionConnector {
+  with MockIncomeTaxSubscriptionConnector
+  with FeatureSwitching {
 
   override val controllerName: String = "BusinessAccountingMethodController"
+  private val testId = "testId"
+  private val id: Option[String] = Some(testId)
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessAccountingMethodController$.show(isEditMode = false),
-    "submit" -> TestBusinessAccountingMethodController$.submit(isEditMode = false)
+    "show" -> TestBusinessAccountingMethodController.show(id = id, isEditMode = false),
+    "submit" -> TestBusinessAccountingMethodController.submit(id = id, isEditMode = false)
   )
 
-  object TestBusinessAccountingMethodController$ extends BusinessAccountingMethodController(
+  private object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
     mock[BusinessAccountingMethod],
     mockMessagesControllerComponents,
     mockIncomeTaxSubscriptionConnector,
@@ -56,17 +62,17 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return ok (200)" when {
       "the connector returns data" in withController { controller =>
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(
+        mockGetSelfEmployments(businessAccountingMethodKey)(
           Right(Some(testAccountingMethodModel))
         )
-        val result = controller.show(false)(fakeRequest)
+        val result = controller.show(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in withController { controller =>
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Right(None))
-        val result = controller.show(false)(fakeRequest)
+        mockGetSelfEmployments(businessAccountingMethodKey)(Right(None))
+        val result = controller.show(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -74,15 +80,15 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "Throw an internal exception" when {
       "there is an unexpected status failure" in withController { controller =>
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        val response = intercept[InternalServerException](await(controller.show(false)(fakeRequest)))
+        mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Unexpected status: 500")
       }
 
       "there is an invalid Json" in withController { controller =>
         mockAuthSuccess()
-        mockGetSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey)(Left(InvalidJson))
-        val response = intercept[InternalServerException](await(controller.show(false)(fakeRequest)))
+        mockGetSelfEmployments(businessAccountingMethodKey)(Left(InvalidJson))
+        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
         response.message mustBe ("[BusinessAccountingMethodController][show] - Invalid Json")
       }
     }
@@ -96,7 +102,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
           testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-        val result = controller.submit(false)(
+        val result = controller.submit(id = id, isEditMode = false)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
         )
         status(result) mustBe SEE_OTHER
@@ -109,7 +115,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
           testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-        val result = controller.submit(true)(
+        val result = controller.submit(id = id, isEditMode = true)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
         )
         status(result) mustBe SEE_OTHER
@@ -120,26 +126,50 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in withController { controller =>
         mockAuthSuccess()
-        mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+        mockSaveSelfEmployments(businessAccountingMethodKey,
           "invalid")(Right(PostSubscriptionDetailsSuccessResponse))
-        val result = controller.submit(false)(fakeRequest)
+        val result = controller.submit(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
     }
   }
 
-  "The back url" should {
+  "The back url" when {
     "not in edit mode" when {
-      "return a url for the business trade name page" in withController { controller =>
+      "save and retrieve is disabled" should {
+        "return a url for the business list CYA page" in withController { controller =>
+          disable(SaveAndRetrieve)
         mockAuthSuccess()
-        controller.backUrl(false) mustBe routes.BusinessListCYAController.show.url
+          controller.backUrl(id = None, isEditMode = false) mustBe Some(routes.BusinessListCYAController.show.url)
       }
     }
+
+      "save and retrieve is enabled" should {
+        "return None when Save and Retrieve is enabled" in withController { controller =>
+          enable(SaveAndRetrieve)
+          mockAuthSuccess()
+          controller.backUrl(id = None, isEditMode = false) mustBe None
+        }
+      }
+    }
+
     "in edit mode" when {
-      "return a url for the business trade name page" in withController { controller =>
+      "save and retrieve is disabled" should {
+        "return a url for the sign up front end final CYA page" in withController { controller =>
+          disable(SaveAndRetrieve)
         mockAuthSuccess()
-        controller.backUrl(true) mustBe s"${appConfig.subscriptionFrontendClientRoutingController}"
+          controller.backUrl(id = None, isEditMode = true) mustBe Some(appConfig.subscriptionFrontendFinalCYAController)
+        }
+      }
+
+      "save and retrieve is enabled" should {
+        "return a url for the self employed CYA page" in withController { controller =>
+          enable(SaveAndRetrieve)
+          mockAuthSuccess()
+          controller.backUrl(id = id, isEditMode = true) mustBe
+            Some(routes.SelfEmployedCYAController.show(testId).url)
+        }
       }
     }
   }
@@ -160,5 +190,4 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
     testCode(controller)
   }
-
 }
