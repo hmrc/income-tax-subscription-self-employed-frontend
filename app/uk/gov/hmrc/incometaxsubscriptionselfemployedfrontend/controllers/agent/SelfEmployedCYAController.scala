@@ -68,7 +68,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
             multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
               case Left(_) =>
                 throw new InternalServerException("[SelfEmployedCYAController][submit] - Failure to save self employment data")
-              case Right(_) => Redirect(appConfig.taskListUrl)
+              case Right(_) => Redirect(appConfig.clientTaskListUrl)
             }
           } else {
             Future.successful(Redirect(routes.SelfEmployedCYAController.show(id)))
@@ -106,7 +106,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
 
   def backUrl(isEditMode: Boolean): Option[String] = {
     if (isEditMode) {
-      Some(appConfig.taskListUrl)
+      Some(appConfig.clientTaskListUrl)
     } else {
       None
     }
