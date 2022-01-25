@@ -160,7 +160,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
             val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isEditMode = false)(fakeRequest)
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(appConfig.taskListUrl)
+            redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
           }
         }
         "the user submits valid incomplete data" in {
@@ -180,7 +180,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   "backUrl" should {
     "return the task list page" when {
       "in edit mode" in {
-        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.taskListUrl)
+        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientTaskListUrl)
       }
     }
     "return nothing" when {
