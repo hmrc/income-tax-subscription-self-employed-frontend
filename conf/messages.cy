@@ -138,6 +138,7 @@ error.agent.business_name.invalid_character                     = Ni all enw’r
 
 #Agent Trade Name
 business.agent.trade_name.title                                 = Beth yw masnach busnes unig fasnachwr eich cleient?
+business.agent.trade_name.heading                               = Beth yw masnach busnes unig fasnachwr eich cleient?
 business.agent.trade_name.hint                                  = Er enghraifft: plymio, gwaith trydanol, ymgynghori
 
 #Agent Trade Name errors
@@ -171,7 +172,6 @@ agent.check_your_answers.business_address                       = Cyfeiriad y bu
 agent.check_your_answers.business_address.change                = Newid cyfeiriad y busnes
 agent.check_your_answers.remove_business                        = Dileu busnes {0}
 agent.check_your_answers.add_another_business_heading           = A hoffech ychwanegu busnes unig fasnachwr arall?
-agent.check_your_answers.confirm_and_sign_up                    = Cadarnhau a chofrestru
 
 # Agent Check your answers add another business
 agent.error.add_another_business.limit_reached                  = Gallwch ychwanegu hyd at {0} o fusnesau yn unig
