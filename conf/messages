@@ -139,6 +139,7 @@ error.agent.business_name.invalid_character                     = Business name 
 
 #Agent Trade Name
 business.agent.trade_name.title                                 = What is the trade of your client’s sole trader business?
+business.agent.trade_name.heading                               = What is the trade of your client’s sole trader business?
 business.agent.trade_name.hint                                  = For example: plumbing, electrical work, consulting
 
 #Agent Trade Name errors
