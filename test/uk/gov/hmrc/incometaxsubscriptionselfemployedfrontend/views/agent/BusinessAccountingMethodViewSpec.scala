@@ -22,13 +22,14 @@ import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 
-
-class BusinessAccountingMethodViewSpec extends ViewSpec {
+class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
   val backUrl: Option[String] = Some("/test-back-url")
   val action: Call = testCall
@@ -43,18 +44,27 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
     val continue = "Continue"
     val update = "Update"
     val backLink = "Back"
+    val saveAndContinue = "Save and continue"
   }
 
   private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
 
   class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
-              isEditMode: Boolean = false, backLink: Option[String] = Some(testBackUrl)) {
+              isEditMode: Boolean = false, saveAndRetrieve: Boolean = false, backLink: Option[String] = Some(testBackUrl)) {
+
+    if(saveAndRetrieve)
+      enable(SaveAndRetrieve)
+    else
+      disable(SaveAndRetrieve)
+
     val page: HtmlFormat.Appendable = businessAccountingMethodView(
       businessAccountingMethodForm,
       testCall,
       isEditMode,
       backUrl = backLink
     )(FakeRequest(), implicitly, appConfig)
+
+
 
     val document: Document = Jsoup.parse(page.body)
   }
@@ -90,12 +100,21 @@ class BusinessAccountingMethodViewSpec extends ViewSpec {
       document.getForm.attr("action") mustBe testCall.url
     }
 
-    "have a continue button when not in edit mode" in new Setup {
+    "have a continue button when not in edit mode" when {
+      "save and retrieve is not enabled" in new Setup {
       document.getButtonByClass mustBe BusinessAccountingMethodMessages.continue
     }
-
-    "have a update button when in edit mode" in new Setup(isEditMode = true) {
+  }
+    "have a update button when in edit mode" when {
+      "the save and retrieve is not enabled" in new Setup(isEditMode = true) {
       document.getButtonByClass mustBe BusinessAccountingMethodMessages.update
+    }
+  }
+
+    "have a save and continue button" when {
+      "the save and retrieve feature switch is enabled" in new Setup(saveAndRetrieve = true) {
+        document.select("button").last().text mustBe BusinessAccountingMethodMessages.saveAndContinue
+      }
     }
 
     "must display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {

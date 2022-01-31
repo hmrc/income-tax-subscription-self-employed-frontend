@@ -82,7 +82,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=false")
+          redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing")
         )
       }
 
