@@ -1,10 +1,5 @@
-$govuk-assets-path: "/report-quarterly/income-and-expenses/sign-up/self-employments/assets/lib/govuk-frontend/govuk/assets/";
-$hmrc-assets-path: "/report-quarterly/income-and-expenses/sign-up/self-employments/assets/lib/hmrc-frontend/hmrc/";
-
-@import "lib/govuk-frontend/govuk/all";
-@import "lib/hmrc-frontend/hmrc/all";
-
-.app-reference-number {
-  display: block;
-  font-weight: bold;
+body:not(.js-enabled) {
+  a.govuk-back-link[href*="javascript"] {
+    display: none;
+  }
 }
