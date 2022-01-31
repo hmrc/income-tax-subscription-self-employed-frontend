@@ -22,7 +22,7 @@ import play.api.libs.json.{JsObject, Json}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
+class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesApi) {
 
   //scalastyle:off
   def config(continueUrl: String): JsObject = {
@@ -48,7 +48,7 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
         ),
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,
-          "timeoutUrl" -> "http://tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/session-timeout"
+          "timeoutUrl" -> s"${appConfig.incomeTaxSubscriptionFrontendBaseUrl}/session-timeout"
         )
       ),
       "labels" -> Json.obj(
@@ -118,7 +118,7 @@ class AddressLookupConfig @Inject()(messagesApi: MessagesApi) {
         ),
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,
-          "timeoutUrl" -> "http://tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/session-timeout"
+          "timeoutUrl" -> s"${appConfig.incomeTaxSubscriptionFrontendBaseUrl}/session-timeout"
         )
       ),
       "labels" -> Json.obj(

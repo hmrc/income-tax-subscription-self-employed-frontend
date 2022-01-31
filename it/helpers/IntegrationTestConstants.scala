@@ -77,7 +77,7 @@ object IntegrationTestConstants {
        |    },
        |    "timeoutConfig": {
        |      "timeoutAmount": 900,
-       |      "timeoutUrl": "http://tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/session-timeout"
+       |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    }
        |},
        |    "labels": {
@@ -142,7 +142,7 @@ object IntegrationTestConstants {
        |    },
        |    "timeoutConfig": {
        |      "timeoutAmount": 900,
-       |      "timeoutUrl": "http://tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/session-timeout"
+       |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    }
        |},
        |    "labels": {
