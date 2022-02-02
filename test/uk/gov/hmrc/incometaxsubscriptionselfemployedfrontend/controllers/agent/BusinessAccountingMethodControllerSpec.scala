@@ -97,8 +97,9 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   "Submit" should {
 
-    "return 303, SEE_OTHER not in edit mode" when {
+    "return 303, SEE_OTHER not in edit mode and saveAndRetrieve is enabled" when {
       "the user submits valid data" in withController { controller =>
+        enable(SaveAndRetrieve)
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
           testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
@@ -107,20 +108,49 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
-          Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=false")
+          Some("/report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers?id=testId")
       }
     }
-    "return 303, SEE_OTHER in edit mode" when {
+    "return 303, SEE_OTHER in edit mode and saveAndRetrieve is enabled" when {
       "the user submits valid data" in withController { controller =>
+            enable(SaveAndRetrieve)
+            mockAuthSuccess()
+            mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+              testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+            val result = controller.submit(id = id, isEditMode = true)(
+              fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+            )
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe
+              Some("/report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers?id=testId&isEditMode=true")
+          }
+        }
+    "return 303, SEE_OTHER in edit mode and saveAndRetrieve is disabled" when {
+      "the user submits valid data" in withController { controller =>
+        disable(SaveAndRetrieve)
         mockAuthSuccess()
         mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
           testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-        val result = controller.submit(id = id, isEditMode = true)(
+        val result = controller.submit(id = None, isEditMode = true)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
         )
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe
           Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=true")
+      }
+    }
+    "return 303, SEE_OTHER not in edit mode and saveAndRetrieve is disabled" when {
+      "the user submits valid data" in withController { controller =>
+        disable(SaveAndRetrieve)
+        mockAuthSuccess()
+        mockSaveSelfEmployments(BusinessAccountingMethodController.businessAccountingMethodKey,
+          testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+        val result = controller.submit(id = None, isEditMode = false)(
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe
+          Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=false")
       }
     }
     "return 400, SEE_OTHER)" when {

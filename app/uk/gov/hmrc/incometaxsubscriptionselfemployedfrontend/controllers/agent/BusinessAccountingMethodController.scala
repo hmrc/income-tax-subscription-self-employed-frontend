@@ -77,14 +77,14 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessAccountingMethod =>
-            incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessAccountingMethodKey, businessAccountingMethod) map { _ =>
+            incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessAccountingMethodKey, businessAccountingMethod).map(_ =>
               (id, isEditMode, isEnabled(SaveAndRetrieve)) match {
                 case (Some(id), _, true) =>
-                  Redirect(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode))
+                  Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode))
                 case _ =>
                   Redirect(s"${appConfig.subscriptionFrontendClientRoutingController}?editMode=$isEditMode")
               }
-            }
+            )
         )
       }
     }
