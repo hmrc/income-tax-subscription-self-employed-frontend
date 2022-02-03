@@ -80,6 +80,11 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
 
+    "have a javascript backlink" in new Setup(backLink = None) {
+      document.getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
+      document.getBackLinkByClass.attr("href") mustBe "javascript:history.back()"
+    }
+
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessAccountingMethodMessages.heading
 

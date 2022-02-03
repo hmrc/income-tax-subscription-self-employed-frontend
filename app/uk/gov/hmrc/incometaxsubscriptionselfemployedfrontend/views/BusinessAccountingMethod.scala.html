@@ -58,8 +58,14 @@
   </details>
 }
 
-@mainTemplate(title = messages("business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = backUrl) {
+@handleBackUrl = @{
+  backUrl match {
+    case None => Some("javascript:history.back()")
+    case Some(url) => Some(url)
+  }
+}
 
+@mainTemplate(title = messages("business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
   @form(action = postAction) {
 
     @govukRadios(Radios(

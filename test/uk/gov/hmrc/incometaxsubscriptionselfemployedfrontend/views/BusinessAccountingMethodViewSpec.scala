@@ -66,8 +66,10 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document().getBackLinkByClass.attr("href") mustBe testBackUrl
     }
 
-    "not have a backlink" in {
-      document(backLink = None).getBackLinkByClass.isEmpty mustBe true
+    "have a javascript backlink" in {
+      val testDoc = document(backLink = None)
+      testDoc.getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
+      testDoc.getBackLinkByClass.attr("href") mustBe "javascript:history.back()"
     }
 
     "have a heading" in {
