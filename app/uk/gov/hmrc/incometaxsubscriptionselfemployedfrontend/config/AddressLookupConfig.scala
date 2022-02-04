@@ -18,14 +18,16 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{JsObject, Json}
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesApi) {
+class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesApi, accessibilityStatementConfig: AccessibilityStatementConfig) {
 
   //scalastyle:off
-  def config(continueUrl: String): JsObject = {
+  def config(continueUrl: String)(implicit request: RequestHeader): JsObject = {
     val en = Lang("EN")
     val cy = Lang("CY")
 
@@ -49,7 +51,8 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,
           "timeoutUrl" -> s"${appConfig.incomeTaxSubscriptionFrontendBaseUrl}/session-timeout"
-        )
+        ),
+        "accessibilityFooterUrl" -> accessibilityStatementConfig.url
       ),
       "labels" -> Json.obj(
         "en" -> Json.obj(
@@ -95,7 +98,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
   }
 
   //scalastyle:off
-  def agentConfig(continueUrl: String): JsObject = {
+  def agentConfig(continueUrl: String)(implicit request: RequestHeader): JsObject = {
     val en = Lang("EN")
     val cy = Lang("CY")
 
@@ -119,7 +122,8 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,
           "timeoutUrl" -> s"${appConfig.incomeTaxSubscriptionFrontendBaseUrl}/session-timeout"
-        )
+        ),
+        "accessibilityFooterUrl" -> accessibilityStatementConfig.url
       ),
       "labels" -> Json.obj(
         "en" -> Json.obj(

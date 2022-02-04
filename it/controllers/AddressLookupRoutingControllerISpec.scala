@@ -29,6 +29,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel}
 
+import java.net.URLEncoder
+
 class AddressLookupRoutingControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   private val addressId = "testId1"
@@ -42,26 +44,28 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
 
   private val businessId = "12345"
 
-  private def testConfig(contineUrl: String): String = testAddressLookupConfig(contineUrl)
+  private def testConfig(continueUrl: String, referrerUrlMaybe: Option[String]): String = testAddressLookupConfig(continueUrl, referrerUrlMaybe)
 
-  private val clientOrIndividual = ""
+  private val clientOrIndividual = ""  // if this were the client version, we would have /client here, but individual gets nothing.
 
   def getAddressLookupInitialiseResponse(itsaId: String): WSResponse = getAddressLookupInitialise(itsaId): WSResponse
 
   def getAddressLookupResponse(itsaId: String, id: String, isEditMode: Boolean): WSResponse = getAddressLookup(itsaId, id, isEditMode)
 
-  s"GET /report-quarterly/income-and-expenses/sign-up/self-employments$clientOrIndividual/address-lookup-initialise/" + businessId when {
+  private val addressLookupInitialise = "/address-lookup-initialise"
+  s"GET $baseUrl$clientOrIndividual$addressLookupInitialise/$businessId" when {
 
     "the Connector receives NO_CONTENT and location details in headers" should {
       "with location details in headers" in {
         Given("I setup the Wiremock stubs")
-        val continueUrl = s"http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments$clientOrIndividual/details/address-lookup/" + businessId
+        val continueUrl = s"http://localhost:9563$baseUrl$clientOrIndividual/details/address-lookup/" + businessId
         stubAuthSuccess()
-        stubInitializeAddressLookup(
-          Json.parse(
-            testConfig(continueUrl)))(s"$continueUrl?id=$businessId", ACCEPTED)
+        val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$businessId", "UTF8")
+        stubInitializeAddressLookup(Json.parse(
+          testConfig(continueUrl, Some(referrerUrl))
+        ))(s"$continueUrl?id=$businessId", ACCEPTED)
 
-        When(s"GET $clientOrIndividual/address-lookup-initialise/" + businessId + " is called")
+        When(s"GET $clientOrIndividual$addressLookupInitialise/$businessId is called")
         val res = getAddressLookupInitialiseResponse(businessId)
 
         Then("should return an SEE_OTHER with Address lookup location")
@@ -76,10 +80,12 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
       "with location details in headers" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$businessId", "UTF8")
         stubInitializeAddressLookup(Json.parse(
-          testConfig("http://localhost/continueUrl")))("http://localhost/testLocation", OK)
+          testConfig("http://localhost/continueUrl", Some(referrerUrl))
+        ))("http://localhost/testLocation", OK)
 
-        When(s"GET $clientOrIndividual/address-lookup-initialise/" + businessId + " is called")
+        When(s"GET $clientOrIndividual$addressLookupInitialise/$businessId is called")
         val res = getAddressLookupInitialiseResponse(businessId)
 
         Then("should return an Internal server page")
@@ -90,7 +96,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
     }
   }
 
-  s"GET /report-quarterly/income-and-expenses/sign-up/self-employments$clientOrIndividual/details/address-lookup/$businessId" when {
+  s"GET $baseUrl$clientOrIndividual/details/address-lookup/$businessId" when {
     "save and retrieve is enabled" when {
       "it is not in edit mode" when {
         "business accounting method is not defined" when {

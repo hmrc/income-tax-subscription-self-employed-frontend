@@ -57,7 +57,12 @@ object IntegrationTestConstants {
 
   val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
 
-  def testAddressLookupConfig(continueUrl: String): String =
+  val referrerPath = "dummyPath"
+  val referrerQueryString = "dummyQueryString"
+
+  def testAddressLookupConfig(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
+    val referrerUrl = referrerUrlMaybe.getOrElse(referrerPath + "%3F" + referrerQueryString)
+    val accessibilityFooterUrl = s"http://localhost:12346/accessibility-statement/income-tax-sign-up?referrerUrl=$referrerUrl"
     s"""{
        |  "version": 2,
        |  "options": {
@@ -78,51 +83,55 @@ object IntegrationTestConstants {
        |    "timeoutConfig": {
        |      "timeoutAmount": 900,
        |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
-       |    }
-       |},
-       |    "labels": {
-       |      "en": {
-       |        "selectPageLabels": {
-       |          "title": "Select business address",
-       |          "heading": "Select business address"
-       |        },
-       |        "lookupPageLabels": {
-       |          "title": "What is your business address?",
-       |          "heading": "What is your business address?"
-       |        },
-       |        "editPageLabels": {
-       |          "title": "Enter business address",
-       |          "heading": "Enter business address",
-       |          "postcodeLabel":"Postcode (optional)"
-       |        },
-       |        "confirmPageLabels": {
-       |          "title": "Confirm business address",
-       |          "heading": "Confirm business address"
-       |        }
+       |    },
+       |    "accessibilityFooterUrl":"$accessibilityFooterUrl"
+       |  },
+       |  "labels": {
+       |    "en": {
+       |      "selectPageLabels": {
+       |        "title": "Select business address",
+       |        "heading": "Select business address"
        |      },
-       |      "cy": {
-       |        "selectPageLabels": {
-       |          "title": "Dewiswch gyfeiriad busnes",
-       |          "heading": "Dewiswch gyfeiriad busnes"
-       |        },
-       |        "lookupPageLabels": {
-       |          "title": "Beth yw cyfeiriad eich busnes?",
-       |          "heading": "Beth yw cyfeiriad eich busnes?"
-       |        },
-       |        "editPageLabels": {
-       |          "title": "Rhowch gyfeiriad busnes",
-       |          "heading": "Rhowch gyfeiriad busnes",
-       |          "postcodeLabel":"Cod post (dewisol)"
-       |        },
-       |        "confirmPageLabels": {
-       |          "title": "Cadarnhau cyfeiriad busnes",
-       |          "heading": "Cadarnhau cyfeiriad busnes"
-       |        }
+       |      "lookupPageLabels": {
+       |        "title": "What is your business address?",
+       |        "heading": "What is your business address?"
+       |      },
+       |      "editPageLabels": {
+       |        "title": "Enter business address",
+       |        "heading": "Enter business address",
+       |        "postcodeLabel":"Postcode (optional)"
+       |      },
+       |      "confirmPageLabels": {
+       |        "title": "Confirm business address",
+       |        "heading": "Confirm business address"
+       |      }
+       |    },
+       |    "cy": {
+       |      "selectPageLabels": {
+       |        "title": "Dewiswch gyfeiriad busnes",
+       |        "heading": "Dewiswch gyfeiriad busnes"
+       |      },
+       |      "lookupPageLabels": {
+       |        "title": "Beth yw cyfeiriad eich busnes?",
+       |        "heading": "Beth yw cyfeiriad eich busnes?"
+       |      },
+       |      "editPageLabels": {
+       |        "title": "Rhowch gyfeiriad busnes",
+       |        "heading": "Rhowch gyfeiriad busnes",
+       |        "postcodeLabel":"Cod post (dewisol)"
+       |      },
+       |      "confirmPageLabels": {
+       |        "title": "Cadarnhau cyfeiriad busnes",
+       |        "heading": "Cadarnhau cyfeiriad busnes"
        |      }
        |    }
-       |  }""".stripMargin
+       |  }
+       |}""".stripMargin
+  }
 
-  def testAddressLookupConfigClient(continueUrl: String): String =
+  def testAddressLookupConfigClient(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
+    val referrerUrl = referrerUrlMaybe.getOrElse(referrerPath + "%3F" + referrerQueryString)
+    val accessibilityFooterUrl = s"http://localhost:12346/accessibility-statement/income-tax-sign-up?referrerUrl=$referrerUrl"
     s"""{
        |  "version": 2,
        |  "options": {
@@ -143,47 +152,49 @@ object IntegrationTestConstants {
        |    "timeoutConfig": {
        |      "timeoutAmount": 900,
        |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
-       |    }
-       |},
-       |    "labels": {
-       |      "en": {
-       |        "selectPageLabels": {
-       |          "title": "Select client’s business address",
-       |          "heading": "Select client’s business address"
-       |        },
-       |        "lookupPageLabels": {
-       |          "title": "What is your client’s business address?",
-       |          "heading": "What is your client’s business address?"
-       |        },
-       |        "editPageLabels": {
-       |          "title": "Enter client’s business address",
-       |          "heading": "Enter client’s business address",
-       |          "postcodeLabel":"Postcode"
-       |        },
-       |        "confirmPageLabels": {
-       |          "title": "Confirm client’s business address",
-       |          "heading": "Confirm client’s business address"
-       |        }
+       |    },
+       |    "accessibilityFooterUrl":"$accessibilityFooterUrl"
+       |  },
+       |  "labels": {
+       |    "en": {
+       |      "selectPageLabels": {
+       |        "title": "Select client’s business address",
+       |        "heading": "Select client’s business address"
        |      },
-       |      "cy": {
-       |        "selectPageLabels": {
-       |          "title": "dewis cyfeiriad busnes y cleient",
-       |          "heading": "dewis cyfeiriad busnes y cleient"
-       |        },
-       |        "lookupPageLabels": {
-       |          "title": "Beth yw cyfeiriad busnes eich cleient?",
-       |          "heading": "Beth yw cyfeiriad busnes eich cleient?"
-       |        },
-       |        "editPageLabels": {
-       |          "title": "Rhowch gyfeiriad busnes y cleient",
-       |          "heading": "Rhowch gyfeiriad busnes y cleient",
-       |          "postcodeLabel":"Cod post y DU"
-       |        },
-       |        "confirmPageLabels": {
-       |          "title": "Cadarnhau cyfeiriad busnes y cleient",
-       |          "heading": "Cadarnhau cyfeiriad busnes y cleient"
-       |        }
+       |      "lookupPageLabels": {
+       |        "title": "What is your client’s business address?",
+       |        "heading": "What is your client’s business address?"
+       |      },
+       |      "editPageLabels": {
+       |        "title": "Enter client’s business address",
+       |        "heading": "Enter client’s business address",
+       |        "postcodeLabel":"Postcode"
+       |      },
+       |      "confirmPageLabels": {
+       |        "title": "Confirm client’s business address",
+       |        "heading": "Confirm client’s business address"
+       |      }
+       |    },
+       |    "cy": {
+       |      "selectPageLabels": {
+       |        "title": "dewis cyfeiriad busnes y cleient",
+       |        "heading": "dewis cyfeiriad busnes y cleient"
+       |      },
+       |      "lookupPageLabels": {
+       |        "title": "Beth yw cyfeiriad busnes eich cleient?",
+       |        "heading": "Beth yw cyfeiriad busnes eich cleient?"
+       |      },
+       |      "editPageLabels": {
+       |        "title": "Rhowch gyfeiriad busnes y cleient",
+       |        "heading": "Rhowch gyfeiriad busnes y cleient",
+       |        "postcodeLabel":"Cod post y DU"
+       |      },
+       |      "confirmPageLabels": {
+       |        "title": "Cadarnhau cyfeiriad busnes y cleient",
+       |        "heading": "Cadarnhau cyfeiriad busnes y cleient"
        |      }
        |    }
-       |  }""".stripMargin
+       |  }
+       |}""".stripMargin
+  }
 }

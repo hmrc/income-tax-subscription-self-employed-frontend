@@ -17,6 +17,7 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
 import play.api.libs.json.JsValue
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.{AddressLookupConfig, AppConfig}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.GetAddressLookupDetailsResponse
@@ -38,7 +39,7 @@ class AddressLookupConnector @Inject()(appConfig: AppConfig,
     s"${appConfig.addressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
-  def initialiseAddressLookup(continueUrl: String, isAgent: Boolean)(implicit hc: HeaderCarrier): Future[PostAddressLookupResponse] = {
+  def initialiseAddressLookup(continueUrl: String, isAgent: Boolean)(implicit hc: HeaderCarrier, request: RequestHeader): Future[PostAddressLookupResponse] = {
     http.POST[JsValue, PostAddressLookupResponse](
       url = addressLookupInitializeUrl,
       body = if (isAgent) addressLookupConfig.agentConfig(continueUrl) else addressLookupConfig.config(continueUrl)
