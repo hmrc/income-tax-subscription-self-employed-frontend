@@ -47,6 +47,6 @@ trait MockAddressLookupConnector extends UnitTestTrait with MockitoSugar with Be
     when(mockAddressLookupConnector.initialiseAddressLookup(
       ArgumentMatchers.eq(continueUrl),
       ArgumentMatchers.eq(isAgent)
-    )(ArgumentMatchers.any())).thenReturn(Future.successful(response))
+    )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 }

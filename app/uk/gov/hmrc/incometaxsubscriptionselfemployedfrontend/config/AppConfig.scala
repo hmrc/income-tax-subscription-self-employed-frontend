@@ -68,6 +68,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   val feedbackFrontendRedirectUrl: String = servicesConfig.getString("feedback-frontend.url")
   val feedbackFrontendRedirectUrlAgent: String = servicesConfig.getString("feedback-frontend.agent.url")
   val urBannerUrl: String = servicesConfig.getString("urBannerUrl.url")
+  val accessibilityStatementServicePath: String = servicesConfig.getString("accessibility-statement.service-path")
 
   def ggSignOutUrl(redirectionUrl: String = incomeTaxSubscriptionFrontendBaseUrl): String = s"$ggUrl/bas-gateway/sign-out-without-state?continue=$redirectionUrl"
 

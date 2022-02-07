@@ -17,9 +17,12 @@
 package connectors
 
 import connectors.stubs.AddressLookupConnectorStub._
-import helpers.ComponentSpecBase
+import helpers.{ComponentSpecBase, IntegrationTestConstants}
 import helpers.IntegrationTestConstants._
+import org.mockito.Mockito
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.libs.json.{JsObject, Json}
+import play.api.mvc.RequestHeader
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
@@ -76,6 +79,9 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
   }
 
   "Initialise AddressLookup journey" when {
+    implicit val mockRequestHeader: RequestHeader = mock[RequestHeader]
+    Mockito.when(mockRequestHeader.rawQueryString).thenReturn(IntegrationTestConstants.referrerQueryString)
+    Mockito.when(mockRequestHeader.path).thenReturn(IntegrationTestConstants.referrerPath)
     "the user is an agent" should {
       "Return PostSubscriptionDetailsSuccessResponse" in {
         stubInitializeAddressLookup(Json.parse(testAddressLookupConfigClient("testUrl")))("testLocation", ACCEPTED)
