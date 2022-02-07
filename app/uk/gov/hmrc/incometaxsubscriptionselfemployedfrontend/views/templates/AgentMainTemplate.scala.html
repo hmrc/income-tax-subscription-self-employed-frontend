@@ -18,10 +18,11 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 
 @this(
+        appConfig: AppConfig,
         govukWrapper: GovUkWrapper
 )
 
-@(title: String, optForm: Option[Form[_]] = None, backLink: Option[String]= None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(title: String, optForm: Option[Form[_]] = None, backLink: Option[String]= None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @prefixedTitle = @{
     optForm match {
@@ -33,6 +34,7 @@
 @govukWrapper(
     title = prefixedTitle,
     serviceName = messages("agent_service_name.title"),
+    serviceUrl = appConfig.govukGuidanceITSASignUpAgentLink,
     optForm = optForm,
     backLink = backLink,
     showSignOutLink = showSignOutLink
