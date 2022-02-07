@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
-import javax.inject.{Inject, Singleton}
 import play.api.i18n.Lang
 import play.api.mvc.Call
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject()(servicesConfig: ServicesConfig) {
@@ -86,5 +87,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   def routeToSwitchAgentLanguage(language: String): Call = {
     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AgentLanguageSwitchController.switchToLanguage(language)
   }
+
+  val govukGuidanceLink: String = servicesConfig.getString("govuk-guidance.url")
+  val govukGuidanceITSASignUpIndivLink: String = s"$govukGuidanceLink/sign-up-your-business-for-making-tax-digital-for-income-tax"
+  val govukGuidanceITSASignUpAgentLink: String = s"$govukGuidanceLink/sign-up-your-client-for-making-tax-digital-for-income-tax"
 
 }

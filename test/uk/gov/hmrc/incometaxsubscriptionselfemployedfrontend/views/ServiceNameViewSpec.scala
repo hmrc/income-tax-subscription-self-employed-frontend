@@ -25,35 +25,45 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.template
 
 class ServiceNameViewSpec extends ViewSpec {
 
-
   val layout: GovUkWrapper = app.injector.instanceOf[GovUkWrapper]
 
-  class Setup(serviceName: String) {
+  class Setup(serviceName: String, serviceUrl: String) {
 
     val page: HtmlFormat.Appendable = layout(
       title = "title",
       serviceName = serviceName,
+      serviceUrl = serviceUrl,
       optForm = None,
       backLink = Some("backUrl"),
       showSignOutLink = false
-    )(Html(""))(FakeRequest(), implicitly, appConfig)
+    )(Html(""))(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
   }
 
   "layout" must {
     "have a service name" when {
-      "passing in an individual service name" in new Setup("Use software to send Income Tax updates") {
+      "passing in an individual service name" in new Setup(
+        serviceName = "Use software to send Income Tax updates",
+        serviceUrl = appConfig.govukGuidanceITSASignUpIndivLink
+      ) {
         val serviceName = "Use software to send Income Tax updates"
+        val serviceUrl: String = appConfig.govukGuidanceITSASignUpIndivLink
         document.getElementsByClass("hmrc-header__service-name").text() mustBe serviceName
+        document.getElementsByClass("hmrc-header__service-name--linked").attr("href") mustBe serviceUrl
       }
 
-      "passing in an agent service name" in new Setup("Use software to report your client’s Income Tax") {
+      "passing in an agent service name" in new Setup(
+        serviceName = "Use software to report your client’s Income Tax",
+        serviceUrl = appConfig.govukGuidanceITSASignUpAgentLink
+      ) {
         val serviceName = "Use software to report your client’s Income Tax"
+        val serviceUrl: String = appConfig.govukGuidanceITSASignUpAgentLink
         document.getElementsByClass("hmrc-header__service-name").text() mustBe serviceName
+        document.getElementsByClass("hmrc-header__service-name--linked").attr("href") mustBe serviceUrl
       }
     }
   }
 
 
-  }
+}

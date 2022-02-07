@@ -19,7 +19,9 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcTimeoutDialogHelper}
 
-@this(  hmrcLayout: HmrcLayout,
+@this(
+        appConfig: AppConfig,
+        hmrcLayout: HmrcLayout,
         govukBackLink: GovukBackLink,
         govukErrorSummary: GovukErrorSummary,
         hmrcHead: HmrcHead,
@@ -32,7 +34,7 @@
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
 
-@(title: String, serviceName: String, optForm: Option[Form[_]] = None, backLink: Option[String] = None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(title: String, serviceName: String, serviceUrl: String, optForm: Option[Form[_]] = None, backLink: Option[String] = None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
@@ -45,15 +47,15 @@
 }
 
 @additionalHeadBlock = {
-  <link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css" />
+    <link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css" />
 
-  @if(showSignOutLink) {
-    @hmrcTimeoutDialogHelper(
-      timeout = Some(appConfig.timeoutInSeconds.toInt),
-      countdown = Some(appConfig.timeoutWarningInSeconds.toInt),
-      signOutUrl = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url
-    )
-  }
+    @if(showSignOutLink) {
+        @hmrcTimeoutDialogHelper(
+            timeout = Some(appConfig.timeoutInSeconds.toInt),
+            countdown = Some(appConfig.timeoutWarningInSeconds.toInt),
+            signOutUrl = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url
+        )
+    }
 }
 
 @content = {
@@ -67,21 +69,21 @@
         }
     }
 
-@contentBlock
+    @contentBlock
 
-@hmrcReportTechnicalIssueHelper()
+    @hmrcReportTechnicalIssueHelper()
 
 }
-
 
 @hmrcLayout(
     pageTitle = Some(title),
     additionalHeadBlock = Some(additionalHeadBlock),
     isWelshTranslationAvailable = true,
     serviceName = Some(serviceName),
-    serviceUrl = None,
+    serviceUrl = Some(serviceUrl),
     backLinkUrl = backLink,
     signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
     phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl)),
     userResearchBannerUrl = Some(appConfig.urBannerUrl),
-    nonce = None)(content)
+    nonce = None
+)(content)
