@@ -53,6 +53,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
   def getAddressLookupResponse(itsaId: String, id: String, isEditMode: Boolean): WSResponse = getClientAddressLookup(itsaId, id, isEditMode)
 
   private val addressLookupInitialise = "/address-lookup-initialise"
+
   s"GET $baseUrl$clientOrIndividual$addressLookupInitialise/$businessId" when {
 
     "the Connector receives NO_CONTENT and location details in headers" should {
@@ -101,8 +102,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
         "business accounting method is not defined" when {
           "the address lookup service return successful JSON details" should {
             "redirect to sole trader accounting method page" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
+              Given("I setup the Wiremock stubs")
+              stubAuthSuccess()
 
               enable(SaveAndRetrieve)
               stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
@@ -208,55 +209,52 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           }
         }
 
-
-    "the address lookup service return NOT_FOUND" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubGetAddressLookupDetails(addressId)(NOT_FOUND)
+        "the address lookup service return NOT_FOUND" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetAddressLookupDetails(addressId)(NOT_FOUND)
           stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
           When(s"GET $clientOrIndividual/details/address-lookup/$businessId is called")
-      val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
+          val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
 
+          Then("Should return a INTERNAL_SERVER_ERROR")
+          res must have(
+            httpStatus(INTERNAL_SERVER_ERROR)
+          )
+        }
 
-      Then("Should return a INTERNAL_SERVER_ERROR")
-      res must have(
-        httpStatus(INTERNAL_SERVER_ERROR)
-      )
-    }
-
-    "the address lookup service return invalid Json" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubGetAddressLookupDetails(addressId)(OK, Json.obj("abc" -> "def"))
+        "the address lookup service return invalid Json" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetAddressLookupDetails(addressId)(OK, Json.obj("abc" -> "def"))
           stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
           When(s"POST $clientOrIndividual/details/address-lookup/$businessId is called")
           val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
 
 
-      Then("Should return a INTERNAL_SERVER_ERROR")
-      res must have(
-        httpStatus(INTERNAL_SERVER_ERROR)
-      )
-    }
+          Then("Should return a INTERNAL_SERVER_ERROR")
+          res must have(
+            httpStatus(INTERNAL_SERVER_ERROR)
+          )
+        }
 
-    "the address lookup service return 400" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubGetAddressLookupDetails(addressId)(BAD_REQUEST)
+        "the address lookup service return 400" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetAddressLookupDetails(addressId)(BAD_REQUEST)
           stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
-      When(s"POST $clientOrIndividual/details/address-lookup/$businessId is called")
-      val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
+          When(s"POST $clientOrIndividual/details/address-lookup/$businessId is called")
+          val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
 
-
-      Then("Should return a INTERNAL_SERVER_ERROR")
-      res must have(
-        httpStatus(INTERNAL_SERVER_ERROR)
-      )
+          Then("Should return a INTERNAL_SERVER_ERROR")
+          res must have(
+            httpStatus(INTERNAL_SERVER_ERROR)
+          )
+        }
+      }
     }
-  }
-}
   }
 }
