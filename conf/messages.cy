@@ -38,6 +38,7 @@ error.business_start_date.month_year.empty                      = Mae’n rhaid 
 error.business_start_date.maxStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
 error.business_start_date.minStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}
 error.business_start_date.invalid                               = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.year.length                           = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Business Name
 business.name.title                                             = Beth yw enw’ch busnes fel unig fasnachwr?
@@ -125,6 +126,7 @@ error.agent.business_start_date.month_year.empty                = Mae’n rhaid 
 error.agent.business_start_date.maxStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
 error.agent.business_start_date.minStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}
 error.agent.business_start_date.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.agent.business_start_date.year.length                     = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Agent Business Name
 business.agent.name.title                                       = Beth yw enw busnes eich cleient?
