@@ -18,21 +18,21 @@ package helpers
 
 import org.jsoup.nodes.Element
 import org.scalatest.Matchers.fail
-import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
+import scala.collection.JavaConverters._
 
 trait ViewSpec {
 
   implicit class CustomSelectors(element: Element) {
 
     def selectFirst(selector: String): Element = {
-      element.select(selector).headOption match {
+      element.select(selector).asScala.headOption match {
         case Some(element) => element
         case None => fail(s"No elements returned for selector: $selector")
       }
     }
 
     def selectOptionally(selector: String): Option[Element] = {
-      element.select(selector).headOption
+      element.select(selector).asScala.headOption
     }
   }
 }
