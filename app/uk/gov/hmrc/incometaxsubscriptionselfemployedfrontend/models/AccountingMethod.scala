@@ -23,13 +23,13 @@ sealed trait AccountingMethod
 case object Cash extends AccountingMethod {
   private[models] val CASH = "Cash"
 
-  override def toString : String = CASH
+  override def toString: String = CASH
 }
 
 case object Accruals extends AccountingMethod {
   private[models] val ACCRUALS = "Accruals"
 
-  override def toString : String = ACCRUALS
+  override def toString: String = ACCRUALS
 
 }
 
