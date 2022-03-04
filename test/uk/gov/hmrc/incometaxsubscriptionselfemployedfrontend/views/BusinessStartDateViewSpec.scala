@@ -118,7 +118,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     ) {
       document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-      document.select("span[id=startDate-Error]").text() mustBe "Error: testError"
+      document.select("p[id=startDate-Error]").text() mustBe "Error: testError"
     }
 
   }
