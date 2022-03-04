@@ -96,6 +96,11 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document().getBulletPointNth(1) mustBe BusinessAccountingMethodMessages.accordionBullet_2
     }
 
+    "have a hidden legend" in {
+      document().selectHead("legend").text mustBe BusinessAccountingMethodMessages.heading
+      document().selectHead("legend").attr("class") mustBe "govuk-fieldset__legend govuk-visually-hidden"
+    }
+
     //radio button test
     "have a radio button for cash accounting" in {
       document().getGovukRadioButtonByIndex().select("#businessAccountingMethod-Cash").size() mustBe 1

@@ -14,21 +14,20 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.{RadioItem, Text}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.html.components.{Radios, Fieldset, Legend, Text, RadioItem}
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, RadioHelper, SaveAndContinueButtonHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 
 @this(
     mainTemplate: AgentMainTemplate,
     form: FormWithCSRF,
-    govukRadios: GovukRadios,
+    radioHelper: RadioHelper,
     continueButton: ContinueButton,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
     featureSwitches: FeatureSwitchingImpl
@@ -43,41 +42,33 @@
 }
 
 @mainTemplate(title = messages("agent.business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
+  <h1 class="govuk-heading-l">@messages("agent.business.accounting_method.heading")</h1>
 
-    @form(action = postAction) {
+  @form(action = postAction) {
+    @radioHelper(
+      field = businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod),
+      legend = messages("agent.business.accounting_method.heading"),
+      isPageHeading = false,
+      radioItems = Seq(
+        RadioItem(
+          id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_cash}"),
+          content = Text(Messages("agent.business.accounting_method.cash")),
+          value = Some(AccountingMethodMapping.option_cash),
+          hint = None,
+        ),
+        RadioItem(
+          id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_accruals}"),
+          content = Text(Messages("agent.business.accounting_method.accruals")),
+          value = Some(AccountingMethodMapping.option_accruals),
+          hint = None,
+        )
+      )
+    )
 
-        @govukRadios(Radios(
-            hint = None,
-                fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                content = Text(Messages("agent.business.accounting_method.heading")),
-                classes = "govuk-fieldset__legend--l",
-                isPageHeading = true
-                ))
-            )),
-            items = Seq(
-                RadioItem(
-                id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_cash}"),
-                content = Text(Messages("agent.business.accounting_method.cash")),
-                value = Some(AccountingMethodMapping.option_cash),
-                hint = None,
-            ),
-                RadioItem(
-                id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_accruals}"),
-                content = Text(Messages("agent.business.accounting_method.accruals")),
-                value = Some(AccountingMethodMapping.option_accruals),
-                hint = None,
-                )
-            ),
-            classes = "govuk-radios--inline"
-        ).withFormField(businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod)))
-
-        @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
-            @saveAndContinueButtonHelper(individual = false)
-        } else {
-            @continueButton(isEditMode = isEditMode)
-        }
-
+    @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
+        @saveAndContinueButtonHelper(individual = false)
+    } else {
+        @continueButton(isEditMode = isEditMode)
     }
-
+  }
 }
