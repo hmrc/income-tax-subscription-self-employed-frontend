@@ -6,7 +6,7 @@ object AppDependencies {
 
   private val playLanguageVersion = "5.1.0-play-28"
   private val bootstrapVersion = "5.14.0"
-  private val playHmrcFrontendVersion = "1.19.0-play-28"
+  private val playHmrcFrontendVersion = "3.0.0-play-28"
   private val scalatestplusVersion = "5.0.0"
 
   val compile = Seq(
