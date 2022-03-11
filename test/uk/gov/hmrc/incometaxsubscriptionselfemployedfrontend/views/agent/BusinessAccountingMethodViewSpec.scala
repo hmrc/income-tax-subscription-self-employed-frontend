@@ -22,9 +22,12 @@ import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
@@ -95,15 +98,22 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document.selectHead("legend").attr("class") mustBe "govuk-fieldset__legend govuk-visually-hidden"
     }
 
-    "have a radio button for cash accounting" in new Setup {
-      document.getGovukRadioButtonByIndex(0).select("#businessAccountingMethod-Cash").size() mustBe 1
-      document.getGovukRadioButtonByIndex(0).select("label").text() mustBe BusinessAccountingMethodMessages.cash
-    }
-
-    "have a radio button for standard accounting" in new Setup {
-
-      document.getGovukRadioButtonByIndex(1).select("#businessAccountingMethod-Standard").size() mustBe 1
-      document.getGovukRadioButtonByIndex(1).select("label").text() mustBe BusinessAccountingMethodMessages.accruals
+    "has a set of radio buttons inputs" in new Setup {
+      document.mainContent.mustHaveRadioInput(
+        name = BusinessAccountingMethodForm.businessAccountingMethod,
+        radioItems = Seq(
+          RadioItem(
+            content = Text(BusinessAccountingMethodMessages.cash),
+            value = Some(AccountingMethodMapping.option_cash),
+            id = Some(BusinessAccountingMethodForm.businessAccountingMethod)
+          ),
+          RadioItem(
+            content = Text(BusinessAccountingMethodMessages.accruals),
+            value = Some(AccountingMethodMapping.option_accruals),
+            id = Some(s"${BusinessAccountingMethodForm.businessAccountingMethod}-2")
+          )
+        )
+      )
     }
 
     "have a Form" in new Setup {

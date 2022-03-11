@@ -67,16 +67,14 @@
       isPageHeading = false,
       radioItems = Seq(
         RadioItem(
-          id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_cash}"),
           content = Text(Messages("business.accounting_method.cash.label")),
           value = Some(AccountingMethodMapping.option_cash),
-          hint = Some(Hint(content = Text(Messages("business.accounting_method.cash.hint")))),
+          hint = Some(Hint(content = Text(Messages("business.accounting_method.cash.hint"))))
         ),
         RadioItem(
-          id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_accruals}"),
           content = Text(Messages("business.accounting_method.accruals.label")),
           value = Some(AccountingMethodMapping.option_accruals),
-          hint = Some(Hint(content = Text(Messages("business.accounting_method.accruals.hint")))),
+          hint = Some(Hint(content = Text(Messages("business.accounting_method.accruals.hint"))))
         )
       )
     )

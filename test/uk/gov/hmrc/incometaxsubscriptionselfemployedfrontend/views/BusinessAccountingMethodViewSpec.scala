@@ -21,9 +21,12 @@ import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
@@ -102,9 +105,6 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     //radio button test
-    "have a radio button for cash accounting" in {
-      document().getGovukRadioButtonByIndex().select("#businessAccountingMethod-Cash").size() mustBe 1
-    }
 
     "have a cash accounting heading for the radio button" in {
       document().getGovukRadioButtonByIndex().select("label").text() mustBe BusinessAccountingMethodMessages.cash
@@ -114,16 +114,30 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document().getGovukRadioButtonByIndex().select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.cashDescription
     }
 
-    "have a radio button for standard accounting" in {
-      document().getGovukRadioButtonByIndex(1).select("#businessAccountingMethod-Standard").size() mustBe 1
-    }
-
     "have a standard accounting heading for the radio button" in {
       document().getGovukRadioButtonByIndex(1).select("label").text() mustBe BusinessAccountingMethodMessages.accruals
     }
 
     "have the correct description for the standard accounting radio button" in {
       document().getGovukRadioButtonByIndex(1).select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.accrualsDescription
+    }
+
+    "has a set of radio buttons inputs" in {
+      document().mainContent.mustHaveRadioInput(
+        name = BusinessAccountingMethodForm.businessAccountingMethod,
+        radioItems = Seq(
+          RadioItem(
+            content = Text(BusinessAccountingMethodMessages.cash),
+            value = Some(AccountingMethodMapping.option_cash),
+            id = Some(BusinessAccountingMethodForm.businessAccountingMethod)
+          ),
+          RadioItem(
+            content = Text(BusinessAccountingMethodMessages.accruals),
+            value = Some(AccountingMethodMapping.option_accruals),
+            id = Some(s"${BusinessAccountingMethodForm.businessAccountingMethod}-2")
+          )
+        )
+      )
     }
 
     "have a Form" in {

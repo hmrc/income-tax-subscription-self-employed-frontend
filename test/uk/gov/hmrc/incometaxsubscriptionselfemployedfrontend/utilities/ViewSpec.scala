@@ -26,6 +26,8 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{AnyContentAsEmpty, Call}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
@@ -173,6 +175,21 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
   }
 
   implicit class ElementTests(element: Element) {
+
+    def mustHaveRadioInput(name: String, radioItems: Seq[RadioItem]): Assertion = {
+      radioItems.zip(1 to radioItems.length) map { case (radioItem, index) =>
+        val radioElement: Element = element.selectNth(".govuk-radios__item", index)
+        val radioInput: Element = radioElement.selectHead("input")
+        radioItem.id mustBe Some(radioInput.attr("id"))
+        radioInput.attr("name") mustBe name
+        radioInput.attr("type") mustBe "radio"
+        Some(radioInput.attr("value")) mustBe radioItem.value
+
+        val radioLabel: Element = radioElement.selectHead("label")
+        radioLabel.attr("for") mustBe radioInput.attr("id")
+        Text(radioLabel.text) mustBe radioItem.content
+      } forall (_ == succeed) mustBe true
+    }
 
     def mustHaveTextField(name: String, label: String): Assertion = {
       val eles = element.select(s"input[name=$name]")
