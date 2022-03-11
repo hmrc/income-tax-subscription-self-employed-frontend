@@ -241,7 +241,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       "not in edit mode" should {
         s"redirect correctly" in {
           withFeatureSwitch(SaveAndRetrieve) {
-            TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+            TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income-source"
           }
         }
       }
