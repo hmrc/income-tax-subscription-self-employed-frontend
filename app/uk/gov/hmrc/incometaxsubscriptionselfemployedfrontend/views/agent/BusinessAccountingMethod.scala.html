@@ -51,16 +51,14 @@
       isPageHeading = false,
       radioItems = Seq(
         RadioItem(
-          id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_cash}"),
           content = Text(Messages("agent.business.accounting_method.cash")),
           value = Some(AccountingMethodMapping.option_cash),
-          hint = None,
+          hint = None
         ),
         RadioItem(
-          id = Some(s"businessAccountingMethod-${AccountingMethodMapping.option_accruals}"),
           content = Text(Messages("agent.business.accounting_method.accruals")),
           value = Some(AccountingMethodMapping.option_accruals),
-          hint = None,
+          hint = None
         )
       )
     )
