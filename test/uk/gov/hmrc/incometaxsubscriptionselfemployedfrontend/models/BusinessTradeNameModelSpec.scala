@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
@@ -26,7 +25,7 @@ class BusinessTradeNameModelSpec extends PlaySpec with GuiceOneServerPerSuite {
   "BusinessTradeNameModel" should {
 
     val name = BusinessTradeNameModel("BusinessTrade")
-    val json = Json.obj("businessTradeName"-> "BusinessTrade")
+    val json = Json.obj("businessTradeName" -> "BusinessTrade")
 
     "read from Json correctly" in {
       Json.fromJson[BusinessTradeNameModel](json) mustBe JsSuccess(name)

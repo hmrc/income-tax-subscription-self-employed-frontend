@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -40,7 +40,7 @@ class SignOutControllerSpec extends ControllerBaseSpec {
         val result = TestSignOutController.signOut(request)
         status(result) shouldBe SEE_OTHER
         val agentRedirectUrl = appConfig.feedbackFrontendRedirectUrlAgent
-        agentRedirectUrl should endWith ("ITSU-A")
+        agentRedirectUrl should endWith("ITSU-A")
         redirectLocation(result).get should be(appConfig.ggSignOutUrl(agentRedirectUrl))
       }
     }
@@ -51,7 +51,7 @@ class SignOutControllerSpec extends ControllerBaseSpec {
         val result = TestSignOutController.signOut(request)
         status(result) shouldBe SEE_OTHER
         val individualRedirectUrl = appConfig.feedbackFrontendRedirectUrl
-        individualRedirectUrl should endWith ("ITSU")
+        individualRedirectUrl should endWith("ITSU")
         redirectLocation(result).get should be(appConfig.ggSignOutUrl(individualRedirectUrl))
       }
 

@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class UrlHelpersSpec extends FunSuite with UrlHelpers {
+class UrlHelpersSpec extends AnyFunSuite with UrlHelpers {
 
   test("can infer agent from source path") {
     val baseUrl = "http://a/b/c"

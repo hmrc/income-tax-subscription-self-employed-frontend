@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.mvc.{AnyContent, Request, Results}
@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessi
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReferenceRetrievalSpec extends PlaySpec with MustMatchers with MockIncomeTaxSubscriptionConnector with Results {
+class ReferenceRetrievalSpec extends PlaySpec with Matchers with MockIncomeTaxSubscriptionConnector with Results {
 
   object TestReferenceRetrieval extends ReferenceRetrieval {
     override implicit val ec: ExecutionContext = executionContext

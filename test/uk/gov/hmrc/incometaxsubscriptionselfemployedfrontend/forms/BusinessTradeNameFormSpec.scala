@@ -16,14 +16,13 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms
 
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.{Form, FormError}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
-
 
 class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 

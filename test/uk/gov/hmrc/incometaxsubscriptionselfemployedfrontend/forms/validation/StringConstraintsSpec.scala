@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation
 
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.data.validation.{Constraints, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints
 
-class StringConstraintsSpec extends Constraints with WordSpecLike with Matchers {
+class StringConstraintsSpec extends Constraints with AnyWordSpecLike with Matchers {
 
   val maxLength = 2
   val errMsgMaxLength = "Too Long"

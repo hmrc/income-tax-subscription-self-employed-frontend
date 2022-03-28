@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser._
 
-class RetrieveReferenceHttpParserSpec extends PlaySpec with MustMatchers {
+class RetrieveReferenceHttpParserSpec extends PlaySpec with Matchers {
 
   val testHttpVerb = "POST"
   val testUri = "/"

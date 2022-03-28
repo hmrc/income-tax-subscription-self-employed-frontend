@@ -16,25 +16,25 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers.convertToAnyShouldWrapper
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 import scala.io.Source
 
-class MessagesSpec extends FunSuite with UrlHelpers {
+class MessagesSpec extends AnyFunSuiteLike with UrlHelpers {
 
-  lazy val messageKeysEnglish = getMessageKeys("messages")
-  lazy val messageKeysWelsh = getMessageKeys("messages.cy")
+  lazy val messageKeysEnglish: Set[String] = getMessageKeys("messages")
+  lazy val messageKeysWelsh: Set[String] = getMessageKeys("messages.cy")
 
   test("No messages present in Welsh, but not in English") {
     val keysInWelshNotEnglish = messageKeysWelsh -- messageKeysEnglish
-    keysInWelshNotEnglish map println
+    keysInWelshNotEnglish foreach println
     keysInWelshNotEnglish.size shouldBe 0
   }
 
   test("No messages present in English, but not in Welsh") {
     val keysInEnglishNotWelsh = messageKeysEnglish -- messageKeysWelsh
-    keysInEnglishNotWelsh map println
+    keysInEnglishNotWelsh foreach println
     keysInEnglishNotWelsh.size shouldBe 0
   }
 

@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{RequestHeader, Result}
 import play.twirl.api.HtmlFormat
@@ -26,7 +26,8 @@ import uk.gov.hmrc.auth.core.InvalidBearerToken
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.ErrorTemplate
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
-class ErrorHandlerSpec extends FunSuite with MockitoSugar{
+class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
+
   test("Will redirect agent to agent sign in") {
     withErrorHandler(expected = "http://a.com/b/c/client") { errorHandler =>
       val header = mock[RequestHeader]
@@ -67,4 +68,5 @@ class ErrorHandlerSpec extends FunSuite with MockitoSugar{
 
     testCode(errorHandler)
   }
+
 }
