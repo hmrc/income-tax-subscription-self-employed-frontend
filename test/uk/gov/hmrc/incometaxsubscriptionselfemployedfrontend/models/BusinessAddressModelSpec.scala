@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.json.{JsSuccess, Json}
@@ -26,7 +25,7 @@ class BusinessAddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
   "BusinessAddressModel" should {
 
     val businessAddressModel = BusinessAddressModel(auditRef = "1", Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))
-    val json = Json.obj("auditRef"-> "1",
+    val json = Json.obj("auditRef" -> "1",
       "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> "TF3 4NT"))
 
     "read from Json correctly" in {

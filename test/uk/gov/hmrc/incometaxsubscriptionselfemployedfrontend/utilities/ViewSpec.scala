@@ -19,7 +19,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
-import org.scalatest.{Assertion, BeforeAndAfterEach, MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{Assertion, BeforeAndAfterEach}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
@@ -33,7 +35,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
 import scala.collection.JavaConverters._
 
-trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with BeforeAndAfterEach {
+trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach {
 
   implicit val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -139,6 +141,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
     def getForm: Element = element.selectHead("form")
 
     def getBackLink: Elements = element.select(s"a[class=link-back]")
+
     def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
     def getParagraphNth(index: Int = 0): String = {
@@ -241,7 +244,7 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
       val fieldset: Element = element.selectHead("fieldset")
       val legend: Element = element.selectHead("legend")
 
-      if(isPageHeading) legend.selectHead("h1").text mustBe label
+      if (isPageHeading) legend.selectHead("h1").text mustBe label
       else legend.text mustBe label
 
       hint.foreach { value =>
@@ -304,7 +307,6 @@ trait ViewSpec extends WordSpec with MustMatchers with GuiceOneAppPerSuite with 
     def mustHaveErrorSummaryByNewGovUkClass(errors: List[String]): Assertion = {
       element.getErrorSummaryByNewGovUkClass.attr("role") mustBe "alert"
       element.getErrorSummaryByNewGovUkClass.attr("aria-labelledby") mustBe "error-summary-title"
-      element.getErrorSummaryByNewGovUkClass.attr("tabindex") mustBe "-1"
       element.getErrorSummaryByNewGovUkClass.select("h2").attr("id") mustBe "error-summary-title"
       element.getErrorSummaryByNewGovUkClass.select("h2").text mustBe "There is a problem"
       element.getErrorSummaryByNewGovUkClass.select("ul > li").text mustBe errors.mkString(" ")

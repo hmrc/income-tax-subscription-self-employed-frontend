@@ -17,7 +17,8 @@
 package helpers
 
 import org.jsoup.nodes.Element
-import org.scalatest.Matchers.fail
+import org.scalatest.Assertions.fail
+
 import scala.collection.JavaConverters._
 
 trait ViewSpec {
@@ -35,4 +36,5 @@ trait ViewSpec {
       element.select(selector).asScala.headOption
     }
   }
+
 }

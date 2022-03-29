@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
@@ -47,13 +47,13 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
       "the map be empty" in {
         val emptyInput0 = DataMap.EmptyMap
         val emptyTest0 = businessAccountingMethodForm.bind(emptyInput0)
-        emptyTest0.errors must contain(FormError(businessAccountingMethod,empty))
+        emptyTest0.errors must contain(FormError(businessAccountingMethod, empty))
       }
 
       "the name be empty" in {
         val emptyInput = DataMap.businessAccountingMethod("")
         val emptyTest = businessAccountingMethodForm.bind(emptyInput)
-        emptyTest.errors must contain(FormError(businessAccountingMethod,empty))
+        emptyTest.errors must contain(FormError(businessAccountingMethod, empty))
       }
 
       "the name should be invalid" in {

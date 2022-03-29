@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation
 
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import play.api.data.Form
 import play.api.data.validation.Invalid
 
@@ -28,7 +28,6 @@ package object testutils {
       case _ => s"$prefix.$name"
     }
   }
-
 
 
   implicit class ErrorValidationUtil[T](testForm: Form[T]) {
