@@ -24,7 +24,11 @@ sealed trait FeatureSwitch {
 object FeatureSwitch {
   val prefix = "feature-switch"
 
-  val switches: Set[FeatureSwitch] = Set(SaveAndRetrieve)
+  val switches: Set[FeatureSwitch] = Set(
+    SaveAndRetrieve,
+    EnableUseRealAddressLookup
+  )
+
 
   def apply(str: String): FeatureSwitch =
     switches find (_.name == str) match {
@@ -37,6 +41,11 @@ object FeatureSwitch {
   case object SaveAndRetrieve extends FeatureSwitch {
     override val name = s"$prefix.enable-save-and-retrieve"
     override val displayText = "Save & Retrieve"
+  }
+
+  case object EnableUseRealAddressLookup extends FeatureSwitch {
+    override val name = s"$prefix.enable-use-real-AL"
+    override val displayText = "Enable to use real Address Lookup"
   }
 
 }
