@@ -19,6 +19,8 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 import play.api.libs.json.JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableUseRealAddressLookup
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.{AddressLookupConfig, AppConfig}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.GetAddressLookupDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupResponse
@@ -29,25 +31,44 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AddressLookupConnector @Inject()(appConfig: AppConfig,
                                        addressLookupConfig: AddressLookupConfig,
-                                       http: HttpClient)(implicit ec: ExecutionContext) {
+                                       http: HttpClient)(implicit ec: ExecutionContext) extends FeatureSwitching {
 
   def addressLookupInitializeUrl: String = {
     s"${appConfig.addressLookupUrl}/api/v2/init"
+  }
+
+  def stubbedAddressLookupInitializeUrl: String = {
+    s"${appConfig.stubAddressLookupUrl}/api/v2/init"
   }
 
   def getAddressDetailsUrl(id: String): String = {
     s"${appConfig.addressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
+  def getStubbedAddressDetailsUrl(id: String): String = {
+    s"${appConfig.stubAddressLookupUrl}/api/v2/confirmed?id=$id"
+  }
+
   def initialiseAddressLookup(continueUrl: String, isAgent: Boolean)(implicit hc: HeaderCarrier, request: RequestHeader): Future[PostAddressLookupResponse] = {
-    http.POST[JsValue, PostAddressLookupResponse](
-      url = addressLookupInitializeUrl,
-      body = if (isAgent) addressLookupConfig.agentConfig(continueUrl) else addressLookupConfig.config(continueUrl)
-    )
+    if (isEnabled(EnableUseRealAddressLookup)) {
+      http.POST[JsValue, PostAddressLookupResponse](
+        url = addressLookupInitializeUrl,
+        body = if (isAgent) addressLookupConfig.agentConfig(continueUrl) else addressLookupConfig.config(continueUrl)
+      )
+    } else {
+      http.POST[JsValue, PostAddressLookupResponse](
+        url = stubbedAddressLookupInitializeUrl,
+        body = if (isAgent) addressLookupConfig.agentConfig(continueUrl) else addressLookupConfig.config(continueUrl)
+      )
+    }
   }
 
   def getAddressDetails(id: String)(implicit hc: HeaderCarrier): Future[GetAddressLookupDetailsResponse] = {
-    http.GET[GetAddressLookupDetailsResponse](getAddressDetailsUrl(id))
+    if (isEnabled(EnableUseRealAddressLookup)) {
+      http.GET[GetAddressLookupDetailsResponse](getAddressDetailsUrl(id))
+    } else {
+      http.GET[GetAddressLookupDetailsResponse](getStubbedAddressDetailsUrl(id))
+    }
   }
 
 }
