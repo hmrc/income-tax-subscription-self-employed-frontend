@@ -64,6 +64,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     "microservice.services.des.url" -> mockUrl,
     "microservice.services.income-tax-subscription.host" -> mockHost,
     "microservice.services.income-tax-subscription.port" -> mockPort,
+    "microservice.services.income-tax-subscription-stubs.host" -> mockHost,
+    "microservice.services.income-tax-subscription-stubs.port" -> mockPort,
     "microservice.services.address-lookup-frontend.host" -> mockHost,
     "microservice.services.address-lookup-frontend.port" -> mockPort
   )

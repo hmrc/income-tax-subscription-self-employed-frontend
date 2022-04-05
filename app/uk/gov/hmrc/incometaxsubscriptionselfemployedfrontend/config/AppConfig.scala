@@ -53,6 +53,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig) {
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
   lazy val limitOnNumberOfBusinesses: Int = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
   lazy val addressLookupUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
+  lazy val stubAddressLookupUrl: String = servicesConfig.baseUrl("income-tax-subscription-stubs")
   lazy val timeoutWarningInSeconds: String = servicesConfig.getString("session-timeout.warning")
   lazy val timeoutInSeconds: String = servicesConfig.getString("session-timeout.seconds")
 

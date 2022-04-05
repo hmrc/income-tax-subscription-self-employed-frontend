@@ -17,7 +17,6 @@
 package controllers
 
 import java.time.LocalDate
-
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
@@ -140,4 +139,3 @@ class BusinessListCYAControllerISpec extends ComponentSpecBase {
     }
   }
 }
-
