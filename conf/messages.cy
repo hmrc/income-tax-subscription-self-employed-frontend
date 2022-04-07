@@ -21,6 +21,10 @@ error-notification.prefix                                       = Gwall:
 ## Service name
 agent_service_name.title                                        = Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient
 
+##service name
+individual_serviceName                                          = Defnyddio meddalwedd i anfon diweddariadau Treth Incwm
+agent_serviceName                                               = Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient
+
 # Business start date
 business.start_date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
 business.start_date.heading                                     = Pryd y dechreuodd eich busnes fasnachu?

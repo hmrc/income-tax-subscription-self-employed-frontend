@@ -195,7 +195,11 @@ agent.error.business_accounting_method.empty                    = Select if your
 title_pattern.serviceName.govUk                                 = {0} - Use software to send Income Tax updates - GOV.UK
 agent_title_pattern.serviceName.govUk                           = {0} - Use software to report your client’s Income Tax - GOV.UK
 base.title.error                                                = Error: {0} - Use software to send Income Tax updates - GOV.UK
-agent_base.title.error                                           = Error: {0} - Use software to report your client’s Income Tax - GOV.UK
+agent_base.title.error                                          = Error: {0} - Use software to report your client’s Income Tax - GOV.UK
+
+##service name
+individual_serviceName                                          = Use software to send Income Tax updates
+agent_serviceName                                               = Use software to report your client’s Income Tax
 
 ## Language switching
 language-selector.change-to-language                            = Newid yr iaith ir Gymraeg

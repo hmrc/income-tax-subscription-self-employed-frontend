@@ -24,7 +24,7 @@ import uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesApi, accessibilityStatementConfig: AccessibilityStatementConfig) {
+class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesApi, accessibilityStatementConfig: AccessibilityStatementConfig){
 
   //scalastyle:off
   def config(continueUrl: String)(implicit request: RequestHeader): JsObject = {
@@ -37,6 +37,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
         "includeHMRCBranding" -> true,
+        "serviceHref" -> Some(appConfig.govukGuidanceITSASignUpIndivLink),
         "ukMode" -> true,
         "selectPageConfig" -> Json.obj(
           "proposalListLimit" -> 50,
@@ -56,6 +57,9 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       ),
       "labels" -> Json.obj(
         "en" -> Json.obj(
+          "appLevelLabels" -> Json.obj(
+            "navTitle" -> messagesApi("individual_serviceName")(en)
+          ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("addressLookup.selectPage.title")(en),
             "heading" -> messagesApi("addressLookup.selectPage.heading")(en)
@@ -75,6 +79,9 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
           )
         ),
         "cy" -> Json.obj(
+          "appLevelLabels" -> Json.obj(
+            "navTitle" -> messagesApi("individual_serviceName")(cy)
+          ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("addressLookup.selectPage.title")(cy),
             "heading" -> messagesApi("addressLookup.selectPage.heading")(cy)
@@ -108,6 +115,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
         "includeHMRCBranding" -> true,
+        "serviceHref" -> Some(appConfig.govukGuidanceITSASignUpAgentLink),
         "ukMode" -> true,
         "selectPageConfig" -> Json.obj(
           "proposalListLimit" -> 50,
@@ -127,6 +135,9 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       ),
       "labels" -> Json.obj(
         "en" -> Json.obj(
+          "appLevelLabels" -> Json.obj(
+            "navTitle" -> messagesApi("agent_serviceName")(en)
+          ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("agent.addressLookup.selectPage.title")(en),
             "heading" -> messagesApi("agent.addressLookup.selectPage.heading")(en)
@@ -146,6 +157,9 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
           )
         ),
         "cy" -> Json.obj(
+          "appLevelLabels" -> Json.obj(
+            "navTitle" -> messagesApi("agent_serviceName")(cy)
+          ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("agent.addressLookup.selectPage.title")(cy),
             "heading" -> messagesApi("agent.addressLookup.selectPage.heading")(cy)

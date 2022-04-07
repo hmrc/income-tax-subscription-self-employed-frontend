@@ -69,6 +69,7 @@ object IntegrationTestConstants {
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
+       |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-business-for-making-tax-digital-for-income-tax",
        |    "ukMode": true,
        |    "selectPageConfig": {
        |      "proposalListLimit": 50,
@@ -88,6 +89,9 @@ object IntegrationTestConstants {
        |  },
        |  "labels": {
        |    "en": {
+       |      "appLevelLabels": {
+       |        "navTitle": "Use software to send Income Tax updates"
+       |      },
        |      "selectPageLabels": {
        |        "title": "Select business address",
        |        "heading": "Select business address"
@@ -107,6 +111,9 @@ object IntegrationTestConstants {
        |      }
        |    },
        |    "cy": {
+       |      "appLevelLabels": {
+       |        "navTitle": "Defnyddio meddalwedd i anfon diweddariadau Treth Incwm"
+       |      },
        |      "selectPageLabels": {
        |        "title": "Dewiswch gyfeiriad busnes",
        |        "heading": "Dewiswch gyfeiriad busnes"
@@ -138,6 +145,7 @@ object IntegrationTestConstants {
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
+       |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-client-for-making-tax-digital-for-income-tax",
        |    "ukMode": true,
        |    "selectPageConfig": {
        |      "proposalListLimit": 50,
@@ -157,6 +165,9 @@ object IntegrationTestConstants {
        |  },
        |  "labels": {
        |    "en": {
+       |      "appLevelLabels": {
+       |        "navTitle": "Use software to report your client’s Income Tax"
+       |      },
        |      "selectPageLabels": {
        |        "title": "Select client’s business address",
        |        "heading": "Select client’s business address"
@@ -176,6 +187,9 @@ object IntegrationTestConstants {
        |      }
        |    },
        |    "cy": {
+       |      "appLevelLabels": {
+       |        "navTitle": "Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient"
+       |       },
        |      "selectPageLabels": {
        |        "title": "dewis cyfeiriad busnes y cleient",
        |        "heading": "dewis cyfeiriad busnes y cleient"
