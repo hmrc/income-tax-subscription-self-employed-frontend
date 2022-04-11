@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import java.text.SimpleDateFormat
+import com.ibm.icu.text.SimpleDateFormat
+import play.api.i18n.Messages
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel._
+
 import java.time.format.{DateTimeFormatter, ResolverStyle}
 import java.time.{LocalDate, ZoneId}
 import java.util.Date
-
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel._
-import play.api.i18n.Messages
-import play.api.libs.json.{Json, OFormat}
 
 case class DateModel(day: String, month: String, year: String) {
 

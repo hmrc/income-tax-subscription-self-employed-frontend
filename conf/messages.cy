@@ -28,16 +28,22 @@ business.start_date.line_1                                      = Os oes gennych
 business.start_date.exampleStartDate                            = Er enghraifft, 1 8 2014
 
 # Date errors
-error.business_start_date.date.empty                            = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu
+error.business_start_date.day_month_year.empty                  = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu
 error.business_start_date.day.empty                             = Mae’n rhaid i’r dyddiad gynnwys diwrnod
 error.business_start_date.month.empty                           = Mae’n rhaid i’r dyddiad gynnwys mis
 error.business_start_date.year.empty                            = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
 error.business_start_date.day_month.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
 error.business_start_date.day_year.empty                        = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
 error.business_start_date.month_year.empty                      = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
-error.business_start_date.maxStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
-error.business_start_date.minStartDate                          = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}
-error.business_start_date.invalid                               = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.day_month_year.max_date               = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+error.business_start_date.day_month_year.min_date               = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}
+error.business_start_date.day_month_year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.day.invalid                           = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.month.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.year.invalid                          = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.day_month.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.day_year.invalid                      = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.month_year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn
 error.business_start_date.year.length                           = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Business Name
@@ -116,17 +122,23 @@ business.agent.start_date.heading                               = Pryd y dechreu
 business.agent.start_date.exampleStartDate                      = Er enghraifft, 1 8 2014
 
 # Agent Date errors
-error.agent.business_start_date.date.empty                      = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
-error.agent.business_start_date.day.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod
-error.agent.business_start_date.month.empty                     = Mae’n rhaid i’r dyddiad gynnwys mis
-error.agent.business_start_date.year.empty                      = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
-error.agent.business_start_date.day_month.empty                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
-error.agent.business_start_date.day_year.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
-error.agent.business_start_date.month_year.empty                = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
-error.agent.business_start_date.maxStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
-error.agent.business_start_date.minStartDate                    = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}
-error.agent.business_start_date.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-error.agent.business_start_date.year.length                     = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
+agent.error.business_start_date.day_month_year.empty            = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
+agent.error.business_start_date.day.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod
+agent.error.business_start_date.month.empty                     = Mae’n rhaid i’r dyddiad gynnwys mis
+agent.error.business_start_date.year.empty                      = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
+agent.error.business_start_date.day_month.empty                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
+agent.error.business_start_date.day_year.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
+agent.error.business_start_date.month_year.empty                = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
+agent.error.business_start_date.day_month_year.max_date         = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
+agent.error.business_start_date.day_month_year.min_date         = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}
+agent.error.business_start_date.day.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.day_month.invalid               = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.day_year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.month_year.invalid              = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.day_month_year.invalid          = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.month.invalid                   = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.year.length                     = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Agent Business Name
 business.agent.name.title                                       = Beth yw enw busnes eich cleient?

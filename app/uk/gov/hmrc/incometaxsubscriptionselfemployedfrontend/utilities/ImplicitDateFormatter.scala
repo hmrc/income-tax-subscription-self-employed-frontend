@@ -32,8 +32,8 @@ trait ImplicitDateFormatter {
 
   implicit class LongDate(date: LocalDate)(implicit messages: Messages) {
 
-    def toLongDate: String = {
-      languageUtils.Dates.formatDate(date)(messages)
+    def toLongDate(): String = {
+      languageUtils.Dates.formatDate(LocalDate.parse(date.toString))(messages)
     }
 
   }

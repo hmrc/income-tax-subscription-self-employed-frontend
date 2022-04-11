@@ -24,19 +24,28 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 
 class DateModelFormatterSpec extends AnyWordSpecLike with Matchers {
 
-  def dateModelFormatter(isAgent: Boolean = false): Formatter[DateModel] = DateModelMapping.dateModelFormatter(isAgent = isAgent, errorContext = "test")
+  def dateModelFormatter(isAgent: Boolean = false): Formatter[DateModel] = DateModelMapping.DateModelFormatter(
+    isAgent = isAgent,
+    minDate = None,
+    maxDate = None,
+    dateFormatter = None,
+    errorContext = "test")
 
   val bindingKey: String = "testKey"
 
+  private val dayKey = s"$bindingKey-${DateModelMapping.day}"
+  private val monthKey = s"$bindingKey-${DateModelMapping.month}"
+  private val yearKey = s"$bindingKey-${DateModelMapping.year}"
+
   def inputMap(day: Option[String], month: Option[String], year: Option[String]): Map[String, String] = List(
-    s"$bindingKey.${DateModelMapping.day}" -> day,
-    s"$bindingKey.${DateModelMapping.month}" -> month,
-    s"$bindingKey.${DateModelMapping.year}" -> year
+    dayKey -> day,
+    monthKey -> month,
+    yearKey -> year
   ).collect {
     case (key, Some(value)) => (key, value)
   }.toMap
 
-  def errorKey(isAgent: Boolean)(error: String): String = if (isAgent) s"error.agent.$error" else s"error.$error"
+  def errorKey(isAgent: Boolean)(error: String): String = if (isAgent) s"agent.error.$error" else s"error.$error"
 
   "dateModelFormatter.bind" when {
     for (isAgent <- Seq(true, false)) {
@@ -54,90 +63,90 @@ class DateModelFormatterSpec extends AnyWordSpecLike with Matchers {
         "return an error" when {
           "the day field is empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some(""), month = Some("2"), year = Some("2020")))
-            result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.day}", errorKey(isAgent)("test.day.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day.empty"))))
           }
           "the day field is not present" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = None, month = Some("2"), year = Some("2020")))
-            result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.day}", errorKey(isAgent)("test.day.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day.empty"))))
           }
           "the month field is empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = Some(""), year = Some("2020")))
-            result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.month}", errorKey(isAgent)("test.month.empty"))))
+            result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month.empty"))))
           }
           "the month field is not present" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = None, year = Some("2020")))
-            result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.month}", errorKey(isAgent)("test.month.empty"))))
+            result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month.empty"))))
           }
           "the year field is empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = Some("10"), year = Some("")))
-            result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.year}", errorKey(isAgent)("test.year.empty"))))
+            result mustBe Left(Seq(FormError(yearKey, errorKey(isAgent)("test.year.empty"))))
           }
           "the year field is not present" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = Some("10"), year = None))
-            result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.year}", errorKey(isAgent)("test.year.empty"))))
+            result mustBe Left(Seq(FormError(yearKey, errorKey(isAgent)("test.year.empty"))))
           }
           "the day and month fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = None, month = None, year = Some("2020")))
-            result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.day_month.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day_month.empty"))))
           }
           "the day and year fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = None, month = Some("2"), year = None))
-            result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.day_year.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day_year.empty"))))
           }
           "the month and year fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = None, year = None))
-            result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.month_year.empty"))))
+            result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month_year.empty"))))
           }
           "all fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = None, month = None, year = None))
-            result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.date.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day_month_year.empty"))))
           }
           "the day field is invalid" when {
             "the day is text" in {
               val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("invalid"), month = Some("10"), year = Some("2020")))
-              result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.day}", errorKey(isAgent)("test.invalid"))))
+              result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day.invalid"))))
             }
             "the day is 0" in {
               (1 to 12) map { month =>
                 val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("0"), month = Some(month.toString), year = Some("2020")))
-                result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.day}", errorKey(isAgent)("test.invalid"))))
+                result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day.invalid"))))
               }
             }
             "it's not a leap year, the month is february and day is 29th" in {
               val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("29"), month = Some("2"), year = Some("2019")))
-              result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.day}", errorKey(isAgent)("test.invalid"))))
+              result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day.invalid"))))
             }
             "its the 31st of month without 31 days" in {
               List(4, 6, 9, 11) map { month =>
                 val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("31"), month = Some(month.toString), year = Some("2020")))
-                result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.day}", errorKey(isAgent)("test.invalid"))))
+                result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day.invalid"))))
               }
             }
             "its the 32nd of the months with only 31 days" in {
               List(1, 3, 5, 7, 8, 10, 12) map { month =>
                 val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("32"), month = Some(month.toString), year = Some("2020")))
-                result mustBe Left(Seq(FormError(s"$bindingKey.${DateModelMapping.day}", errorKey(isAgent)("test.invalid"))))
+                result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day.invalid"))))
               }
             }
           }
           "the month field is invalid" when {
             "the month is text" in {
               val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = Some("invalid"), year = Some("2020")))
-              result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.invalid"))))
+              result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month.invalid"))))
             }
             "the month is 0" in {
               val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = Some("0"), year = Some("2020")))
-              result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.invalid"))))
+              result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month.invalid"))))
             }
             "the month is 13" in {
               val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = Some("13"), year = Some("2020")))
-              result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.invalid"))))
+              result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month.invalid"))))
             }
           }
           "the year field is invalid" when {
             "the year is text" in {
               val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = Some("10"), year = Some("invalid")))
-              result mustBe Left(Seq(FormError(bindingKey, errorKey(isAgent)("test.invalid"))))
+              result mustBe Left(Seq(FormError(yearKey, errorKey(isAgent)("test.year.invalid"))))
             }
           }
         }
@@ -148,9 +157,9 @@ class DateModelFormatterSpec extends AnyWordSpecLike with Matchers {
   "dateModelFormatter.unbind" must {
     "return a map of values in the date model relating to the original inputs" in {
       dateModelFormatter().unbind(bindingKey, DateModel("20", "10", "2020")) mustBe Map(
-        s"$bindingKey.${DateModelMapping.day}" -> "20",
-        s"$bindingKey.${DateModelMapping.month}" -> "10",
-        s"$bindingKey.${DateModelMapping.year}" -> "2020"
+        dayKey -> "20",
+        monthKey -> "10",
+        yearKey -> "2020"
       )
     }
   }

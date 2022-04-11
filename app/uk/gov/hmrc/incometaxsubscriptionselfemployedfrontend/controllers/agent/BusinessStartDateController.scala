@@ -108,10 +108,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {
-    businessStartDateForm(
-      minStartDate = BusinessStartDateForm.minStartDate.toLongDate,
-      maxStartDate = BusinessStartDateForm.maxStartDate.toLongDate
-    )
+    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toLongDate)
   }
 
 }

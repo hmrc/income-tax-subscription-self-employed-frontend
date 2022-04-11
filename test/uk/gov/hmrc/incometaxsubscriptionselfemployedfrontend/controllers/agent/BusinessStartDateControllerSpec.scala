@@ -72,8 +72,9 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   def businessStartDateForm(fill: Option[BusinessStartDateModel] = None, bind: Option[Map[String, String]] = None): Form[BusinessStartDateModel] = {
     val filledForm = BusinessStartDateForm.businessStartDateForm(
-      minStartDate = BusinessStartDateForm.minStartDate.toLongDate,
-      maxStartDate = BusinessStartDateForm.maxStartDate.toLongDate
+      minStartDate = BusinessStartDateForm.minStartDate,
+      maxStartDate = BusinessStartDateForm.maxStartDate,
+      d => d.toLongDate()
     ).fill(fill)
     bind match {
       case Some(data) => filledForm.bind(data)
@@ -91,7 +92,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   )
 
   def modelToFormData(model: BusinessStartDateModel): Seq[(String, String)] = {
-    BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").fill(model).data.toSeq
+    BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).fill(model).data.toSeq
   }
 
   "Show" should {
