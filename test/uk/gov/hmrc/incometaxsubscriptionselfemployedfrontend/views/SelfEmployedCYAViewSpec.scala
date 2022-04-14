@@ -36,7 +36,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val saveAndBack = "Save and come back later"
     val change = "Change"
     val back = "Back"
-    val incomplete = "Incomplete"
+    val add = "Add"
     val tradingStartDate = "Business trading start date"
     val changeTradingStartDate = "Change Business trading start date"
     val businessName = "Business name"
@@ -308,7 +308,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
             }
             "has a incomplete link" in new SetupIncomplete {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
-              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.incomplete
+              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addAccountingMethod
               changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = Some("testId"), isEditMode = true).url
             }

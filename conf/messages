@@ -15,7 +15,7 @@ base.change                                                     = Change
 base.update                                                     = Update
 base.yes                                                        = Yes
 base.no                                                         = No
-base.incomplete                                                 = Incomplete
+base.add                                                        = Add
 
 error-notification.prefix                                       = Error:
 
