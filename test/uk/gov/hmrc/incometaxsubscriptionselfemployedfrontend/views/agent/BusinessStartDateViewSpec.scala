@@ -35,6 +35,9 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
     val update = "Update"
+    val empty = "Enter the date your client’s business started trading"
+    val maxDate = "The date the business started trading must be on or before 11 April 2021"
+    val minDate = "The date your client’s business started must be on or after 11 April 2021"
   }
 
   val taxYearEnd: Int = 2020
@@ -42,7 +45,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
   val businessStartDateView: BusinessStartDate = app.injector.instanceOf[BusinessStartDate]
 
   def page(isEditMode: Boolean = false, error: Option[FormError] = None): Html = {
-    val form = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError")
+    val form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString)
     businessStartDateView(
       businessStartDateForm = error match {
         case Some(value) => form.withError(value)
@@ -57,7 +60,10 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
   def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document =
     Jsoup.parse(page(isEditMode, error).body)
 
-  val testError: FormError = FormError(BusinessStartDateForm.startDate, "test error message")
+  private val testError: FormError = FormError(BusinessStartDateForm.startDate, "test error message")
+  private val emptyError = FormError("startDate", "agent.error.business_start_date.day_month_year.empty")
+  private val dateTooLateError = FormError("startDate", "agent.error.business_start_date.day_month_year.max_date", List("11 April 2021"))
+  private val dateTooEarlyError = FormError("startDate", "agent.error.business_start_date.day_month_year.min_date", List("11 April 2021"))
 
   "BusinessStartDate" must {
     "have the correct template details" when {
@@ -94,15 +100,27 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
             isPageHeading = false
           )
         }
-        "there is an error on the page" in {
-          document(error = Some(testError)).getForm.mustHaveDateInput(
-            name = BusinessStartDateForm.startDate,
-            label = BusinessStartDateMessages.heading,
-            hint = Some(BusinessStartDateMessages.exampleStartDate),
-            error = Some(testError),
-            isPageHeading = false
-          )
-        }
+      }
+
+      "display form error on page" in {
+        val doc = document(error = Some(emptyError))
+        doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+        doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
+        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.empty}"
+      }
+
+      "display max date error on page" in {
+        val doc = document(error = Some(dateTooLateError))
+        doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+        doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
+        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.maxDate}"
+      }
+
+      "display min date error on page" in {
+        val doc = document(error = Some(dateTooEarlyError))
+        doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+        doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
+        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"
       }
 
       "has a button to continue" when {

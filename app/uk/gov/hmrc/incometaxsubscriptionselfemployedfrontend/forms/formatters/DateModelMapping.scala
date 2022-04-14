@@ -16,115 +16,84 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters
 
-import play.api.data.Forms.{mapping, of}
+import cats.data.Validated.{Invalid, Valid}
+import cats.implicits._
+import play.api.data.Forms.of
 import play.api.data.format.Formatter
 import play.api.data.{FormError, Mapping}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.{OTextUtil, oText}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateValidation._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 
 import java.time.LocalDate
-import scala.util.Try
 
 object DateModelMapping {
-
   val day: String = "dateDay"
   val month: String = "dateMonth"
   val year: String = "dateYear"
 
-  val dateMapping: Mapping[DateModel] = mapping(
-    day -> oText.toText,
-    month -> oText.toText,
-    year -> oText.toText
-  )(DateModel.apply)(DateModel.unapply)
+  type DateModelValidation = Either[Seq[FormError], DateModel]
 
-  def isDayValid(dayText: String, monthText: String, yearText: String): Either[String, Int] = {
-    Try[Either[String, Int]] {
-      val day: Int = dayText.toInt
-      val month: Int = monthText.toInt
-      val year: Int = yearText.toInt
-
-      val dayMaxValid: Boolean = month match {
-        case 2 if year % 4 == 0 => day <= 29
-        case 2 => day <= 28
-        case 4 | 6 | 9 | 11 => day <= 30
-        case 1 | 3 | 5 | 7 | 8 | 10 | 12 => day <= 31
-      }
-
-      if (day >= 1 && dayMaxValid) Right(day) else Left("invalid")
-
-    }.getOrElse(Left("invalid"))
-  }
-
-  def isMonthValid(monthText: String): Either[String, Int] = {
-    Try[Either[String, Int]] {
-      val month = monthText.toInt
-      if (month >= 1 && month <= 12) {
-        Right(month)
-      } else {
-        Left("invalid")
-      }
-    }.getOrElse(Left("invalid"))
-  }
-
-  def isYearValid(yearText: String): Either[String, Int] = {
-    Try[Either[String, Int]] {
-      Right(yearText.toInt)
-    }.getOrElse(Left("invalid"))
-  }
-
-  def dateModelFormatter(isAgent: Boolean = false, errorContext: String): Formatter[DateModel] = new Formatter[DateModel] {
-
-    def errorKey(error: String): String = if (isAgent) s"error.agent.$errorContext.$error" else s"error.$errorContext.$error"
-
-    def totalDayKey(key: String): String = s"$key.$day"
-
-    def totalMonthKey(key: String): String = s"$key.$month"
-
-    def totalYearKey(key: String): String = s"$key.$year"
-
-    def validateFieldsFilled(key: String, maybeDay: Option[String], maybeMonth: Option[String], maybeYear: Option[String]): Either[FormError, (String, String, String)] = {
-      (maybeDay, maybeMonth, maybeYear) match {
-        case (None, None, None) => Left(FormError(key, errorKey("date.empty")))
-        case (Some(_), None, None) => Left(FormError(key, errorKey("month_year.empty")))
-        case (None, Some(_), None) => Left(FormError(key, errorKey("day_year.empty")))
-        case (None, None, Some(_)) => Left(FormError(key, errorKey("day_month.empty")))
-        case (Some(_), Some(_), None) => Left(FormError(totalYearKey(key), errorKey("year.empty")))
-        case (None, Some(_), Some(_)) => Left(FormError(totalDayKey(key), errorKey("day.empty")))
-        case (Some(_), None, Some(_)) => Left(FormError(totalMonthKey(key), errorKey("month.empty")))
-        case (Some(dayValue), Some(monthValue), Some(yearValue)) => Right((dayValue, monthValue, yearValue))
-      }
-    }
+  case class DateModelFormatter(isAgent: Boolean,
+                                errorContext: String,
+                                minDate: Option[LocalDate],
+                                maxDate: Option[LocalDate],
+                                dateFormatter: Option[LocalDate => String])
+    extends Formatter[DateModel] {
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], DateModel] = {
-      val maybeDay: Option[String] = data.get(totalDayKey(key)).filter(_.nonEmpty)
-      val maybeMonth: Option[String] = data.get(totalMonthKey(key)).filter(_.nonEmpty)
-      val maybeYear: Option[String] = data.get(totalYearKey(key)).filter(_.nonEmpty)
+      val ids: HtmlIds = HtmlIds(key)
 
-      val formErrorOrDateValues = validateFieldsFilled(key, maybeDay, maybeMonth, maybeYear)
+      // These two sections have been split because the scala type inference fails without declaring the type of dayMonthValidation
+      val dayMonthValidation: DateFormValidation[DayMonth] = (validateDay(data, ids), validateMonth(data, ids))
+        .map2(
+          (day, month) => DayMonth(day, month)
+        ).andThen(validateDayMonth)
+      val result = (dayMonthValidation, validateYear(data, ids))
+        .map2(
+          (dayMonth, year) => ValidDate(dayMonth.day, dayMonth.month, year)
+        ).andThen(date => validateDate(date, minDate, maxDate))
 
-      formErrorOrDateValues match {
-        case Left(value) => Left(Seq(value))
-        case Right((day, month, year)) =>
-          (isDayValid(day, month, year), isMonthValid(month), isYearValid(year)) match {
-            case (Right(day), Right(month), Right(year)) => Try[Either[Seq[FormError], DateModel]] {
-              LocalDate.of(year, month, day)
-              Right(DateModel(maybeDay.get, maybeMonth.get, maybeYear.get))
-            }.getOrElse(Left(Seq(FormError(key, errorKey("invalid")))))
-            case (Left(_), Right(_), Right(_)) => Left(Seq(FormError(totalDayKey(key), errorKey("invalid"))))
-            case (Right(_), Left(_), Right(_)) => Left(Seq(FormError(totalMonthKey(key), errorKey("invalid"))))
-            case (Right(_), Right(_), Left(_)) => Left(Seq(FormError(totalYearKey(key), errorKey("invalid"))))
-            case _ => Left(Seq(FormError(key, errorKey("invalid"))))
-          }
+      result match {
+        case Valid(date) => Right(date)
+        case Invalid(errors) =>
+          DateErrorMapping.transformErrors(errors.toList, ids, isAgent, errorContext, minDate, maxDate, dateFormatter)
       }
     }
 
-    override def unbind(key: String, value: DateModel): Map[String, String] = Map(
-      totalDayKey(key) -> value.day,
-      totalMonthKey(key) -> value.month,
-      totalYearKey(key) -> value.year
-    )
+    override def unbind(key: String, value: DateModel): Map[String, String] = {
+      val ids = HtmlIds(key)
+      Map(
+        ids.totalDayKey -> value.day,
+        ids.totalMonthKey -> value.month,
+        ids.totalYearKey -> value.year
+      )
+    }
   }
 
-  def dateModelMapping(isAgent: Boolean = false, errorContext: String): Mapping[DateModel] = of[DateModel](
-    dateModelFormatter(isAgent = isAgent, errorContext = errorContext))
+  def dateModelMapping(isAgent: Boolean = false,
+                       errorContext: String,
+                       minDate: Option[LocalDate] = None,
+                       maxDate: Option[LocalDate] = None,
+                       dateFormatter: Option[LocalDate => String]): Mapping[DateModel] = of[DateModel](
+    DateModelFormatter(
+      isAgent = isAgent,
+      errorContext = errorContext,
+      minDate = minDate,
+      maxDate = maxDate,
+      dateFormatter = dateFormatter)
+  )
+
+  // Encapsulation of field ids.
+  // We should never send people to the field with id "key".  Only to an editable field.
+  // The sole exception to this is the fallback position where all our checks have passed
+  // but the values do not parse to a local date for some reason.
+  case class HtmlIds(key: String) {
+    private val day: String = "dateDay"
+    private val month: String = "dateMonth"
+    private val year: String = "dateYear"
+
+    val totalDayKey: String = s"$key-$day"
+    val totalMonthKey: String = s"$key-$month"
+    val totalYearKey: String = s"$key-$year"
+  }
 }

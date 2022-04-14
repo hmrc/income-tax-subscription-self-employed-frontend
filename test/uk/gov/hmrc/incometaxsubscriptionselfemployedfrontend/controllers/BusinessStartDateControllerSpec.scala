@@ -43,7 +43,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   val id: String = "testId"
 
-  val businessStartDate = mock[BusinessStartDateView]
+  private val businessStartDate = mock[BusinessStartDateView]
   when(businessStartDate(any(), any(), any(), any(), any())(any(), any(), any()))
     .thenReturn(HtmlFormat.empty)
 
@@ -64,7 +64,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   )
 
   def modelToFormData(businessStartDateModel: BusinessStartDate): Seq[(String, String)] = {
-    BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").fill(businessStartDateModel).data.toSeq
+    BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).fill(businessStartDateModel).data.toSeq
   }
 
   def selfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(

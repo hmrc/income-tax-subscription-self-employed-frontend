@@ -32,6 +32,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
 
+import java.time.LocalDate
+
 trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
   with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen with SessionCookieBaker {
 
@@ -127,7 +129,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
       request.fold(Map.empty[String, Seq[String]])(
         model =>
           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm(
-            "minStartDateError", "maxStartDateError"
+            LocalDate.now(), LocalDate.now(), d => d.toString
           ).fill(model).data.map {
             case (k, v) =>
               (k, Seq(v))
@@ -172,7 +174,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
       request.fold(Map.empty[String, Seq[String]])(
         model =>
           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm(
-            "minStartDateError", "maxStartDateError"
+            BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString
           ).fill(model).data.map {
             case (k, v) =>
               (k, Seq(v))

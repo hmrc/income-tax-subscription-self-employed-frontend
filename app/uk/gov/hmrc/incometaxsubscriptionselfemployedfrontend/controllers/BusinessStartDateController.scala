@@ -48,7 +48,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             val languageUtils: LanguageUtils,
                                             businessStartDate: BusinessStartDateView)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with FeatureSwitching with ReferenceRetrieval {
+  extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with FeatureSwitching with ReferenceRetrieval {
 
   private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
 
@@ -109,10 +109,7 @@ extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {
-    businessStartDateForm(
-      minStartDate = BusinessStartDateForm.minStartDate.toLongDate,
-      maxStartDate = BusinessStartDateForm.maxStartDate.toLongDate
-    )
+    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toLongDate)
   }
 
 }

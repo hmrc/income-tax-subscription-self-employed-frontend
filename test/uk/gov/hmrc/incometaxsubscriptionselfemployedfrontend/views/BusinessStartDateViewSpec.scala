@@ -28,6 +28,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 
+import java.time.LocalDate
+
 class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
@@ -41,18 +43,24 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val update = "Update"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
+    val empty = "Enter the date your business started trading"
+    val maxDate = "The date your business started trading must be the same as or before 11 April 2021"
+    val minDate = "The date your business started must be on or after 11 April 2021"
   }
 
   val backUrl: String = testBackUrl
   val action: Call = testCall
   val taxYearEnd: Int = 2020
-  val testError: FormError = FormError("startDate", "testError")
+  private val testError: FormError = FormError("startDate", "error.business_start_date.day_month_year.empty")
+
+  private val dateTooLateError = FormError("startDate", "error.business_start_date.day_month_year.max_date", List("11 April 2021"))
+  private val dateTooEarlyError = FormError("startDate", "error.business_start_date.day_month_year.min_date", List("11 April 2021"))
 
   val businessStartDateView : BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
 
   class Setup(isEditMode: Boolean = false,
               isSaveAndRetrieve: Boolean = false,
-              businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError")) {
+              businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString)) {
     val page: HtmlFormat.Appendable = businessStartDateView(
       businessStartDateForm,
       testCall,
@@ -112,14 +120,30 @@ class BusinessStartDateViewSpec extends ViewSpec {
       backLink.text mustBe BusinessStartDateMessages.backLink
       backLink.attr("href") mustBe testBackUrl
     }
+
     "must display form error on page" in new Setup(
       isEditMode = false,
-      businessStartDateForm = BusinessStartDateForm.businessStartDateForm("minStartDateError", "maxStartDateError").withError(testError)
+      businessStartDateForm = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).withError(testError)
     ) {
       document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-      document.select("p[id=startDate-Error]").text() mustBe "Error: testError"
+      document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.empty}"
     }
 
+    "must display max date error on page" in new Setup(
+      businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooLateError)
+    ){
+      document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+      document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
+      document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.maxDate}"
+    }
+
+    "must display min date error on page" in new Setup(
+      businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooEarlyError)
+    ){
+      document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+      document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
+      document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"
+    }
   }
 }

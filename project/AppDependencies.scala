@@ -8,11 +8,13 @@ object AppDependencies {
   private val bootstrapVersion = "5.21.0"
   private val playHmrcFrontendVersion = "3.8.0-play-28"
   private val scalatestplusVersion = "5.1.0"
+  private val catsVersion              = "0.9.0"
 
   val compile = Seq(
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapVersion,
     "uk.gov.hmrc" %% "play-language" % playLanguageVersion,
-    "uk.gov.hmrc" %% "play-frontend-hmrc" % playHmrcFrontendVersion
+    "uk.gov.hmrc" %% "play-frontend-hmrc" % playHmrcFrontendVersion,
+    "org.typelevel" %% "cats" % catsVersion
   )
 
   val test = Seq(

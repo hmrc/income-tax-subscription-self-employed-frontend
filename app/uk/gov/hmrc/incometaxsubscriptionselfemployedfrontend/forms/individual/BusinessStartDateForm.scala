@@ -18,10 +18,8 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.NewDateModelMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 
 import java.time.LocalDate
 
@@ -35,28 +33,9 @@ object BusinessStartDateForm {
 
   val errorContext: String = "business_start_date"
 
-  def startBeforeTwoYears(date: String): Constraint[DateModel] = constraint[DateModel] { dateModel =>
-    if (DateModel.dateConvert(dateModel).isAfter(maxStartDate)) {
-      Invalid(s"error.$errorContext.maxStartDate", date)
-    } else {
-      Valid
-    }
-  }
-
-  def earliestStartDate(date: String): Constraint[DateModel] = constraint[DateModel] { dateModel =>
-    val earliestAllowedYear: Int = minStartDate.getYear
-    if (dateModel.year.toInt < earliestAllowedYear) {
-      Invalid(s"error.$errorContext.minStartDate", date)
-    } else {
-      Valid
-    }
-  }
-
-  def businessStartDateForm(minStartDate: String, maxStartDate: String): Form[BusinessStartDate] = Form(
+  def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String): Form[BusinessStartDate] = Form(
     mapping(
-      startDate -> NewDateModelMapping.dateModelMapping(errorContext = errorContext).verifying(
-        startBeforeTwoYears(maxStartDate) andThen earliestStartDate(minStartDate)
-      )
+      startDate -> DateModelMapping.dateModelMapping(errorContext = errorContext, minDate = Some(minStartDate), maxDate = Some(maxStartDate), dateFormatter = Some(f))
     )(BusinessStartDate.apply)(BusinessStartDate.unapply)
   )
 
