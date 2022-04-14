@@ -14,7 +14,7 @@ base.title.error                                                = Error: {0}
 base.change                                                     = Newid
 base.yes                                                        = Iawn
 base.no                                                         = Na
-base.incomplete                                                 = Anghyflawn
+base.add                                                        = Ychwanegu
 
 error-notification.prefix                                       = Gwall:
 

@@ -42,7 +42,7 @@
         <dd class="govuk-summary-list__actions">
             @changeUrl.map { link =>
                 <a class="govuk-link" href="@link.url">
-                    <span aria-hidden="true">@if(answer.isDefined)(messages("base.change")) else (messages("base.incomplete"))</span>
+                    <span aria-hidden="true">@if(answer.isDefined)(messages("base.change")) else (messages("base.add"))</span>
                     <span class="govuk-visually-hidden">@link.hiddenContent</span>
                 </a>
             }
