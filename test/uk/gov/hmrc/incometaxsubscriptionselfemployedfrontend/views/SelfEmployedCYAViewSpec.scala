@@ -30,7 +30,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmpl
 class SelfEmployedCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
-    val heading = "Check your details"
+    val heading = "Check your answers"
+    val title = "Check your details"
     val confirmAndContinue = "Confirm and continue"
     val continue = "Continue"
     val saveAndBack = "Save and come back later"
@@ -119,7 +120,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
           postAction = testCall,
           backUrl
         )(FakeRequest(), implicitly),
-        title = CheckYourAnswersMessages.heading,
+        title = CheckYourAnswersMessages.title,
         hasSignOutLink = true,
         backLink = backUrl
       )
