@@ -16,7 +16,7 @@ if [[ "$1" == "--minimal" ]]; then
    sm --start ITSA_SUBSC_DEP "${@:2}"
    sm --start AGENTS_TAX_ENROLMENTS "${@:2}"
    sm --start INCOME_TAX_SUBSCRIPTION "${@:2}"
-   sm --start INCOME_TAX_SUBSCRIPTION_SELF_EMPLOYED_FRONTEND "${@:2}"
+   sm --start INCOME_TAX_SUBSCRIPTION_FRONTEND "${@:2}"
    sm --start INCOME_TAX_SUBSCRIPTION_STUBS "${@:2}"
    sm --start INCOME_TAX_SUBSCRIPTION_ELIGIBILITY "${@:2}"
    sm --start INCOME_TAX_SUBSCRIPTION_ELIGIBILITY_FRONTEND "${@:2}"

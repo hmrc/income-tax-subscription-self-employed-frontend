@@ -19,20 +19,29 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{maxLength, nonEmpty, validateChar}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{maxLength, nonEmpty, validateCharAgainst}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.trimmedText
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 
 object BusinessNameForm {
 
+  /**
+    Spec:
+    "tradingName": {
+      "description": "Trading name",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9 ,.&'\/-]{1,105}$"
+    }
+   */
   val businessName = "businessName"
 
-  private val businessNameMaxLength: Int = 160
+  private val businessNameMaxLength: Int = 105
 
   val nameNotEmpty: Constraint[String] = nonEmpty("error.business_name.empty")
   val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, "error.business_name.max_length")
-  val nameValidChars: Constraint[String] = validateChar("error.business_name.invalid_character")
+  val businessTradeNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
+  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, "error.business_name.invalid_character")
 
   def nameIsNotExcluded(excludedNames: Seq[BusinessNameModel]): Constraint[String] = constraint[String] { name =>
     if (excludedNames.exists(_.businessName == name)) Invalid("error.business_trade_name.duplicate")

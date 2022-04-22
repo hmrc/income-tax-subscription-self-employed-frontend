@@ -39,10 +39,11 @@
 
     @form(action = postAction) {
 
+
         @textInputHelper(
             field = businessNameForm(businessName),
             label = messages("business.name.heading"),
-            hint = Some(messages("business.name.line_1")),
+            hint = Some(messages("business.name.hint")),
             classes = Some("govuk-!-width-one-half")
         )
 

@@ -48,14 +48,14 @@ error.business_start_date.month_year.invalid                    = The date must 
 error.business_start_date.year.length                           = The year must be in four digits. For example, 2020.
 
 # Business Name
-business.name.title                                             = What is the name of your sole trader business?
-business.name.heading                                           = What is the name of your sole trader business?
-business.name.line_1                                            = This is the business name you used to register for Self Assessment. If your business does not have a separate name, enter your own first and last name.
+business.name.title                                             = What is the name of your business?
+business.name.heading                                           = What is the name of your business?
+business.name.hint                                              = This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name. The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, '', \, /, -.
 
 # Business Name errors
 error.business_name.empty                                       = Enter your name or the name of your business
-error.business_name.max_length                                  = Business name must be 160 characters or fewer
-error.business_name.invalid_character                           = Business name cannot include !, " ", * or ?
+error.business_name.max_length                                  = Business name must be between 1 and 105 characters
+error.business_name.invalid_character                           = Business name can only include characters listed
 
 # Business trade name
 business.trade_name.title                                       = What is the trade of your business?
@@ -142,14 +142,14 @@ agent.error.business_start_date.month_year.invalid              = The date must 
 agent.error.business_start_date.year.length                     = The year must be in four digits. For example, 2020.
 
 # Agent Business Name
-business.agent.name.title                                       = What is the name of your client’s business?
-business.agent.name.heading                                     = What is the name of your client’s business?
-business.agent.name.line_1                                      = This is the business name they used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name.
+agent.business.name.title                                       = What is the name of your client’s business?
+agent.business.name.heading                                     = What is the name of your client’s business?
+agent.business.name.hint                                        = This is the business name they used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name.
 
 # Agent Business Name errors
 error.agent.business_name.empty                                 = Enter your client’s name or the name of their business
-error.agent.business_name.max_length                            = Business name must be 160 characters or fewer
-error.agent.business_name.invalid_character                     = Business name cannot include !, " ", * or ?
+error.agent.business_name.max_length                            = Business name must be between 1 and 105 characters
+error.agent.business_name.invalid_character                     = Business name can only include characters listed
 
 #Agent Trade Name
 business.agent.trade_name.title                                 = What is the trade of your client’s sole trader business?
