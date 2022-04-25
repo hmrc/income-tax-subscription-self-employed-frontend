@@ -58,7 +58,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
     businessName = Some(BusinessNameModel(s"ABC Limited")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-    businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), "TF3 4NT"))),
+    businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
     businessAddressRedirect = Some(s"test address redirect"),
     accountingMethod = Some(AccountingMethodModel(Cash))
   )
@@ -76,7 +76,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
     businessName = Some(BusinessNameModel(s"ABC Limited")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-    businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), "TF3 4NT"))),
+    businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
     businessAddressRedirect = Some(s"test address redirect")
   )) {
     val page: HtmlFormat.Appendable = checkYourAnswers(
@@ -94,7 +94,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
       businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
       businessName = Some(BusinessNameModel(s"ABC Limited")),
       businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-      businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), "TF3 4NT"))),
+      businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
       confirmed = confirmed,
       businessAddressRedirect = Some(s"test address redirect"),
       accountingMethod = Some(AccountingMethodModel(Cash))

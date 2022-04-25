@@ -56,7 +56,7 @@ class BusinessListCYAViewSpec extends ViewSpec {
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
     businessName = Some(BusinessNameModel(s"ABC Limited $id")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing $id")),
-    businessAddress = Some(BusinessAddressModel(s"AuditRefId$id", Address(Seq(s"line$id", "line9", "line99"), "TF3 4NT"))),
+    businessAddress = Some(BusinessAddressModel(s"AuditRefId$id", Address(Seq(s"line$id", "line9", "line99"), Some("TF3 4NT")))),
     addressRedirect = Some(s"test address redirect $id")
   )
 

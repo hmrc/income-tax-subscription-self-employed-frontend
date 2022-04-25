@@ -37,10 +37,10 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   val businessAddressModel: BusinessAddressModel = BusinessAddressModel(auditRef = "1",
-    Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))
+    Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT")))
 
   val successJson: JsObject = Json.obj("auditRef"-> "1",
-    "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> "TF3 4NT"))
+    "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> Some("TF3 4NT")))
 
   "GetAddressLookupDetails" should {
     "Return TestModel" in {
