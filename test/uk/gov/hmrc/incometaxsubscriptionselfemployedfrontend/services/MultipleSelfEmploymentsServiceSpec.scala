@@ -35,7 +35,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
   def businessTrade(id: String): BusinessTradeNameModel = BusinessTradeNameModel(s"Plumbing $id")
 
-  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(s"Audit Ref $id", Address(Seq("line1", "line2", "line3"), "TF3 4NT"))
+  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(s"Audit Ref $id", Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
 
   def fullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
     id = id,

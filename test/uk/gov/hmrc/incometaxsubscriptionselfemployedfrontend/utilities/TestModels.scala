@@ -36,6 +36,6 @@ object TestModels {
   val mockAddAnotherBusinessModelWithNo: AddAnotherBusinessModel = AddAnotherBusinessModel(No)
 
   val testValidBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(auditRef = "1",
-    Address(lines = Seq("line1", "line2", "line3"), postcode = "TF3 4NT"))
+    Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT")))
 
 }

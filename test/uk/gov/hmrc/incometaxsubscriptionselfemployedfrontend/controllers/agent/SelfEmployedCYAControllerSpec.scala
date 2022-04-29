@@ -61,7 +61,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
     businessName = Some(BusinessNameModel("testBusinessName")),
     businessTradeName = Some(BusinessTradeNameModel("testBusinessTrade")),
-    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = "ZZ1 1ZZ"))),
+    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))),
     addressRedirect = Some("/test-redirect")
   )
 
@@ -70,7 +70,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
     businessName = Some(BusinessNameModel("testBusinessName")),
     businessTradeName = None,
-    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = "ZZ1 1ZZ"))),
+    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))),
     addressRedirect = Some("/test-redirect")
   )
 

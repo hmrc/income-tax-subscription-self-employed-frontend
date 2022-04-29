@@ -52,7 +52,7 @@ class BusinessListCYAControllerSpec extends ControllerBaseSpec with MockIncomeTa
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2017"))),
     businessName = Some(BusinessNameModel("ABC Limited")),
     businessTradeName = Some(BusinessTradeNameModel("Plumbing")),
-    businessAddress = Some(BusinessAddressModel("12345", Address(Seq("line1"), "TF3 4NT")))
+    businessAddress = Some(BusinessAddressModel("12345", Address(Seq("line1"), Some("TF3 4NT"))))
   )
 
   "show" should {
