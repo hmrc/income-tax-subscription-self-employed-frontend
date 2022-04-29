@@ -31,8 +31,10 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   lazy val testNameValid = "business"
   lazy val testNameEmpty = ""
-  lazy val testNameTooLong = "Qwertyuioplkjhgfdsazxcvbnmawedfoinaeoifnaeoifnoienfoqenfoqenfefkjadbfoeifijqebfkjadnfvasasdasdasdasdasdasdsssasdasdasdasdasdasdasdasdasdasdasdwdqwcrwcrwerohwe8ryc2r8ywehcowehfcwuefhcwiuefhc;wuehfcwiueFCuwe"
-  lazy val testNameInvalidChar = "!"
+  lazy val testNameNotTooLong = "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-12345"
+  lazy val testNameTooLong = "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456"
+  lazy val testNameInvalidChar = "!@£$%^*():;"
+  lazy val testNameValidChar = """abcdefghijklmnopqrstuvwxyz1234567890 ,.&'\/-"""
 
   "BusinessNameForm" should {
 
@@ -62,19 +64,42 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       emptyTest.errors must contain(FormError(businessName, "error.agent.business_name.empty"))
     }
 
-    "invalidate a business name that is over 160 characters" in {
+    "invalidate a business name that is over 105 characters" in {
       val testInput = Map(businessName -> testNameTooLong)
 
       val tooLongTest = form().bind(testInput)
       tooLongTest.errors must contain(FormError(businessName, "error.agent.business_name.max_length"))
     }
 
+    "validate a business name that is 105 characters" in {
+      val testInput = Map(businessName -> testNameNotTooLong)
+
+      val tooLongTest = form().bind(testInput)
+      tooLongTest.errors must not contain(FormError(businessName, "error.agent.business_name.max_length"))
+    }
+
     "invalidate a business name that includes invalid characters" in {
 
-      val testInput = Map(businessName -> testNameInvalidChar)
+      for (invalidChar <- testNameInvalidChar) {
+        val testInput = Map(businessName -> s"Some valid name except for ${invalidChar.toString} which is not allowed")
 
-      val invalidCharTest = form().bind(testInput)
-      invalidCharTest.errors must contain(FormError(businessName, "error.agent.business_name.invalid_character"))
+        val invalidCharTest = form().bind(testInput)
+        if (!invalidCharTest.errors.nonEmpty)
+          println(s"$invalidChar is not allowed")
+        invalidCharTest.errors must contain(FormError(businessName, "error.agent.business_name.invalid_character"))
+      }
+    }
+
+    "validate a business name that includes only valid characters" in {
+
+      for (validChar <- testNameValidChar) {
+        val testInput = Map(businessName -> s"Some valid name except for ${validChar.toString} which is not allowed")
+
+        val validCharTest = form().bind(testInput)
+        if (!validCharTest.errors.isEmpty)
+          println(s"${validChar.toString} should be allowed")
+        validCharTest.errors must not contain(FormError(businessName, "error.agent.business_name.invalid_character"))
+      }
     }
 
     "invalidate a business name which is in the list of excluded business names" in {

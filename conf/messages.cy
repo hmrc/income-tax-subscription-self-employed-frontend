@@ -52,14 +52,14 @@ error.business_start_date.month_year.invalid                    = Rhaid i’r dy
 error.business_start_date.year.length                           = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Business Name
-business.name.title                                             = Beth yw enw’ch busnes fel unig fasnachwr?
-business.name.heading                                           = Beth yw enw’ch busnes fel unig fasnachwr?
-business.name.line_1                                            = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gwahanol ar eich busnes, nodwch eich enw cyntaf ac enw olaf.
+business.name.title                                             = Beth yw enw’ch busnes?
+business.name.heading                                           = Beth yw enw’ch busnes?
+business.name.hint                                              = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gwahanol ar eich busnes unig fasnachwr, nodwch eich enw cyntaf ac enw olaf. Gall enw’r busnes rydych yn ei nodi gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ’, \, /, - yn unig.
 
 # Business Name errors
 error.business_name.empty                                       = Nodwch eich enw neu enw’ch busnes
-error.business_name.max_length                                  = Mae’n rhaid i enw’r busnes fod yn 160 o gymeriadau neu lai
-error.business_name.invalid_character                           = Ni all enw’r busnes gynnwys !, “ “ , * na ?
+error.business_name.max_length                                  = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau
+error.business_name.invalid_character                           = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig
 
 # Business trade name
 business.trade_name.title                                       = Beth yw masnach eich busnes?
@@ -147,14 +147,14 @@ agent.error.business_start_date.year.invalid                    = Rhaid i’r dy
 agent.error.business_start_date.year.length                     = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Agent Business Name
-business.agent.name.title                                       = Beth yw enw busnes eich cleient?
-business.agent.name.heading                                     = Beth yw enw busnes eich cleient?
-business.agent.name.line_1                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gan ei fusnes unig fasnachwr, nodwch enw eich cleient.
+agent.business.name.title                                       = Beth yw enw busnes eich cleient?
+agent.business.name.heading                                     = Beth yw enw busnes eich cleient?
+agent.business.name.hint                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gan ei fusnes unig fasnachwr, nodwch enw eich cleient.
 
 # Agent Business Name errors
 error.agent.business_name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient
-error.agent.business_name.max_length                            = Mae’n rhaid i enw’r busnes fod yn 160 o gymeriadau neu lai
-error.agent.business_name.invalid_character                     = Ni all enw’r busnes gynnwys !, “ “ , * na ?
+error.agent.business_name.max_length                            = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau
+error.agent.business_name.invalid_character                     = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig
 
 #Agent Trade Name
 business.agent.trade_name.title                                 = Beth yw masnach busnes unig fasnachwr eich cleient?

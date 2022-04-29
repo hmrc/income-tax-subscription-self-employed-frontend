@@ -30,14 +30,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.Business
 class BusinessNameViewSpec extends ViewSpec {
 
   object BusinessNameMessages {
-    val title = "What is the name of your sole trader business?"
+    val title = "What is the name of your business?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
     val continue = "Continue"
     val update = "Update"
     val saveAndContinueButton = "Save and continue"
     val backLink = "Back"
-    val line1 = "This is the business name you used to register for Self Assessment. If your business does not have a separate name, enter your own first and last name."
+    val line1 = "This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name. The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
     val emptyError = "Enter your name or the name of your business"
   }
 

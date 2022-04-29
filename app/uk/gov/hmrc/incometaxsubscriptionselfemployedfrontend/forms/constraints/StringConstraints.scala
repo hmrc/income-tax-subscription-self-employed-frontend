@@ -27,6 +27,9 @@ object StringConstraints {
   val validateChar: String => Constraint[String] = msgKey => constraint[String](
     x => if (x.matches(charRegex)) Valid else Invalid(msgKey)
   )
+  val validateCharAgainst: (String, String) => Constraint[String] = (test, msgKey) => constraint[String](
+    x => if (x.matches(test)) Valid else Invalid(msgKey)
+  )
 
   val nonEmpty: String => Constraint[String] = msgKey => constraint[String](
     x => if (x.isEmpty) Invalid(msgKey) else Valid

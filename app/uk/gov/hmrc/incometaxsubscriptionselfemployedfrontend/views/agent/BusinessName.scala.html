@@ -34,14 +34,14 @@
 
 @(businessNameForm: Form[BusinessNameModel], postAction: Call, isEditMode: Boolean, backUrl: String, isSaveAndRetrieve: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = messages("business.agent.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("agent.business.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
 
     @form(action = postAction) {
 
         @textInputHelper(
             field = businessNameForm(businessName),
-            label = messages("business.agent.name.heading"),
-            hint = Some(messages("business.agent.name.line_1")),
+            label = messages("agent.business.name.heading"),
+            hint = Some(messages("agent.business.name.hint")),
             classes = Some("govuk-!-width-one-half")
         )
 
