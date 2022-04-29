@@ -110,7 +110,7 @@ implicit appConfig: AppConfig
     optForm = Some(addAnotherBusinessForm)
 ) {
 
-    <h1 class="govuk-heading-l">@messages("check_your_answers.heading")</h1>
+<h1 class="govuk-heading-l">@messages("check_your_answers.heading")</h1>
 
     @answers.zip(1 to answers.length).map { case (business, businessNumber) =>
         @businessTable(business, businessNumber)

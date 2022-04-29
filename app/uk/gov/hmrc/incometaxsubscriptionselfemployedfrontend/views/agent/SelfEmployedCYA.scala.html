@@ -127,11 +127,16 @@
 }
 
 @mainTemplate(
-    title = messages("agent.self_employed_cya.heading"),
+    title = messages("agent.self_employed_cya.title"),
     backLink = backUrl
 ) {
 
+<header class="hmrc-page-heading">
+    <p class="hmrc-caption govuk-caption-xl">
+        <span class="govuk-visually-hidden">@messages("base.caption")</span>
+        @messages("agent.check_your_answers.caption")</p>
     <h1 class="govuk-heading-l">@messages("agent.self_employed_cya.heading")</h1>
+</header>
 
     @contentTable(answers)
 

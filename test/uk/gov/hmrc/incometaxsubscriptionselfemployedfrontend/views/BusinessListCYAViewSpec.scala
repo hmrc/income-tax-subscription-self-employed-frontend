@@ -31,6 +31,7 @@ class BusinessListCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val heading = "Check your answers"
+    val title = "Check your answers"
 
     def subHeading(businessNumber: Int): String = s"Business $businessNumber"
 
@@ -88,7 +89,7 @@ class BusinessListCYAViewSpec extends ViewSpec {
           Seq(selfEmploymentData("1")),
           testCall
         )(FakeRequest(), implicitly),
-        title = CheckYourAnswersMessages.heading,
+        title = CheckYourAnswersMessages.title,
         hasSignOutLink = true
       )
       "there is an error" in new TemplateViewTest(
@@ -97,7 +98,7 @@ class BusinessListCYAViewSpec extends ViewSpec {
           Seq(selfEmploymentData("1")),
           testCall
         )(FakeRequest(), implicitly),
-        title = CheckYourAnswersMessages.heading,
+        title = CheckYourAnswersMessages.title,
         hasSignOutLink = true,
         error = Some(testError)
       )

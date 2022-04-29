@@ -42,7 +42,7 @@ class BusinessListCYAViewSpec extends ViewSpec {
   object CheckYourAnswersMessages {
     val title = "Check your answers"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
-    val heading: String = title
+    val heading: String = "Check your answers"
 
     def subHeading(businessNumber: Int): String = s"Business $businessNumber"
 
