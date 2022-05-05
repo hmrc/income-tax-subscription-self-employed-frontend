@@ -81,7 +81,7 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
         Then("should return an OK with the SelfEmployedCYA page")
         res must have(
           httpStatus(OK),
-          pageTitle("Check your details" + agentTitleSuffix)
+          pageTitle("Check your answers - sole trader business" + agentTitleSuffix)
         )
       }
     }

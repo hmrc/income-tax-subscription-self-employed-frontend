@@ -116,6 +116,8 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
     def getH1Element: Elements = element.getElementsByTag("h1")
 
+    def getHeader: Element = element.selectHead("header")
+
     def getH2Elements: Elements = element.getElementsByTag("h2")
 
     def getH2Element(nth: Int = 1): Element = element.selectHead(s"h2:nth-of-type($nth)")
