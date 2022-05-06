@@ -27,25 +27,25 @@ agent_service_name.title                                        = Use software t
 business.start_date.title                                       = When did your sole trader business start trading?
 business.start_date.heading                                     = When did your sole trader business start trading?
 business.start_date.line_1                                      = If you have multiple sole trader businesses, enter the start date of your main business.
-business.start_date.exampleStartDate                            = For example, 1 4 2018
+business.start_date.hint                                        = For example, 17 4 2018.
 
 # Date errors
-error.business_start_date.day_month_year.empty                  = Enter the date your business started trading
-error.business_start_date.day.empty                             = The date must include a day
-error.business_start_date.month.empty                           = The date must include a month
-error.business_start_date.year.empty                            = The date must include a year
-error.business_start_date.day_month.empty                       = The date must include a day and a month
-error.business_start_date.day_year.empty                        = The date must include a day and a year
-error.business_start_date.month_year.empty                      = The date must include a month and a year
-error.business_start_date.day_month_year.max_date               = The date your business started trading must be the same as or before {0}
-error.business_start_date.day_month_year.min_date               = The date your business started must be on or after {0}
-error.business_start_date.day_month_year.invalid                = The date must be a real date
-error.business_start_date.day.invalid                           = The date must be a real date
-error.business_start_date.month.invalid                         = The date must be a real date
-error.business_start_date.year.invalid                          = The date must be a real date
-error.business_start_date.day_month.invalid                     = The date must be a real date
-error.business_start_date.day_year.invalid                      = The date must be a real date
-error.business_start_date.month_year.invalid                    = The date must be a real date
+error.business_start_date.day_month_year.empty                  = Enter the date your business started trading.
+error.business_start_date.day.empty                             = The date must include a day.
+error.business_start_date.month.empty                           = The date must include a month.
+error.business_start_date.year.empty                            = The date must include a year.
+error.business_start_date.day_month.empty                       = The date must include a day and a month.
+error.business_start_date.day_year.empty                        = The date must include a day and a year.
+error.business_start_date.month_year.empty                      = The date must include a month and a year.
+error.business_start_date.day_month_year.max_date               = The date your business started trading must be the same as or before {0}.
+error.business_start_date.day_month_year.min_date               = The date your business started must be on or after {0}.
+error.business_start_date.day_month_year.invalid                = The date must be a real date.
+error.business_start_date.day.invalid                           = The date must be a real date.
+error.business_start_date.month.invalid                         = The date must be a real date.
+error.business_start_date.year.invalid                          = The date must be a real date.
+error.business_start_date.day_month.invalid                     = The date must be a real date.
+error.business_start_date.day_year.invalid                      = The date must be a real date.
+error.business_start_date.month_year.invalid                    = The date must be a real date.
 error.business_start_date.year.length                           = The year must be in four digits. For example, 2020.
 
 # Business Name
@@ -54,24 +54,24 @@ business.name.heading                                           = What is the na
 business.name.hint                                              = This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name. The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, '', \, /, -.
 
 # Business Name errors
-error.business_name.empty                                       = Enter your name or the name of your business
-error.business_name.max_length                                  = Business name must be between 1 and 105 characters
-error.business_name.invalid_character                           = Business name can only include characters listed
+error.business_name.empty                                       = Enter your name or the name of your business.
+error.business_name.max_length                                  = Business name must be between 1 and 105 characters.
+error.business_name.invalid_character                           = Business name can only include characters listed.
 
 # Business trade name
 business.trade_name.title                                       = What is the trade of your business?
 business.trade_name.heading                                     = What is the trade of your business?
-business.trade_name.hint                                        = For example: plumbing, electrical work, consulting
+business.trade_name.hint                                        = For example: plumbing, electrical work, consulting.
 
 # Business trade name errors
-error.business_trade_name.empty                                 = Enter the trade of your business
-error.business_trade_name.maxLength                             = Business trade must be 35 characters or fewer
-error.business_trade_name.duplicate                             = You cannot enter the same trade and same business name
-error.business_trade_name.invalid                               = Business trade must only include letters a to z, hyphens, spaces and apostrophes
+error.business_trade_name.empty                                 = Enter the trade of your business.
+error.business_trade_name.maxLength                             = Business trade must be 35 characters or fewer.
+error.business_trade_name.duplicate                             = You cannot enter the same trade and same business name.
+error.business_trade_name.invalid                               = Business trade must only include letters a to z, hyphens, spaces and apostrophes.
 
 #Business accounting method errors
-error.business_accounting_method.invalid                        = Select if you use cash accounting or standard accounting
-error.business_accounting_method.empty                          = Select if you use cash accounting or standard accounting
+error.business_accounting_method.invalid                        = Select if you use cash accounting or standard accounting.
+error.business_accounting_method.empty                          = Select if you use cash accounting or standard accounting.
 
 # Business Accounting Method page
 business.accounting_method.title                                = What accounting method do you use for your sole trader business?
@@ -105,9 +105,9 @@ check_your_answers.remove_business                              = Remove busines
 check_your_answers.add_another_business_heading                 = Do you want to add another sole trader business?
 
 # Check your answers add another business
-error.add_another_business.limit_reached                        = You can only add up to {0} businesses
-error.add_another_business.invalid                              = Select yes if you want to add another sole trader business
-error.add_another_business.empty                                = Select yes if you want to add another sole trader business
+error.add_another_business.limit_reached                        = You can only add up to {0} businesses.
+error.add_another_business.invalid                              = Select yes if you want to add another sole trader business.
+error.add_another_business.empty                                = Select yes if you want to add another sole trader business.
 
 # Business Address page
 addressLookup.selectPage.title                                  = Select business address
@@ -122,25 +122,25 @@ addressLookup.confirmPage.heading                               = Confirm busine
 
 # Agent Business start date
 business.agent.start_date.heading                               = When did your client’s sole trader business start trading?
-business.agent.start_date.exampleStartDate                      = For example, 1 8 2014
+business.agent.start_date.hint                                  = For example, 17 4 2018.
 
 # Agent Date errors
-agent.error.business_start_date.day_month_year.empty            = Enter the date your client’s business started trading
-agent.error.business_start_date.day.empty                       = The date must include a day
-agent.error.business_start_date.month.empty                     = The date must include a month
-agent.error.business_start_date.year.empty                      = The date must include a year
-agent.error.business_start_date.day_month.empty                 = The date must include a day and a month
-agent.error.business_start_date.day_year.empty                  = The date must include a day and a year
-agent.error.business_start_date.month_year.empty                = The date must include a month and a year
-agent.error.business_start_date.day_month_year.max_date         = The date the business started trading must be on or before {0}
-agent.error.business_start_date.day_month_year.min_date         = The date your client’s business started must be on or after {0}
-agent.error.business_start_date.day_month_year.invalid          = The date must be a real date
-agent.error.business_start_date.day.invalid                     = The date must be a real date
-agent.error.business_start_date.month.invalid                   = The date must be a real date
-agent.error.business_start_date.year.invalid                    = The date must be a real date
-agent.error.business_start_date.day_month.invalid               = The date must be a real date
-agent.error.business_start_date.day_year.invalid                = The date must be a real date
-agent.error.business_start_date.month_year.invalid              = The date must be a real date
+agent.error.business_start_date.day_month_year.empty            = Enter the date your client’s business started trading.
+agent.error.business_start_date.day.empty                       = The date must include a day.
+agent.error.business_start_date.month.empty                     = The date must include a month.
+agent.error.business_start_date.year.empty                      = The date must include a year.
+agent.error.business_start_date.day_month.empty                 = The date must include a day and a month.
+agent.error.business_start_date.day_year.empty                  = The date must include a day and a year.
+agent.error.business_start_date.month_year.empty                = The date must include a month and a year.
+agent.error.business_start_date.day_month_year.max_date         = The date the business started trading must be on or before {0}.
+agent.error.business_start_date.day_month_year.min_date         = The date your client’s business started must be on or after {0}.
+agent.error.business_start_date.day_month_year.invalid          = The date must be a real date.
+agent.error.business_start_date.day.invalid                     = The date must be a real date.
+agent.error.business_start_date.month.invalid                   = The date must be a real date.
+agent.error.business_start_date.year.invalid                    = The date must be a real date.
+agent.error.business_start_date.day_month.invalid               = The date must be a real date.
+agent.error.business_start_date.day_year.invalid                = The date must be a real date.
+agent.error.business_start_date.month_year.invalid              = The date must be a real date.
 agent.error.business_start_date.year.length                     = The year must be in four digits. For example, 2020.
 
 # Agent Business Name
@@ -149,20 +149,20 @@ agent.business.name.heading                                     = What is the na
 agent.business.name.hint                                        = This is the business name they used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name.
 
 # Agent Business Name errors
-error.agent.business_name.empty                                 = Enter your client’s name or the name of their business
-error.agent.business_name.max_length                            = Business name must be between 1 and 105 characters
-error.agent.business_name.invalid_character                     = Business name can only include characters listed
+error.agent.business_name.empty                                 = Enter your client’s name or the name of their business.
+error.agent.business_name.max_length                            = Business name must be between 1 and 105 characters.
+error.agent.business_name.invalid_character                     = Business name can only include characters listed.
 
 #Agent Trade Name
 business.agent.trade_name.title                                 = What is the trade of your client’s sole trader business?
 business.agent.trade_name.heading                               = What is the trade of your client’s sole trader business?
-business.agent.trade_name.hint                                  = For example: plumbing, electrical work, consulting
+business.agent.trade_name.hint                                  = For example: plumbing, electrical work, consulting.
 
 #Agent Trade Name errors
-error.agent.business_trade_name.empty                           = Enter the trade of your client’s business
-error.agent.business_trade_name.maxLength                       = Business trade must be 35 characters or fewer
-error.agent.business_trade_name.invalid                         = Business trade must only include letters a to z, hyphens, spaces and apostrophes
-error.agent.business_trade_name.duplicate                       = You cannot enter the same trade and same business name
+error.agent.business_trade_name.empty                           = Enter the trade of your client’s business.
+error.agent.business_trade_name.maxLength                       = Business trade must be 35 characters or fewer.
+error.agent.business_trade_name.invalid                         = Business trade must only include letters a to z, hyphens, spaces and apostrophes.
+error.agent.business_trade_name.duplicate                       = You cannot enter the same trade and same business name.
 
 #Agent Business Address page
 agent.addressLookup.selectPage.title                            = Select client’s business address
@@ -192,9 +192,9 @@ agent.check_your_answers.add_another_business_heading           = Do you want to
 agent.check_your_answers.remove_business                        = Remove business {0}
 
 # Check your answers add another business
-agent.error.add_another_business.limit_reached                  = You can only add up to {0} businesses
-agent.error.add_another_business.invalid                        = Select yes if you want to add another sole trader business
-agent.error.add_another_business.empty                          = Select yes if you want to add another sole trader business
+agent.error.add_another_business.limit_reached                  = You can only add up to {0} businesses.
+agent.error.add_another_business.invalid                        = Select yes if you want to add another sole trader business.
+agent.error.add_another_business.empty                          = Select yes if you want to add another sole trader business.
 
 # Agent Business Accounting Method page
 agent.business.accounting_method.title                          = What accounting method does your client use for their sole trader businesses?
@@ -203,8 +203,8 @@ agent.business.accounting_method.cash                           = Cash accountin
 agent.business.accounting_method.accruals                       = Standard accounting
 
 # Agent Business Accounting Method page
-agent.error.business_accounting_method.invalid                  = Select if your client uses cash accounting or standard accounting
-agent.error.business_accounting_method.empty                    = Select if your client uses cash accounting or standard accounting
+agent.error.business_accounting_method.invalid                  = Select if your client uses cash accounting or standard accounting.
+agent.error.business_accounting_method.empty                    = Select if your client uses cash accounting or standard accounting.
 
 ## Title pattern
 title_pattern.serviceName.govUk                                 = {0} - Use software to send Income Tax updates - GOV.UK

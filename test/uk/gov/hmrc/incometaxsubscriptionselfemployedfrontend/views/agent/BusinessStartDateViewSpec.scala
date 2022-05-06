@@ -30,14 +30,14 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
     val heading: String = "When did your client’s sole trader business start trading?"
-    val exampleStartDate = "For example, 1 8 2014"
+    val hint = "For example, 17 4 2018."
     val continue = "Continue"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
     val update = "Update"
-    val empty = "Enter the date your client’s business started trading"
-    val maxDate = "The date the business started trading must be on or before 11 April 2021"
-    val minDate = "The date your client’s business started must be on or after 11 April 2021"
+    val empty = "Enter the date your client’s business started trading."
+    val maxDate = "The date the business started trading must be on or before 11 April 2021."
+    val minDate = "The date your client’s business started must be on or after 11 April 2021."
   }
 
   val taxYearEnd: Int = 2020
@@ -96,7 +96,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
           document().getForm.mustHaveDateInput(
             name = BusinessStartDateForm.startDate,
             label = BusinessStartDateMessages.heading,
-            hint = Some(BusinessStartDateMessages.exampleStartDate),
+            hint = Some(BusinessStartDateMessages.hint),
             isPageHeading = false
           )
         }
