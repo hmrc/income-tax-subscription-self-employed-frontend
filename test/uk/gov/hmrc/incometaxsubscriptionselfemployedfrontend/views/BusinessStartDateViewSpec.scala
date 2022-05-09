@@ -37,15 +37,15 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
     val line_1: String = "If you have multiple sole trader businesses, enter the start date of your main business."
-    val exampleStartDate = "For example, 1 4 2018"
+    val hint = "For example, 17 4 2018."
     val continue = "Continue"
     val backLink = "Back"
     val update = "Update"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
-    val empty = "Enter the date your business started trading"
-    val maxDate = "The date your business started trading must be the same as or before 11 April 2021"
-    val minDate = "The date your business started must be on or after 11 April 2021"
+    val empty = "Enter the date your business started trading."
+    val maxDate = "The date your business started trading must be the same as or before 11 April 2021."
+    val minDate = "The date your business started must be on or after 11 April 2021."
   }
 
   val backUrl: String = testBackUrl
@@ -93,7 +93,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
       fieldset.select("div[id=startDate]").attr("class") mustBe "govuk-date-input"
       fieldset.attr("aria-describedby") mustBe s"startDate-hint"
       fieldset.selectHead("legend").text mustBe BusinessStartDateMessages.heading
-      fieldset.selectHead("div[id=startDate-hint]").text mustBe BusinessStartDateMessages.exampleStartDate
+      fieldset.selectHead("div[id=startDate-hint]").text mustBe BusinessStartDateMessages.hint
       fieldset.select("div label[for=startDate-dateDay]").text() mustBe "Day"
       fieldset.select("div label[for=startDate-dateMonth]").text() mustBe "Month"
       fieldset.select("div label[for=startDate-dateYear]").text() mustBe "Year"

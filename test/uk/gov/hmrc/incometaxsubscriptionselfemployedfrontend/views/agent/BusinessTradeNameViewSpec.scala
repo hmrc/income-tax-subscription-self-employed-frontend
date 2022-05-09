@@ -42,7 +42,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val title = "What is the trade of your client’s sole trader business?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
-    val hintText = "For example: plumbing, electrical work, consulting"
+    val hintText = "For example: plumbing, electrical work, consulting."
     val continue = "Continue"
     val update = "Update"
     val backLink = "Back"

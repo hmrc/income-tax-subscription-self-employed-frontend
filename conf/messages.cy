@@ -30,25 +30,25 @@ agent_serviceName                                               = Defnyddiwch fe
 business.start_date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
 business.start_date.heading                                     = Pryd y dechreuodd eich busnes fasnachu?
 business.start_date.line_1                                      = Os oes gennych nifer o fusnesau unig fasnachwr, nodwch ddyddiad dechrau eich prif fusnes.
-business.start_date.exampleStartDate                            = Er enghraifft, 1 8 2014
+business.start_date.hint                                        = Er enghraifft, 17 4 2018.
 
 # Date errors
-error.business_start_date.day_month_year.empty                  = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu
-error.business_start_date.day.empty                             = Mae’n rhaid i’r dyddiad gynnwys diwrnod
-error.business_start_date.month.empty                           = Mae’n rhaid i’r dyddiad gynnwys mis
-error.business_start_date.year.empty                            = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
-error.business_start_date.day_month.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
-error.business_start_date.day_year.empty                        = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
-error.business_start_date.month_year.empty                      = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
-error.business_start_date.day_month_year.max_date               = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
-error.business_start_date.day_month_year.min_date               = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}
-error.business_start_date.day_month_year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-error.business_start_date.day.invalid                           = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-error.business_start_date.month.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-error.business_start_date.year.invalid                          = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-error.business_start_date.day_month.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-error.business_start_date.day_year.invalid                      = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-error.business_start_date.month_year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business_start_date.day_month_year.empty                  = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu.
+error.business_start_date.day.empty                             = Mae’n rhaid i’r dyddiad gynnwys diwrnod.
+error.business_start_date.month.empty                           = Mae’n rhaid i’r dyddiad gynnwys mis.
+error.business_start_date.year.empty                            = Mae’n rhaid i’r dyddiad gynnwys blwyddyn.
+error.business_start_date.day_month.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis.
+error.business_start_date.day_year.empty                        = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn.
+error.business_start_date.month_year.empty                      = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn.
+error.business_start_date.day_month_year.max_date               = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}.
+error.business_start_date.day_month_year.min_date               = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}.
+error.business_start_date.day_month_year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+error.business_start_date.day.invalid                           = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+error.business_start_date.month.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+error.business_start_date.year.invalid                          = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+error.business_start_date.day_month.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+error.business_start_date.day_year.invalid                      = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+error.business_start_date.month_year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 error.business_start_date.year.length                           = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Business Name
@@ -57,24 +57,24 @@ business.name.heading                                           = Beth yw enw’
 business.name.hint                                              = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gwahanol ar eich busnes unig fasnachwr, nodwch eich enw cyntaf ac enw olaf. Gall enw’r busnes rydych yn ei nodi gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ’, \, /, - yn unig.
 
 # Business Name errors
-error.business_name.empty                                       = Nodwch eich enw neu enw’ch busnes
-error.business_name.max_length                                  = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau
-error.business_name.invalid_character                           = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig
+error.business_name.empty                                       = Nodwch eich enw neu enw’ch busnes.
+error.business_name.max_length                                  = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau.
+error.business_name.invalid_character                           = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.
 
 # Business trade name
 business.trade_name.title                                       = Beth yw masnach eich busnes?
 business.trade_name.heading                                     = Beth yw masnach eich busnes?
-business.trade_name.hint                                        = Er enghraifft: plymio, gwaith trydanol, ymgynghori
+business.trade_name.hint                                        = Er enghraifft: plymio, gwaith trydanol, ymgynghori.
 
 # Business trade name errors
-error.business_trade_name.empty                                 = Nodwch fasnach eich busnes
-error.business_trade_name.maxLength                             = Mae’n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai
-error.business_trade_name.duplicate                             = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
-error.business_trade_name.invalid                               = Mae’n rhaid i fasnach y busnes gynnwys y llythrennau a i z, cysylltnodau, bylchau a chollnodau yn unig
+error.business_trade_name.empty                                 = Nodwch fasnach eich busnes.
+error.business_trade_name.maxLength                             = Mae’n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.
+error.business_trade_name.duplicate                             = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes.
+error.business_trade_name.invalid                               = Mae’n rhaid i fasnach y busnes gynnwys y llythrennau a i z, cysylltnodau, bylchau a chollnodau yn unig.
 
 #Business accounting method errors
-error.business_accounting_method.invalid                        = Dewiswch os ydych yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
-error.business_accounting_method.empty                          = Dewiswch os ydych yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
+error.business_accounting_method.invalid                        = Dewiswch os ydych yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
+error.business_accounting_method.empty                          = Dewiswch os ydych yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
 
 # Business Accounting Method page
 business.accounting_method.title                                = Pa ddull cyfrifyddu a ydych yn ei ddefnyddio ar gyfer eich busnes unig fasnachwr?
@@ -108,9 +108,9 @@ check_your_answers.remove_business                              = Dileu busnes {
 check_your_answers.add_another_business_heading                 = A hoffech ychwanegu busnes unig fasnachwr arall?
 
 # Check your answers add another business
-error.add_another_business.limit_reached                        = Gallwch ychwanegu hyd at {0} o fusnesau yn unig
-error.add_another_business.invalid                              = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
-error.add_another_business.empty                                = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
+error.add_another_business.limit_reached                        = Gallwch ychwanegu hyd at {0} o fusnesau yn unig.
+error.add_another_business.invalid                              = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall.
+error.add_another_business.empty                                = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall.
 
 # Business Address page
 addressLookup.selectPage.title                                  = Dewiswch gyfeiriad busnes
@@ -125,25 +125,25 @@ addressLookup.confirmPage.heading                               = Cadarnhau cyfe
 
 # Agent Business start date
 business.agent.start_date.heading                               = Pryd y dechreuodd busnes unig fasnachwr eich cleient fasnachu?
-business.agent.start_date.exampleStartDate                      = Er enghraifft, 1 8 2014
+business.agent.start_date.hint                                  = Er enghraifft, 17 4 2018.
 
 # Agent Date errors
-agent.error.business_start_date.day_month_year.empty            = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
-agent.error.business_start_date.day.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod
-agent.error.business_start_date.month.empty                     = Mae’n rhaid i’r dyddiad gynnwys mis
-agent.error.business_start_date.year.empty                      = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
-agent.error.business_start_date.day_month.empty                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
-agent.error.business_start_date.day_year.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
-agent.error.business_start_date.month_year.empty                = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
-agent.error.business_start_date.day_month_year.max_date         = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}
-agent.error.business_start_date.day_month_year.min_date         = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}
-agent.error.business_start_date.day.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-agent.error.business_start_date.day_month.invalid               = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-agent.error.business_start_date.day_year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-agent.error.business_start_date.month_year.invalid              = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-agent.error.business_start_date.day_month_year.invalid          = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-agent.error.business_start_date.month.invalid                   = Rhaid i’r dyddiad fod yn ddyddiad go iawn
-agent.error.business_start_date.year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+agent.error.business_start_date.day_month_year.empty            = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu.
+agent.error.business_start_date.day.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod.
+agent.error.business_start_date.month.empty                     = Mae’n rhaid i’r dyddiad gynnwys mis.
+agent.error.business_start_date.year.empty                      = Mae’n rhaid i’r dyddiad gynnwys blwyddyn.
+agent.error.business_start_date.day_month.empty                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis.
+agent.error.business_start_date.day_year.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn.
+agent.error.business_start_date.month_year.empty                = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn.
+agent.error.business_start_date.day_month_year.max_date         = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}.
+agent.error.business_start_date.day_month_year.min_date         = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}.
+agent.error.business_start_date.day.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+agent.error.business_start_date.day_month.invalid               = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+agent.error.business_start_date.day_year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+agent.error.business_start_date.month_year.invalid              = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+agent.error.business_start_date.day_month_year.invalid          = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+agent.error.business_start_date.month.invalid                   = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
+agent.error.business_start_date.year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 agent.error.business_start_date.year.length                     = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Agent Business Name
@@ -152,20 +152,20 @@ agent.business.name.heading                                     = Beth yw enw bu
 agent.business.name.hint                                      = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gan ei fusnes unig fasnachwr, nodwch enw eich cleient.
 
 # Agent Business Name errors
-error.agent.business_name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient
-error.agent.business_name.max_length                            = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau
-error.agent.business_name.invalid_character                     = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig
+error.agent.business_name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient.
+error.agent.business_name.max_length                            = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau.
+error.agent.business_name.invalid_character                     = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.
 
 #Agent Trade Name
 business.agent.trade_name.title                                 = Beth yw masnach busnes unig fasnachwr eich cleient?
 business.agent.trade_name.heading                               = Beth yw masnach busnes unig fasnachwr eich cleient?
-business.agent.trade_name.hint                                  = Er enghraifft: plymio, gwaith trydanol, ymgynghori
+business.agent.trade_name.hint                                  = Er enghraifft: plymio, gwaith trydanol, ymgynghori.
 
 #Agent Trade Name errors
-error.agent.business_trade_name.empty                           = Nodwch fasnach busnes eich cleient
-error.agent.business_trade_name.maxLength                       = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai
-error.agent.business_trade_name.invalid                         = Ni all enw‘r busnes gynnwys !, “ “ , * na ?
-error.agent.business_trade_name.duplicate                       = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
+error.agent.business_trade_name.empty                           = Nodwch fasnach busnes eich cleient.
+error.agent.business_trade_name.maxLength                       = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.
+error.agent.business_trade_name.invalid                         = Ni all enw‘r busnes gynnwys !, “ “ , * na?
+error.agent.business_trade_name.duplicate                       = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes.
 
 #Agent Business Address page
 agent.addressLookup.selectPage.title                            = dewis cyfeiriad busnes y cleient
@@ -195,9 +195,9 @@ agent.check_your_answers.remove_business                        = Dileu busnes {
 agent.check_your_answers.add_another_business_heading           = A hoffech ychwanegu busnes unig fasnachwr arall?
 
 # Agent Check your answers add another business
-agent.error.add_another_business.limit_reached                  = Gallwch ychwanegu hyd at {0} o fusnesau yn unig
-agent.error.add_another_business.invalid                        = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
-agent.error.add_another_business.empty                          = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall
+agent.error.add_another_business.limit_reached                  = Gallwch ychwanegu hyd at {0} o fusnesau yn unig.
+agent.error.add_another_business.invalid                        = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall.
+agent.error.add_another_business.empty                          = Dewiswch ‘Iawn’ os ydych am ychwanegu busnes unig fasnachwr arall.
 
 # Agent Business Accounting Method page
 agent.business.accounting_method.title                          = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
@@ -206,8 +206,8 @@ agent.business.accounting_method.cash                           = Cyfrifyddu ari
 agent.business.accounting_method.accruals                       = Cyfrifyddu safonol
 
 # Agent Business Accounting Method page
-agent.error.business_accounting_method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
-agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol
+agent.error.business_accounting_method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
+agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
 
 ## Title pattern
 title_pattern.serviceName.govUk                                 = {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
