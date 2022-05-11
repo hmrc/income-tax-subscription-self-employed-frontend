@@ -23,6 +23,7 @@ import helpers.{ComponentSpecBase, ViewSpec}
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel, SelfEmploymentData}
@@ -36,6 +37,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
     super.beforeEach()
   }
 
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val businessId: String = "testId"
 
   val testStartDate: DateModel = DateModel.dateConvert(LocalDate.now)

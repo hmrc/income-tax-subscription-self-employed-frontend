@@ -16,14 +16,86 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch
 
-trait FeatureSwitchingSpec extends FeatureSwitching {
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.Configuration
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.{EnableUseRealAddressLookup, SaveAndRetrieve, switches}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-  def withFeatureSwitch(featureSwitch: FeatureSwitch)(f: => Any): Unit = {
-    enable(featureSwitch)
-    try {
-      f
-    } finally {
-      disable(featureSwitch)
+class FeatureSwitchingSpec extends UnitTestTrait with FeatureSwitching {
+
+  class Setup(sarEnabled: Boolean = false, alEnabled: Boolean = false) extends FeatureSwitching {
+
+    val servicesConfig: ServicesConfig = app.injector.instanceOf[ServicesConfig]
+    val mockConfig: Configuration = mock[Configuration]
+
+    if(sarEnabled) {
+      when(mockConfig.getOptional[String]("feature-switch.enable-save-and-retrieve")).thenReturn(Some(FEATURE_SWITCH_ON))
+    } else
+      when(mockConfig.getOptional[String]("feature-switch.enable-save-and-retrieve")).thenReturn(Some(FEATURE_SWITCH_OFF))
+
+    if(alEnabled)
+      when(mockConfig.getOptional[String]("feature-switch.enable-use-real-AL")).thenReturn(Some(FEATURE_SWITCH_ON))
+    else
+      when(mockConfig.getOptional[String]("feature-switch.enable-use-real-AL")).thenReturn(Some(FEATURE_SWITCH_OFF))
+
+    override val appConfig: AppConfig = new AppConfig(servicesConfig, mockConfig)
+
+    FeatureSwitch.switches foreach { switch =>
+      sys.props -= switch.name
     }
   }
+
+  "FeatureSwitch switches" should {
+    "contain all the feature switches in the app" in new Setup {
+      FeatureSwitch.switches mustBe switches
+    }
+  }
+
+  "FeatureSwitching constants" should {
+    "be true and false" in new Setup {
+      FEATURE_SWITCH_ON mustBe "true"
+      FEATURE_SWITCH_OFF mustBe "false"
+    }
+  }
+
+  "SaveAndRetrieve" should {
+    "return true if SaveAndRetrieve feature switch is enabled in sys.props" in new Setup {
+      enable(SaveAndRetrieve)
+      isEnabled(SaveAndRetrieve) mustBe true
+    }
+    "return false if SaveAndRetrieve feature switch is disabled in sys.props" in new Setup {
+      disable(SaveAndRetrieve)
+      isEnabled(SaveAndRetrieve) mustBe false
+    }
+    "return false if SaveAndRetrieve feature switch is not in sys.props but is set to off in config" in new Setup {
+      isEnabled(SaveAndRetrieve) mustBe false
+    }
+    "return true if SaveAndRetrieve feature switch is not in sys.props but is set to on in config" in new Setup(sarEnabled = true) {
+      isEnabled(SaveAndRetrieve) mustBe true
+    }
+  }
+
+  "EnableUseRealAddressLookup" should {
+    "return true if EnableUseRealAddressLookup feature switch is enabled" in new Setup {
+      enable(EnableUseRealAddressLookup)
+      isEnabled(EnableUseRealAddressLookup) mustBe true
+    }
+    "return false if EnableUseRealAddressLookup feature switch is disabled" in new Setup {
+      disable(EnableUseRealAddressLookup)
+      isEnabled(EnableUseRealAddressLookup) mustBe false
+    }
+    "return false if EnableUseRealAddressLookup feature switch does not exist" in new Setup {
+      isEnabled(EnableUseRealAddressLookup) mustBe false
+    }
+    "return false if EnableUseRealAddressLookup feature switch is not in sys.props but is set to off in config" in new Setup {
+      isEnabled(EnableUseRealAddressLookup) mustBe false
+    }
+    "return true if EnableUseRealAddressLookup feature switch is not in sys.props but is set to on in config" in new Setup(alEnabled = true) {
+      isEnabled(EnableUseRealAddressLookup) mustBe true
+    }
+  }
+
 }

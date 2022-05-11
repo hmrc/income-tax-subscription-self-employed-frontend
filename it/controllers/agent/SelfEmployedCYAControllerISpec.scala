@@ -23,6 +23,7 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel, BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, DateModel, SelfEmploymentData}
@@ -30,6 +31,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Bu
 import java.time.LocalDate
 
 class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwitching {
+
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val businessId: String = "testId"
 
   val testBusinessName: String = "businessName"

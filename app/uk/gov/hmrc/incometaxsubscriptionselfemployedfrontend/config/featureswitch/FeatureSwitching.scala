@@ -16,15 +16,22 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch
 
-import javax.inject.Singleton
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+
+import javax.inject.{Inject, Singleton}
 
 trait FeatureSwitching {
+
+  val appConfig: AppConfig
 
   val FEATURE_SWITCH_ON = "true"
   val FEATURE_SWITCH_OFF = "false"
 
   def isEnabled(featureSwitch: FeatureSwitch): Boolean =
-    sys.props get featureSwitch.name contains FEATURE_SWITCH_ON
+    (sys.props.get(featureSwitch.name) orElse appConfig.config.getOptional[String](featureSwitch.name)) contains FEATURE_SWITCH_ON
+
+  def isDisabled(featureSwitch: FeatureSwitch): Boolean =
+    (sys.props.get(featureSwitch.name) orElse appConfig.config.getOptional[String](featureSwitch.name)) contains FEATURE_SWITCH_OFF
 
   def enable(featureSwitch: FeatureSwitch): Unit =
     sys.props += featureSwitch.name -> FEATURE_SWITCH_ON
@@ -32,7 +39,14 @@ trait FeatureSwitching {
   def disable(featureSwitch: FeatureSwitch): Unit =
     sys.props += featureSwitch.name -> FEATURE_SWITCH_OFF
 
+  protected implicit class FeatureOps(feature: FeatureSwitch) {
+    def fold[T](ifEnabled: => T, ifDisabled: => T): T = {
+      if (isEnabled(feature)) ifEnabled
+      else ifDisabled
+    }
+  }
+
 }
 
 @Singleton
-class FeatureSwitchingImpl extends FeatureSwitching
+class FeatureSwitchingImpl @Inject()(val appConfig: AppConfig) extends FeatureSwitching

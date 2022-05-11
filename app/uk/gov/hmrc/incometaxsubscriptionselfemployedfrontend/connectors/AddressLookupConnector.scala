@@ -29,7 +29,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddressLookupConnector @Inject()(appConfig: AppConfig,
+class AddressLookupConnector @Inject()(val appConfig: AppConfig,
                                        addressLookupConfig: AddressLookupConfig,
                                        http: HttpClient)(implicit ec: ExecutionContext) extends FeatureSwitching {
 

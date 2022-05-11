@@ -19,11 +19,13 @@ package controllers
 import helpers.ComponentSpecBase
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 class InitialiseControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   override def beforeEach(): Unit = {
     disable(SaveAndRetrieve)
     super.beforeEach()

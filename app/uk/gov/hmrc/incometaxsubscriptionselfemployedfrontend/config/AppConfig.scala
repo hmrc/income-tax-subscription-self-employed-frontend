@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
+import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.Call
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -23,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig) {
+class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configuration) {
 
   private val assetsUrl = servicesConfig.getString("assets.url")
 
