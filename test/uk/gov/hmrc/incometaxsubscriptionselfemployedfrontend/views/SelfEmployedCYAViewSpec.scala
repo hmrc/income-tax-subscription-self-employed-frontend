@@ -30,8 +30,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmpl
 class SelfEmployedCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
+    val captionHidden = "This section is"
+    val captionVisual = "Sole trader business you entered"
     val heading = "Check your answers"
-    val title = "Check your details"
+    val title = "Check your answers - sole trader business"
     val confirmAndContinue = "Confirm and continue"
     val continue = "Continue"
     val saveAndBack = "Save and come back later"
@@ -126,8 +128,10 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
       )
     }
 
-    "have a heading" in new SetupComplete {
-      document.getH1Element.text mustBe CheckYourAnswersMessages.heading
+    "have a heading with a caption" in new SetupComplete {
+      val header: Element = document.mainContent.getHeader
+      header.getH1Element.text mustBe CheckYourAnswersMessages.heading
+      header.selectHead("p").text mustBe s"${CheckYourAnswersMessages.captionHidden} ${CheckYourAnswersMessages.captionVisual}"
     }
 
     "display a business check your answers" when {
