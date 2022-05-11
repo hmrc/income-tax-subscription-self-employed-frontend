@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{maxLength, nonEmpty, validateChar}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{maxLength, nonEmpty}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.trimmedText
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
@@ -32,7 +32,6 @@ object BusinessTradeNameForm {
 
   val tradeNameEmpty: Constraint[String] = nonEmpty("error.business_trade_name.empty")
   val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.business_trade_name.maxLength")
-  val tradeNameInvalidCharacters: Constraint[String] = validateChar("error.business_trade_name.invalid")
 
   def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
     if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.business_trade_name.duplicate")
@@ -42,7 +41,7 @@ object BusinessTradeNameForm {
   def businessTradeNameValidationForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel]): Form[BusinessTradeNameModel] = Form(
     mapping(
       businessTradeName -> trimmedText.verifying(
-        tradeNameEmpty andThen nameTooLong andThen tradeNameInvalidCharacters andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
+        tradeNameEmpty andThen nameTooLong andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
       )
     )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
   )
