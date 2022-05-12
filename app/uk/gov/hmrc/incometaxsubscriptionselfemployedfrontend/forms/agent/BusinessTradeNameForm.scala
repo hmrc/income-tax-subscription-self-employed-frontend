@@ -32,7 +32,6 @@ object BusinessTradeNameForm {
 
   val tradeNameEmpty: Constraint[String] = nonEmpty("error.agent.business_trade_name.empty")
   val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.agent.business_trade_name.maxLength")
-  val tradeNameInvalidCharacters: Constraint[String] = validateChar("error.agent.business_trade_name.invalid")
 
   def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
     if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.agent.business_trade_name.duplicate")
@@ -42,7 +41,7 @@ object BusinessTradeNameForm {
   def businessTradeNameValidationForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel]): Form[BusinessTradeNameModel] = Form(
     mapping(
       businessTradeName -> trimmedText.verifying(
-        tradeNameEmpty andThen nameTooLong andThen tradeNameInvalidCharacters andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
+        tradeNameEmpty andThen nameTooLong andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
       )
     )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
   )

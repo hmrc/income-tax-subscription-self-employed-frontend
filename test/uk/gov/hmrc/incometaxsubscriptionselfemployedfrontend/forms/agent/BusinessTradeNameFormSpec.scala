@@ -80,12 +80,6 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         maxLengthTest.errors must contain(FormError(businessTradeName, maxLen))
       }
 
-      "the name should be invalid" in {
-        val invalidInput = DataMap.businessTradeNameMap("!()+{}?^~")
-        val invalidTest = businessTradeForm().bind(invalidInput)
-        invalidTest.errors must contain(FormError(businessTradeName, invalid))
-      }
-
       "the name should not allow just a space" in {
         val emptyInput = DataMap.businessTradeNameMap(" ")
         val invalidTest = businessTradeForm().bind(emptyInput)
@@ -109,6 +103,13 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       "The following submission should be valid" when {
         "there are no other businesses" in {
           val valid = DataMap.businessTradeNameMap("Test business")
+          val result = businessTradeForm().bind(valid)
+          result.hasErrors shouldBe false
+          result.hasGlobalErrors shouldBe false
+        }
+
+        "the name contains special characters" in {
+          val valid = DataMap.businessTradeNameMap("!()+{}?^~")
           val result = businessTradeForm().bind(valid)
           result.hasErrors shouldBe false
           result.hasGlobalErrors shouldBe false

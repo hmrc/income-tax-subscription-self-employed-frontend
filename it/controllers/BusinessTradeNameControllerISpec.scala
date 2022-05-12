@@ -36,10 +36,11 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
 
   val businessId: String = "testId"
 
+  val maxLength = 35
   val testValidBusinessTradeName: String = "Plumbing"
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
-  val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
+  val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName * maxLength + 1)
 
   val testBusiness: SelfEmploymentData = SelfEmploymentData(
     id = businessId,
