@@ -23,12 +23,14 @@ import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, SelfEmploymentData}
 
 class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   override def beforeEach(): Unit = {
     disable(SaveAndRetrieve)
     super.beforeEach()

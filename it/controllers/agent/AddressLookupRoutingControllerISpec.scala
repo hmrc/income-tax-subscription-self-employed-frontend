@@ -25,6 +25,7 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel}
@@ -33,6 +34,7 @@ import java.net.URLEncoder
 
 class AddressLookupRoutingControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val addressId = "testId1"
 
   val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(addressId, Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))

@@ -23,10 +23,13 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 
     "the Connector receives no content" should {
