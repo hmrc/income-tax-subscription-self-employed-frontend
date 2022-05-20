@@ -4,11 +4,13 @@ import sbt._
 
 object AppDependencies {
 
+  val appName = "income-tax-subscriptionself-employed-frontend"
+
   private val playLanguageVersion = "5.2.0-play-28"
-  private val bootstrapVersion = "5.21.0"
+  private val bootstrapVersion = "5.24.0"
   private val playHmrcFrontendVersion = "3.8.0-play-28"
   private val scalatestplusVersion = "5.1.0"
-  private val catsVersion              = "0.9.0"
+  private val catsVersion = "0.9.0"
 
   val compile = Seq(
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapVersion,
