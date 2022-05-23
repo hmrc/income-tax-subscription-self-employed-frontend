@@ -221,7 +221,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
             fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id).url)
+          redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
 
         }
       }
@@ -252,7 +252,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       "save and retrieve feature switch is enabled" should {
         s"redirect to Self-Employment check your answer page" in {
           enable(SaveAndRetrieve)
-          TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id).url
+          TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
         }
       }
       "save and retrieve feature switch is disabled" should {

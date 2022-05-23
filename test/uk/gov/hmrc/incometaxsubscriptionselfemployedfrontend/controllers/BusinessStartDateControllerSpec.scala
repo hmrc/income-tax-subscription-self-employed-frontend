@@ -117,7 +117,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
               fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
             )
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id).url)
+            redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
           }
         }
       }
@@ -131,7 +131,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
               fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
             )
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url)
+            redirectLocation(result) mustBe Some(routes.BusinessNameController.show(id).url)
           }
         }
       }
@@ -147,7 +147,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
               fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
             )
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id).url)
+            redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
           }
         }
       }
@@ -161,7 +161,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
               fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
             )
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessListCYAController.show.url)
+            redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
           }
         }
       }
@@ -177,7 +177,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
             fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(id).url)
+          redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
         }
       }
     }
@@ -198,7 +198,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "save and retrieve feature switch is enabled" should {
         s"redirect to Self-Employment check your answer page" in {
           enable(SaveAndRetrieve)
-          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id).url
+          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
         }
       }
       "save and retrieve feature switch is disabled" should {
@@ -211,7 +211,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "save and retrieve feature switch is enabled" should {
         "redirect to business name page" in {
           enable(SaveAndRetrieve)
-          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(id).url
+          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
         }
       }
       "save and retrieve feature switch is disabled" should {

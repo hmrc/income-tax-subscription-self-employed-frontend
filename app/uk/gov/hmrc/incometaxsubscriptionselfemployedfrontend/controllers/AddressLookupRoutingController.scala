@@ -76,7 +76,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
           (isEditMode, isSaveAndRetrieve) match {
             case (false, true) if accountingMethod.isDefined => Redirect(routes.SelfEmployedCYAController.show(businessId))
             case (false, true) => Redirect(routes.BusinessAccountingMethodController.show(Some(businessId)))
-            case (true, true) => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
+            case (true, true) => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode))
             case (_, false) => Redirect(routes.BusinessListCYAController.show)
           }
         }

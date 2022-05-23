@@ -94,7 +94,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
 
   def backUrl(id: Option[String], isEditMode: Boolean): Option[String] = {
     (id, isEditMode, isEnabled(SaveAndRetrieve)) match {
-      case (Some(id), true, true) => Some(routes.SelfEmployedCYAController.show(id).url)
+      case (Some(id), true, true) => Some(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url)
       case (_, false, true) => None
       case (_, true, false) => Some(appConfig.subscriptionFrontendFinalCYAController)
       case _ => Some(routes.BusinessListCYAController.show.url)

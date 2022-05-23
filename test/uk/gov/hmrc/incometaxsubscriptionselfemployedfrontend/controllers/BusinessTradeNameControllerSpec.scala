@@ -228,7 +228,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           )
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id).url)
+          redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, true).url)
         }
         }
       }
@@ -276,7 +276,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       "save and retrieve is enabled" should {
         s"redirect to ${routes.SelfEmployedCYAController.show(id).url}" in withController { controller => {
           enable(SaveAndRetrieve)
-          controller.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id).url
+          controller.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
         }
         }
       }
