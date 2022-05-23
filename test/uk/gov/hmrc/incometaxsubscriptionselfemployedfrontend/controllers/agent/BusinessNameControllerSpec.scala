@@ -234,7 +234,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       "in edit mode" should {
         s"redirect correctly" in {
           withFeatureSwitch(SaveAndRetrieve) {
-            TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id).url
+            TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
           }
         }
       }

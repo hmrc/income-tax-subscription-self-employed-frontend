@@ -198,7 +198,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
           enable(SaveAndRetrieve)
           mockAuthSuccess()
           controller.backUrl(id = id, isEditMode = true) mustBe
-            Some(routes.SelfEmployedCYAController.show(testId).url)
+            Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
         }
       }
     }

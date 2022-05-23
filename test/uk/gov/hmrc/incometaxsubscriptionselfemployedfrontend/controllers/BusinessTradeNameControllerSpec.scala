@@ -274,7 +274,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   "The back url" when {
     "in edit mode" when {
       "save and retrieve is enabled" should {
-        s"redirect to ${routes.SelfEmployedCYAController.show(id).url}" in withController { controller => {
+        s"redirect to ${routes.SelfEmployedCYAController.show(id, true).url}" in withController { controller => {
           enable(SaveAndRetrieve)
           controller.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
         }

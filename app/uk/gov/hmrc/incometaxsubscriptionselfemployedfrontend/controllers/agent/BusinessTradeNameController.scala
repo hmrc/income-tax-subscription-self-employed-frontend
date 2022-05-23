@@ -90,8 +90,8 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
   //save & retrieve on should have an order of: business name -> business start date -> business trade (this)
   //save & retrieve off should have an order of: business start date -> business name -> business trade (this)
   private def next(id: String, isEditMode: Boolean) = Redirect((isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => routes.SelfEmployedCYAController.show(id)
-    case (false, true) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)
+    case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+    case (false, true) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, isEditMode)
     case (true, false) => routes.BusinessListCYAController.show
     case (false, false) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)
   })
@@ -116,8 +116,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
   //save & retrieve on should have an order of: business name -> business start date -> business trade (this)
   //save & retrieve off should have an order of: business start date -> business name -> business trade (this)
   def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
-    // This will change when we build the equivalent controller for self employed cya, for agents.
-    case (true, true) => routes.BusinessStartDateController.show(id).url
+    case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
     case (false, true) => routes.BusinessStartDateController.show(id).url
     case (true, false) => routes.BusinessListCYAController.show.url
     case (false, false) => routes.BusinessNameController.show(id).url
