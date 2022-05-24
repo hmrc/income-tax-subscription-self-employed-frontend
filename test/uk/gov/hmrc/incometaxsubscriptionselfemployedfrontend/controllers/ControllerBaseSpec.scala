@@ -34,9 +34,12 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
   val controllerName: String
   val authorisedRoutes: Map[String, Action[AnyContent]]
 
-  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(
+  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+    .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
+    .withMethod(POST)
+    .withSession(
     ITSASessionKeys.UTR -> "1234567890",
-    ITSASessionKeys.REFERENCE -> "test-reference"
+    ITSASessionKeys.REFERENCE -> "test-reference",
   )
 
   final def authorisationTests(): Unit = {
@@ -67,6 +70,7 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
 
     implicit def post[T](form: Form[T]): FakeRequest[AnyContentAsFormUrlEncoded] =
       fakeRequest.withFormUrlEncodedBody(form.data.toSeq: _*)
-
+        .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
+        .withMethod(POST)
   }
 }
