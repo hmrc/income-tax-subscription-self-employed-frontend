@@ -51,6 +51,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   lazy val clientTaskListUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/task-list"
   lazy val subscriptionFrontendClientFinalCYAController: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/check-your-answers"
 
+
   lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")
   lazy val limitOnNumberOfBusinesses: Int = servicesConfig.getInt("check-your-answers.maxNumberOfBusinesses")
   lazy val addressLookupUrl: String = servicesConfig.baseUrl("address-lookup-frontend")

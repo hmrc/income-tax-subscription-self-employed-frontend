@@ -105,7 +105,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       "the save and retrieve feature switch is enabled" in new Setup(false, true) {
         val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
         saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
-        saveAndComeBackLink.attr("href") mustBe appConfig.subscriptionFrontendProgressSavedUrl
+        saveAndComeBackLink.attr("href") mustBe appConfig.subscriptionFrontendClientProgressSavedUrl
       }
     }
     "have a backlink " in new Setup {
