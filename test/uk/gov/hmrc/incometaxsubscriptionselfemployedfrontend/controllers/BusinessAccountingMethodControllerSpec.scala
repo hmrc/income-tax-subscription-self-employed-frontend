@@ -204,7 +204,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
           enable(SaveAndRetrieve)
           mockAuthSuccess()
           controller.backUrl(id = id, isEditMode = true) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(testId).url)
+            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
         }
       }
     }

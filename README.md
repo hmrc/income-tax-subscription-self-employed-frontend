@@ -20,14 +20,9 @@ Scala/Play frontend web UI that provides screens for an existing SA Individual t
 
 ## How to start
 
-**Run the service with `ITSA_SUBSC_ALL`:**
+**Run the service:**
 ```
 ./scripts/start
-```
-
-**Run the service with mininal downstreams:**
-```
-./scripts/start --minimal
 ```
    
 ## How to use
