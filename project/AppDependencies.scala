@@ -4,7 +4,7 @@ import sbt._
 
 object AppDependencies {
 
-  val appName = "income-tax-subscriptionself-employed-frontend"
+  val appName = "income-tax-subscription-self-employed-frontend"
 
   private val playLanguageVersion = "5.2.0-play-28"
   private val bootstrapVersion = "5.24.0"
