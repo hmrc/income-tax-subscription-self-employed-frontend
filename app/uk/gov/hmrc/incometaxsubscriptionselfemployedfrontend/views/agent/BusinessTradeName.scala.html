@@ -49,7 +49,7 @@
         )
 
         @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
-            @saveAndContinueButtonHelper(individual = true)
+            @saveAndContinueButtonHelper(individual = false)
         } else {
             @continueButton(isEditMode = isEditMode)
         }
