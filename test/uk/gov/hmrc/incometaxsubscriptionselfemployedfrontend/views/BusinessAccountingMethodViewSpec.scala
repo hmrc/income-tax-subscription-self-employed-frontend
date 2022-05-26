@@ -175,7 +175,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
         enable(SaveAndRetrieve)
         val saveAndComeBackLink: Element = document(BusinessAccountingMethodForm.businessAccountingMethodForm).selectHead("a[role=button]")
         saveAndComeBackLink.text mustBe BusinessAccountingMethodMessages.saveAndComeBackLater
-        saveAndComeBackLink.attr("href") mustBe appConfig.subscriptionFrontendProgressSavedUrl
+        saveAndComeBackLink.attr("href") mustBe
+          appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-accounting-type"
       }
     }
   }

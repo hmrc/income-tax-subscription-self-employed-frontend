@@ -143,7 +143,8 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
           enable(SaveAndRetrieve)
           val saveAndComeBackLink = document().selectHead("a[role=button]")
           saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBackLater
-          saveAndComeBackLink.attr("href") mustBe appConfig.subscriptionFrontendClientProgressSavedUrl
+          saveAndComeBackLink.attr("href") mustBe
+            appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-trading-start-date"
         }
       }
     }

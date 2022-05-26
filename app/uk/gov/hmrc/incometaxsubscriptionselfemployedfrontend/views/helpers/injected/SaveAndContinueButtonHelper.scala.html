@@ -22,20 +22,25 @@
         appConfig: AppConfig
 )
 
-@(individual: Boolean, saveAndContinueText: Option[String] = None, hasSaveAndReturnLink: Boolean = true, disabled: Boolean = false)(implicit messages: Messages)
+@(individual: Boolean, saveAndContinueText: Option[String] = None, saveAndReturnReference: Option[String] = None, disabled: Boolean = false)(implicit messages: Messages)
+
+@href = @{
+    if(individual) {
+        appConfig.subscriptionFrontendProgressSavedUrl
+    } else {
+        appConfig.subscriptionFrontendClientProgressSavedUrl
+    }
+}
 
 @buttonHelper(
     buttonText = saveAndContinueText.getOrElse(messages("save-and-continue-button")),
     disabled = disabled
 )
 
-@if(hasSaveAndReturnLink) {
+@saveAndReturnReference.map { location =>
     @buttonHelper(
         buttonText = messages("save-and-come-back-later"),
         classes = Some("govuk-button govuk-button--secondary"),
-        href = if(individual)
-          Some(appConfig.subscriptionFrontendProgressSavedUrl)
-        else
-          Some(appConfig.subscriptionFrontendClientProgressSavedUrl)
+        href = Some(s"$href?location=$location")
     )
 }

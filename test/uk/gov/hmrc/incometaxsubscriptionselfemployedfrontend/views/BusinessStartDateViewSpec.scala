@@ -17,12 +17,13 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
@@ -107,12 +108,16 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.select("button[id=continue-button]").text mustBe BusinessStartDateMessages.update
     }
 
-    "have a continue button with alternate text when in SaveAndRetrieve mode" in new Setup(false, true) {
-      document.select("button").last.text mustBe BusinessStartDateMessages.saveAndContinue
-    }
-
-    "have a SaveAndComeBack button when in SaveAndRetrieve mode" in new Setup(false, true) {
-      document.select(s"a[href=${appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"}]").text mustBe BusinessStartDateMessages.saveAndComeBack
+    "has save and retrieve buttons" which {
+      "include the save and continue button" in new Setup(isSaveAndRetrieve = true) {
+        document.getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
+      }
+      "include the save and come back later link" in new Setup(isSaveAndRetrieve = true) {
+        val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
+        saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBack
+        saveAndComeBackLink.attr("href") mustBe
+          appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-trading-start-date"
+      }
     }
 
     "have a backlink " in new Setup {

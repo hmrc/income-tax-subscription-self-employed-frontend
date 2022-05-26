@@ -225,7 +225,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
         "have a save and come back later button" in new SetupComplete {
           val buttonLink: Element = document.selectHead(".govuk-button--secondary")
           buttonLink.text mustBe CheckYourAnswersMessages.saveAndBack
-          buttonLink.attr("href") mustBe appConfig.subscriptionFrontendProgressSavedUrl
+          buttonLink.attr("href") mustBe
+            appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-check-your-answers"
         }
 
         "not have a save and come back later button if confirmed" in new SetupComplete(true) {
@@ -327,7 +328,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
           "have a save and come back later button" in new SetupIncomplete {
             val buttonLink: Element = document.selectHead(".govuk-button--secondary")
             buttonLink.text mustBe CheckYourAnswersMessages.saveAndBack
-            buttonLink.attr("href") mustBe appConfig.subscriptionFrontendProgressSavedUrl
+            buttonLink.attr("href") mustBe
+              appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-check-your-answers"
           }
 
           "have a back button" in new SetupIncomplete {

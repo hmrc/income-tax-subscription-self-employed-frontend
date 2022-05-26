@@ -25,48 +25,48 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 
 @this(
-    mainTemplate: AgentMainTemplate,
-    form: FormWithCSRF,
-    radioHelper: RadioHelper,
-    continueButton: ContinueButton,
-    saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-    featureSwitches: FeatureSwitchingImpl
+        mainTemplate: AgentMainTemplate,
+        form: FormWithCSRF,
+        radioHelper: RadioHelper,
+        continueButton: ContinueButton,
+        saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+        featureSwitches: FeatureSwitchingImpl
 )
 @(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @handleBackUrl = @{
-  backUrl match {
-    case None => Some("javascript:history.back()")
-    case Some(url) => Some(url)
-  }
+    backUrl match {
+        case None => Some("javascript:history.back()")
+        case Some(url) => Some(url)
+    }
 }
 
 @mainTemplate(title = messages("agent.business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
-  <h1 class="govuk-heading-l">@messages("agent.business.accounting_method.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("agent.business.accounting_method.heading")</h1>
 
-  @form(action = postAction) {
-    @radioHelper(
-      field = businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod),
-      legend = messages("agent.business.accounting_method.heading"),
-      isPageHeading = false,
-      radioItems = Seq(
-        RadioItem(
-          content = Text(Messages("agent.business.accounting_method.cash")),
-          value = Some(AccountingMethodMapping.option_cash),
-          hint = None
-        ),
-        RadioItem(
-          content = Text(Messages("agent.business.accounting_method.accruals")),
-          value = Some(AccountingMethodMapping.option_accruals),
-          hint = None
+    @form(action = postAction) {
+        @radioHelper(
+            field = businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod),
+            legend = messages("agent.business.accounting_method.heading"),
+            isPageHeading = false,
+            radioItems = Seq(
+                RadioItem(
+                    content = Text(Messages("agent.business.accounting_method.cash")),
+                    value = Some(AccountingMethodMapping.option_cash),
+                    hint = None
+                ),
+                RadioItem(
+                    content = Text(Messages("agent.business.accounting_method.accruals")),
+                    value = Some(AccountingMethodMapping.option_accruals),
+                    hint = None
+                )
+            )
         )
-      )
-    )
 
-    @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
-        @saveAndContinueButtonHelper(individual = false)
-    } else {
-        @continueButton(isEditMode = isEditMode)
+        @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
+            @saveAndContinueButtonHelper(individual = false, saveAndReturnReference = Some("sole-trader-accounting-type"))
+        } else {
+            @continueButton(isEditMode = isEditMode)
+        }
     }
-  }
 }
