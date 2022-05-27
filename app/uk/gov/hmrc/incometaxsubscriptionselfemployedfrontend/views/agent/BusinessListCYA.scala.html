@@ -16,31 +16,21 @@
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnotherBusinessAgentForm
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SelfEmploymentData
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel}
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessAddressModel
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AddAnotherBusinessModel
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Yes
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.No
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AddAnotherBusinessModel, BusinessAddressModel, BusinessNameModel, BusinessTradeNameModel, No, SelfEmploymentData, Yes, BusinessStartDate => BusinessStartDateModel}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, RadioHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.RadioHelper
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.ContinueButton
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
 
 @this(
-mainTemplate: AgentMainTemplate,
-form: FormWithCSRF,
-radioHelper: RadioHelper,
-continueButton: ContinueButton,
-implicitDateFormatter: ImplicitDateFormatterImpl
+        mainTemplate: AgentMainTemplate,
+        form: FormWithCSRF,
+        radioHelper: RadioHelper,
+        continueButton: ContinueButton,
+        implicitDateFormatter: ImplicitDateFormatterImpl
 )(
-implicit appConfig: AppConfig
+        implicit appConfig: AppConfig
 )
 
 @(addAnotherBusinessForm: Form[AddAnotherBusinessModel], answers: Seq[SelfEmploymentData], postAction: Call, implicitDateFormatter: ImplicitDateFormatter)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
@@ -99,18 +89,18 @@ implicit appConfig: AppConfig
     </dl>
     <div class="govuk-form-group">
         <a id="remove-business-@businessNumber" class="govuk-link"
-           href="@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.RemoveBusinessController.show(business.id).url">@messages("agent.check_your_answers.remove_business",
+        href="@uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.RemoveBusinessController.show(business.id).url">@messages("agent.check_your_answers.remove_business",
             businessNumber)</a>
     </div>
 
 }
 
 @mainTemplate(
-title = messages("check_your_answers.title"),
-optForm = Some(addAnotherBusinessForm)
+    title = messages("check_your_answers.title"),
+    optForm = Some(addAnotherBusinessForm)
 ) {
 
-<h1 class="govuk-heading-l">@messages("agent.check_your_answers.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("agent.check_your_answers.heading")</h1>
 
     @answers.zip(1 to answers.length).map { case (business, businessNumber) =>
         @businessTable(business, businessNumber)

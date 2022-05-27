@@ -17,7 +17,7 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.agent
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -48,6 +48,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val update = "Update"
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
+    val saveAndComeBackLater = "Save and come back later"
   }
 
   private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
@@ -55,7 +56,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
   class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
               isEditMode: Boolean = false, saveAndRetrieve: Boolean = false, backLink: Option[String] = Some(testBackUrl)) {
 
-    if(saveAndRetrieve)
+    if (saveAndRetrieve)
       enable(SaveAndRetrieve)
     else
       disable(SaveAndRetrieve)
@@ -66,7 +67,6 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       isEditMode,
       backUrl = backLink
     )(FakeRequest(), implicitly, appConfig)
-
 
 
     val document: Document = Jsoup.parse(page.body)
@@ -123,18 +123,27 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
     "have a continue button when not in edit mode" when {
       "save and retrieve is not enabled" in new Setup {
-      document.getButtonByClass mustBe BusinessAccountingMethodMessages.continue
+        document.getButtonByClass mustBe BusinessAccountingMethodMessages.continue
+      }
     }
-  }
     "have a update button when in edit mode" when {
       "the save and retrieve is not enabled" in new Setup(isEditMode = true) {
-      document.getButtonByClass mustBe BusinessAccountingMethodMessages.update
+        document.getButtonByClass mustBe BusinessAccountingMethodMessages.update
+      }
     }
-  }
 
     "have a save and continue button" when {
       "the save and retrieve feature switch is enabled" in new Setup(saveAndRetrieve = true) {
         document.select("button").last().text mustBe BusinessAccountingMethodMessages.saveAndContinue
+      }
+    }
+
+    "have a save and come back later button" when {
+      "the save and retrieve feature switch is enabled" in new Setup(saveAndRetrieve = true) {
+        val saveAndComeBackLater: Element = document.mainContent.selectHead("a[role=button]")
+        saveAndComeBackLater.text mustBe BusinessAccountingMethodMessages.saveAndComeBackLater
+        saveAndComeBackLater.attr("href") mustBe
+          appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-accounting-type"
       }
     }
 

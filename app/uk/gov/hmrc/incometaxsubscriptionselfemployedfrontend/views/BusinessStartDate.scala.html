@@ -22,11 +22,11 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 
 @this(
-mainTemplate: PrincipalMainTemplate,
-continueButton: ContinueButton,
-buttonHelper: ButtonHelper,
-dateHelper: DateHelper,
-form: FormWithCSRF
+        mainTemplate: PrincipalMainTemplate,
+        continueButton: ContinueButton,
+        dateHelper: DateHelper,
+        form: FormWithCSRF,
+        saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
 @(businessStartDateForm: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, isSaveAndRetrieve: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
@@ -46,12 +46,9 @@ form: FormWithCSRF
         )
 
         @if(isSaveAndRetrieve) {
-            @buttonHelper(buttonText = messages("save-and-continue-button"))
-            @buttonHelper(classes=Some("govuk-button govuk-button--secondary"), messages("save-and-come-back-later"), href=Some(appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"))
-        } else if(isEditMode) {
-            @continueButton(Some(messages("base.update")))
+            @saveAndContinueButtonHelper(individual = true, saveAndReturnReference = Some("sole-trader-trading-start-date"))
         } else {
-            @continueButton()
+            @continueButton(isEditMode = isEditMode)
         }
 
     }

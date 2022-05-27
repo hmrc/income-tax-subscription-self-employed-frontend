@@ -49,7 +49,7 @@
         )
 
         @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
-            @saveAndContinueButtonHelper(individual = false)
+            @saveAndContinueButtonHelper(individual = false, saveAndReturnReference = Some("sole-trader-business-trade"))
         } else {
             @continueButton(isEditMode = isEditMode)
         }

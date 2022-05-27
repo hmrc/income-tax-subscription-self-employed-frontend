@@ -40,7 +40,11 @@
         <dd class="govuk-summary-list__actions">
         @changeUrl.map { link =>
             <a class="govuk-link" href="@link.url">
-                <span aria-hidden="true">@if(answer.isDefined) { @messages("base.change") } else { @messages("base.add") }</span>
+                <span aria-hidden="true">@if(answer.isDefined) {
+                    @messages("base.change")
+                } else {
+                    @messages("base.add")
+                }</span>
                 <span class="govuk-visually-hidden">@link.hiddenContent</span>
             </a>
         }
@@ -137,7 +141,8 @@
         @saveAndContinueButton(
             individual = true,
             saveAndContinueText = if(!answers.confirmed) Some(messages("confirm-and-continue")) else Some(messages("base.continue")),
-            hasSaveAndReturnLink = (!answers.confirmed),
-            disabled = !answers.isComplete)
+            saveAndReturnReference = if(!answers.confirmed) Some("sole-trader-check-your-answers") else None,
+            disabled = !answers.isComplete
+        )
     }
 }
