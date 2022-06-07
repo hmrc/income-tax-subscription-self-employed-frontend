@@ -321,9 +321,9 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
             }
           }
 
-          "have a disabled save and continue button" in new SetupIncomplete {
-            val continueButton: Element = document.selectHead(".govuk-button--disabled")
-            continueButton.text mustBe CheckYourAnswersMessages.confirmAndContinue
+          "the confirm and continue button is not disabled" in new SetupIncomplete {
+            val buttonLink: Element = document.selectHead(".govuk-button")
+            buttonLink.hasAttr("disabled") mustBe false
           }
 
           "have a save and come back later button" in new SetupIncomplete {

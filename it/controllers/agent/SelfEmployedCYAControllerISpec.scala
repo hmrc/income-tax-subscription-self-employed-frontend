@@ -141,41 +141,43 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {
-    "redirect to the task list page" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
-      stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
-      And("save & retrieve feature switch is enabled")
-      enable(SaveAndRetrieve)
+    "redirect to the task list page" when {
+      "the user submits valid full data" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
+        And("save & retrieve feature switch is enabled")
+        enable(SaveAndRetrieve)
 
-      When("GET /client/details/business-check-your-answers is called")
-      val res = submitClientBusinessCheckYourAnswers(businessId)
+        When("GET /client/details/business-check-your-answers is called")
+        val res = submitClientBusinessCheckYourAnswers(businessId)
 
-      Then("Should return a SEE_OTHER with a redirect location of task list page")
-      res must have(
-        httpStatus(SEE_OTHER),
-        redirectURI(clientTaskListURI)
-      )
-    }
+        Then("Should return a SEE_OTHER with a redirect location of task list page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(clientTaskListURI)
+        )
+      }
 
-    "redirect to the self employed CYA page" in {
-      Given("I setup the Wiremock stubs")
-      stubAuthSuccess()
-      stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
-      And("save & retrieve feature switch is enabled")
-      enable(SaveAndRetrieve)
+      "the user submits valid incomplete data" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
+        And("save & retrieve feature switch is enabled")
+        enable(SaveAndRetrieve)
 
-      When("GET /client/details/business-check-your-answers is called")
-      val res = submitClientBusinessCheckYourAnswers(businessId)
+        When("GET /client/details/business-check-your-answers is called")
+        val res = submitClientBusinessCheckYourAnswers(businessId)
 
-      Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
-      res must have(
-        httpStatus(SEE_OTHER),
-        redirectURI(ClientBusinessCYAUri)
-      )
+        Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(clientTaskListURI)
+        )
+      }
     }
 
     "return NOT_FOUND" when {

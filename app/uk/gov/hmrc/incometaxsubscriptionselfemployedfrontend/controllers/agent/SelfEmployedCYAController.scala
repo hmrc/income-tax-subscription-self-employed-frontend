@@ -71,7 +71,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
               case Right(_) => Redirect(appConfig.clientTaskListUrl)
             }
           } else {
-            Future.successful(Redirect(routes.SelfEmployedCYAController.show(id)))
+            Future.successful(Redirect(appConfig.clientTaskListUrl))
           }
         }
       }

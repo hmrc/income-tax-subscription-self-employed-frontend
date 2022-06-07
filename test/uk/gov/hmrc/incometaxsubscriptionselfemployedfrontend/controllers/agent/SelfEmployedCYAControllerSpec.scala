@@ -151,7 +151,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         }
       }
 
-      "return 303, (SEE_OTHER)" when {
+      "return 303, (SEE_OTHER) and redirect to the task list page" when {
         "the user submits valid full data" in {
           withFeatureSwitch(SaveAndRetrieve) {
             mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
@@ -170,7 +170,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
             val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isEditMode = false)(fakeRequest)
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id).url)
+            redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
           }
         }
       }
