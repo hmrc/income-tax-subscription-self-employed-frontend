@@ -22,8 +22,6 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
@@ -43,15 +41,14 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                        authService: AuthService,
                                        businessName: BusinessName)
                                       (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with FeatureSwitching with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
-  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean, isSaveAndRetrieve: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     businessName(
       businessNameForm = businessNameForm,
       postAction = routes.BusinessNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
-      backUrl = backUrl(id, isEditMode),
-      isSaveAndRetrieve = isSaveAndRetrieve
+      backUrl = backUrl(id, isEditMode)
     )
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
@@ -61,7 +58,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
           val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
           val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
           Future.successful(Ok(
-            view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode, isSaveAndRetrieve = isSaveAndRetrieve)
+            view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode)
           ))
         }
       }
@@ -75,7 +72,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
           val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
           businessNameValidationForm(excludedBusinessNames).bindFromRequest.fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode, isSaveAndRetrieve = isSaveAndRetrieve))),
+              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
             businessNameData =>
               multipleSelfEmploymentsService.saveBusinessName(reference, id, businessNameData).map(_ =>
                 next(id, isEditMode)
@@ -86,13 +83,10 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  //save & retrieve on should have an order of: business name (this) -> business start date -> business trade
-  //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
-  private def next(id: String, isEditMode: Boolean) = Redirect((isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
-    case (false, true) => routes.BusinessStartDateController.show(id)
-    case (true, false) => routes.BusinessListCYAController.show
-    case (false, false) => routes.BusinessTradeNameController.show(id)
+  private def next(id: String, isEditMode: Boolean) = Redirect(if (isEditMode) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+  } else {
+    routes.BusinessStartDateController.show(id)
   })
 
   private def getExcludedBusinessNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessNameModel] = {
@@ -110,15 +104,10 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
-
-  //save & retrieve on should have an order of: business name (this) -> business start date -> business trade
-  //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
-  def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
-    case (false, true) => appConfig.clientWhatIncomeSourceToSignUpUrl
-    case (true, false) => routes.BusinessListCYAController.show.url
-    case (false, false) => routes.BusinessStartDateController.show(id).url
+  def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
+  } else {
+    appConfig.clientWhatIncomeSourceToSignUpUrl
   }
 
 }

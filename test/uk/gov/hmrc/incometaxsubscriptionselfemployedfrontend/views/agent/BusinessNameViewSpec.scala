@@ -33,11 +33,11 @@ class BusinessNameViewSpec extends ViewSpec {
     val title = "What is the name of your client’s business?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
-    val continue = "Continue"
     val backLink = "Back"
     val update = "Update"
     val saveAndContinue = "Save and continue"
-    val line1 = "This is the business name they used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name."
+    val line1: String = "This is the business name they used to register for Self Assessment. " +
+      "If their sole trader business does not have a name, enter your client’s name."
     val emptyError = "Enter your client’s name or the name of their business"
   }
 
@@ -45,53 +45,20 @@ class BusinessNameViewSpec extends ViewSpec {
   val action: Call = testCall
   val testError: FormError = FormError("businessName", "testError")
   val testError2: FormError = FormError("businessName", "testError2")
-  val businessName = app.injector.instanceOf[BusinessName]
+  val businessName: BusinessName = app.injector.instanceOf[BusinessName]
 
-  class Setup(isEditMode: Boolean = false, isSaveAndRetrieve: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
+  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = businessName(
       businessNameForm,
       testCall,
       isEditMode = isEditMode,
-      testBackUrl,
-      isSaveAndRetrieve = isSaveAndRetrieve
+      testBackUrl
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
   }
 
   "Business Name Page" must {
-
-    "have the correct template" when {
-      "there is an error" in new TemplateViewTest(
-        view = businessName(
-          businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError),
-          testCall,
-          isEditMode = false,
-          testBackUrl,
-          isSaveAndRetrieve = false
-        )(FakeRequest(), implicitly, appConfig),
-        title = BusinessNameMessages.title,
-        isAgent = true,
-        backLink = Some(testBackUrl),
-        hasSignOutLink = true,
-        error = Some(testError)
-      )
-
-      "there is no error" in new TemplateViewTest(
-        view = businessName(
-          businessNameForm = BusinessNameForm.businessNameValidationForm(Nil),
-          testCall,
-          isEditMode = false,
-          testBackUrl,
-          isSaveAndRetrieve = false
-        )(FakeRequest(), implicitly, appConfig),
-        title = BusinessNameMessages.title,
-        isAgent = true,
-        backLink = Some(testBackUrl),
-        hasSignOutLink = true,
-        error = None
-      )
-    }
 
     "have a title" in new Setup() {
       document.title mustBe BusinessNameMessages.title + BusinessNameMessages.titleSuffix
@@ -107,14 +74,10 @@ class BusinessNameViewSpec extends ViewSpec {
     }
 
     "have a continue button when not in edit mode" in new Setup() {
-      document.getGovukButton.text mustBe BusinessNameMessages.continue
+      document.getGovukButton.text mustBe BusinessNameMessages.saveAndContinue
     }
 
-    "have update button when in edit mode" in new Setup(true) {
-      document.getGovukButton.text mustBe BusinessNameMessages.update
-    }
-
-    "have save and continue button when in edit mode and save and retrieve mode" in new Setup(true, isSaveAndRetrieve = true) {
+    "have save and continue button when in edit mode" in new Setup(true) {
       document.getGovukButton.text mustBe BusinessNameMessages.saveAndContinue
     }
 

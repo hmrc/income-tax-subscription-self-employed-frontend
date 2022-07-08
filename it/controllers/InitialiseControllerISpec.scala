@@ -20,48 +20,23 @@ import helpers.ComponentSpecBase
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 class InitialiseControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  override def beforeEach(): Unit = {
-    disable(SaveAndRetrieve)
-    super.beforeEach()
-  }
 
-  "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details" when {
-    "the save and retrieve feature switch is enabled" should {
-      "redirect to self-employment business name page" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        enable(SaveAndRetrieve)
-        When("GET /details is called")
-        val res = getInitialise
+  "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details" should {
+    "redirect to self-employment business name page" in {
+      Given("I setup the Wiremock stubs")
+      stubAuthSuccess()
+      When("GET /details is called")
+      val res = getInitialise
 
-        Then("should redirect to the BusinessNamePage")
-        res must have(
-          httpStatus(SEE_OTHER)
-        )
-      }
+      Then("should redirect to the BusinessNamePage")
+      res must have(
+        httpStatus(SEE_OTHER)
+      )
     }
-
-    "the save and retrieve feature switch is disabled" should {
-      "redirect to self-employment business start date page" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        When("GET /details is called")
-        val res = getInitialise
-
-        Then("should redirect to the BusinessStartDatePage")
-        res must have(
-          httpStatus(SEE_OTHER)
-        )
-      }
-    }
-
   }
-
 }

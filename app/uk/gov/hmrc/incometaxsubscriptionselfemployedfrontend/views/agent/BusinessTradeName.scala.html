@@ -21,8 +21,6 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.ContinueButton
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
 
 @this(
@@ -30,8 +28,7 @@
     form: FormWithCSRF,
     textInputHelper: TextInputHelper,
     continueButton: ContinueButton,
-    saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-    featureSwitches: FeatureSwitchingImpl
+    saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
 
 @(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call,isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
@@ -48,11 +45,7 @@
 
         )
 
-        @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
-            @saveAndContinueButtonHelper(individual = false, saveAndReturnReference = Some("sole-trader-business-trade"))
-        } else {
-            @continueButton(isEditMode = isEditMode)
-        }
+        @saveAndContinueButtonHelper(individual = false, saveAndReturnReference = Some("sole-trader-business-trade"))
 
     }
 }

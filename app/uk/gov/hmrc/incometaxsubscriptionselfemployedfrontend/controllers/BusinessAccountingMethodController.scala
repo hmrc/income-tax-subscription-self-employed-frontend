@@ -23,8 +23,6 @@ import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
@@ -44,7 +42,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
                                                    val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                    authService: AuthService)
                                                   (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with FeatureSwitching with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   def view(businessAccountingMethodForm: Form[AccountingMethodModel], id: Option[String], isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html =
@@ -78,11 +76,9 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessAccountingMethod =>
             incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessAccountingMethodKey, businessAccountingMethod).map(_ =>
-              (id, isEditMode, isEnabled(SaveAndRetrieve)) match {
-                case (Some(id), _, true) =>
+              (id, isEditMode) match {
+                case (Some(id), _) =>
                   Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id))
-                case (_, true, false) =>
-                  Redirect(appConfig.subscriptionFrontendFinalCYAController)
                 case _ =>
                   Redirect(appConfig.subscriptionFrontendRoutingController)
               }
@@ -93,10 +89,9 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
   }
 
   def backUrl(id: Option[String], isEditMode: Boolean): Option[String] = {
-    (id, isEditMode, isEnabled(SaveAndRetrieve)) match {
-      case (Some(id), true, true) => Some(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url)
-      case (_, false, true) => None
-      case (_, true, false) => Some(appConfig.subscriptionFrontendFinalCYAController)
+    (id, isEditMode) match {
+      case (Some(id), true) => Some(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url)
+      case (_, false) => None
       case _ => Some(routes.BusinessListCYAController.show.url)
     }
   }

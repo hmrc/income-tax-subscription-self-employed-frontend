@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -42,9 +41,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   override val controllerName: String = "BusinessNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
 
-  val businessName = mock[BusinessName]
-  when(businessName(any(), any(), any(), any(), any())(any(), any(), any()))
-    .thenReturn(HtmlFormat.empty)
+  private val businessName = mock[BusinessName]
+  when(businessName(any(), any(), any(), any())(any(), any(), any())).thenReturn(HtmlFormat.empty)
 
   object TestBusinessNameController extends BusinessNameController(
     mockMessagesControllerComponents,
@@ -73,7 +71,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(
           Right(Seq(selfEmploymentData))
         )
-        val result = TestBusinessNameController.show(id,isEditMode = false)(fakeRequest)
+        val result = TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -83,7 +81,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           Right(Seq(selfEmploymentData.copy(businessName = None)))
         )
 
-        val result = TestBusinessNameController.show(id,isEditMode = false)(fakeRequest)
+        val result = TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -94,14 +92,14 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(
           Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
-        intercept[InternalServerException](await(TestBusinessNameController.show(id,isEditMode = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)))
       }
     }
 
   }
 
-  "Submit" should {
-    "when it is not in edit mode" should {
+  "Submit" when {
+    "it is not in edit mode" should {
       "return 303, SEE_OTHER" when {
         "the user submits valid data and is saved successfully" in {
           mockAuthSuccess()
@@ -110,142 +108,123 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           )
           mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessNameController.submit(id,isEditMode = false)(
+          val result = TestBusinessNameController.submit(id, isEditMode = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
+          redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
         }
         "the user submits valid data in S&R mode and is saved successfully" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockAuthSuccess()
-            mockFetchAllBusinesses(
-              Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
-            )
-            mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
-
-            val result = TestBusinessNameController.submit(id,isEditMode = false)(
-              fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
-            )
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
-          }
-        }
-      }
-      "return 400, SEE_OTHER)" when {
-        "the user submits invalid data" in {
           mockAuthSuccess()
           mockFetchAllBusinesses(
             Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
           )
-          val result = TestBusinessNameController.submit(id,isEditMode = false)(fakeRequest)
-          status(result) mustBe BAD_REQUEST
-          contentType(result) mustBe Some("text/html")
+          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+          val result = TestBusinessNameController.submit(id, isEditMode = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
         }
       }
-      "the user enters a business name which would cause a duplicate business name / trade combination" in {
+    }
+    "return 400, SEE_OTHER" when {
+      "the user submits invalid data" in {
         mockAuthSuccess()
         mockFetchAllBusinesses(
-          Right(Seq(
-            selfEmploymentData.copy(
-              id = "idOne",
-              businessName = Some(BusinessNameModel("nameOne")),
-              businessTradeName = Some(BusinessTradeNameModel("tradeOne"))
-            ),
-            selfEmploymentData.copy(
-              id = "idTwo",
-              businessName = None,
-              businessTradeName = Some(BusinessTradeNameModel("tradeOne"))
-            )
-          ))
+          Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
         )
-        val result = TestBusinessNameController.submit("idTwo", isEditMode = false)(
-          fakeRequest.withFormUrlEncodedBody(modelToFormData(BusinessNameModel("nameOne")): _*)
-        )
+        val result = TestBusinessNameController.submit(id, isEditMode = false)(fakeRequest)
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
-      "throw an exception" when {
-        "an error is returned when retrieving all businesses" in {
-          mockAuthSuccess()
-          mockFetchAllBusinesses(
-            Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+    }
+    "the user enters a business name which would cause a duplicate business name / trade combination" in {
+      mockAuthSuccess()
+      mockFetchAllBusinesses(
+        Right(Seq(
+          selfEmploymentData.copy(
+            id = "idOne",
+            businessName = Some(BusinessNameModel("nameOne")),
+            businessTradeName = Some(BusinessTradeNameModel("tradeOne"))
+          ),
+          selfEmploymentData.copy(
+            id = "idTwo",
+            businessName = None,
+            businessTradeName = Some(BusinessTradeNameModel("tradeOne"))
           )
+        ))
+      )
+      val result = TestBusinessNameController.submit("idTwo", isEditMode = false)(
+        fakeRequest.withFormUrlEncodedBody(modelToFormData(BusinessNameModel("nameOne")): _*)
+      )
+      status(result) mustBe BAD_REQUEST
+      contentType(result) mustBe Some("text/html")
+    }
+    "throw an exception" when {
+      "an error is returned when retrieving all businesses" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(
+          Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
 
-          intercept[InternalServerException](await(TestBusinessNameController.submit(id, isEditMode = false)(fakeRequest)))
-        }
+        intercept[InternalServerException](await(TestBusinessNameController.submit(id, isEditMode = false)(fakeRequest)))
       }
     }
-    "when it is in edit mode" should {
-      "return 303, SEE_OTHER)" when {
-        "the user submits valid data and answer is updated correctly" in {
-          mockAuthSuccess()
-          mockFetchAllBusinesses(
-            Right(Seq(selfEmploymentData.copy(businessName = Some(BusinessNameModel("nameOne")))))
-          )
-          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
-          val result = TestBusinessNameController.submit(id,isEditMode = true)(
-            fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
-          )
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessListCYAController.show.url)
-        }
-        "the user does not update their answer" in {
-          mockAuthSuccess()
-          mockFetchAllBusinesses(
-            Right(Seq(selfEmploymentData))
-          )
-          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
-          val result = TestBusinessNameController.submit(id, isEditMode = true)(
-            fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
-          )
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
-        }
-      }
-      "return 400, SEE_OTHER)" when {
-        "the user submits invalid data" in {
-          mockAuthSuccess()
-          mockFetchAllBusinesses(
-            Right(Seq(selfEmploymentData))
-          )
-          val result = TestBusinessNameController.submit(id,isEditMode = true)(fakeRequest)
-          status(result) mustBe BAD_REQUEST
-          contentType(result) mustBe Some("text/html")
-        }
-      }
-    }
-
-    "The back url" when {
-      "in edit mode" should {
-        s"redirect to ${routes.BusinessListCYAController.show.url}" in {
-          TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
-        }
-      }
-      "not in edit mode" should {
-        s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
-          TestBusinessNameController.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
-        }
-      }
-    }
-
-    "The save-and-retrieve back url" when {
-      "in edit mode" should {
-        s"redirect correctly" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
-          }
-        }
-      }
-      "not in edit mode" should {
-        s"redirect correctly" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income-source"
-          }
-        }
-      }
-    }
-
   }
+  "it is in edit mode" should {
+    "return 303, SEE_OTHER" when {
+      "the user submits valid data and answer is updated correctly" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(
+          Right(Seq(selfEmploymentData.copy(businessName = Some(BusinessNameModel("nameOne")))))
+        )
+        mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+        val result = TestBusinessNameController.submit(id, isEditMode = true)(
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe
+          Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+      }
+      "the user does not update their answer" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(
+          Right(Seq(selfEmploymentData))
+        )
+        mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+        val result = TestBusinessNameController.submit(id, isEditMode = true)(
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+      }
+    }
+    "return 400, SEE_OTHER)" when {
+      "the user submits invalid data" in {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(
+          Right(Seq(selfEmploymentData))
+        )
+        val result = TestBusinessNameController.submit(id, isEditMode = true)(fakeRequest)
+        status(result) mustBe BAD_REQUEST
+        contentType(result) mustBe Some("text/html")
+      }
+    }
+  }
+
+  "The back url" when {
+    "in edit mode" should {
+      s"redirect correctly" in {
+        TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+      }
+    }
+  }
+  "not in edit mode" should {
+    s"redirect correctly" in {
+      TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income-source"
+    }
+  }
+
 }

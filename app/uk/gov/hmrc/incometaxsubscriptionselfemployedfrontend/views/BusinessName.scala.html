@@ -29,7 +29,7 @@
         buttonHelper: ButtonHelper
 )
 
-@(businessNameForm: Form[BusinessNameModel], postAction: Call, isEditMode: Boolean, backUrl: String, isSaveAndRetrieve: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessNameForm: Form[BusinessNameModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = messages("business.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
 
@@ -42,10 +42,6 @@
             classes = Some("govuk-!-width-one-half")
         )
 
-        @if(isSaveAndRetrieve) {
-            @buttonHelper(messages("save-and-continue-button"))
-        } else {
-            @continueButton(isEditMode = isEditMode)
-        }
+        @buttonHelper(messages("save-and-continue-button"))
     }
 }

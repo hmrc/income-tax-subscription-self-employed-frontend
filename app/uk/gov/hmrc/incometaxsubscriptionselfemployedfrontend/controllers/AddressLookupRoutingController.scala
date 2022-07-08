@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
@@ -40,10 +39,8 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                                addressLookupConnector: AddressLookupConnector,
                                                val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService)
-                                               (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
-
-  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
+                                              (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   private def addressLookupContinueUrl(businessId: String, id: Option[String], isEditMode: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
@@ -73,7 +70,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
           accountingMethod <- fetchAccountMethod(reference)
           _ <- multipleSelfEmploymentsService.saveBusinessAddress(reference, businessId, addressDetails)
         } yield {
-          (isEditMode, isSaveAndRetrieve) match {
+          (isEditMode, true) match {
             case (false, true) if accountingMethod.isDefined => Redirect(routes.SelfEmployedCYAController.show(businessId))
             case (false, true) => Redirect(routes.BusinessAccountingMethodController.show(Some(businessId)))
             case (true, true) => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode))

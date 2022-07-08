@@ -24,7 +24,6 @@ import play.api.mvc.{Action, AnyContent, Call}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -57,11 +56,10 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    disable(SaveAndRetrieve)
     reset(businessStartDate)
   }
 
-  def mockBusinessStartDate(form: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, isSaveAndRetrieve: Boolean, backUrl: String): Unit = {
+  def mockBusinessStartDate(form: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String): Unit = {
     when(businessStartDate(
       ArgumentMatchers.any(),
       ArgumentMatchers.any(),
@@ -106,8 +104,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           form = businessStartDateForm(fill = Some(returnedModel)),
           postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = false,
-          isSaveAndRetrieve = false,
-          backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+          backUrl = routes.BusinessNameController.show(id).url
         )
 
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
@@ -122,8 +119,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           form = businessStartDateForm(),
           postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = false,
-          isSaveAndRetrieve = false,
-          backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+          backUrl = routes.BusinessNameController.show(id).url
         )
 
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
@@ -140,7 +136,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           form = businessStartDateForm(fill = Some(returnedModel)),
           postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = true,
-          isSaveAndRetrieve = false,
           backUrl = agent.routes.BusinessListCYAController.show.url
         )
       }
@@ -155,8 +150,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   }
 
-  "Submit" should {
-    "when it is not in edit mode" should {
+  "Submit" when {
+    "it is not in edit mode" should {
       "return 303, SEE_OTHER" when {
         "the user submits valid data" in {
           mockAuthSuccess()
@@ -168,21 +163,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(agent.routes.BusinessNameController.show(id).url)
-        }
-        "the user submits valid data in S&R mode" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockAuthSuccess()
-            mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
-
-            val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
-              fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
-            )
-
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe
-              Some(agent.routes.BusinessTradeNameController.show(id).url)
-          }
+            Some(agent.routes.BusinessTradeNameController.show(id).url)
         }
       }
       "return 400, SEE_OTHER" when {
@@ -193,8 +174,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
             form = businessStartDateForm(bind = None),
             postAction = agent.routes.BusinessStartDateController.submit(id),
             isEditMode = false,
-            isSaveAndRetrieve = false,
-            backUrl = appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+            backUrl = routes.BusinessNameController.show(id).url
           )
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = false)(fakeRequest)
@@ -204,7 +184,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         }
       }
     }
-    "when it is in edit mode" should {
+    "it is in edit mode" should {
       "return 303, SEE_OTHER" when {
         "the user submits valid data" in {
           mockAuthSuccess()
@@ -216,7 +196,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(agent.routes.BusinessListCYAController.show.url)
+            Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
         }
       }
       "return 400, SEE_OTHER" when {
@@ -227,8 +207,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
             form = businessStartDateForm(bind = None),
             postAction = agent.routes.BusinessListCYAController.submit,
             isEditMode = true,
-            isSaveAndRetrieve = false,
-            backUrl = agent.routes.BusinessListCYAController.show.url
+            backUrl = routes.SelfEmployedCYAController.show(id, isEditMode = true).url
           )
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = true)(fakeRequest)
@@ -243,30 +222,12 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   "The back url" when {
     "in edit mode" should {
       s"redirect to ${routes.BusinessListCYAController.show.url}" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
+        TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
       }
     }
     "not in edit mode" should {
       s"redirect to ${routes.BusinessNameController.show(id).url}" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = false) must
-          include("/report-quarterly/income-and-expenses/sign-up/client/income")
-      }
-    }
-  }
-
-  "The save-and-retrieve back url" when {
-    "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show.url}" in {
-        withFeatureSwitch(SaveAndRetrieve) {
-          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
-        }
-      }
-    }
-    "not in edit mode" should {
-      s"redirect to ${routes.BusinessNameController.show(id).url}" in {
-        withFeatureSwitch(SaveAndRetrieve) {
-          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
-        }
+        TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
       }
     }
   }

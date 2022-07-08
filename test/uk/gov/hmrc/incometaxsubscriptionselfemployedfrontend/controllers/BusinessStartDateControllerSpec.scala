@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -36,21 +35,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{Busines
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with FeatureSwitching with MockIncomeTaxSubscriptionConnector {
 
-  override def beforeEach(): Unit = {
-    disable(SaveAndRetrieve)
-    super.beforeEach()
-  }
-
   val id: String = "testId"
 
   private val businessStartDate = mock[BusinessStartDateView]
-  when(businessStartDate(any(), any(), any(), any(), any())(any(), any(), any()))
-    .thenReturn(HtmlFormat.empty)
+  when(businessStartDate(any(), any(), any(), any())(any(), any(), any())).thenReturn(HtmlFormat.empty)
 
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-  "show" -> TestBusinessStartDateController.show(id, isEditMode = false),
-  "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false)
+    "show" -> TestBusinessStartDateController.show(id, isEditMode = false),
+    "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false)
   )
 
 
@@ -107,70 +100,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   "Submit" should {
     "when it is not in edit mode" when {
-      "save and retrieve feature switch is enabled" should {
-        "return 303, SEE_OTHER and redirect to Business Trade Name page" when {
-          "the user submits valid data" in {
-            enable(SaveAndRetrieve)
-            mockAuthSuccess()
-            mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
-            val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
-              fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
-            )
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
-          }
-        }
-      }
-
-      "save and retrieve feature switch is disabled" should {
-        "return 303, SEE_OTHER and redirect to Business Name Page" when {
-          "the user submits valid data" in {
-            mockAuthSuccess()
-            mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
-            val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
-              fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
-            )
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.BusinessNameController.show(id).url)
-          }
-        }
-      }
-    }
-    "when it is in edit mode" when {
-      "save and retrieve feature switch is enabled" should {
-        "return 303, SEE_OTHER and redirect to Self-employment Check Your Answer page" when {
-          "the user submits valid data" in {
-            enable(SaveAndRetrieve)
-            mockAuthSuccess()
-            mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
-            val result = TestBusinessStartDateController.submit(id, isEditMode = true)(
-              fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
-            )
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
-          }
-        }
-      }
-
-      "save and retrieve feature switch is disabled" should {
-        "return 303, SEE_OTHER and redirect to Business Check Your Answer page" when {
-          "the user submits valid data" in {
-            mockAuthSuccess()
-            mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
-            val result = TestBusinessStartDateController.submit(id, isEditMode = true)(
-              fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
-            )
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
-          }
-        }
-      }
-
-    }
-    "when it is in SaveAndRetrieve mode" should {
-      "return 303, SEE_OTHER)" when {
+      "return 303, SEE_OTHER and redirect to Business Trade Name page" when {
         "the user submits valid data" in {
-          enable(SaveAndRetrieve)
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
           val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
@@ -181,7 +112,31 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         }
       }
     }
-    "return 400, SEE_OTHER)" when {
+    "when it is in edit mode" when {
+      "return 303, SEE_OTHER and redirect to Self-employment Check Your Answer page" when {
+        "the user submits valid data" in {
+          mockAuthSuccess()
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+          val result = TestBusinessStartDateController.submit(id, isEditMode = true)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+        }
+      }
+    }
+    "return 303, SEE_OTHER" when {
+      "the user submits valid data" in {
+        mockAuthSuccess()
+        mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+        val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+        )
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
+      }
+    }
+    "return 400, SEE_OTHER" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
@@ -194,30 +149,14 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" when {
-    "in edit mode" when {
-      "save and retrieve feature switch is enabled" should {
-        s"redirect to Self-Employment check your answer page" in {
-          enable(SaveAndRetrieve)
-          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
-        }
-      }
-      "save and retrieve feature switch is disabled" should {
-        "redirect to business check your answer page" in {
-          TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
-        }
+    "in edit mode" should {
+      s"redirect to Self-Employment check your answer page" in {
+        TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
-    "not in edit mode" when {
-      "save and retrieve feature switch is enabled" should {
-        "redirect to business name page" in {
-          enable(SaveAndRetrieve)
-          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
-        }
-      }
-      "save and retrieve feature switch is disabled" should {
-        "redirect to how income receive page" in {
-          TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-receive"
-        }
+    "not in edit mode" should {
+      "redirect to business name page" in {
+        TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
       }
     }
   }

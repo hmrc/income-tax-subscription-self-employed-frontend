@@ -19,8 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import _root_.uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -29,18 +27,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents, authService: AuthService, uuidGen: UUIDGenerator)
-                                    (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) with FeatureSwitching {
+                                    (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
 
   def initialise: Action[AnyContent] = Action.async { implicit request =>
 
     val id = uuidGen.generateId
 
     authService.authorised() {
-      if (isEnabled(SaveAndRetrieve)) {
-        Future.successful(Redirect(routes.BusinessNameController.show(id)))
-      } else {
-        Future.successful(Redirect(routes.BusinessStartDateController.show(id)))
-      }
+      Future.successful(Redirect(routes.BusinessNameController.show(id)))
     }
   }
 }

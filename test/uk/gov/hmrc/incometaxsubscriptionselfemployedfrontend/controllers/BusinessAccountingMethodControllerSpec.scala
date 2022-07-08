@@ -23,7 +23,6 @@ import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -99,9 +98,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER)" when {
       "the user submits valid data" when {
         "not in edit mode" when {
-          "save and retrieve is enabled (an ID is provided)" should {
+          "an ID is provided" should {
             "redirect to the self employed CYA page" in withController { controller =>
-              enable(SaveAndRetrieve)
               mockAuthSuccess()
               mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
               val result = controller.submit(id = id, isEditMode = false)(
@@ -113,25 +111,11 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
             }
           }
 
-          "save and retrieve is disabled" should {
-            "redirect to sign up front end rerouting page" in withController { controller =>
-              disable(SaveAndRetrieve)
-              mockAuthSuccess()
-              mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-              val result = controller.submit(id = None, isEditMode = false)(
-                fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
-              )
-              status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe
-                Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
-            }
-          }
         }
 
         "in edit mode" when {
-          "save and retrieve is enabled (an ID is provided)" should {
+          "an ID is provided" should {
             "redirect to the self employed CYA page" in withController { controller =>
-              enable(SaveAndRetrieve)
               mockAuthSuccess()
               mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
               val result = controller.submit(id = id, isEditMode = true)(
@@ -143,19 +127,6 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
             }
           }
 
-          "save and retrieve is disabled" should {
-            "redirect to sign up front end check your answer page" in withController { controller =>
-              disable(SaveAndRetrieve)
-              mockAuthSuccess()
-              mockSaveSelfEmployments(businessAccountingMethodKey, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-              val result = controller.submit(id = None, isEditMode = true)(
-                fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
-              )
-              status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe
-                Some("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/check-your-answers")
-            }
-          }
         }
       }
     }
@@ -172,40 +143,18 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" when {
-    "not in edit mode" when {
-      "save and retrieve is disabled" should {
-        "return a url for the business list CYA page" in withController { controller =>
-          disable(SaveAndRetrieve)
-          mockAuthSuccess()
-          controller.backUrl(id = None, isEditMode = false) mustBe Some(routes.BusinessListCYAController.show.url)
-        }
-      }
-
-      "save and retrieve is enabled" should {
-        "return None when Save and Retrieve is enabled" in withController { controller =>
-          enable(SaveAndRetrieve)
-          mockAuthSuccess()
-          controller.backUrl(id = None, isEditMode = false) mustBe None
-        }
+    "not in edit mode" should {
+      "return None " in withController { controller =>
+        mockAuthSuccess()
+        controller.backUrl(id = None, isEditMode = false) mustBe None
       }
     }
 
-    "in edit mode" when {
-      "save and retrieve is disabled" should {
-        "return a url for the sign up front end final CYA page" in withController { controller =>
-          disable(SaveAndRetrieve)
-          mockAuthSuccess()
-          controller.backUrl(id = None, isEditMode = true) mustBe Some(appConfig.subscriptionFrontendFinalCYAController)
-        }
-      }
-
-      "save and retrieve is enabled" should {
-        "return a url for the self employed CYA page" in withController { controller =>
-          enable(SaveAndRetrieve)
-          mockAuthSuccess()
-          controller.backUrl(id = id, isEditMode = true) mustBe
-            Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
-        }
+    "in edit mode" should {
+      "return a url for the self employed CYA page" in withController { controller =>
+        mockAuthSuccess()
+        controller.backUrl(id = id, isEditMode = true) mustBe
+          Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
       }
     }
   }

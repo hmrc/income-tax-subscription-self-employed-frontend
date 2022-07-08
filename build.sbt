@@ -1,5 +1,6 @@
 import uk.gov.hmrc.ForkedJvmPerTestSettings.oneForkedJvmPerTest
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import scala.sys.process._
 
 val appName = "income-tax-subscription-self-employed-frontend"
 
@@ -42,3 +43,11 @@ TwirlKeys.templateImports ++= Seq(
   "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
   "uk.gov.hmrc.govukfrontend.views.html.components.implicits._"
 )
+
+lazy val results = taskKey[Unit]("Opens test results'")
+results := { "open target/test-reports/html-report/index.html" ! }
+Test / results := (results).value
+
+lazy val itResults = taskKey[Unit]("Opens it test results'")
+itResults := { "open target/int-test-reports/html-report/index.html" ! }
+IntegrationTest / results := (itResults).value

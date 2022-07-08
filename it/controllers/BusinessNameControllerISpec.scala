@@ -24,17 +24,12 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, SelfEmploymentData}
 
 class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  override def beforeEach(): Unit = {
-    disable(SaveAndRetrieve)
-    super.beforeEach()
-  }
 
   val businessId: String = "testId"
 
@@ -82,44 +77,21 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-name" when {
     "not in edit mode" when {
-      "save and retrieve feature switch is enabled" when {
-        "the form data is valid and is stored successfully" should {
-          "redirect to Business Start Date page " in {
-            enable(SaveAndRetrieve)
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
-            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
+      "the form data is valid and is stored successfully" should {
+        "redirect to Business Start Date page " in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
-            When("Post /details/business-name is called")
-            val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
+          When("Post /details/business-name is called")
+          val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
 
-            Then("should return a SEE_OTHER")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(BusinessStartDateUri)
-            )
-          }
-        }
-      }
-
-      "save and retrieve feature switch is disabled" when {
-        "the form data is valid and is stored successfully" should {
-          "redirect to Business Trade Name page " in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
-            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
-
-            When("Post /details/business-name is called")
-            val res = submitBusinessName(businessId, inEditMode = false, Some(testBusinessNameModel))
-
-            Then("should return a SEE_OTHER")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(BusinessTradeNameUri)
-            )
-          }
+          Then("should return a SEE_OTHER")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessStartDateUri)
+          )
         }
       }
 
@@ -140,44 +112,39 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
     }
 
     "in edit mode" when {
-      "save and retrieve feature switch is enabled" when {
-        "the form data is valid and is stored successfully" should {
-          " redirect to Self-employment Check Your Answers" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            enable(SaveAndRetrieve)
-            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
-            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
+      "the form data is valid and is stored successfully" should {
+        " redirect to Self-employment Check Your Answers" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
-            When("Post /details/business-name is called")
-            val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
+          When("Post /details/business-name is called")
+          val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
 
-            Then("should return a SEE_OTHER")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(BusinessCYAUri)
-            )
-          }
+          Then("should return a SEE_OTHER")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessCYAUri)
+          )
         }
       }
 
-      "save and retrieve feature switch is disabled" when {
-        "the form data is valid and is stored successfully" should {
-          " redirect to Business Check Your Answers" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
-            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
+      "the form data is valid and is stored successfully" should {
+        "redirect to Business Check Your Answers" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
-            When("Post /details/business-name is called")
-            val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
+          When("Post /details/business-name is called")
+          val res = submitBusinessName(businessId, inEditMode = true, Some(testBusinessNameModel))
 
-            Then("should return a SEE_OTHER")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(BusinessListCYAUri)
-            )
-          }
+          Then("should return a SEE_OTHER")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessCYAUri)
+          )
         }
       }
 

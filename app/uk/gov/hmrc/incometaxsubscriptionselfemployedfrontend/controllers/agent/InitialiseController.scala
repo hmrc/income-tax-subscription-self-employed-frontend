@@ -18,8 +18,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -29,24 +27,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents, authService: AuthService)
-                                    (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) with FeatureSwitching {
+                                    (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
 
   val initialise: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       val id = UUID.randomUUID().toString
 
-      Future.successful(Redirect(next(id)))
+      Future.successful(Redirect(routes.BusinessNameController.show(id)))
     }
   }
 
-  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
-
-  //save & retrieve on should have an order of: business name (this) -> business start date -> business trade
-  //save & retrieve off should have an order of: business start date -> business name (this) -> business trade
-  private def next(id: String) = {
-    if (isSaveAndRetrieve)
-      routes.BusinessNameController.show(id)
-    else
-      routes.BusinessStartDateController.show(id)
-  }
 }

@@ -22,8 +22,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
@@ -47,9 +45,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             val languageUtils: LanguageUtils,
                                             businessStartDate: BusinessStartDateView)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with FeatureSwitching with ReferenceRetrieval {
-
-  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
   def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html = {
@@ -65,7 +61,8 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     authService.authorised() {
       withReference { reference =>
         multipleSelfEmploymentsService.fetchBusinessStartDate(reference, id).map {
-          case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
+          case Right(businessStartDateData) =>
+            Ok(view(form.fill(businessStartDateData), id, isEditMode))
           case Left(error) => throw new InternalServerException(error.toString)
         }
       }
@@ -87,24 +84,18 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  //save & retrieve on should have an order of: business name -> business start date (this)-> business trade
-  //save & retrieve off should have an order of: business start date (this)-> business name -> business trade
   private def next(id: String, isEditMode: Boolean) = Redirect(
-    (isEditMode, isSaveAndRetrieve) match {
-      case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
-      case (false, true) => routes.BusinessTradeNameController.show(id)
-      case (true, false) => routes.BusinessListCYAController.show
-      case (false, false) => routes.BusinessNameController.show(id)
+    if (isEditMode) {
+      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+    } else {
+      routes.BusinessTradeNameController.show(id)
     }
   )
 
-  //save & retrieve on should have an order of: business name -> business start date (this)-> business trade
-  //save & retrieve off should have an order of: business start date (this)-> business name -> business trade
-  def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
-    case (false, true) => routes.BusinessNameController.show(id).url
-    case (true, false) => routes.BusinessListCYAController.show.url
-    case (false, false) => appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income"
+  def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
+  } else {
+    routes.BusinessNameController.show(id).url
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {

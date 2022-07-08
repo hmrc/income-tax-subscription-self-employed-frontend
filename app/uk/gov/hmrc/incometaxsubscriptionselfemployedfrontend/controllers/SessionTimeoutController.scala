@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import play.api.mvc.{Action, AnyContent, _}
+import play.api.mvc._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects

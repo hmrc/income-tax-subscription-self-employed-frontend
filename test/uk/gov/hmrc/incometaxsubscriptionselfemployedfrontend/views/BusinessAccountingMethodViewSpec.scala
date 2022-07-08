@@ -23,7 +23,6 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
@@ -145,39 +144,15 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document().getForm.attr("action") mustBe testCall.url
     }
 
-    "have a continue button" when {
-      "not in edit mode" when {
-        "the save and retrieve feature switch is disabled" in {
-          disable(SaveAndRetrieve)
-          document().getButtonByClass mustBe BusinessAccountingMethodMessages.continue
-        }
-      }
+    "have a save and continue button" in {
+      document(BusinessAccountingMethodForm.businessAccountingMethodForm).select("button").last().text mustBe BusinessAccountingMethodMessages.saveAndContinue
     }
 
-    "have an update button" when {
-      "in edit mode" when {
-        "the save and retrieve feature switch is disabled" in {
-          disable(SaveAndRetrieve)
-          document(BusinessAccountingMethodForm.businessAccountingMethodForm, isEditMode = true).getButtonByClass mustBe BusinessAccountingMethodMessages.update
-        }
-      }
-    }
-
-    "have a save and continue button" when {
-      "the save and retrieve feature switch is enabled" in {
-        enable(SaveAndRetrieve)
-        document(BusinessAccountingMethodForm.businessAccountingMethodForm).select("button").last().text mustBe BusinessAccountingMethodMessages.saveAndContinue
-      }
-    }
-
-    "have a save and come back later link" when {
-      "the save and retrieve feature switch is enabled" in {
-        enable(SaveAndRetrieve)
-        val saveAndComeBackLink: Element = document(BusinessAccountingMethodForm.businessAccountingMethodForm).selectHead("a[role=button]")
-        saveAndComeBackLink.text mustBe BusinessAccountingMethodMessages.saveAndComeBackLater
-        saveAndComeBackLink.attr("href") mustBe
-          appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-accounting-type"
-      }
+    "have a save and come back later link" in {
+      val saveAndComeBackLink: Element = document(BusinessAccountingMethodForm.businessAccountingMethodForm).selectHead("a[role=button]")
+      saveAndComeBackLink.text mustBe BusinessAccountingMethodMessages.saveAndComeBackLater
+      saveAndComeBackLink.attr("href") mustBe
+        appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-accounting-type"
     }
   }
 

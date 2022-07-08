@@ -22,8 +22,6 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm._
@@ -43,7 +41,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
                                             val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with FeatureSwitching with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   def view(businessTradeNameForm: Form[BusinessTradeNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     businessTradeName(
@@ -87,13 +85,10 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  //save & retrieve on should have an order of: business name -> business start date -> business trade (this)
-  //save & retrieve off should have an order of: business start date -> business name -> business trade (this)
-  private def next(id: String, isEditMode: Boolean) = Redirect((isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
-    case (false, true) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, isEditMode)
-    case (true, false) => routes.BusinessListCYAController.show
-    case (false, false) => routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)
+  private def next(id: String, isEditMode: Boolean) = Redirect(if (isEditMode) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+  } else {
+    routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, isEditMode)
   })
 
   private def getExcludedBusinessTradeNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessTradeNameModel] = {
@@ -111,15 +106,10 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
-
-  //save & retrieve on should have an order of: business name -> business start date -> business trade (this)
-  //save & retrieve off should have an order of: business start date -> business name -> business trade (this)
-  def backUrl(id: String, isEditMode: Boolean): String = (isEditMode, isSaveAndRetrieve) match {
-    case (true, true) => routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
-    case (false, true) => routes.BusinessStartDateController.show(id).url
-    case (true, false) => routes.BusinessListCYAController.show.url
-    case (false, false) => routes.BusinessNameController.show(id).url
+  def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
+  } else {
+    routes.BusinessStartDateController.show(id).url
   }
 
 }

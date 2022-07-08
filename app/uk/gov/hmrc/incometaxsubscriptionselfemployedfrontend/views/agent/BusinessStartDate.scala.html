@@ -16,8 +16,6 @@
 
 @import play.api.data.Form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{SaveAndContinueButtonHelper, _}
@@ -28,7 +26,6 @@
         continueButton: ContinueButton,
         buttonHelper: ButtonHelper,
         dateHelper: DateHelper,
-        featureSwitches: FeatureSwitchingImpl,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         form: FormWithCSRF
 )
@@ -48,12 +45,7 @@
             isPageHeading = false
         )
 
-        @if(featureSwitches.isEnabled(SaveAndRetrieve)) {
-            @saveAndContinueButtonHelper(individual = false, saveAndReturnReference = Some("sole-trader-trading-start-date"))
-        } else {
-            @continueButton(isEditMode = isEditMode)
-        }
-
+        @saveAndContinueButtonHelper(individual = false, saveAndReturnReference = Some("sole-trader-trading-start-date"))
     }
 
 }
