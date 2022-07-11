@@ -24,7 +24,6 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with FeatureSwitching {
@@ -67,7 +66,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           res must have(
             httpStatus(OK),
             pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
-            elementTextByID(id = "continue-button")("Continue"),
+            elementTextByClass(cssClass = "govuk-button")("Save and continue"),
             govukRadioButtonSet(id = "businessAccountingMethod", expectedLabel, expectedHint)
           )
         }
@@ -89,95 +88,47 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           res must have(
             httpStatus(OK),
             pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
-            elementTextByID(id = "continue-button")("Update"),
+            elementTextByClass("govuk-button")("Save and continue"),
             govukRadioButtonSet(id = "businessAccountingMethod", expectedLabel, expectedHint)
           )
         }
       }
-
     }
-
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
     "the form data is valid and connector stores it successfully" when {
       "not in edit mode" when {
-        "save and retrieve is enabled" should {
-          "redirect to self employed check your answer page" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
-            And("save and retrieve is enabled")
-            enable(SaveAndRetrieve)
+        "redirect to self employed check your answer page" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
 
-            When("POST /details/business-accounting-method is called")
-            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), id = Some("testId"))
+          When("POST /details/business-accounting-method is called")
+          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), id = Some("testId"))
 
-            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(BusinessCYAUri)
-            )
-          }
-        }
-
-        "save and retrieve is disabled" should {
-          "redirect to sign up frontend business routing controller" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
-            And("save and retrieve is disabled")
-            disable(SaveAndRetrieve)
-
-            When("POST /details/business-accounting-method is called")
-            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel))
-
-            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/business/routing")
-            )
-          }
+          Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessCYAUri)
+          )
         }
       }
 
       "in edit mode" when {
-        "save and retrieve is enabled" should {
-          "redirect to self employed check your answer page" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
-            And("save and retrieve is enabled")
-            enable(SaveAndRetrieve)
+        "redirect to self employed check your answer page" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
 
-            When("POST /details/business-accounting-method is called")
-            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true, id = Some("testId"))
+          When("POST /details/business-accounting-method is called")
+          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true, id = Some("testId"))
 
-            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(BusinessCYAUri)
-            )
-          }
-        }
-
-        "save and retrieve is disabled" should {
-          "redirect to sign up frontend final check your answer page" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
-            And("save and retrieve is disabled")
-            disable(SaveAndRetrieve)
-
-            When("POST /details/business-accounting-method is called")
-            val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), true)
-
-            Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/check-your-answers")
-            )
-          }
+          Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessCYAUri)
+          )
         }
       }
     }

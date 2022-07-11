@@ -18,9 +18,8 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{InternalServerException, NotFoundException}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -39,13 +38,8 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   override val controllerName: String = "SelfEmployedCYAController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
     "show" -> TestSelfEmployedCYAController.show(id, isEditMode = false),
-    "submit" -> TestSelfEmployedCYAController.submit(id, isEditMode = false)
+    "submit" -> TestSelfEmployedCYAController.submit(id)
   )
-
-  override def beforeEach(): Unit = {
-    disable(SaveAndRetrieve)
-    super.beforeEach()
-  }
 
   object TestSelfEmployedCYAController extends SelfEmployedCYAController(
     selfEmployedCYA,
@@ -74,103 +68,88 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   )
 
   "show" when {
-    "the save and retrieve feature switch is disabled" should {
-      "throw a not found exception" in {
+    "throw an internal server exception" when {
+      "there was a problem retrieving the users accounting method" in {
         mockAuthSuccess()
-        intercept[NotFoundException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][show] - The save and retrieve feature switch is disabled"
+        mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
+          .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method"
+      }
+      "there was a problem retrieving the users self employment data" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+        mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
+          .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data"
       }
     }
-    "the save and retrieve feature switch is enabled" should {
-      "throw an internal server exception" when {
-        "there was a problem retrieving the users accounting method" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockAuthSuccess()
-            mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+    "return OK" when {
+      "all data is retrieved successfully" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+        mockFetchBusiness(id)(Right(Some(selfEmployment)))
+        mockSelfEmployedCYA()
 
-            intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-              .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method"
-          }
-        }
-        "there was a problem retrieving the users self employment data" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockAuthSuccess()
-            mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-            mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)
 
-            intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-              .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data"
-          }
-        }
-      }
-      "return OK" when {
-        "all data is retrieved successfully" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockAuthSuccess()
-            mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-            mockFetchBusiness(id)(Right(Some(selfEmployment)))
-            mockSelfEmployedCYA()
-
-            val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)
-
-            status(result) mustBe OK
-            contentType(result) mustBe Some(HTML)
-          }
-        }
+        status(result) mustBe OK
+        contentType(result) mustBe Some(HTML)
       }
     }
   }
 
   "submit" when {
-    "the save and retrieve feature switch is disabled" should {
-      "throw a not found exception" in {
-        intercept[NotFoundException](await(TestSelfEmployedCYAController.submit(id, isEditMode = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][submit] - The save and retrieve feature switch is disabled"
+    "throw an internal server exception" when {
+      "there was a problem retrieving the users accounting method" in {
+        mockAuthSuccess()
+        mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
+          .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method"
+      }
+      "there was a problem retrieving the users self employment data" in {
+        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+        mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
+          .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data"
       }
     }
-    "the save and retrieve feature switch is enabled" should {
-      "throw an internal server exception" when {
-        "there was a problem retrieving the users accounting method" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockAuthSuccess()
-            mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-            intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-              .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method"
-          }
-        }
-        "there was a problem retrieving the users self employment data" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-            mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+    "return 303, (SEE_OTHER)" when {
+      "the user submits valid full data" in {
+        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+        mockFetchBusiness(id)(Right(Some(selfEmployment)))
+        mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
-            intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-              .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data"
-          }
-        }
+        val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(appConfig.taskListUrl)
+      }
+      "the user submits valid incomplete data" in {
+        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+        mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
       }
 
       "return 303, (SEE_OTHER) and redirect to the task list page" when {
         "the user submits valid full data" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-            mockFetchBusiness(id)(Right(Some(selfEmployment)))
-            mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
+          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+          mockFetchBusiness(id)(Right(Some(selfEmployment)))
+          mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
-            val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isEditMode = false)(fakeRequest)
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(appConfig.taskListUrl)
-          }
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(appConfig.taskListUrl)
         }
         "the user submits valid incomplete data" in {
-          withFeatureSwitch(SaveAndRetrieve) {
-            mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-            mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
+          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+          mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
 
-            val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isEditMode = false)(fakeRequest)
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(appConfig.taskListUrl)
-          }
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(appConfig.taskListUrl)
         }
       }
     }
@@ -188,6 +167,5 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
     }
   }
-
 
 }

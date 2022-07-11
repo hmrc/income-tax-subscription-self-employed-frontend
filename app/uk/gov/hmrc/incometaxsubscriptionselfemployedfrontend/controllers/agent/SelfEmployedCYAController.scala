@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-import play.api.i18n.I18nSupport
 import play.api.mvc._
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, SelfEmploymentsCYAModel}
@@ -39,44 +36,36 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
                                           multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                           mcc: MessagesControllerComponents)
                                          (implicit val appConfig: AppConfig, val ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport with FeatureSwitching with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval {
 
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      if (isEnabled(SaveAndRetrieve)) {
-        withReference { reference =>
-          withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-            Future.successful(Ok(checkYourAnswersView(
-              answers = selfEmploymentCYAModel,
-              postAction = routes.SelfEmployedCYAController.submit(id),
-              backUrl = backUrl(isEditMode)
-            )))
-          }
+      withReference { reference =>
+        withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
+          Future.successful(Ok(checkYourAnswersView(
+            answers = selfEmploymentCYAModel,
+            postAction = routes.SelfEmployedCYAController.submit(id),
+            backUrl = backUrl(isEditMode)
+          )))
         }
-      } else {
-        Future.failed(new NotFoundException("[SelfEmployedCYAController][show] - The save and retrieve feature switch is disabled"))
       }
     }
   }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    if (isEnabled(SaveAndRetrieve)) {
-      withReference { reference =>
-        withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-          if (selfEmploymentCYAModel.isComplete) {
-            multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
-              case Left(_) =>
-                throw new InternalServerException("[SelfEmployedCYAController][submit] - Failure to save self employment data")
-              case Right(_) => Redirect(appConfig.clientTaskListUrl)
-            }
-          } else {
-            Future.successful(Redirect(appConfig.clientTaskListUrl))
+  def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
+    withReference { reference =>
+      withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
+        if (selfEmploymentCYAModel.isComplete) {
+          multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
+            case Left(_) =>
+              throw new InternalServerException("[SelfEmployedCYAController][submit] - Failure to save self employment data")
+            case Right(_) => Redirect(appConfig.clientTaskListUrl)
           }
+        } else {
+          Future.successful(Redirect(appConfig.clientTaskListUrl))
         }
       }
-    } else {
-      Future.failed(new NotFoundException("[SelfEmployedCYAController][submit] - The save and retrieve feature switch is disabled"))
     }
   }
 

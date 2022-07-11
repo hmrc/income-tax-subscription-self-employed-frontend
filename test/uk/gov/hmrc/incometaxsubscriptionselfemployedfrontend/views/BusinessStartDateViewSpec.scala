@@ -38,7 +38,6 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val heading: String = title
     val line_1: String = "If you have multiple sole trader businesses, enter the start date of your main business."
     val hint = "For example, 17 4 2018."
-    val continue = "Continue"
     val backLink = "Back"
     val update = "Update"
     val saveAndContinue = "Save and continue"
@@ -56,16 +55,14 @@ class BusinessStartDateViewSpec extends ViewSpec {
   private val dateTooLateError = FormError("startDate", "error.business_start_date.day_month_year.max_date", List("11 April 2021"))
   private val dateTooEarlyError = FormError("startDate", "error.business_start_date.day_month_year.min_date", List("11 April 2021"))
 
-  val businessStartDateView : BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
+  val businessStartDateView: BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
 
   class Setup(isEditMode: Boolean = false,
-              isSaveAndRetrieve: Boolean = false,
               businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString)) {
     val page: HtmlFormat.Appendable = businessStartDateView(
       businessStartDateForm,
       testCall,
       isEditMode,
-      isSaveAndRetrieve = isSaveAndRetrieve,
       testBackUrl
     )(FakeRequest(), implicitly, appConfig)
 
@@ -89,7 +86,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.getForm.attr("action") mustBe testCall.url
     }
     "have a fieldset with dateInputs" in new Setup {
-      val fieldset = document.selectFirst("fieldset")
+      private val fieldset = document.selectFirst("fieldset")
       fieldset.select("div[id=startDate]").attr("class") mustBe "govuk-date-input"
       fieldset.attr("aria-describedby") mustBe s"startDate-hint"
       fieldset.selectHead("legend").text mustBe BusinessStartDateMessages.heading
@@ -99,19 +96,11 @@ class BusinessStartDateViewSpec extends ViewSpec {
       fieldset.select("div label[for=startDate-dateYear]").text() mustBe "Year"
     }
 
-    "have a continue button when not in edit mode" in new Setup {
-      document.select("button[id=continue-button]").text mustBe BusinessStartDateMessages.continue
-    }
-
-    "have update button when in edit mode" in new Setup(true) {
-      document.select("button[id=continue-button]").text mustBe BusinessStartDateMessages.update
-    }
-
-    "has save and retrieve buttons" which {
-      "include the save and continue button" in new Setup(isSaveAndRetrieve = true) {
+    "has buttons" which {
+      "include the save and continue button" in new Setup() {
         document.getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
       }
-      "include the save and come back later link" in new Setup(isSaveAndRetrieve = true) {
+      "include the save and come back later link" in new Setup() {
         val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
         saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBack
         saveAndComeBackLink.attr("href") mustBe
@@ -136,7 +125,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
     "must display max date error on page" in new Setup(
       businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooLateError)
-    ){
+    ) {
       document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
       document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.maxDate}"
@@ -144,7 +133,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
     "must display min date error on page" in new Setup(
       businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooEarlyError)
-    ){
+    ) {
       document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
       document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"

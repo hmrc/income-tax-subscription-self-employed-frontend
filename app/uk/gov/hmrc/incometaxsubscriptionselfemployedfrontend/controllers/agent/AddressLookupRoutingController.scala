@@ -20,8 +20,6 @@ import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
@@ -41,9 +39,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                                val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService)
                                               (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
-
-  private def isSaveAndRetrieve: Boolean = isEnabled(SaveAndRetrieve)
+  extends FrontendController(mcc) with ReferenceRetrieval {
 
   private def addressLookupContinueUrl(businessId: String, isEditMode: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
@@ -73,11 +69,10 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
           accountingMethod <- fetchAccountMethod(reference)
           _ <- multipleSelfEmploymentsService.saveBusinessAddress(reference, businessId, addressDetails)
         } yield {
-          (isEditMode, isSaveAndRetrieve) match {
-            case (false, true) if accountingMethod.isDefined => Redirect(routes.SelfEmployedCYAController.show(businessId))
-            case (false, true) => Redirect(routes.BusinessAccountingMethodController.show(Some(businessId)))
-            case (true, true) => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
-            case (_, false) => Redirect(routes.BusinessListCYAController.show)
+          isEditMode match {
+            case false if accountingMethod.isDefined => Redirect(routes.SelfEmployedCYAController.show(businessId))
+            case false => Redirect(routes.BusinessAccountingMethodController.show(Some(businessId)))
+            case true => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
           }
         }
       }

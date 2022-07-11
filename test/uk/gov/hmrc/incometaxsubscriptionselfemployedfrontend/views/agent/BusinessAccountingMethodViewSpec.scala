@@ -24,7 +24,6 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
@@ -54,12 +53,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
   private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
 
   class Setup(businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
-              isEditMode: Boolean = false, saveAndRetrieve: Boolean = false, backLink: Option[String] = Some(testBackUrl)) {
-
-    if (saveAndRetrieve)
-      enable(SaveAndRetrieve)
-    else
-      disable(SaveAndRetrieve)
+              isEditMode: Boolean = false, backLink: Option[String] = Some(testBackUrl)) {
 
     val page: HtmlFormat.Appendable = businessAccountingMethodView(
       businessAccountingMethodForm,
@@ -121,30 +115,15 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document.getForm.attr("action") mustBe testCall.url
     }
 
-    "have a continue button when not in edit mode" when {
-      "save and retrieve is not enabled" in new Setup {
-        document.getButtonByClass mustBe BusinessAccountingMethodMessages.continue
-      }
-    }
-    "have a update button when in edit mode" when {
-      "the save and retrieve is not enabled" in new Setup(isEditMode = true) {
-        document.getButtonByClass mustBe BusinessAccountingMethodMessages.update
-      }
+    "have a save and continue button" in new Setup() {
+      document.select("button").last().text mustBe BusinessAccountingMethodMessages.saveAndContinue
     }
 
-    "have a save and continue button" when {
-      "the save and retrieve feature switch is enabled" in new Setup(saveAndRetrieve = true) {
-        document.select("button").last().text mustBe BusinessAccountingMethodMessages.saveAndContinue
-      }
-    }
-
-    "have a save and come back later button" when {
-      "the save and retrieve feature switch is enabled" in new Setup(saveAndRetrieve = true) {
-        val saveAndComeBackLater: Element = document.mainContent.selectHead("a[role=button]")
-        saveAndComeBackLater.text mustBe BusinessAccountingMethodMessages.saveAndComeBackLater
-        saveAndComeBackLater.attr("href") mustBe
-          appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-accounting-type"
-      }
+    "have a save and come back later button" in new Setup() {
+      val saveAndComeBackLater: Element = document.mainContent.selectHead("a[role=button]")
+      saveAndComeBackLater.text mustBe BusinessAccountingMethodMessages.saveAndComeBackLater
+      saveAndComeBackLater.attr("href") mustBe
+        appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-accounting-type"
     }
 
     "must display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {

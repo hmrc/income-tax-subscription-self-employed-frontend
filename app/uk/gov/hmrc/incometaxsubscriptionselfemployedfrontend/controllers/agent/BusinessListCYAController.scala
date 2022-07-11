@@ -44,7 +44,7 @@ class BusinessListCYAController @Inject()(authService: AuthService,
                                          (implicit val ec: ExecutionContext,
                                           val appConfig: AppConfig,
                                           dateFormatter: ImplicitDateFormatterImpl)
-  extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   def view(addAnotherBusinessForm: Form[AddAnotherBusinessModel], businesses: Seq[SelfEmploymentData])(implicit request: Request[AnyContent]): Html = {
     checkYourAnswers(

@@ -18,19 +18,18 @@ package controllers
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants.{BusinessCYAUri, taskListURI, testAccountingMethodModel}
+import helpers.IntegrationTestConstants.{taskListURI, testAccountingMethodModel}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK, SEE_OTHER}
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 import java.time.LocalDate
 
-class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwitching {
+class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
   val businessId: String = "testId"
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
@@ -69,49 +68,26 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
     ))
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-check-your-answers" should {
-    "return OK" when {
-      "the save & retrieve feature switch is enabled" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
+    "return OK" in {
+      Given("I setup the Wiremock stubs")
+      stubAuthSuccess()
+      stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
-        When("GET /details/business-check-your-answers is called")
-        val res = getBusinessCheckYourAnswers(businessId, false )
+      When("GET /details/business-check-your-answers is called")
+      val res = getBusinessCheckYourAnswers(businessId, false)
 
-        Then("should return an OK with the SelfEmployedCYA page")
-        res must have(
-          httpStatus(OK),
-          pageTitle("Check your answers - sole trader business" + titleSuffix)
-        )
-      }
-    }
-
-    "return NOT_FOUND" when {
-      "the save & retrieve feature switch is disabled" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        And("save & retrieve feature switch is enabled")
-        disable(SaveAndRetrieve)
-
-        When("GET /details/business-check-your-answers is called")
-        val res = getBusinessCheckYourAnswers(businessId, false)
-
-        Then("Should return NOT FOUND")
-        res must have(
-          httpStatus(NOT_FOUND)
-        )
-      }
+      Then("should return an OK with the SelfEmployedCYA page")
+      res must have(
+        httpStatus(OK),
+        pageTitle("Check your answers - sole trader business" + titleSuffix)
+      )
     }
 
     "return INTERNAL_SERVER_ERROR" when {
       "the accounting method cannot be retrieved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
 
         When("GET /details/business-check-your-answers is called")
         val res = getBusinessCheckYourAnswers(businessId, false)
@@ -126,8 +102,6 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
 
         When("GET /details/business-check-your-answers is called")
         val res = getBusinessCheckYourAnswers(businessId, false)
@@ -148,8 +122,6 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
         stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
         stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(businessId)
@@ -166,8 +138,6 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
         stubAuthSuccess()
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
         stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(businessId)
@@ -180,29 +150,10 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
       }
     }
 
-    "return NOT_FOUND" when {
-      "the save & retrieve feature switch is disabled" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        And("save & retrieve feature switch is disabled")
-        disable(SaveAndRetrieve)
-
-        When("GET /details/business-check-your-answers is called")
-        val res = submitBusinessCheckYourAnswers(businessId)
-
-        Then("Should return NOT FOUND")
-        res must have(
-          httpStatus(NOT_FOUND)
-        )
-      }
-    }
-
     "return INTERNAL_SERVER_ERROR" when {
       "the accounting method cannot be retrieved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(businessId)
@@ -217,8 +168,6 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(businessId)
@@ -235,8 +184,6 @@ class SelfEmployedCYAControllerISpec  extends ComponentSpecBase with FeatureSwit
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
         stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
         stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(INTERNAL_SERVER_ERROR)
-        And("save & retrieve feature switch is enabled")
-        enable(SaveAndRetrieve)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(businessId)

@@ -20,7 +20,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.Configuration
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.{EnableUseRealAddressLookup, SaveAndRetrieve, switches}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.{EnableUseRealAddressLookup, switches}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -58,23 +58,6 @@ class FeatureSwitchingSpec extends UnitTestTrait with FeatureSwitching {
     "be true and false" in new Setup {
       FEATURE_SWITCH_ON mustBe "true"
       FEATURE_SWITCH_OFF mustBe "false"
-    }
-  }
-
-  "SaveAndRetrieve" should {
-    "return true if SaveAndRetrieve feature switch is enabled in sys.props" in new Setup {
-      enable(SaveAndRetrieve)
-      isEnabled(SaveAndRetrieve) mustBe true
-    }
-    "return false if SaveAndRetrieve feature switch is disabled in sys.props" in new Setup {
-      disable(SaveAndRetrieve)
-      isEnabled(SaveAndRetrieve) mustBe false
-    }
-    "return false if SaveAndRetrieve feature switch is not in sys.props but is set to off in config" in new Setup {
-      isEnabled(SaveAndRetrieve) mustBe false
-    }
-    "return true if SaveAndRetrieve feature switch is not in sys.props but is set to on in config" in new Setup(sarEnabled = true) {
-      isEnabled(SaveAndRetrieve) mustBe true
     }
   }
 

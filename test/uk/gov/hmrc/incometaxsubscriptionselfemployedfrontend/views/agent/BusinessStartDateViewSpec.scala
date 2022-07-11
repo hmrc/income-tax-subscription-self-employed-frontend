@@ -20,7 +20,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.FormError
 import play.twirl.api.Html
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
@@ -31,7 +30,6 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
   object BusinessStartDateMessages {
     val heading: String = "When did your client’s sole trader business start trading?"
     val hint = "For example, 17 4 2018."
-    val continue = "Continue"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
     val update = "Update"
@@ -123,24 +121,11 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"
       }
 
-      "has a button to continue" when {
-        "not in edit mode" in {
-          disable(SaveAndRetrieve)
-          document().getForm.getGovukButton.text mustBe BusinessStartDateMessages.continue
-        }
-        "in edit mode" in {
-          disable(SaveAndRetrieve)
-          document(isEditMode = true).getForm.getGovukButton.text mustBe BusinessStartDateMessages.update
-        }
-      }
-
-      "has save and retrieve buttons" which {
+      "has buttons" which {
         "include the save and continue button" in {
-          enable(SaveAndRetrieve)
           document().getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
         }
         "include the save and come back later link" in {
-          enable(SaveAndRetrieve)
           val saveAndComeBackLink = document().selectHead("a[role=button]")
           saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBackLater
           saveAndComeBackLink.attr("href") mustBe

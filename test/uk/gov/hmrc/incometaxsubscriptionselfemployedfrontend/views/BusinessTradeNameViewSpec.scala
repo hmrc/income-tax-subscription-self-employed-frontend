@@ -22,7 +22,6 @@ import play.api.data.{Form, FormError}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
@@ -33,7 +32,6 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    disable(SaveAndRetrieve)
   }
 
   val businessTradeName: BusinessTradeName = app.injector.instanceOf[BusinessTradeName]
@@ -43,7 +41,6 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
     val hintText = "For example: plumbing, electrical work, consulting."
-    val continue = "Continue"
     val update = "Update"
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
@@ -56,10 +53,8 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
   val testError: FormError = FormError("businessTradeName", "testError")
   val id: String = "testId"
 
-  class Setup(isEditMode: Boolean = false, saveAndRetrieveEnabled: Boolean = false,
+  class Setup(isEditMode: Boolean = false,
               businessTradeNameForm: Form[BusinessTradeNameModel] = BusinessTradeNameForm.businessTradeNameValidationForm(Nil)) {
-
-    if(saveAndRetrieveEnabled) enable(SaveAndRetrieve)
 
     val page: HtmlFormat.Appendable = businessTradeName(
       businessTradeNameForm,
@@ -89,31 +84,24 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     "have a hint text for textInput" in new Setup {
       document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
     }
-    "have a continue button when not in edit mode" in new Setup {
-      document.getButtonByClass mustBe BusinessTradeNameMessages.continue
-    }
     "have update button when in edit mode" in new Setup(true) {
-      document.getButtonByClass mustBe BusinessTradeNameMessages.update
+      document.getButtonByClass mustBe BusinessTradeNameMessages.saveAndContinue
     }
-    "have a save and continue button" when {
-      "the save and retrieve feature switch is enabled" in new Setup(false, true) {
-        document.select("button").last().text mustBe BusinessTradeNameMessages.saveAndContinue
-      }
+    "have a save and continue button" in new Setup() {
+      document.select("button").last().text mustBe BusinessTradeNameMessages.saveAndContinue
     }
-    "have a save and come back later link" when {
-      "the save and retrieve feature switch is enabled" in new Setup(false, true) {
-        val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
-        saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
-        saveAndComeBackLink.attr("href") mustBe
-          appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-business-trade"
-      }
+    "have a save and come back later link" in new Setup() {
+      val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
+      saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
+      saveAndComeBackLink.attr("href") mustBe
+        appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-business-trade"
     }
     "have a backlink " in new Setup {
       document.getBackLinkByClass.text mustBe BusinessTradeNameMessages.backLink
       document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
     "must display form error on page along with textInput and hintText" in
-      new Setup(false, false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
+      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
         document.mustHaveErrorSummaryByNewGovUkClass(List[String](testError.message))
         document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
         document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText

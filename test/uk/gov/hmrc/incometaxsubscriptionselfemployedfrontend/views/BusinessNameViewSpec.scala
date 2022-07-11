@@ -37,7 +37,9 @@ class BusinessNameViewSpec extends ViewSpec {
     val update = "Update"
     val saveAndContinueButton = "Save and continue"
     val backLink = "Back"
-    val line1 = "This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name. The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
+    val line1: String = "This is the business name you used to register for Self Assessment. " +
+      "If your sole trader business does not have a separate name, enter your own first and last name. " +
+      "The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
     val emptyError = "Enter your name or the name of your business"
   }
 
@@ -45,50 +47,20 @@ class BusinessNameViewSpec extends ViewSpec {
   val action: Call = testCall
   val testError: FormError = FormError("businessName", "testError")
   val testError2: FormError = FormError("businessName", "testError2")
-  val businessName = app.injector.instanceOf[BusinessName]
+  val businessName: BusinessName = app.injector.instanceOf[BusinessName]
 
-  class Setup(isSaveAndRetrieve: Boolean = false, isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
+  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = businessName(
       businessNameForm,
       testCall,
       isEditMode = isEditMode,
-      testBackUrl,
-      isSaveAndRetrieve = isSaveAndRetrieve
+      testBackUrl
     )(FakeRequest(), implicitly, appConfig)
 
     val document: Document = Jsoup.parse(page.body)
   }
 
   "Business Name Page" must {
-    "have the correct template" when {
-      "there is an error" in new TemplateViewTest(
-        view = businessName(
-          businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError),
-          testCall,
-          isEditMode = false,
-          testBackUrl,
-          isSaveAndRetrieve = false
-        )(FakeRequest(), implicitly, appConfig),
-        title = BusinessNameMessages.title,
-        backLink = Some(testBackUrl),
-        hasSignOutLink = true,
-        error = Some(testError)
-      )
-
-      "there is no error" in new TemplateViewTest(
-        view = businessName(
-          businessNameForm = BusinessNameForm.businessNameValidationForm(Nil),
-          testCall,
-          isEditMode = false,
-          testBackUrl,
-          isSaveAndRetrieve = false
-        )(FakeRequest(), implicitly, appConfig),
-        title = BusinessNameMessages.title,
-        backLink = Some(testBackUrl),
-        hasSignOutLink = true,
-        error = None
-      )
-    }
 
     "have a heading" in new Setup() {
       document.getH1Element.text mustBe BusinessNameMessages.heading
@@ -121,18 +93,13 @@ class BusinessNameViewSpec extends ViewSpec {
 
     }
 
-    "have a continue button when not in edit mode" in new Setup(isEditMode = false) {
-      document.selectHead(".govuk-button").text mustBe BusinessNameMessages.continue
+    "have a save and continue button when not in edit mode" in new Setup(isEditMode = false) {
+      document.selectHead(".govuk-button").text mustBe BusinessNameMessages.saveAndContinueButton
     }
 
-    "have update button when in edit mode" in new Setup(isEditMode = true) {
-      document.select("button").last().text mustBe BusinessNameMessages.update
-    }
-
-    "have a save and continue button when in save and retrieve feature switch is enabled" in new Setup(isSaveAndRetrieve = true) {
+    "have save and continue button when in edit mode" in new Setup(isEditMode = true) {
       document.select("button").last().text mustBe BusinessNameMessages.saveAndContinueButton
     }
-
 
   }
 

@@ -25,7 +25,6 @@ object FeatureSwitch {
   val prefix = "feature-switch"
 
   val switches: Set[FeatureSwitch] = Set(
-    SaveAndRetrieve,
     EnableUseRealAddressLookup
   )
 
@@ -37,11 +36,6 @@ object FeatureSwitch {
     }
 
   def get(str: String): Option[FeatureSwitch] = switches find (_.name == str)
-
-  case object SaveAndRetrieve extends FeatureSwitch {
-    override val name = s"$prefix.enable-save-and-retrieve"
-    override val displayText = "Save & Retrieve"
-  }
 
   case object EnableUseRealAddressLookup extends FeatureSwitch {
     override val name = s"$prefix.enable-use-real-AL"

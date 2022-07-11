@@ -17,7 +17,6 @@
 package controllers.agent
 
 import java.time.LocalDate
-
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
 import helpers.IntegrationTestConstants._
 import helpers.ComponentSpecBase
@@ -25,6 +24,7 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel, SelfEmploymentData}
 
 
@@ -91,7 +91,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER with a redirect location of business name")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(ClientBusinessNameUri)
+          redirectURI(routes.BusinessTradeNameController.show(businessId).url)
         )
       }
 
@@ -125,7 +125,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER with a redirect location of business name")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(ClientBusinessListCYAUri)
+          redirectURI(routes.SelfEmployedCYAController.show(businessId, isEditMode = true).url)
         )
       }
     }

@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
@@ -31,7 +30,6 @@ class InitialiseControllerSpec extends ControllerBaseSpec
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
 
   override def beforeEach(): Unit = {
-    disable(SaveAndRetrieve)
     super.beforeEach()
   }
 
@@ -46,29 +44,16 @@ class InitialiseControllerSpec extends ControllerBaseSpec
   )
 
   "initialise" when {
-    "save and retrieve feature switch is enabled" should {
-      s"return $SEE_OTHER and redirect to Business Name page" in {
+    s"return $SEE_OTHER and redirect to Business Name page" in {
 
-        mockAuthSuccess()
-        enable(SaveAndRetrieve)
+      mockAuthSuccess()
 
-        val result = TestInitialiseController.initialise(fakeRequest)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessNameController.show("testId").url)
-      }
+      val result = TestInitialiseController.initialise(fakeRequest)
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.BusinessNameController.show("testId").url)
     }
 
-    "save and retrieve feature switch is disabled" should {
-      s"return $SEE_OTHER and redirect to Business Start Date page" in {
-
-        mockAuthSuccess()
-        val result = TestInitialiseController.initialise(fakeRequest)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show("testId").url)
-      }
-    }
   }
-
 
   authorisationTests()
 

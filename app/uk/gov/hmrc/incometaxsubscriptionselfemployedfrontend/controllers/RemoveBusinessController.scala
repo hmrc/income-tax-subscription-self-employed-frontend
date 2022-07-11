@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
@@ -36,7 +35,7 @@ class RemoveBusinessController @Inject()(authService: AuthService,
                                          val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                          mcc: MessagesControllerComponents)
                                         (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval {
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {

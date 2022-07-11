@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.SaveAndRetrieve
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -131,7 +130,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   "Submit when not in edit mode" should {
 
-    "return 303, SEE_OTHER)" when {
+    "return 303, SEE_OTHER" when {
       "the user submits valid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
@@ -147,7 +146,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
       }
     }
-    "return 400, SEE_OTHER)" when {
+    "return 400, SEE_OTHER" when {
       "the user submits invalid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
@@ -186,35 +185,20 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   "Submit when in edit mode" should {
 
-    "return 303, SEE_OTHER)" when {
-      "the user submits valid data in edit mode" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+    "return 303, SEE_OTHER" when {
+      "the user submits valid data" in
+        withController { controller => {
+          mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-        val result = controller.submit(id, isEditMode = true)(
-          fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
-
-      }
-      }
-      "the user submits valid data in S&R mode" in
-        withFeatureSwitch(SaveAndRetrieve) {
-          withController { controller => {
-            mockAuthSuccess()
-            mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
-            mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
-
-            val result = controller.submit(id, isEditMode = false)(
-              fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-            )
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
-          }
+          val result = controller.submit(id, isEditMode = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
         }
-      }
+        }
       "the user does not update their trade in edit mode" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(
@@ -227,11 +211,11 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessListCYAController.show.url)
+        redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
       }
       }
     }
-    "return 400, SEE_OTHER)" when {
+    "return 400, SEE_OTHER" when {
       "the user submits invalid data" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
@@ -248,7 +232,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   "Submit when not in edit mode" should {
 
-    "return 303, SEE_OTHER)" when {
+    "return 303, SEE_OTHER" when {
       "the user submits valid data in non-edit mode" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
@@ -278,7 +262,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       }
       }
     }
-    "return 400, SEE_OTHER)" when {
+    "return 400, SEE_OTHER" when {
       "the user submits invalid data when in non-edit mode" in withController { controller => {
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
@@ -296,13 +280,13 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   "The back url" when {
     "in edit mode" should {
       s"redirect to ${routes.BusinessListCYAController.show.url}" in withController { controller => {
-        controller.backUrl(id, isEditMode = true) mustBe routes.BusinessListCYAController.show.url
+        controller.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
       }
     }
     "not in edit mode" should {
       s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller => {
-        controller.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+        controller.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
       }
       }
     }
