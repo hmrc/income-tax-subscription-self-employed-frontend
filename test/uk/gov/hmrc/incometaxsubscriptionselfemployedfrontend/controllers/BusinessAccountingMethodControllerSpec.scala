@@ -38,7 +38,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessAccountingMethodController"
   private val testId = "testId"
-  private val id: Option[String] = Some(testId)
+  private val id: String = testId
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
     "show" -> TestBusinessAccountingMethodController.show(id = id, isEditMode = false),
     "submit" -> TestBusinessAccountingMethodController.submit(id = id, isEditMode = false)
@@ -80,14 +80,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
         val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
-        response.message mustBe ("[BusinessAccountingMethodController][show] - Unexpected status: 500")
+        response.message mustBe "[BusinessAccountingMethodController][show] - Unexpected status: 500"
       }
 
       "there is an invalid Json" in withController { controller =>
         mockAuthSuccess()
         mockGetSelfEmployments(businessAccountingMethodKey)(Left(InvalidJson))
         val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
-        response.message mustBe ("[BusinessAccountingMethodController][show] - Invalid Json")
+        response.message mustBe "[BusinessAccountingMethodController][show] - Invalid Json"
       }
     }
 
@@ -123,7 +123,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
               )
               status(result) mustBe SEE_OTHER
               redirectLocation(result) mustBe
-                Some(routes.SelfEmployedCYAController.show(testId).url)
+                Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
             }
           }
 
@@ -146,7 +146,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "not in edit mode" should {
       "return None " in withController { controller =>
         mockAuthSuccess()
-        controller.backUrl(id = None, isEditMode = false) mustBe None
+        controller.backUrl(id = id, isEditMode = false) mustBe None
       }
     }
 

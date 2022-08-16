@@ -20,15 +20,8 @@ POST        /details/business-trade                    uk.gov.hmrc.incometaxsubs
 GET         /address-lookup-initialise/:businessId     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
 GET         /details/address-lookup/:businessId        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false)
 
-#Check your answers
-GET         /details/business-list                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.show
-POST        /details/business-list                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessListCYAController.submit
-
-# Remove business
-GET         /details/remove-business                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.RemoveBusinessController.show(id: String)
-
-GET         /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show(id: Option[String] ?= None, isEditMode: Boolean ?= false)
-POST        /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit(id: Option[String] ?= None, isEditMode: Boolean ?= false)
+GET         /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.show(id: String, isEditMode: Boolean ?= false)
+POST        /details/business-accounting-method        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAccountingMethodController.submit(id: String, isEditMode: Boolean ?= false)
 
 GET         /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.submit(id: String)

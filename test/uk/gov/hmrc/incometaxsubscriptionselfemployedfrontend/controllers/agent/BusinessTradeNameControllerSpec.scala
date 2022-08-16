@@ -38,7 +38,6 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   val id: String = "testId"
 
-
   override val controllerName: String = "BusinessTradeNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
 
@@ -279,15 +278,13 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show.url}" in withController { controller => {
+      s"redirect to ${routes.SelfEmployedCYAController.show(id).url}" in withController { controller =>
         controller.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
-      }
       }
     }
     "not in edit mode" should {
-      s"redirect to ${routes.BusinessNameController.show(id).url}" in withController { controller => {
+      s"redirect to ${routes.BusinessStartDateController.show(id).url}" in withController { controller =>
         controller.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
-      }
       }
     }
   }

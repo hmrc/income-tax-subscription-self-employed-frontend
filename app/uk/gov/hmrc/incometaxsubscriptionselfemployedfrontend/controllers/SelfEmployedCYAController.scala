@@ -58,9 +58,10 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
       withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
         if (selfEmploymentCYAModel.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
+            case Right(_) =>
+              Redirect(appConfig.taskListUrl)
             case Left(_) =>
-              throw new InternalServerException("[SelfEmployedCYAController][submit] - Failure to save self employment data")
-            case Right(_) => Redirect(appConfig.taskListUrl)
+              throw new InternalServerException("[SelfEmployedCYAController][submit] - Could not confirm self employment business")
           }
         } else {
           Future.successful(Redirect(appConfig.taskListUrl))

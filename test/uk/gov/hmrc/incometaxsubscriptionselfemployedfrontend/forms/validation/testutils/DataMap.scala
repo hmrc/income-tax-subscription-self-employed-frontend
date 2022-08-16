@@ -18,12 +18,11 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.t
 
 import play.api.data.validation._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{AddAnotherBusinessForm, BusinessAccountingMethodForm}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil._
 
 object DataMap {
-
 
   object DataMap {
 
@@ -40,15 +39,13 @@ object DataMap {
 
     val alwaysFailInvalid: Invalid = Invalid("always fail")
 
-    def addAnotherBusiness(value: String): DataMap = Map(AddAnotherBusinessForm.addAnotherBusiness -> value)
-
     def businessTradeNameMap(name: String): DataMap = Map(businessTradeName -> name)
 
     def businessAccountingMethod(accountingMethod: String): DataMap = Map(
       BusinessAccountingMethodForm.businessAccountingMethod -> accountingMethod
     )
 
-    def alwaysFail[T]: Constraint[T] = constraint[T]((t: T) => alwaysFailInvalid)
+    def alwaysFail[T]: Constraint[T] = constraint[T]((_: T) => alwaysFailInvalid)
 
   }
 

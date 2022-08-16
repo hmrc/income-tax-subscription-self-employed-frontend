@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 
-import java.time.LocalDate
-
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+
+import java.time.LocalDate
 
 object TestModels {
 
@@ -32,8 +32,6 @@ object TestModels {
   val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
 
   val mockBusinessNameModel: BusinessNameModel = BusinessNameModel("ITSA me, Mario")
-  val mockAddAnotherBusinessModelWithYes: AddAnotherBusinessModel = AddAnotherBusinessModel(Yes)
-  val mockAddAnotherBusinessModelWithNo: AddAnotherBusinessModel = AddAnotherBusinessModel(No)
 
   val testValidBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(auditRef = "1",
     Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT")))

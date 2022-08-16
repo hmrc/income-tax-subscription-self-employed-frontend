@@ -71,16 +71,6 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     saveData(reference, businessId, _.copy(businessAddress = Some(businessAddress), confirmed = false))
   }
 
-  def fetchAddressRedirect(reference: String, businessId: String)
-                          (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[String]]] = {
-    findData[String](reference, businessId, _.addressRedirect)
-  }
-
-  def saveAddressRedirect(reference: String, businessId: String, addressRedirect: String)
-                         (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(reference, businessId, _.copy(addressRedirect = Some(addressRedirect), confirmed = false))
-  }
-
   def confirmBusiness(reference: String, businessId: String)
                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     saveData(reference, businessId, _.copy(confirmed = true))

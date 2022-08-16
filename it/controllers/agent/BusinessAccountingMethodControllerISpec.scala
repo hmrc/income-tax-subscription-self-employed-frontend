@@ -23,8 +23,11 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
+
+  val id: String = "test-id"
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-accounting-method" when {
 
@@ -35,7 +38,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
         When("GET /client/details/business-accounting-method is called")
-        val res = getClientBusinessAccountingMethod()
+        val res = getClientBusinessAccountingMethod(id)
 
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(
@@ -53,7 +56,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
         When("GET /client/details/business-accounting-method is called")
-        val res = getClientBusinessAccountingMethod()
+        val res = getClientBusinessAccountingMethod(id)
 
         val expectedText = removeHtmlMarkup(messages("agent.business.accounting_method.cash"))
 
@@ -76,13 +79,12 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
 
         When("POST /client/details/business-accounting-method is called")
-        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel))
-
+        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel), id = id)
 
         Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing")
+          redirectURI(routes.SelfEmployedCYAController.show(id).url)
         )
       }
 
@@ -92,7 +94,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson("invalid"))(OK)
 
         When("POST /client/details/business-accounting-method is called")
-        val res = submitClientBusinessAccountingMethod(None)
+        val res = submitClientBusinessAccountingMethod(None, id = id)
 
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
@@ -109,13 +111,13 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
           Json.toJson(testAccountingMethodModel))(OK)
 
         When("POST /client/details/business-accounting-method?isEditMode=true is called")
-        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true)
+        val res = submitClientBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true, id = id)
 
 
         Then("Should return a SEE_OTHER with a redirect location of accounting method(this is temporary)")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/business/routing?editMode=true")
+          redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
         )
       }
 
@@ -125,7 +127,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson("invalid"))(OK)
 
         When("POST /client/details/business-accounting-method is called")
-        val res = submitClientBusinessAccountingMethod(None)
+        val res = submitClientBusinessAccountingMethod(None, id = id)
 
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")

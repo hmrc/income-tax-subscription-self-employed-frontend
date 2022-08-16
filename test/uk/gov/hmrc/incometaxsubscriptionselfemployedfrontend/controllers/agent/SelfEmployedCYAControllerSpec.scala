@@ -55,8 +55,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
     businessName = Some(BusinessNameModel("testBusinessName")),
     businessTradeName = Some(BusinessTradeNameModel("testBusinessTrade")),
-    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))),
-    addressRedirect = Some("/test-redirect")
+    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))))
   )
 
   val incompleteSelfEmployment: SelfEmploymentData = SelfEmploymentData(
@@ -64,8 +63,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
     businessName = Some(BusinessNameModel("testBusinessName")),
     businessTradeName = None,
-    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))),
-    addressRedirect = Some("/test-redirect")
+    businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))))
   )
 
   "throw an internal server exception" when {
@@ -132,22 +130,22 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
       "return 303, (SEE_OTHER) and redirect to the task list page" when {
         "the user submits valid full data" in {
-            mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-            mockFetchBusiness(id)(Right(Some(selfEmployment)))
-            mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
+          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+          mockFetchBusiness(id)(Right(Some(selfEmployment)))
+          mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
-            val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
-          }
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
+        }
         "the user submits valid incomplete data" in {
-            mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-            mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
+          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+          mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
 
-            val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
-          }
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
+        }
       }
     }
   }

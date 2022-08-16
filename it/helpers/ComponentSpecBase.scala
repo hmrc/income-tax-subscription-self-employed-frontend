@@ -27,7 +27,6 @@ import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.AddAnotherBusinessAgentForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
@@ -221,16 +220,12 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getClientKeepAlive: WSResponse = get(uri = "/client/keep-alive")
 
 
-  def getBusinessAccountingMethod(inEditMode: Boolean = false): WSResponse = get(s"/details/business-accounting-method?isEditMode=$inEditMode")
+  def getBusinessAccountingMethod(id: String, inEditMode: Boolean = false): WSResponse = get(s"/details/business-accounting-method?id=$id&isEditMode=$inEditMode")
 
   def submitBusinessAccountingMethod(request: Option[AccountingMethodModel],
                                      inEditMode: Boolean = false,
-                                     id: Option[String] = None
-                                    ): WSResponse = {
-    val uri = id
-      .fold(s"/details/business-accounting-method?isEditMode=$inEditMode")(
-        id => s"/details/business-accounting-method?isEditMode=$inEditMode&id=$id"
-      )
+                                     id: String): WSResponse = {
+    val uri = s"/details/business-accounting-method?isEditMode=$inEditMode&id=$id"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -242,11 +237,12 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientBusinessAccountingMethod(): WSResponse = get("/client/details/business-accounting-method")
+  def getClientBusinessAccountingMethod(id: String): WSResponse = get(s"/client/details/business-accounting-method?id=$id")
 
   def submitClientBusinessAccountingMethod(request: Option[AccountingMethodModel],
-                                           inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-accounting-method?isEditMode=$inEditMode"
+                                           inEditMode: Boolean = false,
+                                           id: String): WSResponse = {
+    val uri = s"/client/details/business-accounting-method?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
@@ -254,21 +250,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
             case (k, v) =>
               (k, Seq(v))
           }
-      )
-    )
-  }
-
-  def getCheckYourAnswers: WSResponse = get(s"/details/business-list")
-
-  def submitCheckYourAnswers(request: Option[AddAnotherBusinessModel],
-                             currentBusinesses: Int,
-                             limit: Int
-                            ): WSResponse = {
-    val uri = s"/details/business-list"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          AddAnotherBusinessForm.addAnotherBusinessForm(currentBusinesses, limit).fill(model).data.map { case (k, v) => (k, Seq(v)) }
       )
     )
   }
@@ -285,28 +266,14 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     post(s"/client/details/business-check-your-answers?id=$id")(Map.empty)
   }
 
-  def getClientCheckYourAnswers(id: String): WSResponse = get(s"/client/details/business-list?id=$id")
-
-  def submitClientCheckYourAnswers(request: Option[AddAnotherBusinessModel],
-                                   currentBusinesses: Int,
-                                   limit: Int): WSResponse = {
-    val uri = s"/client/details/business-list"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          AddAnotherBusinessAgentForm.addAnotherBusinessForm(currentBusinesses, limit).fill(model).data.map { case (k, v) => (k, Seq(v)) }
-      )
-    )
-  }
-
   def getAddressLookupInitialise(businessId: String): WSResponse = get(s"/address-lookup-initialise/$businessId")
 
-  def getAddressLookup(businessId: String, id: String, isEditMode : Boolean = false): WSResponse =
+  def getAddressLookup(businessId: String, id: String, isEditMode: Boolean = false): WSResponse =
     get(s"/details/address-lookup/$businessId?id=$id&isEditMode=$isEditMode")
 
   def getClientAddressLookupInitialise(itsaId: String): WSResponse = get(s"/client/address-lookup-initialise/$itsaId")
 
-  def getClientAddressLookup(itsaId: String, id: String, isEditMode : Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
+  def getClientAddressLookup(itsaId: String, id: String, isEditMode: Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
 
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim

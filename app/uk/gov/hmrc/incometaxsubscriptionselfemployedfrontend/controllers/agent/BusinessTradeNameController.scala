@@ -76,9 +76,12 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
             businessTradeNameData =>
-              multipleSelfEmploymentsService.saveBusinessTrade(reference, id, businessTradeNameData).map(_ =>
-                next(id, isEditMode)
-              )
+              multipleSelfEmploymentsService.saveBusinessTrade(reference, id, businessTradeNameData) map {
+                case Right(_) =>
+                  next(id, isEditMode)
+                case Left(_) =>
+                  throw new InternalServerException("[BusinessTradeNameController][submit] - Could not save business trade name")
+              }
           )
         }
       }
@@ -94,7 +97,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
   private def getExcludedBusinessTradeNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessTradeNameModel] = {
     val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
     businesses.filterNot(_.id == id).filter {
-      case SelfEmploymentData(_, _, _, Some(name), _, _, _) if currentBusinessName contains name => true
+      case SelfEmploymentData(_, _, _, Some(name), _, _) if currentBusinessName contains name => true
       case _ => false
     }.flatMap(_.businessTradeName)
   }

@@ -29,6 +29,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val id: String = "test-id"
+
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 
     "the Connector receives no content" should {
@@ -38,7 +40,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
         When("GET /details/business-accounting-method is called")
-        val res = getBusinessAccountingMethod()
+        val res = getBusinessAccountingMethod(id)
 
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(
@@ -57,7 +59,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
           When("GET /details/business-accounting-method is called")
-          val res = getBusinessAccountingMethod()
+          val res = getBusinessAccountingMethod(id)
 
           val expectedLabel = removeHtmlMarkup(messages("business.accounting_method.cash.label"))
           val expectedHint = removeHtmlMarkup(messages("business.accounting_method.cash.hint"))
@@ -79,7 +81,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
           When("GET /details/business-accounting-method is called")
-          val res = getBusinessAccountingMethod(true)
+          val res = getBusinessAccountingMethod(id, inEditMode = true)
 
           val expectedLabel = removeHtmlMarkup(messages("business.accounting_method.cash.label"))
           val expectedHint = removeHtmlMarkup(messages("business.accounting_method.cash.hint"))
@@ -105,7 +107,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
 
           When("POST /details/business-accounting-method is called")
-          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), id = Some("testId"))
+          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), id = id)
 
           Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
           res must have(
@@ -122,7 +124,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson(testAccountingMethodModel))(OK)
 
           When("POST /details/business-accounting-method is called")
-          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true, id = Some("testId"))
+          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), inEditMode = true, id = id)
 
           Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
           res must have(
@@ -139,7 +141,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
       stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson("invalid"))(OK)
 
       When("POST /details/business-accounting-method is called")
-      val res = submitBusinessAccountingMethod(None)
+      val res = submitBusinessAccountingMethod(None, id = id)
 
       Then("Should return a BAD_REQUEST and THE FORM With errors")
       res must have(

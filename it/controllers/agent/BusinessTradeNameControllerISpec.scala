@@ -101,8 +101,9 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+
         stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-        stubSaveSubscriptionData(reference, "BusinessTradeName", Json.toJson(testValidBusinessTradeNameModel))(OK)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
         When("POST /client/details/business-trade is called")
         val res = submitClientTradeName(businessId, Some(testValidBusinessTradeNameModel))
@@ -151,8 +152,9 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+
         stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusiness))(OK)
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
         When("POST /client/details/business-trade is called")
         val res = submitClientTradeName(businessId, Some(testValidBusinessTradeNameModel), inEditMode = true)

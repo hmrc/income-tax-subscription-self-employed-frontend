@@ -44,7 +44,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
                                                   (implicit val ec: ExecutionContext, val appConfig: AppConfig)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
-  def view(businessAccountingMethodForm: Form[AccountingMethodModel], id: Option[String], isEditMode: Boolean)
+  def view(businessAccountingMethodForm: Form[AccountingMethodModel], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html =
     businessAccountingMethod(
       businessAccountingMethodForm = businessAccountingMethodForm,
@@ -53,7 +53,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
       backUrl = backUrl(id, isEditMode)
     )
 
-  def show(id: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
         incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey).map {
@@ -68,32 +68,27 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     }
   }
 
-  def submit(id: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
         businessAccountingMethodForm.bindFromRequest.fold(
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessAccountingMethod =>
-            incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessAccountingMethodKey, businessAccountingMethod).map(_ =>
-              (id, isEditMode) match {
-                case (Some(id), _) =>
-                  Redirect(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id))
-                case _ =>
-                  Redirect(appConfig.subscriptionFrontendRoutingController)
-              }
-            )
+            incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessAccountingMethodKey, businessAccountingMethod) map {
+              case Right(_) =>
+                Redirect(routes.SelfEmployedCYAController.show(id, isEditMode))
+              case Left(_) =>
+                throw new InternalServerException("[BusinessAccountingMethodController][submit] - Could not save business accounting method")
+            }
         )
       }
     }
   }
 
-  def backUrl(id: Option[String], isEditMode: Boolean): Option[String] = {
-    (id, isEditMode) match {
-      case (Some(id), true) => Some(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url)
-      case (_, false) => None
-      case _ => Some(routes.BusinessListCYAController.show.url)
-    }
+  def backUrl(id: String, isEditMode: Boolean): Option[String] = {
+    if (isEditMode) Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+    else None
   }
 
 }
