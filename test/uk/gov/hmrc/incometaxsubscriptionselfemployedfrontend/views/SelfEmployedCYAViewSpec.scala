@@ -18,11 +18,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
-import play.api.data.FormError
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.AddAnotherBusinessForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmployedCYA
@@ -110,8 +108,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
     val document: Document = Jsoup.parse(page.body)
   }
-
-  val testError: FormError = FormError(AddAnotherBusinessForm.addAnotherBusiness, "test error message")
 
   "Check Your Answers" must {
 
@@ -209,7 +205,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
-              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = Some("testId"), isEditMode = true).url
+              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = "testId", isEditMode = true).url
             }
           }
 
@@ -230,7 +226,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
         }
 
         "not have a save and come back later button if confirmed" in new SetupComplete(true) {
-          val buttonLink = document.selectOptionally(".govuk-button--secondary")
+          val buttonLink: Option[Element] = document.selectOptionally(".govuk-button--secondary")
           buttonLink mustBe None
         }
 
@@ -316,7 +312,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addAccountingMethod
-              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = Some("testId"), isEditMode = true).url
+              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = "testId", isEditMode = true).url
             }
           }
 

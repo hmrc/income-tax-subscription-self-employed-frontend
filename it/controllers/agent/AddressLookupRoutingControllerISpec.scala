@@ -27,7 +27,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel, SelfEmploymentData}
 
 import java.net.URLEncoder
 
@@ -49,6 +49,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
   def getAddressLookupResponse(itsaId: String, id: String, isEditMode: Boolean): WSResponse = getClientAddressLookup(itsaId, id, isEditMode)
 
   private val addressLookupInitialise = "/address-lookup-initialise"
+
+  val testBusiness: SelfEmploymentData = SelfEmploymentData(id = businessId, businessAddress = Some(testBusinessAddressModel))
 
   s"GET $baseUrl$clientOrIndividual$addressLookupInitialise/$businessId" when {
 
@@ -100,9 +102,10 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
 
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessAddress = None))))
             stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
             stubGetAddressLookupDetails(addressId)(OK, Json.toJson(testBusinessAddressModel))
-            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinessAddressModel))(OK)
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
             When("GET /details/address-lookup/" + businessId + " is called")
             val res = getAddressLookupResponse(businessId, addressId, isEditMode = false)
@@ -121,81 +124,21 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           "redirect to sole trader check your answers page" in {
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
-            stubGetAddressLookupDetails(addressId)(OK, Json.toJson(testBusinessAddressModel))
-            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinessAddressModel))(OK)
+
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessAddress = None))))
             stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+            stubGetAddressLookupDetails(addressId)(OK, Json.toJson(testBusinessAddressModel))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
             When("GET /details/address-lookup/" + businessId + " is called")
             val res = getAddressLookupResponse(businessId, addressId, isEditMode = false)
 
-            Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers pagee")
+            Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers page")
             res must have(
               httpStatus(SEE_OTHER),
               redirectURI(ClientBusinessCYAUri)
             )
           }
-        }
-      }
-    }
-    "it is in edit mode" when {
-      "the address lookup service return successful JSON details" should {
-        "redirect to sole trader check your answers page" in {
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-          stubGetAddressLookupDetails(addressId)(OK, Json.toJson(testBusinessAddressModel))
-          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinessAddressModel))(OK)
-          stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-
-          When("GET /details/address-lookup/" + businessId + " is called")
-          val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
-
-          Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(ClientBusinessCYAUri)
-          )
-        }
-      }
-    }
-
-    "it is not in edit mode" when {
-      "the address lookup service return successful JSON details" should {
-        "redirect to business list check your answers page" in {
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-          stubGetAddressLookupDetails(addressId)(OK, Json.toJson(testBusinessAddressModel))
-          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinessAddressModel))(OK)
-          stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
-
-          When(s"GET $clientOrIndividual/details/address-lookup/" + businessId + " is called")
-          val res = getAddressLookupResponse(businessId, addressId, isEditMode = false)
-
-          Then("Should return a SEE_OTHER with a redirect location of business list check your answers")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(ClientBusinessAccountingMethodUri)
-          )
-        }
-      }
-    }
-
-    "it is in edit mode" when {
-      "the address lookup service return successful JSON details" should {
-        "redirect to business list check your answers page" in {
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-          stubGetAddressLookupDetails(addressId)(OK, Json.toJson(testBusinessAddressModel))
-          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinessAddressModel))(OK)
-          stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
-
-          When("GET /details/address-lookup/" + businessId + " is called")
-          val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
-
-          Then("Should return a SEE_OTHER with a redirect location of business list check your answers page")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(ClientBusinessAccountingMethodUri)
-          )
         }
       }
 
@@ -206,7 +149,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
         When(s"GET $clientOrIndividual/details/address-lookup/$businessId is called")
-        val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
+        val res = getAddressLookupResponse(businessId, addressId, isEditMode = false)
 
         Then("Should return a INTERNAL_SERVER_ERROR")
         res must have(
@@ -221,7 +164,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
         When(s"POST $clientOrIndividual/details/address-lookup/$businessId is called")
-        val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
+        val res = getAddressLookupResponse(businessId, addressId, isEditMode = false)
 
 
         Then("Should return a INTERNAL_SERVER_ERROR")
@@ -237,12 +180,34 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
 
         When(s"POST $clientOrIndividual/details/address-lookup/$businessId is called")
-        val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
+        val res = getAddressLookupResponse(businessId, addressId, isEditMode = false)
 
         Then("Should return a INTERNAL_SERVER_ERROR")
         res must have(
           httpStatus(INTERNAL_SERVER_ERROR)
         )
+      }
+    }
+    "it is in edit mode" when {
+      "the address lookup service return successful JSON details" should {
+        "redirect to sole trader check your answers page" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+
+          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness)))
+          stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+          stubGetAddressLookupDetails(addressId)(OK, Json.toJson(testBusinessAddressModel))
+          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+
+          When("GET /details/address-lookup/" + businessId + " is called")
+          val res = getAddressLookupResponse(businessId, addressId, isEditMode = true)
+
+          Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(ClientBusinessCYAUri)
+          )
+        }
       }
     }
   }

@@ -39,7 +39,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessAccountingMethodController"
   private val testId = "testId"
-  private val id: Option[String] = Some(testId)
+  private val id: String = testId
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
     "show" -> TestBusinessAccountingMethodController.show(id = id, isEditMode = false),
     "submit" -> TestBusinessAccountingMethodController.submit(id = id, isEditMode = false)
@@ -138,7 +138,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "not in edit mode" should {
       "return None" in withController { controller =>
         mockAuthSuccess()
-        controller.backUrl(id = None, isEditMode = false) mustBe None
+        controller.backUrl(id = id, isEditMode = false) mustBe None
       }
     }
 

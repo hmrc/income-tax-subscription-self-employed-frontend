@@ -20,7 +20,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import play.api.data.Form
-import play.api.mvc.{Action, AnyContent, Call}
+import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
@@ -59,7 +59,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     reset(businessStartDate)
   }
 
-  def mockBusinessStartDate(form: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String): Unit = {
+  def mockBusinessStartDate(isEditMode: Boolean, backUrl: String): Unit = {
     when(businessStartDate(
       ArgumentMatchers.any(),
       ArgumentMatchers.any(),
@@ -101,8 +101,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(Some(returnedModel)))
         mockBusinessStartDate(
-          form = businessStartDateForm(fill = Some(returnedModel)),
-          postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = false,
           backUrl = routes.BusinessNameController.show(id).url
         )
@@ -110,14 +108,12 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
 
         status(result) mustBe OK
-        contentType(result) mustBe Some("text/html")
+        contentType(result) mustBe Some(HTML)
       }
       "the connector returns no data" in {
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(None))
         mockBusinessStartDate(
-          form = businessStartDateForm(),
-          postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = false,
           backUrl = routes.BusinessNameController.show(id).url
         )
@@ -125,7 +121,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
 
         status(result) mustBe OK
-        contentType(result) mustBe Some("text/html")
+        contentType(result) mustBe Some(HTML)
       }
       "the page is in edit mode" in {
         val returnedModel: BusinessStartDateModel = BusinessStartDateModel(DateModel("01", "01", "2000"))
@@ -133,11 +129,14 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(Some(returnedModel)))
         mockBusinessStartDate(
-          form = businessStartDateForm(fill = Some(returnedModel)),
-          postAction = agent.routes.BusinessStartDateController.submit(id),
           isEditMode = true,
-          backUrl = agent.routes.BusinessListCYAController.show.url
+          backUrl = agent.routes.SelfEmployedCYAController.show(id, isEditMode = true).url
         )
+
+        val result = TestBusinessStartDateController.show(id, isEditMode = true)(fakeRequest)
+
+        status(result) mustBe OK
+        contentType(result) mustBe Some(HTML)
       }
     }
     "Throw an internal exception error" when {
@@ -171,8 +170,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
           mockBusinessStartDate(
-            form = businessStartDateForm(bind = None),
-            postAction = agent.routes.BusinessStartDateController.submit(id),
             isEditMode = false,
             backUrl = routes.BusinessNameController.show(id).url
           )
@@ -180,7 +177,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           val result = TestBusinessStartDateController.submit(id, isEditMode = false)(fakeRequest)
 
           status(result) mustBe BAD_REQUEST
-          contentType(result) mustBe Some("text/html")
+          contentType(result) mustBe Some(HTML)
         }
       }
     }
@@ -204,8 +201,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
           mockBusinessStartDate(
-            form = businessStartDateForm(bind = None),
-            postAction = agent.routes.BusinessListCYAController.submit,
             isEditMode = true,
             backUrl = routes.SelfEmployedCYAController.show(id, isEditMode = true).url
           )
@@ -213,7 +208,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           val result = TestBusinessStartDateController.submit(id, isEditMode = true)(fakeRequest)
 
           status(result) mustBe BAD_REQUEST
-          contentType(result) mustBe Some("text/html")
+          contentType(result) mustBe Some(HTML)
         }
       }
     }
@@ -221,8 +216,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "in edit mode" should {
-      s"redirect to ${routes.BusinessListCYAController.show.url}" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+      s"redirect to ${routes.SelfEmployedCYAController.show(id, isEditMode = true).url}" in {
+        TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
     "not in edit mode" should {

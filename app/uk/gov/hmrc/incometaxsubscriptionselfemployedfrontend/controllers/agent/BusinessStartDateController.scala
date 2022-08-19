@@ -76,9 +76,12 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessStartDateData =>
-            multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData).map(_ =>
-              next(id, isEditMode)
-            )
+            multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData) map {
+              case Right(_) =>
+                next(id, isEditMode)
+              case Left(_) =>
+                throw new InternalServerException("[BusinessStartDateController][submit] - Could not save business start date")
+            }
         )
       }
     }

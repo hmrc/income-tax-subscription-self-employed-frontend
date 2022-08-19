@@ -65,7 +65,6 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         mockInitialiseAddressLookup(continueUrl, isAgent = isAgent)(
           Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
         )
-        mockSaveAddressRedirect(businessId, redirectUrl)(Right(PostSubscriptionDetailsSuccessResponse))
 
         val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)
 
@@ -140,7 +139,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
             val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false)(fakeRequest)
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe
-              Some(routes.BusinessAccountingMethodController.show(Some(businessId)).url)
+              Some(routes.BusinessAccountingMethodController.show(businessId).url)
           }
         }
       }

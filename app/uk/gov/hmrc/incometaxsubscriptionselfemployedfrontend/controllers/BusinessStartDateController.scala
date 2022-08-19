@@ -46,7 +46,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             val languageUtils: LanguageUtils,
                                             businessStartDate: BusinessStartDateView)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc)  with ImplicitDateFormatter with ReferenceRetrieval with I18nSupport {
+  extends FrontendController(mcc) with ImplicitDateFormatter with ReferenceRetrieval with I18nSupport {
 
   def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html = {
@@ -76,8 +76,13 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           formWithErrors => {
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode)))
           },
-          businessStartDateData => multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData)
-            .map(_ => next(id, isEditMode))
+          businessStartDateData =>
+            multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData) map {
+              case Right(_) =>
+                next(id, isEditMode)
+              case Left(_) =>
+                throw new InternalServerException("[BusinessStartDateController][submit] - Could not save business start date")
+            }
         )
       }
     }

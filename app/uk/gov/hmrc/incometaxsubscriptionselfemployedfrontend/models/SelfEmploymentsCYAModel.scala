@@ -54,12 +54,11 @@ object SelfEmploymentsCYAModel {
   def apply(id: String, selfEmployment: Option[SelfEmploymentData], accountingMethod: Option[AccountingMethodModel]): SelfEmploymentsCYAModel = {
     SelfEmploymentsCYAModel(
       id = id,
-      confirmed = selfEmployment.map(_.confirmed).getOrElse(false),
+      confirmed = selfEmployment.exists(_.confirmed),
       businessStartDate = selfEmployment.flatMap(_.businessStartDate),
       businessName = selfEmployment.flatMap(_.businessName),
       businessTradeName = selfEmployment.flatMap(_.businessTradeName),
       businessAddress = selfEmployment.flatMap(_.businessAddress),
-      businessAddressRedirect = selfEmployment.flatMap(_.addressRedirect),
       accountingMethod = accountingMethod
     )
   }

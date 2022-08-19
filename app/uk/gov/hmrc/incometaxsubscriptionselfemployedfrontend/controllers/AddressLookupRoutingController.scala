@@ -68,13 +68,15 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         for {
           addressDetails <- fetchAddress(addressId)
           accountingMethod <- fetchAccountMethod(reference)
-          _ <- multipleSelfEmploymentsService.saveBusinessAddress(reference, businessId, addressDetails)
+          saveResult <- multipleSelfEmploymentsService.saveBusinessAddress(reference, businessId, addressDetails)
         } yield {
-          (isEditMode, true) match {
-            case (false, true) if accountingMethod.isDefined => Redirect(routes.SelfEmployedCYAController.show(businessId))
-            case (false, true) => Redirect(routes.BusinessAccountingMethodController.show(Some(businessId)))
-            case (true, true) => Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode))
-            case (_, false) => Redirect(routes.BusinessListCYAController.show)
+          saveResult match {
+            case Right(_) =>
+              if (isEditMode) Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode))
+              else if (accountingMethod.isDefined) Redirect(routes.SelfEmployedCYAController.show(businessId))
+              else Redirect(routes.BusinessAccountingMethodController.show(businessId))
+            case Left(_) =>
+              throw new InternalServerException("[AddressLookupResultController][addressLookupRedirect] - Could not save business address")
           }
         }
       }
