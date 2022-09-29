@@ -72,7 +72,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
-        form.bindFromRequest.fold(
+        form.bindFromRequest().fold(
           formWithErrors => {
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode)))
           },
@@ -107,7 +107,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   }
 
   def form(implicit request: Request[_]): Form[BusinessStartDate] = {
-    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toLongDate)
+    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toLongDate())
   }
 
 }

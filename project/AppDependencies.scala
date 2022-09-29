@@ -6,20 +6,20 @@ object AppDependencies {
 
   val appName = "income-tax-subscription-self-employed-frontend"
 
-  private val playLanguageVersion = "5.2.0-play-28"
-  private val bootstrapVersion = "5.24.0"
-  private val playHmrcFrontendVersion = "3.8.0-play-28"
+  private val playLanguageVersion = "5.3.0-play-28"
+  private val bootstrapVersion = "7.6.0"
+  private val playHmrcFrontendVersion = "3.29.0-play-28"
   private val scalatestplusVersion = "5.1.0"
-  private val catsVersion = "0.9.0"
+  private val catsVersion = "2.8.0"
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapVersion,
     "uk.gov.hmrc" %% "play-language" % playLanguageVersion,
     "uk.gov.hmrc" %% "play-frontend-hmrc" % playHmrcFrontendVersion,
-    "org.typelevel" %% "cats" % catsVersion
+    "org.typelevel" %% "cats-core" % catsVersion
   )
 
-  val test = Seq(
+  val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc" %% "bootstrap-test-play-28" % bootstrapVersion % Test,
     "org.scalatest" %% "scalatest" % "3.2.11" % "test, it",
     "org.jsoup" % "jsoup" % "1.14.3" % "test, it",

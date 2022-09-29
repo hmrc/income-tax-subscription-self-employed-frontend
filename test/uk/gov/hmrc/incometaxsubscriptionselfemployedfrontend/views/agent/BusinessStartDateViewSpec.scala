@@ -52,7 +52,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
       postAction = testCall,
       isEditMode = isEditMode,
       backUrl = testBackUrl
-    )(fakeTestRequest, implicitly, appConfig)
+    )(fakeTestRequest, implicitly)
   }
 
   def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document =

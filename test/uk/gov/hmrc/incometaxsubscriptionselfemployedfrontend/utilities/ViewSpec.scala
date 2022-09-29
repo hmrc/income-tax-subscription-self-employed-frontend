@@ -33,7 +33,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach {
 
@@ -268,7 +268,6 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
       dayInput.attr("name") mustBe s"$name-dateDay"
       dayInput.attr("type") mustBe "text"
-      dayInput.attr("pattern") mustBe "[0-9]*"
       dayInput.attr("inputmode") mustBe "numeric"
       if (isDateOfBirth) dayInput.attr("autocomplete") mustBe "bday-day"
       dayLabel.text mustBe "Day"
@@ -276,7 +275,6 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
       monthInput.attr("name") mustBe s"$name-dateMonth"
       monthInput.attr("type") mustBe "text"
-      monthInput.attr("pattern") mustBe "[0-9]*"
       monthInput.attr("inputmode") mustBe "numeric"
       if (isDateOfBirth) monthInput.attr("autocomplete") mustBe "bday-month"
       monthLabel.text mustBe "Month"
@@ -284,7 +282,6 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
       yearInput.attr("name") mustBe s"$name-dateYear"
       yearInput.attr("type") mustBe "text"
-      yearInput.attr("pattern") mustBe "[0-9]*"
       yearInput.attr("inputmode") mustBe "numeric"
       if (isDateOfBirth) yearInput.attr("autocomplete") mustBe "bday-year"
       yearLabel.text mustBe "Year"

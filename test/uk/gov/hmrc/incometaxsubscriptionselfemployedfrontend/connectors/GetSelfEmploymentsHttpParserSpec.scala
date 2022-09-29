@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 import play.api.libs.json.{Json, OFormat}
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure, getSelfEmploymentsHttpReads}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
 class GetSelfEmploymentsHttpParserSpec extends UnitTestTrait {
@@ -45,7 +45,7 @@ class GetSelfEmploymentsHttpParserSpec extends UnitTestTrait {
       "parse an incorrectly formatted Ok response as an invalid Json" in {
         val httpResponse = HttpResponse(OK, json = Json.obj(), headers = Map.empty)
 
-        val res = getSelfEmploymentsHttpReads.read(testHttpVerb, testUri, httpResponse)
+        val res = getSelfEmploymentsHttpReads[DummyModel].read(testHttpVerb, testUri, httpResponse)
 
 
         res mustBe Left(InvalidJson)
@@ -53,7 +53,7 @@ class GetSelfEmploymentsHttpParserSpec extends UnitTestTrait {
       "parse an no content response as None" in {
         val httpResponse = HttpResponse(NO_CONTENT, body = "")
 
-        val res = getSelfEmploymentsHttpReads.read(testHttpVerb, testUri, httpResponse)
+        val res = getSelfEmploymentsHttpReads[DummyModel].read(testHttpVerb, testUri, httpResponse)
 
 
         res mustBe Right(None)
@@ -62,7 +62,7 @@ class GetSelfEmploymentsHttpParserSpec extends UnitTestTrait {
       "parse any other http status as a UnexpectedStatusFailure" in {
         val httpResponse = HttpResponse(INTERNAL_SERVER_ERROR, body = "")
 
-        val res = getSelfEmploymentsHttpReads.read(testHttpVerb, testUri, httpResponse)
+        val res = getSelfEmploymentsHttpReads[DummyModel].read(testHttpVerb, testUri, httpResponse)
 
 
         res mustBe Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))

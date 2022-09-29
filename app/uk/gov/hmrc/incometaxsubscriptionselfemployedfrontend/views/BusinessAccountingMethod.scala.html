@@ -15,7 +15,6 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.{RadioItem, Text}
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
@@ -31,7 +30,7 @@
         radioHelper: RadioHelper
 )
 
-@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
 
 @detailsContent = {
     <p>@Messages("business.accounting_method.accordion.line_1")</p>

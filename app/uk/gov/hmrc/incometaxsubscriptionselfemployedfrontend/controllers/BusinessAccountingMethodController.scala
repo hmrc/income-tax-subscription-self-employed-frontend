@@ -71,7 +71,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
-        businessAccountingMethodForm.bindFromRequest.fold(
+        businessAccountingMethodForm.bindFromRequest().fold(
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessAccountingMethod =>

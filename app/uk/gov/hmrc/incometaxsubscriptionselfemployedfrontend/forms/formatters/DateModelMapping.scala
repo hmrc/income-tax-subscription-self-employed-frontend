@@ -45,11 +45,11 @@ object DateModelMapping {
 
       // These two sections have been split because the scala type inference fails without declaring the type of dayMonthValidation
       val dayMonthValidation: DateFormValidation[DayMonth] = (validateDay(data, ids), validateMonth(data, ids))
-        .map2(
+        .mapN(
           (day, month) => DayMonth(day, month)
         ).andThen(validateDayMonth)
       val result = (dayMonthValidation, validateYear(data, ids))
-        .map2(
+        .mapN(
           (dayMonth, year) => ValidDate(dayMonth.day, dayMonth.month, year)
         ).andThen(date => validateDate(date, minDate, maxDate))
 

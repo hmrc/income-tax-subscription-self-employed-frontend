@@ -65,7 +65,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       ArgumentMatchers.any(),
       ArgumentMatchers.eq(isEditMode),
       ArgumentMatchers.eq(backUrl)
-    )(any(), any(), any())) thenReturn HtmlFormat.empty
+    )(any(), any())) thenReturn HtmlFormat.empty
   }
 
   def businessStartDateForm(fill: Option[BusinessStartDateModel] = None, bind: Option[Map[String, String]] = None): Form[BusinessStartDateModel] = {

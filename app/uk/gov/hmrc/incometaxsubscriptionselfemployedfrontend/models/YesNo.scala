@@ -46,19 +46,15 @@ object YesNo {
   import No.NO
   import Yes.YES
 
-  private val reads: Reads[YesNo] = new Reads[YesNo] {
-    override def reads(json: JsValue): JsResult[YesNo] =
-      json.validate[String] map {
-        case YES => Yes
-        case NO => No
-      }
+  private val reads: Reads[YesNo] = (json: JsValue) => json.validate[String] flatMap {
+    case YES => JsSuccess(Yes)
+    case NO => JsSuccess(No)
+    case _ => JsError("[YesNo][reads] - Unable to parse value to YesNo type")
   }
 
-  private val writes: Writes[YesNo] = new Writes[YesNo] {
-    override def writes(o: YesNo): JsValue = o match {
-      case Yes => JsString(YES)
-      case No => JsString(NO)
-    }
+  private val writes: Writes[YesNo] = {
+    case Yes => JsString(YES)
+    case No => JsString(NO)
   }
 
   implicit val format: Format[YesNo] = Format[YesNo](reads, writes)

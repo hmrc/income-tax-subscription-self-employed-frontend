@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel, _}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
@@ -27,8 +26,6 @@
         saveAndContinueButton: SaveAndContinueButtonHelper,
         implicitDateFormatter: ImplicitDateFormatterImpl,
         hmrcPageHeading: HmrcPageHeadingHelper
-)(
-        implicit appConfig: AppConfig
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
@@ -66,7 +63,7 @@
 @tradingStartDate(businessStartDate: Option[BusinessStartDateModel], businessId: String) = @{
     import implicitDateFormatter.LongDate
     val question: String = messages("self_employed_cya.trading_start_date")
-    val answer: Option[String] = businessStartDate.map(_.startDate.toLocalDate.toLongDate)
+    val answer: Option[String] = businessStartDate.map(_.startDate.toLocalDate.toLongDate())
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,

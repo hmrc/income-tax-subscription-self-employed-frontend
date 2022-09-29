@@ -37,15 +37,22 @@ object DateValidation {
 
   final case class Year(value: Int)
 
-  abstract class DateField(name: String) {
+  sealed trait DateField {
+    def name: String
     override def toString: String = s"$name"
   }
 
-  final case object DayField extends DateField(name = "day")
+  final case object DayField extends DateField {
+    override val name: String = "day"
+  }
 
-  final case object MonthField extends DateField(name = "month")
+  final case object MonthField extends DateField {
+    override val name: String = "month"
+  }
 
-  final case object YearField extends DateField(name = "year")
+  final case object YearField extends DateField {
+    override val name: String = "year"
+  }
 
   final case class DayMonth(day: Day, month: Month)
 
