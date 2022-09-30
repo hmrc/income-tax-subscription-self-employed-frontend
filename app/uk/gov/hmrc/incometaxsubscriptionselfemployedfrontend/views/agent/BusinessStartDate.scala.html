@@ -15,7 +15,6 @@
  *@
 
 @import play.api.data.Form
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{SaveAndContinueButtonHelper, _}
@@ -29,7 +28,7 @@
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         form: FormWithCSRF
 )
-@(businessStartDateForm: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessStartDateForm: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.agent.start_date.heading"), optForm = Some(businessStartDateForm), backLink = Some(backUrl)) {
 

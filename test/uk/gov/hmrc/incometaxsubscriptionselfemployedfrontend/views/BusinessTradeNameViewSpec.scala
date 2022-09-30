@@ -61,7 +61,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       testCall,
       isEditMode = isEditMode,
       testBackUrl
-    )(FakeRequest(), implicitly, appConfig)
+    )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
   }

@@ -30,8 +30,8 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "6",
           "key-dateYear" -> "2001"
         ))
-        result.isRight must be (true)
-        result.right.get must be (DateModel("1", "6", "2001"))
+        result.isRight must be(true)
+        result mustBe Right(DateModel("1", "6", "2001"))
       }
     }
     "day only is numeric but rubbish" should {
@@ -41,10 +41,10 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "6",
           "key-dateYear" -> "2001"
         ))
-        result.isLeft must be (true)
-        val maybeFormError = result.left.get.headOption
-        maybeFormError.isDefined must be (true)
-        maybeFormError.get.key must be ("key-dateDay")
+        result.isLeft must be(true)
+        val maybeFormError = result.swap.getOrElse(Seq.empty).headOption
+        maybeFormError.isDefined must be(true)
+        maybeFormError.get.key must be("key-dateDay")
       }
     }
     "day only is non-numeric rubbish" should {
@@ -54,10 +54,10 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "6",
           "key-dateYear" -> "2001"
         ))
-        result.isLeft must be (true)
-        val maybeFormError = result.left.get.headOption
-        maybeFormError.isDefined must be (true)
-        maybeFormError.get.key must be ("key-dateDay")
+        result.isLeft must be(true)
+        val maybeFormError = result.swap.getOrElse(Seq.empty).headOption
+        maybeFormError.isDefined must be(true)
+        maybeFormError.get.key must be("key-dateDay")
       }
     }
     "month only is numeric but rubbish" should {
@@ -67,10 +67,10 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "13",
           "key-dateYear" -> "2001"
         ))
-        result.isLeft must be (true)
-        val maybeFormError = result.left.get.headOption
-        maybeFormError.isDefined must be (true)
-        maybeFormError.get.key must be ("key-dateMonth")
+        result.isLeft must be(true)
+        val maybeFormError = result.swap.getOrElse(Seq.empty).headOption
+        maybeFormError.isDefined must be(true)
+        maybeFormError.get.key must be("key-dateMonth")
       }
     }
     "month only is non-numeric rubbish" should {
@@ -80,10 +80,10 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "x",
           "key-dateYear" -> "2001"
         ))
-        result.isLeft must be (true)
-        val maybeFormError = result.left.get.headOption
-        maybeFormError.isDefined must be (true)
-        maybeFormError.get.key must be ("key-dateMonth")
+        result.isLeft must be(true)
+        val maybeFormError = result.swap.getOrElse(Seq.empty).headOption
+        maybeFormError.isDefined must be(true)
+        maybeFormError.get.key must be("key-dateMonth")
       }
     }
     "year only is numeric but rubbish" should {
@@ -93,10 +93,10 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "12",
           "key-dateYear" -> "1"
         ))
-        result.isLeft must be (true)
-        val maybeFormError = result.left.get.headOption
-        maybeFormError.isDefined must be (true)
-        maybeFormError.get.key must be ("key-dateYear")
+        result.isLeft must be(true)
+        val maybeFormError = result.swap.getOrElse(Seq.empty).headOption
+        maybeFormError.isDefined must be(true)
+        maybeFormError.get.key must be("key-dateYear")
       }
     }
     "year only is non-numeric rubbish" should {
@@ -106,10 +106,10 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "12",
           "key-dateYear" -> "x"
         ))
-        result.isLeft must be (true)
-        val maybeFormError = result.left.get.headOption
-        maybeFormError.isDefined must be (true)
-        maybeFormError.get.key must be ("key-dateYear")
+        result.isLeft must be(true)
+        val maybeFormError = result.swap.getOrElse(Seq.empty).headOption
+        maybeFormError.isDefined must be(true)
+        maybeFormError.get.key must be("key-dateYear")
       }
     }
     "corner case NOT leap year provided" should {
@@ -119,10 +119,10 @@ class DateModelMappingSpec extends AnyWordSpec with Matchers {
           "key-dateMonth" -> "2",
           "key-dateYear" -> "1900"
         ))
-        result.isLeft must be (true)
-        val maybeFormError = result.left.get.headOption
-        maybeFormError.isDefined must be (true)
-        maybeFormError.get.key must be ("key-dateDay")
+        result.isLeft must be(true)
+        val maybeFormError = result.swap.getOrElse(Seq.empty).headOption
+        maybeFormError.isDefined must be(true)
+        maybeFormError.get.key must be("key-dateDay")
       }
     }
   }

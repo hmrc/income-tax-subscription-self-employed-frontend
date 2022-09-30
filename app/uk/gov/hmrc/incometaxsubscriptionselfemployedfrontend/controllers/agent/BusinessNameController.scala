@@ -70,7 +70,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
       withReference { reference =>
         withAllBusinesses(reference) { businesses =>
           val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
-          businessNameValidationForm(excludedBusinessNames).bindFromRequest.fold(
+          businessNameValidationForm(excludedBusinessNames).bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
             businessNameData =>

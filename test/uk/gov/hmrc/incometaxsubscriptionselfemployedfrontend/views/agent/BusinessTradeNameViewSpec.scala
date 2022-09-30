@@ -61,7 +61,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       testCall,
       isEditMode = isEditMode,
       testBackUrl
-    )(FakeRequest(), implicitly, appConfig)
+    )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
   }
@@ -91,10 +91,10 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       document.select("button").last().text mustBe BusinessTradeNameMessages.saveAndContinue
     }
     "have a save and come back later link" in new Setup(false) {
-        val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
-        saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
-        saveAndComeBackLink.attr("href") mustBe
-          appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-business-trade"
+      val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
+      saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
+      saveAndComeBackLink.attr("href") mustBe
+        appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-business-trade"
     }
     "have a backlink " in new Setup {
       document.getBackLinkByClass.text mustBe BusinessTradeNameMessages.backLink

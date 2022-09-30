@@ -174,7 +174,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       testCall,
       isEditMode,
       backLink
-    )(FakeRequest(), implicitly, appConfig)
+    )(FakeRequest(), implicitly)
   }
 
   private def document(

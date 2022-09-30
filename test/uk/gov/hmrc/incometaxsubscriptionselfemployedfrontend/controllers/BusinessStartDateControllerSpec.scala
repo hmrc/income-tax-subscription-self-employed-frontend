@@ -38,7 +38,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   val id: String = "testId"
 
   private val businessStartDate = mock[BusinessStartDateView]
-  when(businessStartDate(any(), any(), any(), any())(any(), any(), any())).thenReturn(HtmlFormat.empty)
+  when(businessStartDate(any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
 
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(

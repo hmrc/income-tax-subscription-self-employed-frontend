@@ -45,7 +45,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
     val businessTradeNameView = mock[BusinessTradeName]
 
     when(businessTradeNameView(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
-    (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
+    (ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
 
     val controller = new BusinessTradeNameController(
       mockMessagesControllerComponents,

@@ -64,7 +64,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
       testCall,
       isEditMode,
       testBackUrl
-    )(FakeRequest(), implicitly, appConfig)
+    )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
   }

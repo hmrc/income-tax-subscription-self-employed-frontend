@@ -55,7 +55,7 @@ class BusinessNameViewSpec extends ViewSpec {
       testCall,
       isEditMode = isEditMode,
       testBackUrl
-    )(FakeRequest(), implicitly, appConfig)
+    )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
   }

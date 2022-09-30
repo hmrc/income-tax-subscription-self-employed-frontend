@@ -60,7 +60,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       testCall,
       isEditMode,
       backUrl = backLink
-    )(FakeRequest(), implicitly, appConfig)
+    )(FakeRequest(), implicitly)
 
 
     val document: Document = Jsoup.parse(page.body)
