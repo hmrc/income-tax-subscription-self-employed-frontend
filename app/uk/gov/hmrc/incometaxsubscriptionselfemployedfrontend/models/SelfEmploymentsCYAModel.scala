@@ -24,8 +24,8 @@ case class SelfEmploymentsCYAModel(id: String,
                                    businessName: Option[BusinessNameModel] = None,
                                    businessTradeName: Option[BusinessTradeNameModel] = None,
                                    businessAddress: Option[BusinessAddressModel] = None,
-                                   businessAddressRedirect: Option[String] = None,
-                                   accountingMethod: Option[AccountingMethodModel] = None) {
+                                   accountingMethod: Option[AccountingMethodModel] = None,
+                                   totalSelfEmployments: Int) {
 
   val businessStartDateComplete: Boolean = businessStartDate.isDefined
 
@@ -51,7 +51,7 @@ object SelfEmploymentsCYAModel {
 
   implicit val format: Format[SelfEmploymentsCYAModel] = Json.format[SelfEmploymentsCYAModel]
 
-  def apply(id: String, selfEmployment: Option[SelfEmploymentData], accountingMethod: Option[AccountingMethodModel]): SelfEmploymentsCYAModel = {
+  def apply(id: String, selfEmployment: Option[SelfEmploymentData], accountingMethod: Option[AccountingMethodModel], businessCount: Int): SelfEmploymentsCYAModel = {
     SelfEmploymentsCYAModel(
       id = id,
       confirmed = selfEmployment.exists(_.confirmed),
@@ -59,7 +59,8 @@ object SelfEmploymentsCYAModel {
       businessName = selfEmployment.flatMap(_.businessName),
       businessTradeName = selfEmployment.flatMap(_.businessTradeName),
       businessAddress = selfEmployment.flatMap(_.businessAddress),
-      accountingMethod = accountingMethod
+      accountingMethod = accountingMethod,
+      totalSelfEmployments = businessCount
     )
   }
 

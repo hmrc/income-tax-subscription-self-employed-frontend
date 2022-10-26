@@ -90,6 +90,12 @@ business.accounting_method.accruals                             = <span class="h
 business.accounting_method.accruals.label                       = Cyfrifyddu safonol
 business.accounting_method.accruals.hint                        = Rydych yn cofnodi ar y dyddiad yr ydych yn anfon anfoneb at eich tenantiaid, neu’n gofyn am daliad ganddynt, hyd yn oed os nad ydych yn cael nac yn talu unrhyw arian. Rydych yn cofnodi ar y dyddiad yr ydych yn cael anfoneb ar gyfer atgyweirio neu gynnal a chadw. Mae hwn hefyd yn cael ei alw yn ‘cyfrifyddu croniadau’ neu ‘cyfrifyddu traddodiadol’.
 
+# Change accounting method page
+business.change-accounting-method.heading                       = Newid y dull cyfrifyddu
+business.change-accounting-method.line-1                        = Os oes gennych fwy nag un busnes fel unig fasnachwr, mae’n rhaid i’ch holl fusnesau ddefnyddio’r un dull cyfrifyddu.
+business.change-accounting-method.warning                       = Rhybudd
+business.change-accounting-method.warning-text                  = Os byddwch yn newid y dull cyfrifyddu ar gyfer y busnes hwn, bydd gwneud hynny’n diweddaru’r dull cyfrifyddu yn awtomatig ar gyfer pob un o’ch busnesau fel unig fasnachwr.
+
 # Check your answers
 check_your_answers.title                                        = Gwiriwch eich atebion
 check_your_answers.heading                                      = Gwiriwch eich atebion

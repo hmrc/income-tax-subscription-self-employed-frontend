@@ -94,7 +94,7 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@accountingMethod(accountingMethod: Option[AccountingMethodModel], businessId: String) = @{
+@accountingMethod(accountingMethod: Option[AccountingMethodModel], businessCount: Int, businessId: String) = @{
     val question: String = messages("self_employed_cya.accounting_method")
     val answer: Option[String] = accountingMethod.map { accountingMethodModel =>
         accountingMethodModel.accountingMethod match {
@@ -102,7 +102,11 @@
             case Accruals => messages("self_employed_cya.accounting_method.accruals")
         }
     }
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
+    val changeUrl: String = if(businessCount > 1) {
+        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.ChangeAccountingMethodController.show(businessId).url
+    } else {
+        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
+    }
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
         hiddenContent = if(answer.isDefined) messages("self_employed_cya.accounting_method.change") else messages("self_employed_cya.accounting_method.add")
@@ -117,7 +121,7 @@
         @tradingStartDate(business.businessStartDate, business.id)
         @businessTrade(business.businessTradeName, business.id)
         @businessAddress(business.businessAddress, business.id)
-        @accountingMethod(business.accountingMethod, business.id)
+        @accountingMethod(business.accountingMethod, business.totalSelfEmployments, business.id)
     </dl>
 
 }

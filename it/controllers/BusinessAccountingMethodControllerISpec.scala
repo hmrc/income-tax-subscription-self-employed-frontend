@@ -22,14 +22,25 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel, BusinessNameModel, BusinessStartDate, BusinessTradeNameModel, DateModel, SelfEmploymentData}
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val id: String = "test-id"
+
+  val testBusinesses: Seq[SelfEmploymentData] = Seq(
+    SelfEmploymentData(
+      id = id,
+      businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
+      businessName = Some(BusinessNameModel("testBusinessName")),
+      businessTradeName = Some(BusinessTradeNameModel("testBusinessTrade")),
+      businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))))
+    )
+  )
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 
@@ -38,6 +49,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
         When("GET /details/business-accounting-method is called")
         val res = getBusinessAccountingMethod(id)
@@ -57,6 +69,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod(id)
@@ -79,6 +92,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod(id, inEditMode = true)
@@ -139,6 +153,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
       stubSaveSubscriptionData(reference, businessAccountingMethodKey, Json.toJson("invalid"))(OK)
+      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("POST /details/business-accounting-method is called")
       val res = submitBusinessAccountingMethod(None, id = id)

@@ -60,8 +60,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessName = Some(BusinessNameModel(s"ABC Limited")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
     businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
-    businessAddressRedirect = Some(s"test address redirect"),
-    accountingMethod = Some(AccountingMethodModel(Cash))
+    accountingMethod = Some(AccountingMethodModel(Cash)),
+    totalSelfEmployments = 1
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -78,7 +78,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessName = Some(BusinessNameModel(s"ABC Limited")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
     businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
-    businessAddressRedirect = Some(s"test address redirect")
+    totalSelfEmployments = 1
   )) {
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
@@ -97,8 +97,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
       businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
       businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
       confirmed = confirmed,
-      businessAddressRedirect = Some(s"test address redirect"),
-      accountingMethod = Some(AccountingMethodModel(Cash))
+      accountingMethod = Some(AccountingMethodModel(Cash)),
+      totalSelfEmployments = 1
     )
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,

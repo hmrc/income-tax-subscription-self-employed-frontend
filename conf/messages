@@ -87,6 +87,12 @@ business.accounting_method.accruals                             = <span class="h
 business.accounting_method.accruals.label                       = Standard accounting
 business.accounting_method.accruals.hint                        = You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
 
+# Change accounting method page
+business.change-accounting-method.heading                       = Changing accounting method
+business.change-accounting-method.line-1                        = If you have more than one sole trader business, all your businesses must have the same accounting method.
+business.change-accounting-method.warning                       = Warning
+business.change-accounting-method.warning-text                  = If you change the accounting method for this business, it will automatically update the accounting method across all your sole trader businesses.
+
 # Check your answers
 check_your_answers.title                                        = Check your answers
 check_your_answers.heading                                      = Check your answers

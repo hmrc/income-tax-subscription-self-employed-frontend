@@ -74,25 +74,28 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
                                         (implicit hc: HeaderCarrier): Future[Result] =
     for {
       accountingMethod <- fetchAccountMethod(reference)
-      business <- fetchSelfEmployment(reference, id)
-      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod))
+      businesses <- fetchSelfEmployments(reference)
+      business = businesses.find(_.id == id)
+      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, businesses.length))
     } yield result
 
   private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier) = {
-    incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey) map {
-      case Left(_) =>
-        throw new InternalServerException("[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method")
-      case Right(accountingMethod) => accountingMethod
-    }
+    incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey)
+      .map(_.getOrElse(throw new FetchAccountingMethodException))
   }
 
-  private def fetchSelfEmployment(reference: String, id: String)(implicit hc: HeaderCarrier) = {
-    multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
-      case Left(_) =>
-        throw new InternalServerException("[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data")
-      case Right(business) => business
-    }
+  private class FetchAccountingMethodException extends InternalServerException(
+    "[SelfEmployedCYAController][fetchAccountingMethod] - Failed to retrieve accounting method"
+  )
+
+  private def fetchSelfEmployments(reference: String)(implicit hc: HeaderCarrier) = {
+    multipleSelfEmploymentsService.fetchAllBusinesses(reference)
+      .map(_.getOrElse(throw new FetchAllBusinessesException))
   }
+
+  private class FetchAllBusinessesException extends InternalServerException(
+    "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
+  )
 
   def backUrl(isEditMode: Boolean): Option[String] = {
     if (isEditMode) {
