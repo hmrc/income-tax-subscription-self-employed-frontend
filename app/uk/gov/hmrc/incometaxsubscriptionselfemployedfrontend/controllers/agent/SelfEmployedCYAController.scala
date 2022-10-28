@@ -75,7 +75,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
     for {
       accountingMethod <- fetchAccountMethod(reference)
       business <- fetchSelfEmployment(reference, id)
-      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod))
+      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, 0)) //todo: set business count to actual value when agent side is implemented
     } yield result
 
   private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier) = {

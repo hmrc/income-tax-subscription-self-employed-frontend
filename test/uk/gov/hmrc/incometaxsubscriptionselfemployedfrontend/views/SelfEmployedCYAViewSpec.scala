@@ -60,8 +60,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessName = Some(BusinessNameModel(s"ABC Limited")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
     businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
-    businessAddressRedirect = Some(s"test address redirect"),
-    accountingMethod = Some(AccountingMethodModel(Cash))
+    accountingMethod = Some(AccountingMethodModel(Cash)),
+    totalSelfEmployments = 1
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -78,7 +78,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessName = Some(BusinessNameModel(s"ABC Limited")),
     businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
     businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
-    businessAddressRedirect = Some(s"test address redirect")
+    totalSelfEmployments = 1
   )) {
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
@@ -89,7 +89,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val document: Document = Jsoup.parse(page.body)
   }
 
-  class SetupComplete(confirmed: Boolean = false) {
+  class SetupComplete(confirmed: Boolean = false, totalSelfEmployments: Int = 1) {
     val answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
       id = testId,
       businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
@@ -97,8 +97,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
       businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
       businessAddress = Some(BusinessAddressModel(s"AuditRefId", Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
       confirmed = confirmed,
-      businessAddressRedirect = Some(s"test address redirect"),
-      accountingMethod = Some(AccountingMethodModel(Cash))
+      accountingMethod = Some(AccountingMethodModel(Cash)),
+      totalSelfEmployments = totalSelfEmployments
     )
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
@@ -201,11 +201,23 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
             "has a answer the user gave" in new SetupComplete {
               document.getSummaryList().getSummaryListRow(5).getSummaryListValue.text mustBe "Cash accounting"
             }
-            "has a change link" in new SetupComplete {
-              val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
-              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
-              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = "testId", isEditMode = true).url
+            "has a change link" which {
+              "points to the change accounting method page" when {
+                "the number of self employments is more than 1" in new SetupComplete(totalSelfEmployments = 2) {
+                  val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
+                  changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
+                  changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
+                  changeLink.attr("href") mustBe routes.ChangeAccountingMethodController.show(id = "testId").url
+                }
+              }
+              "points to the accounting method page" when {
+                "the number of self employments is 1" in new SetupComplete(totalSelfEmployments = 1) {
+                  val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
+                  changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
+                  changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
+                  changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = "testId", isEditMode = true).url
+                }
+              }
             }
           }
 
