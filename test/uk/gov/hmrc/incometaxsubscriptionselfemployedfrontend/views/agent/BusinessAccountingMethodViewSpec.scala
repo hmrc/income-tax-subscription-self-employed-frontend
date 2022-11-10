@@ -35,14 +35,14 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
   val backUrl: Option[String] = Some("/test-back-url")
   val action: Call = testCall
-  val emptyError = "Select if your client uses cash accounting or standard accounting"
+  val emptyError = "Select if your client uses cash basis accounting or traditional accounting"
 
   object BusinessAccountingMethodMessages {
     val title = "What accounting method does your client use for their sole trader businesses?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
-    val cash = "Cash accounting"
-    val accruals = "Standard accounting"
+    val cash = "Cash basis accounting"
+    val accruals = "Traditional accounting"
     val continue = "Continue"
     val update = "Update"
     val backLink = "Back"

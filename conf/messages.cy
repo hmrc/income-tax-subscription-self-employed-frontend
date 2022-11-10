@@ -72,8 +72,8 @@ error.business_trade_name.duplicate                             = Ni allwch nodi
 error.business_trade_name.invalid                               = Mae’n rhaid i fasnach y busnes gynnwys y llythrennau a i z, cysylltnodau, bylchau a chollnodau yn unig.
 
 #Business accounting method errors
-error.business_accounting_method.invalid                        = Dewiswch os ydych yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
-error.business_accounting_method.empty                          = Dewiswch os ydych yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
+error.business_accounting_method.invalid                        = Dewiswch os ydych yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
+error.business_accounting_method.empty                          = Dewiswch os ydych yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
 
 # Business Accounting Method page
 business.accounting_method.title                                = Pa ddull cyfrifyddu a ydych yn ei ddefnyddio ar gyfer eich busnes unig fasnachwr?
@@ -81,13 +81,13 @@ business.accounting_method.heading                              = Pa ddull cyfri
 business.accounting_method.line_1                               = Os oes gennych fwy nag un busnes unig fasnachwr, mae angen i’ch holl fusnesau gael yr un dull cyfrifyddu.
 business.accounting_method.accordion                            = Rhowch enghraifft i mi
 business.accounting_method.accordion.line_1                     = Gwnaethoch greu anfoneb i rywun ym mis Mawrth 2017, ond ni chawsoch yr arian tan fis Mai 2017. Os ydych yn rhoi gwybod i CThEM eich bod wedi cael yr incwm hwn ym:
-business.accounting_method.accordion.bullet_1                   = mis Mai 2017, rydych yn defnyddio ‘cyfrifyddu arian parod’
-business.accounting_method.accordion.bullet_2                   = mis Mawrth 2017, rydych yn defnyddio ‘cyfrifyddu safonol’
-business.accounting_method.cash                                 = <span class="heading-small">Cyfrifyddu arian parod</span><br>Rydych yn cofnodi naill ai ar y dyddiad yr ydych yn cael taliad gan eich tenantiaid i mewn i’ch cyfrif banc, neu ar y dyddiad yr ydych yn talu bil, er enghraifft ar gyfer atgyweirio a chynnal a chadw. Mae’r rhan fwyaf o fusnesau bach yn defnyddio’r dull hwn.
-business.accounting_method.cash.label                           = Cyfrifyddu arian parod
+business.accounting_method.accordion.bullet_1                   = mis Mai 2017, rydych yn defnyddio ‘cyfrifyddu ar sail arian parod’
+business.accounting_method.accordion.bullet_2                   = mis Mawrth 2017, rydych yn defnyddio ‘cyfrifyddu traddodiadol’
+business.accounting_method.cash                                 = <span class="heading-small">Cyfrifyddu ar sail arian parod</span><br>Rydych yn cofnodi naill ai ar y dyddiad yr ydych yn cael taliad gan eich tenantiaid i mewn i’ch cyfrif banc, neu ar y dyddiad yr ydych yn talu bil, er enghraifft ar gyfer atgyweirio a chynnal a chadw. Mae’r rhan fwyaf o fusnesau bach yn defnyddio’r dull hwn.
+business.accounting_method.cash.label                           = Cyfrifyddu ar sail arian parod
 business.accounting_method.cash.hint                            = Rydych yn cofnodi naill ai ar y dyddiad yr ydych yn cael taliad gan eich tenantiaid i mewn i’ch cyfrif banc, neu ar y dyddiad yr ydych yn talu bil, er enghraifft ar gyfer atgyweirio a chynnal a chadw. Mae’r rhan fwyaf o fusnesau bach yn defnyddio’r dull hwn.
-business.accounting_method.accruals                             = <span class="heading-small">Cyfrifyddu safonol</span><br>Rydych yn cofnodi ar y dyddiad yr ydych yn anfon anfoneb at eich tenantiaid, neu’n gofyn am daliad ganddynt, hyd yn oed os nad ydych yn cael nac yn talu unrhyw arian. Rydych yn cofnodi ar y dyddiad yr ydych yn cael anfoneb ar gyfer atgyweirio neu gynnal a chadw. Mae hwn hefyd yn cael ei alw yn ‘cyfrifyddu croniadau’ neu ‘cyfrifyddu traddodiadol’.
-business.accounting_method.accruals.label                       = Cyfrifyddu safonol
+business.accounting_method.accruals                             = <span class="heading-small">Cyfrifyddu traddodiadol</span><br>Rydych yn cofnodi ar y dyddiad yr ydych yn anfon anfoneb at eich tenantiaid, neu’n gofyn am daliad ganddynt, hyd yn oed os nad ydych yn cael nac yn talu unrhyw arian. Rydych yn cofnodi ar y dyddiad yr ydych yn cael anfoneb ar gyfer atgyweirio neu gynnal a chadw. Mae hwn hefyd yn cael ei alw yn ‘cyfrifyddu croniadau’ neu ‘cyfrifyddu traddodiadol’.
+business.accounting_method.accruals.label                       = Cyfrifyddu traddodiadol
 business.accounting_method.accruals.hint                        = Rydych yn cofnodi ar y dyddiad yr ydych yn anfon anfoneb at eich tenantiaid, neu’n gofyn am daliad ganddynt, hyd yn oed os nad ydych yn cael nac yn talu unrhyw arian. Rydych yn cofnodi ar y dyddiad yr ydych yn cael anfoneb ar gyfer atgyweirio neu gynnal a chadw. Mae hwn hefyd yn cael ei alw yn ‘cyfrifyddu croniadau’ neu ‘cyfrifyddu traddodiadol’.
 
 # Change accounting method page
@@ -205,12 +205,12 @@ agent.error.add_another_business.empty                          = Dewiswch ‘Ia
 # Agent Business Accounting Method page
 agent.business.accounting_method.title                          = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
 agent.business.accounting_method.heading                        = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
-agent.business.accounting_method.cash                           = Cyfrifyddu arian parod
-agent.business.accounting_method.accruals                       = Cyfrifyddu safonol
+agent.business.accounting_method.cash                           = Cyfrifyddu ar sail arian parod
+agent.business.accounting_method.accruals                       = Cyfrifyddu traddodiadol
 
 # Agent Business Accounting Method page
-agent.error.business_accounting_method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
-agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu arian parod neu gyfrifyddu safonol.
+agent.error.business_accounting_method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
+agent.error.business_accounting_method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
 
 ## Title pattern
 title_pattern.serviceName.govUk                                 = {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
@@ -243,8 +243,8 @@ self_employed_cya.business_address.add                          = Ychwanegu cyfe
 self_employed_cya.accounting_method                             = Dull cyfrifyddu ar gyfer incwm unig fasnachwr
 self_employed_cya.accounting_method.change                      = Newid y dull cyfrifyddu ar gyfer incwm unig fasnachwr
 self_employed_cya.accounting_method.add                         = Ychwanegu’r dull cyfrifyddu ar gyfer incwm unig fasnachwr
-self_employed_cya.accounting_method.cash                        = Cyfrifyddu arian parod
-self_employed_cya.accounting_method.accruals                    = Cyfrifyddu safonol
+self_employed_cya.accounting_method.cash                        = Cyfrifyddu ar sail arian parod
+self_employed_cya.accounting_method.accruals                    = Cyfrifyddu traddodiadol
 self_employed_cya.title                                         = Gwiriwch eich atebion - busnes unig fasnachwr
 self_employed_cya.heading                                       = Gwiriwch eich atebion
 self_employed_cya.caption                                       = Y busnes unig fasnachwr a nodwyd gennych
@@ -265,8 +265,8 @@ agent.self_employed_cya.business_address.add                    = Ychwanegu cyfe
 agent.self_employed_cya.accounting_method                       = Dull cyfrifyddu ar gyfer incwm unig fasnachwr
 agent.self_employed_cya.accounting_method.change                = Newid y dull cyfrifyddu ar gyfer incwm unig fasnachwr
 agent.self_employed_cya.accounting_method.add                   = Ychwanegu’r dull cyfrifyddu ar gyfer incwm unig fasnachwr
-agent.self_employed_cya.accounting_method.cash                  = Cyfrifyddu arian parod
-agent.self_employed_cya.accounting_method.accruals              = Cyfrifyddu safonol
+agent.self_employed_cya.accounting_method.cash                  = Cyfrifyddu ar sail arian parod
+agent.self_employed_cya.accounting_method.accruals              = Cyfrifyddu traddodiadol
 agent.self_employed_cya.title                                   = Gwirio’ch atebion – busnes unig fasnachwr
 agent.self_employed_cya.heading                                 = Gwirio’ch atebion
 agent.self_employed_cya.caption                                 = Y busnes unig fasnachwr a nodwyd gennych

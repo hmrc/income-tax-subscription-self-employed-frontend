@@ -19,6 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation
 import org.scalatest.matchers.should.Matchers._
 import play.api.data.Form
 import play.api.data.validation.Invalid
+import scala.language.implicitConversions
 
 package object testutils {
 

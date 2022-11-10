@@ -18,7 +18,6 @@ package controllers.agent
 
 import java.time.LocalDate
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
-import helpers.IntegrationTestConstants._
 import helpers.ComponentSpecBase
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._

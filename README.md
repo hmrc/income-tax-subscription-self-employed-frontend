@@ -32,16 +32,16 @@ Scala/Play frontend web UI that provides screens for an existing SA Individual t
    **Using the service locally**
 
 * Login via: [http://localhost:9949/auth-login-stub/gg-sign-in](http://localhost:9949/auth-login-stub/gg-sign-in)
-* Entry page (individual): [http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/details](http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/details)
-* Entry page (agent): [http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/client/details](http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/client/details)
+* Entry page (individual): [http://localhost:9561/report-quarterly/income-and-expenses/sign-up](http://localhost:9561/report-quarterly/income-and-expenses/sign-up)
+* Entry page (agent): [http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client](http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client)
 * Feature switches: [http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/test-only/feature-switch](http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/test-only/feature-switch)
 
   
 **Using the service on staging**
 
 * Login via: [https://www.staging.tax.service.gov.uk/auth-login-stub/gg-sign-in](https://www.staging.tax.service.gov.uk/auth-login-stub/gg-sign-in)
-* Entry page (individual): [https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/self-employments/details](https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/self-employments/details)
-* Entry page (agent): [https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/self-employments/client/details](https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/self-employments/client/details)
+* Entry page (individual): [https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up](https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up)
+* Entry page (agent): [https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/client](https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/client)
 * Feature switches: [https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/self-employments/test-only/feature-switch](https://www.staging.tax.service.gov.uk/report-quarterly/income-and-expenses/sign-up/self-employments/test-only/feature-switch)
 
 

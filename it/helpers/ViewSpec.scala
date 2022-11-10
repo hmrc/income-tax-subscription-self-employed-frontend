@@ -19,7 +19,7 @@ package helpers
 import org.jsoup.nodes.Element
 import org.scalatest.Assertions.fail
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait ViewSpec {
 
