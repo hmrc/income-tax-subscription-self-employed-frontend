@@ -10,6 +10,7 @@ lazy val microservice = Project(AppDependencies.appName, file("."))
   .settings(
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
+    scalacOptions ++= Seq("-deprecation", "-feature"),
   )
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)

@@ -39,7 +39,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
     .configure(config)
-    .build
+    .build()
 
   implicit def ws(implicit app: Application): WSClient = app.injector.instanceOf[WSClient]
 
@@ -90,7 +90,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     await(
       buildClient(uri)
         .withHttpHeaders(HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies))
-        .get
+        .get()
     )
   }
 

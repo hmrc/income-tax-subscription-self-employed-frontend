@@ -28,7 +28,7 @@ object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
     when(
       method = GET,
       uri = subscriptionDataUri(reference, id)
-    ) thenReturn(responseStatus, responseBody)
+    ).thenReturn(responseStatus, responseBody)
   }
 
   def stubSaveSubscriptionData(reference: String, id: String, body: JsValue = Json.obj())(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
@@ -36,7 +36,7 @@ object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
       method = POST,
       uri = subscriptionDataUri(reference, id),
       body = body
-    ) thenReturn(responseStatus, responseBody)
+    ).thenReturn(responseStatus, responseBody)
   }
 
 }

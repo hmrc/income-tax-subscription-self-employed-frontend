@@ -199,7 +199,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               document.getSummaryList().getSummaryListRow(5).getSummaryListKey.text mustBe CheckYourAnswersMessages.accountingMethod
             }
             "has a answer the user gave" in new SetupComplete {
-              document.getSummaryList().getSummaryListRow(5).getSummaryListValue.text mustBe "Cash accounting"
+              document.getSummaryList().getSummaryListRow(5).getSummaryListValue.text mustBe "Cash basis accounting"
             }
             "has a change link" which {
               "points to the change accounting method page" when {

@@ -18,8 +18,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
-import play.api.i18n.Lang
-import play.api.mvc.{Cookie, Cookies, Headers}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec

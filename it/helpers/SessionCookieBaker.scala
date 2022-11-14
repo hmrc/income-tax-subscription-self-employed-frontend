@@ -17,7 +17,7 @@
 package helpers
 
 import play.api.libs.crypto.DefaultCookieSigner
-import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, PlainText}
+import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, PlainText, SymmetricCryptoFactory}
 import uk.gov.hmrc.http.SessionKeys
 
 import java.net.URLEncoder

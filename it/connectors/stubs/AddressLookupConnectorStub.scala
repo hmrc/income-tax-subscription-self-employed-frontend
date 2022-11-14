@@ -30,14 +30,14 @@ object AddressLookupConnectorStub extends WireMockMethods {
     when(
       method = GET,
       uri = getAddressDetailsUrl(id)
-    ) thenReturn(responseStatus, responseBody)
+    ).thenReturn(responseStatus, responseBody)
   }
 
   def getAddressDetailsUrlNoId(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
     when(
       method = GET,
       uri = getAddressDetailsUrlNoId
-    ) thenReturn(responseStatus, responseBody)
+    ).thenReturn(responseStatus, responseBody)
   }
 
 
@@ -47,6 +47,6 @@ object AddressLookupConnectorStub extends WireMockMethods {
       method = POST,
       uri = addressLookupInitializeUrl,
       body = body
-    ) thenReturn(responseStatus, Map("Location" -> locationHeader), responseBody)
+    ).thenReturn(responseStatus, Map("Location" -> locationHeader), responseBody)
   }
 }

@@ -69,8 +69,8 @@ error.business_trade_name.duplicate                             = You cannot ent
 error.business_trade_name.invalid                               = Business trade must only include letters a to z, hyphens, spaces and apostrophes.
 
 #Business accounting method errors
-error.business_accounting_method.invalid                        = Select if you use cash accounting or standard accounting.
-error.business_accounting_method.empty                          = Select if you use cash accounting or standard accounting.
+error.business_accounting_method.invalid                        = Select if you use cash basis accounting or traditional accounting.
+error.business_accounting_method.empty                          = Select if you use cash basis accounting or traditional accounting.
 
 # Business Accounting Method page
 business.accounting_method.title                                = What accounting method do you use for your sole trader business?
@@ -78,13 +78,13 @@ business.accounting_method.heading                              = What accountin
 business.accounting_method.line_1                               = If you have more than one sole trader business, all your businesses need to have the same accounting method.
 business.accounting_method.accordion                            = Show me an example
 business.accounting_method.accordion.line_1                     = You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:
-business.accounting_method.accordion.bullet_1                   = May 2017, you use ‘cash accounting’
-business.accounting_method.accordion.bullet_2                   = March 2017, you use ‘standard accounting’
-business.accounting_method.cash                                 = <span class="heading-small">Cash accounting</span><br>You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method.
-business.accounting_method.cash.label                           = Cash accounting
+business.accounting_method.accordion.bullet_1                   = May 2017, you use ‘cash basis accounting’
+business.accounting_method.accordion.bullet_2                   = March 2017, you use ‘traditional accounting’
+business.accounting_method.cash                                 = <span class="heading-small">Cash basis accounting</span><br>You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method.
+business.accounting_method.cash.label                           = Cash basis accounting
 business.accounting_method.cash.hint                            = You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method.
-business.accounting_method.accruals                             = <span class="heading-small">Standard accounting</span><br>You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
-business.accounting_method.accruals.label                       = Standard accounting
+business.accounting_method.accruals                             = <span class="heading-small">Traditional accounting</span><br>You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
+business.accounting_method.accruals.label                       = Traditional accounting
 business.accounting_method.accruals.hint                        = You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
 
 # Change accounting method page
@@ -202,12 +202,12 @@ agent.error.add_another_business.empty                          = Select yes if 
 # Agent Business Accounting Method page
 agent.business.accounting_method.title                          = What accounting method does your client use for their sole trader businesses?
 agent.business.accounting_method.heading                        = What accounting method does your client use for their sole trader businesses?
-agent.business.accounting_method.cash                           = Cash accounting
-agent.business.accounting_method.accruals                       = Standard accounting
+agent.business.accounting_method.cash                           = Cash basis accounting
+agent.business.accounting_method.accruals                       = Traditional accounting
 
 # Agent Business Accounting Method page
-agent.error.business_accounting_method.invalid                  = Select if your client uses cash accounting or standard accounting.
-agent.error.business_accounting_method.empty                    = Select if your client uses cash accounting or standard accounting.
+agent.error.business_accounting_method.invalid                  = Select if your client uses cash basis accounting or traditional accounting.
+agent.error.business_accounting_method.empty                    = Select if your client uses cash basis accounting or traditional accounting.
 
 ## Title pattern
 title_pattern.serviceName.govUk                                 = {0} - Use software to send Income Tax updates - GOV.UK
@@ -244,8 +244,8 @@ self_employed_cya.business_address.add                          = Add Business a
 self_employed_cya.accounting_method                             = Accounting method for sole trader income
 self_employed_cya.accounting_method.change                      = Change Accounting method for sole trader income
 self_employed_cya.accounting_method.add                         = Add Accounting method for sole trader income
-self_employed_cya.accounting_method.cash                        = Cash accounting
-self_employed_cya.accounting_method.accruals                    = Standard accounting
+self_employed_cya.accounting_method.cash                        = Cash basis accounting
+self_employed_cya.accounting_method.accruals                    = Traditional accounting
 self_employed_cya.title                                         = Check your answers - sole trader business
 self_employed_cya.heading                                       = Check your answers
 self_employed_cya.caption                                       = Sole trader business you entered
@@ -266,8 +266,8 @@ agent.self_employed_cya.business_address.add                    = Add Business a
 agent.self_employed_cya.accounting_method                       = Accounting method for sole trader income
 agent.self_employed_cya.accounting_method.change                = Change Accounting method for sole trader income
 agent.self_employed_cya.accounting_method.add                   = Add Accounting method for sole trader income
-agent.self_employed_cya.accounting_method.cash                  = Cash accounting
-agent.self_employed_cya.accounting_method.accruals              = Standard accounting
+agent.self_employed_cya.accounting_method.cash                  = Cash basis accounting
+agent.self_employed_cya.accounting_method.accruals              = Traditional accounting
 agent.self_employed_cya.title                                   = Check your answers - sole trader business
 agent.self_employed_cya.heading                                 = Check your answers
 agent.self_employed_cya.caption                                 = Sole trader business you entered
