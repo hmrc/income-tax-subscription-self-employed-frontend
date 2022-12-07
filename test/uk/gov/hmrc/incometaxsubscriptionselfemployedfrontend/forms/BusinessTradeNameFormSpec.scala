@@ -56,9 +56,9 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       val maxLength = 35
 
-      val empty = "error.business_trade_name.empty"
-      val maxLen = "error.business_trade_name.maxLength"
-      val duplicate = "error.business_trade_name.duplicate"
+      val empty = "error.business-trade-name.empty"
+      val maxLen = "error.business-trade-name.max-length"
+      val duplicate = "error.business-trade-name.duplicate"
 
       "the map be empty" in {
         val emptyInput0 = DataMap.EmptyMap

@@ -29,8 +29,8 @@ object BusinessAccountingMethodForm {
   val businessAccountingMethodForm: Form[AccountingMethodModel] = Form(
     mapping(
       businessAccountingMethod -> AccountingMethodMapping(
-        errInvalid = Invalid("agent.error.business_accounting_method.invalid"),
-        errEmpty = Some(Invalid("agent.error.business_accounting_method.empty"))
+        errInvalid = Invalid("agent.error.business-accounting-method.invalid"),
+        errEmpty = Some(Invalid("agent.error.business-accounting-method.empty"))
       )
     )(AccountingMethodModel.apply)(AccountingMethodModel.unapply)
   )

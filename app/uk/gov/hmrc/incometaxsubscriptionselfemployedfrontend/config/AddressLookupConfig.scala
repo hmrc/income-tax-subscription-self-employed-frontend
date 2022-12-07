@@ -58,46 +58,46 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       "labels" -> Json.obj(
         "en" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("individual_serviceName")(en)
+            "navTitle" -> messagesApi("individual-service-name")(en)
           ),
           "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.selectPage.title")(en),
-            "heading" -> messagesApi("addressLookup.selectPage.heading")(en)
+            "title" -> messagesApi("address-lookup.select-page.title")(en),
+            "heading" -> messagesApi("address-lookup.select-page.heading")(en)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.lookupPage.title")(en),
-            "heading" -> messagesApi("addressLookup.lookupPage.heading")(en)
+            "title" -> messagesApi("address-lookup.lookup-page.title")(en),
+            "heading" -> messagesApi("address-lookup.lookup-page.heading")(en)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.editPage.title")(en),
-            "heading" -> messagesApi("addressLookup.editPage.heading")(en),
-            "postcodeLabel" -> messagesApi("addressLookup.editPage.postcodeLabel")(en)
+            "title" -> messagesApi("address-lookup.edit-page.title")(en),
+            "heading" -> messagesApi("address-lookup.edit-page.heading")(en),
+            "postcodeLabel" -> messagesApi("address-lookup.edit-page.postcode-label")(en)
           ),
           "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.confirmPage.title")(en),
-            "heading" -> messagesApi("addressLookup.confirmPage.heading")(en)
+            "title" -> messagesApi("address-lookup.confirm-page.title")(en),
+            "heading" -> messagesApi("address-lookup.confirm-page.heading")(en)
           )
         ),
         "cy" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("individual_serviceName")(cy)
+            "navTitle" -> messagesApi("individual-service-name")(cy)
           ),
           "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.selectPage.title")(cy),
-            "heading" -> messagesApi("addressLookup.selectPage.heading")(cy)
+            "title" -> messagesApi("address-lookup.select-page.title")(cy),
+            "heading" -> messagesApi("address-lookup.select-page.heading")(cy)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.lookupPage.title")(cy),
-            "heading" -> messagesApi("addressLookup.lookupPage.heading")(cy)
+            "title" -> messagesApi("address-lookup.lookup-page.title")(cy),
+            "heading" -> messagesApi("address-lookup.lookup-page.heading")(cy)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.editPage.title")(cy),
-            "heading" -> messagesApi("addressLookup.editPage.heading")(cy),
-            "postcodeLabel" -> messagesApi("addressLookup.editPage.postcodeLabel")(cy)
+            "title" -> messagesApi("address-lookup.edit-page.title")(cy),
+            "heading" -> messagesApi("address-lookup.edit-page.heading")(cy),
+            "postcodeLabel" -> messagesApi("address-lookup.edit-page.postcode-label")(cy)
           ),
           "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("addressLookup.confirmPage.title")(cy),
-            "heading" -> messagesApi("addressLookup.confirmPage.heading")(cy)
+            "title" -> messagesApi("address-lookup.confirm-page.title")(cy),
+            "heading" -> messagesApi("address-lookup.confirm-page.heading")(cy)
           )
         )
       )
@@ -136,46 +136,46 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       "labels" -> Json.obj(
         "en" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("agent_serviceName")(en)
+            "navTitle" -> messagesApi("agent-service-name")(en)
           ),
           "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.selectPage.title")(en),
-            "heading" -> messagesApi("agent.addressLookup.selectPage.heading")(en)
+            "title" -> messagesApi("agent.address-lookup.select-page.title")(en),
+            "heading" -> messagesApi("agent.address-lookup.select-page.heading")(en)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.lookupPage.title")(en),
-            "heading" -> messagesApi("agent.addressLookup.lookupPage.heading")(en)
+            "title" -> messagesApi("agent.address-lookup.lookup-page.title")(en),
+            "heading" -> messagesApi("agent.address-lookup.lookup-page.heading")(en)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.editPage.title")(en),
-            "heading" -> messagesApi("agent.addressLookup.editPage.heading")(en),
-            "postcodeLabel" -> messagesApi("agent.addressLookup.editPage.postcodeLabel")(en)
+            "title" -> messagesApi("agent.address-lookup.edit-page.title")(en),
+            "heading" -> messagesApi("agent.address-lookup.edit-page.heading")(en),
+            "postcodeLabel" -> messagesApi("agent.address-lookup.edit-page.postcode-label")(en)
           ),
           "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.confirmPage.title")(en),
-            "heading" -> messagesApi("agent.addressLookup.confirmPage.heading")(en)
+            "title" -> messagesApi("agent.address-lookup.confirm-page.title")(en),
+            "heading" -> messagesApi("agent.address-lookup.confirm-page.heading")(en)
           )
         ),
         "cy" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("agent_serviceName")(cy)
+            "navTitle" -> messagesApi("agent-service-name")(cy)
           ),
           "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.selectPage.title")(cy),
-            "heading" -> messagesApi("agent.addressLookup.selectPage.heading")(cy)
+            "title" -> messagesApi("agent.address-lookup.select-page.title")(cy),
+            "heading" -> messagesApi("agent.address-lookup.select-page.heading")(cy)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.lookupPage.title")(cy),
-            "heading" -> messagesApi("agent.addressLookup.lookupPage.heading")(cy)
+            "title" -> messagesApi("agent.address-lookup.lookup-page.title")(cy),
+            "heading" -> messagesApi("agent.address-lookup.lookup-page.heading")(cy)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.editPage.title")(cy),
-            "heading" -> messagesApi("agent.addressLookup.editPage.heading")(cy),
-            "postcodeLabel" -> messagesApi("agent.addressLookup.editPage.postcodeLabel")(cy)
+            "title" -> messagesApi("agent.address-lookup.edit-page.title")(cy),
+            "heading" -> messagesApi("agent.address-lookup.edit-page.heading")(cy),
+            "postcodeLabel" -> messagesApi("agent.address-lookup.edit-page.postcode-label")(cy)
           ),
           "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.addressLookup.confirmPage.title")(cy),
-            "heading" -> messagesApi("agent.addressLookup.confirmPage.heading")(cy)
+            "title" -> messagesApi("agent.address-lookup.confirm-page.title")(cy),
+            "heading" -> messagesApi("agent.address-lookup.confirm-page.heading")(cy)
           )
         )
       )

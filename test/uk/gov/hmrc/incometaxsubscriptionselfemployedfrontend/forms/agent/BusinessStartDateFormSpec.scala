@@ -56,15 +56,15 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "when testing the validation" should {
 
       "output the appropriate error messages for the start date" when {
-        val empty = "agent.error.business_start_date.day_month_year.empty"
-        val beforeMax = "agent.error.business_start_date.day_month_year.max_date"
-        val beforeMin = "agent.error.business_start_date.day_month_year.min_date"
+        val empty = "agent.error.business-start-date.day-month-year.empty"
+        val beforeMax = "agent.error.business-start-date.day-month-year.max-date"
+        val beforeMin = "agent.error.business-start-date.day-month-year.min-date"
 
         val dayKeyError: String = s"$startDate-$day"
         val monthKeyError: String = s"$startDate-$month"
         val yearKeyError: String = s"$startDate-$year"
 
-        val errorContext: String = "agent.error.business_start_date"
+        val errorContext: String = "agent.error.business-start-date"
 
         "the date is not supplied to the map" in {
           form.bind(DataMap.EmptyMap).errors must contain(FormError(dayKeyError, empty))
@@ -96,7 +96,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         }
         "it is missing multiple fields" in {
           val test = form.bind(DataMap.date(startDate)("", "", "2017"))
-          test.errors must contain(FormError(dayKeyError, s"$errorContext.day_month.empty"))
+          test.errors must contain(FormError(dayKeyError, s"$errorContext.day-month.empty"))
         }
         "it has an invalid day" in {
           val test = form.bind(DataMap.date(startDate)("0", "1", "2017"))
@@ -112,7 +112,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         }
         "it has multiple invalid fields" in {
           val test = form.bind(DataMap.date(startDate)("0", "0", "2017"))
-          test.errors must contain(FormError(dayKeyError, s"$errorContext.day_month.invalid"))
+          test.errors must contain(FormError(dayKeyError, s"$errorContext.day-month.invalid"))
         }
         "the year provided is not the correct length" when {
           "the year is 3 digits" in {

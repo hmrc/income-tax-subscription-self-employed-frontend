@@ -20,6 +20,8 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, RadioHelper, SaveAndContinueButtonHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Accruals, Cash}
+
 
 @this(
         mainTemplate: AgentMainTemplate,
@@ -37,23 +39,23 @@
     }
 }
 
-@mainTemplate(title = messages("agent.business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
-    <h1 class="govuk-heading-l">@messages("agent.business.accounting_method.heading")</h1>
+@mainTemplate(title = messages("agent.business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
+    <h1 class="govuk-heading-l">@messages("agent.business.accounting-method.heading")</h1>
 
     @form(action = postAction) {
         @radioHelper(
             field = businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod),
-            legend = messages("agent.business.accounting_method.heading"),
+            legend = messages("agent.business.accounting-method.heading"),
             isPageHeading = false,
             radioItems = Seq(
                 RadioItem(
-                    content = Text(Messages("agent.business.accounting_method.cash")),
-                    value = Some(AccountingMethodMapping.option_cash),
+                    content = Text(Messages("agent.business.accounting-method.cash")),
+                    value = Some(Cash.CASH),
                     hint = None
                 ),
                 RadioItem(
-                    content = Text(Messages("agent.business.accounting_method.accruals")),
-                    value = Some(AccountingMethodMapping.option_accruals),
+                    content = Text(Messages("agent.business.accounting-method.accruals")),
+                    value = Some(Accruals.ACCRUALS),
                     hint = None
                 )
             )

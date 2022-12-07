@@ -16,26 +16,46 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
-import org.scalatest.funsuite.AnyFunSuiteLike
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.helpers.MessagesMatcher
 
 import scala.io.Source
 
-class MessagesSpec extends AnyFunSuiteLike with UrlHelpers {
+class MessagesSpec extends PlaySpec with MessagesMatcher {
+  override val excludedKeys: Set[String] = Set.empty
 
-  lazy val messageKeysEnglish: Set[String] = getMessageKeys("messages")
-  lazy val messageKeysWelsh: Set[String] = getMessageKeys("messages.cy")
+  private val messageKeysEnglish: List[String] = getMessageKeys("messages").toList
+  private lazy val messageKeySetEnglish = messageKeysEnglish.toSet
 
-  test("No messages present in Welsh, but not in English") {
-    val keysInWelshNotEnglish = messageKeysWelsh -- messageKeysEnglish
-    keysInWelshNotEnglish foreach println
-    keysInWelshNotEnglish.size shouldBe 0
+  private val messageKeysWelsh: List[String] = getMessageKeys("messages.cy").toList
+  private lazy val messageKeySetWelsh = messageKeysWelsh.toSet
+
+  "Messages present in Welsh (conf/messages.cy)" should {
+    "also have an English translation (conf/messages)" in {
+      messageKeySetWelsh must allBeIn(messageKeySetEnglish)
+    }
+
+    "not contain duplicate keys" in {
+      messageKeysWelsh must containUniqueKeys
+    }
+
+    "contain only permitted characters" in {
+      messageKeysWelsh must containOnlyPermittedCharacters
+    }
   }
 
-  test("No messages present in English, but not in Welsh") {
-    val keysInEnglishNotWelsh = messageKeysEnglish -- messageKeysWelsh
-    keysInEnglishNotWelsh foreach println
-    keysInEnglishNotWelsh.size shouldBe 0
+  "Messages present in English (conf/messages)" should {
+    "also have a Welsh translation (conf/messages.cy)" in {
+      messageKeySetEnglish must allBeIn(messageKeySetWelsh)
+    }
+
+    "not contain duplicate keys" in {
+      messageKeysEnglish must containUniqueKeys
+    }
+
+    "contain only permitted characters" in {
+      messageKeysEnglish must containOnlyPermittedCharacters
+    }
   }
 
   private def getMessageKeys(fileName: String) = {
@@ -45,6 +65,5 @@ class MessagesSpec extends AnyFunSuiteLike with UrlHelpers {
       .filter(!_.startsWith("#"))
       .filter(_.nonEmpty)
       .map(_.split(' ').head)
-      .toSet
   }
 }

@@ -31,7 +31,7 @@ object BusinessStartDateForm {
 
   val startDate: String = "startDate"
 
-  val errorContext: String = "business_start_date"
+  val errorContext: String = "business-start-date"
 
   def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String): Form[BusinessStartDate] = Form(
     mapping(

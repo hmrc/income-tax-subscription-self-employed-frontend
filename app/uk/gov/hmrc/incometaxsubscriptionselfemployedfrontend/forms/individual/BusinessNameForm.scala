@@ -38,13 +38,13 @@ object BusinessNameForm {
 
   private val businessNameMaxLength: Int = 105
 
-  val nameNotEmpty: Constraint[String] = nonEmpty("error.business_name.empty")
-  val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, "error.business_name.max_length")
+  val nameNotEmpty: Constraint[String] = nonEmpty("error.business-name.empty")
+  val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, "error.business-name.max-length")
   val businessTradeNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
-  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, "error.business_name.invalid_character")
+  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, "error.business-name.invalid-character")
 
   def nameIsNotExcluded(excludedNames: Seq[BusinessNameModel]): Constraint[String] = constraint[String] { name =>
-    if (excludedNames.exists(_.businessName == name)) Invalid("error.business_trade_name.duplicate")
+    if (excludedNames.exists(_.businessName == name)) Invalid("error.business-trade-name.duplicate")
     else Valid
   }
 

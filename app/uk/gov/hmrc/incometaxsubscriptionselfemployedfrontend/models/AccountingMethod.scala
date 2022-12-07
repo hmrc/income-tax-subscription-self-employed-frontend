@@ -21,13 +21,13 @@ import play.api.libs.json._
 sealed trait AccountingMethod
 
 case object Cash extends AccountingMethod {
-  private[models] val CASH = "Cash"
+  val CASH = "Cash"
 
   override def toString: String = CASH
 }
 
 case object Accruals extends AccountingMethod {
-  private[models] val ACCRUALS = "Accruals"
+  val ACCRUALS = "Accruals"
 
   override def toString: String = ACCRUALS
 

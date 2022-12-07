@@ -87,19 +87,19 @@ class DateModelFormatterSpec extends AnyWordSpecLike with Matchers {
           }
           "the day and month fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = None, month = None, year = Some("2020")))
-            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day_month.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day-month.empty"))))
           }
           "the day and year fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = None, month = Some("2"), year = None))
-            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day_year.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day-year.empty"))))
           }
           "the month and year fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = Some("20"), month = None, year = None))
-            result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month_year.empty"))))
+            result mustBe Left(Seq(FormError(monthKey, errorKey(isAgent)("test.month-year.empty"))))
           }
           "all fields are empty" in {
             val result = dateModelFormatter(isAgent).bind(bindingKey, inputMap(day = None, month = None, year = None))
-            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day_month_year.empty"))))
+            result mustBe Left(Seq(FormError(dayKey, errorKey(isAgent)("test.day-month-year.empty"))))
           }
           "the day field is invalid" when {
             "the day is text" in {

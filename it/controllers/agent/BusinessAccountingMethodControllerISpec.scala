@@ -58,7 +58,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
         When("GET /client/details/business-accounting-method is called")
         val res = getClientBusinessAccountingMethod(id)
 
-        val expectedText = removeHtmlMarkup(messages("agent.business.accounting_method.cash"))
+        val expectedText = removeHtmlMarkup(messages("agent.business.accounting-method.cash"))
 
         Then("should return an OK with the BusinessAccountingMethodPage")
         res must have(

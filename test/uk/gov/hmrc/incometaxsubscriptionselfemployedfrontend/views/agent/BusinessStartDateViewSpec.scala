@@ -59,9 +59,9 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
     Jsoup.parse(page(isEditMode, error).body)
 
   private val testError: FormError = FormError(BusinessStartDateForm.startDate, "test error message")
-  private val emptyError = FormError("startDate", "agent.error.business_start_date.day_month_year.empty")
-  private val dateTooLateError = FormError("startDate", "agent.error.business_start_date.day_month_year.max_date", List("11 April 2021"))
-  private val dateTooEarlyError = FormError("startDate", "agent.error.business_start_date.day_month_year.min_date", List("11 April 2021"))
+  private val emptyError = FormError("startDate", "agent.error.business-start-date.day-month-year.empty")
+  private val dateTooLateError = FormError("startDate", "agent.error.business-start-date.day-month-year.max-date", List("11 April 2021"))
+  private val dateTooEarlyError = FormError("startDate", "agent.error.business-start-date.day-month-year.min-date", List("11 April 2021"))
 
   "BusinessStartDate" must {
     "have the correct template details" when {

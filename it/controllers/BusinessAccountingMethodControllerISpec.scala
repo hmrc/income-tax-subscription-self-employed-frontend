@@ -74,8 +74,8 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod(id)
 
-          val expectedLabel = removeHtmlMarkup(messages("business.accounting_method.cash.label"))
-          val expectedHint = removeHtmlMarkup(messages("business.accounting_method.cash.hint"))
+          val expectedLabel = removeHtmlMarkup(messages("business.accounting-method.cash.label"))
+          val expectedHint = removeHtmlMarkup(messages("business.accounting-method.cash.hint"))
 
           Then("should return an OK with the BusinessAccountingMethodPage")
           res must have(
@@ -97,8 +97,8 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           When("GET /details/business-accounting-method is called")
           val res = getBusinessAccountingMethod(id, inEditMode = true)
 
-          val expectedLabel = removeHtmlMarkup(messages("business.accounting_method.cash.label"))
-          val expectedHint = removeHtmlMarkup(messages("business.accounting_method.cash.hint"))
+          val expectedLabel = removeHtmlMarkup(messages("business.accounting-method.cash.label"))
+          val expectedHint = removeHtmlMarkup(messages("business.accounting-method.cash.hint"))
 
           Then("should return an OK with the BusinessAccountingMethodPage")
           res must have(

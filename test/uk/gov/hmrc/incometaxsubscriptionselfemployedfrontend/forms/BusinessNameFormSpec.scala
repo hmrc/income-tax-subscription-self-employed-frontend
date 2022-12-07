@@ -61,21 +61,21 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       val testInput = Map(businessName -> testNameEmpty)
 
       val emptyTest = form().bind(testInput)
-      emptyTest.errors must contain(FormError(businessName, "error.business_name.empty"))
+      emptyTest.errors must contain(FormError(businessName, "error.business-name.empty"))
     }
 
     "invalidate a business name that is over 105 characters" in {
       val testInput = Map(businessName -> testNameTooLong)
 
       val tooLongTest = form().bind(testInput)
-      tooLongTest.errors must contain(FormError(businessName, "error.business_name.max_length"))
+      tooLongTest.errors must contain(FormError(businessName, "error.business-name.max-length"))
     }
 
     "validate a business name that is 105 characters" in {
       val testInput = Map(businessName -> testNameNotTooLong)
 
       val tooLongTest = form().bind(testInput)
-      tooLongTest.errors must not contain(FormError(businessName, "error.business_name.max_length"))
+      tooLongTest.errors must not contain(FormError(businessName, "error.business-name.max-length"))
     }
 
     "invalidate a business name that includes invalid characters" in {
@@ -86,7 +86,7 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val invalidCharTest = form().bind(testInput)
         if (!invalidCharTest.errors.nonEmpty)
           println(s"$invalidChar is not allowed")
-        invalidCharTest.errors must contain(FormError(businessName, "error.business_name.invalid_character"))
+        invalidCharTest.errors must contain(FormError(businessName, "error.business-name.invalid-character"))
       }
     }
 
@@ -98,7 +98,7 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val validCharTest = form().bind(testInput)
         if (!validCharTest.errors.isEmpty)
           println(s"${validChar.toString} should be allowed")
-        validCharTest.errors must not contain(FormError(businessName, "error.business_name.invalid_character"))
+        validCharTest.errors must not contain(FormError(businessName, "error.business-name.invalid-character"))
       }
     }
 
@@ -108,7 +108,7 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         BusinessNameModel("nameOne"), BusinessNameModel("nameTwo")
       )).bind(testInput)
 
-      actual.errors must contain(FormError(businessName, "error.business_trade_name.duplicate"))
+      actual.errors must contain(FormError(businessName, "error.business-trade-name.duplicate"))
     }
 
     "remove a leading space from business name" in {

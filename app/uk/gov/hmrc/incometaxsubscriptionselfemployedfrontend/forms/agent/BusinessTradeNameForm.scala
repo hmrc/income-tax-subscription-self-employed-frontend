@@ -30,11 +30,11 @@ object BusinessTradeNameForm {
 
   val businessTradeNameMaxLength = 35
 
-  val tradeNameEmpty: Constraint[String] = nonEmpty("error.agent.business_trade_name.empty")
-  val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.agent.business_trade_name.maxLength")
+  val tradeNameEmpty: Constraint[String] = nonEmpty("error.agent.business-trade-name.empty")
+  val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.agent.business-trade-name.max-length")
 
   def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
-    if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.agent.business_trade_name.duplicate")
+    if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.agent.business-trade-name.duplicate")
     else Valid
   }
 
