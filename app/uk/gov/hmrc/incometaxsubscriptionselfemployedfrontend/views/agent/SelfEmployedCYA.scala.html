@@ -50,62 +50,62 @@
 }
 
 @businessName(businessName: Option[BusinessNameModel], businessId: String) = @{
-    val question: String = messages("agent.self_employed_cya.business_name")
+    val question: String = messages("agent.self-employed-cya.business-name")
     val answer: Option[String] = businessName.map(_.businessName)
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.business_name.change") else messages("agent.self_employed_cya.business_name.add")
+        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.business-name.change") else messages("agent.self-employed-cya.business-name.add")
     )
     summaryRow(question, answer, Some(changeLink))
 }
 
 @tradingStartDate(businessStartDate: Option[BusinessStartDateModel], businessId: String) = @{
     import implicitDateFormatter.LongDate
-    val question: String = messages("agent.self_employed_cya.trading_start_date")
+    val question: String = messages("agent.self-employed-cya.trading-start-date")
     val answer: Option[String] = businessStartDate.map(_.startDate.toLocalDate.toLongDate())
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.trading_start_date.change") else messages("agent.self_employed_cya.trading_start_date.add")
+        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.trading-start-date.change") else messages("agent.self-employed-cya.trading-start-date.add")
     )
     summaryRow(question, answer, Some(changeLink))
 }
 
 @businessTrade(businessTrade: Option[BusinessTradeNameModel], businessId: String) = @{
-    val question: String = messages("agent.self_employed_cya.business_trade")
+    val question: String = messages("agent.self-employed-cya.business-trade")
     val answer: Option[String] = businessTrade.map(_.businessTradeName)
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.business_trade.change") else messages("agent.self_employed_cya.business_trade.add")
+        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.business-trade.change") else messages("agent.self-employed-cya.business-trade.add")
     )
     summaryRow(question, answer, Some(changeLink))
 }
 
 @businessAddress(businessAddress: Option[BusinessAddressModel], businessId: String) = @{
-    val question: String = messages("agent.self_employed_cya.business_address")
+    val question: String = messages("agent.self-employed-cya.business-address")
     val answer: Option[String] = businessAddress.map(_.address.toString)
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.business_address.change") else messages("agent.self_employed_cya.business_address.add")
+        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.business-address.change") else messages("agent.self-employed-cya.business-address.add")
     )
     summaryRow(question, answer, Some(changeLink))
 }
 
 @accountingMethod(accountingMethod: Option[AccountingMethodModel], businessId: String) = @{
-    val question: String = messages("agent.self_employed_cya.accounting_method")
+    val question: String = messages("agent.self-employed-cya.accounting-method")
     val answer: Option[String] = accountingMethod.map { accountingMethodModel =>
         accountingMethodModel.accountingMethod match {
-            case Cash => messages("agent.self_employed_cya.accounting_method.cash")
-            case Accruals => messages("agent.self_employed_cya.accounting_method.accruals")
+            case Cash => messages("agent.self-employed-cya.accounting-method.cash")
+            case Accruals => messages("agent.self-employed-cya.accounting-method.accruals")
         }
     }
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self_employed_cya.accounting_method.change") else messages("agent.self_employed_cya.accounting_method.add")
+        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.accounting-method.change") else messages("agent.self-employed-cya.accounting-method.add")
     )
     summaryRow(question, answer, Some(changeLink))
 }
@@ -123,13 +123,13 @@
 }
 
 @mainTemplate(
-    title = messages("agent.self_employed_cya.title"),
+    title = messages("agent.self-employed-cya.title"),
     backLink = backUrl
 ) {
 
     @hmrcPageHeading(PageHeading(
-        text = messages("agent.self_employed_cya.heading"),
-        section = Some(messages("agent.self_employed_cya.caption"))
+        text = messages("agent.self-employed-cya.heading"),
+        section = Some(messages("agent.self-employed-cya.caption"))
     ))
 
     @contentTable(answers)

@@ -25,14 +25,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingM
 
 object AccountingMethodMapping {
 
-  val option_cash = "Cash"
-  val option_accruals = "Standard"
+  import Cash.CASH
+  import Accruals.ACCRUALS
 
   def apply(errInvalid: Invalid, errEmpty: Option[Invalid]): Mapping[AccountingMethod] = of(new Formatter[AccountingMethod] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], AccountingMethod] = {
       data.get(key) match {
-        case Some(`option_cash`) => Right(Cash)
-        case Some(`option_accruals`) => Right(Accruals)
+        case Some(`CASH`) => Right(Cash)
+        case Some(`ACCRUALS`) => Right(Accruals)
         case Some(other) if other.nonEmpty => Left(errInvalid.errors.map(e => FormError(key, e.message, e.args)))
         case _ =>
           val err = errEmpty.getOrElse(errInvalid)
@@ -42,8 +42,8 @@ object AccountingMethodMapping {
 
     override def unbind(key: String, value: AccountingMethod): Map[String, String] = {
       val stringValue = value match {
-        case Cash => option_cash
-        case Accruals => option_accruals
+        case Cash => CASH
+        case Accruals => ACCRUALS
       }
 
       Map(key -> stringValue)

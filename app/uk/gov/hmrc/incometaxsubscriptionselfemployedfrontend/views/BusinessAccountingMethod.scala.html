@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, DetailsHelper, RadioHelper, SaveAndContinueButtonHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Accruals, Cash}
 
 @this(
         mainTemplate: PrincipalMainTemplate,
@@ -33,10 +34,10 @@
 @(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
 
 @detailsContent = {
-    <p>@Messages("business.accounting_method.accordion.line_1")</p>
+    <p>@Messages("business.accounting-method.accordion.line-1")</p>
     <ul class="bullets">
-        <li>@Messages("business.accounting_method.accordion.bullet_1")</li>
-        <li>@Messages("business.accounting_method.accordion.bullet_2")</li>
+        <li>@Messages("business.accounting-method.accordion.bullet-1")</li>
+        <li>@Messages("business.accounting-method.accordion.bullet-2")</li>
     </ul>
 }
 
@@ -47,31 +48,31 @@
     }
 }
 
-@mainTemplate(title = messages("business.accounting_method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
-    <h1 class="govuk-heading-l">@messages("business.accounting_method.heading")</h1>
+@mainTemplate(title = messages("business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
+    <h1 class="govuk-heading-l">@messages("business.accounting-method.heading")</h1>
 
-    <p class="govuk-body">@messages("business.accounting_method.line_1")</p>
+    <p class="govuk-body">@messages("business.accounting-method.line-1")</p>
 
     @detailsHelper(
-        summary = messages("business.accounting_method.accordion"),
+        summary = messages("business.accounting-method.accordion"),
         content = detailsContent
     )
 
     @form(action = postAction) {
         @radioHelper(
             field = businessAccountingMethodForm(BusinessAccountingMethodForm.businessAccountingMethod),
-            legend = messages("business.accounting_method.heading"),
+            legend = messages("business.accounting-method.heading"),
             isPageHeading = false,
             radioItems = Seq(
                 RadioItem(
-                    content = Text(Messages("business.accounting_method.cash.label")),
-                    value = Some(AccountingMethodMapping.option_cash),
-                    hint = Some(Hint(content = Text(Messages("business.accounting_method.cash.hint"))))
+                    content = Text(Messages("business.accounting-method.cash.label")),
+                    value = Some(Cash.CASH),
+                    hint = Some(Hint(content = Text(Messages("business.accounting-method.cash.hint"))))
                 ),
                 RadioItem(
-                    content = Text(Messages("business.accounting_method.accruals.label")),
-                    value = Some(AccountingMethodMapping.option_accruals),
-                    hint = Some(Hint(content = Text(Messages("business.accounting_method.accruals.hint"))))
+                    content = Text(Messages("business.accounting-method.accruals.label")),
+                    value = Some(Accruals.ACCRUALS),
+                    hint = Some(Hint(content = Text(Messages("business.accounting-method.accruals.hint"))))
                 )
             )
         )

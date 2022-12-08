@@ -29,18 +29,18 @@
 )
 @(businessStartDateForm: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.start_date.title"), optForm = Some(businessStartDateForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("business.start-date.title"), optForm = Some(businessStartDateForm), backLink = Some(backUrl)) {
 
     @form(action = postAction) {
-        <h1 class="govuk-heading-l">@messages("business.start_date.heading")</h1>
-        <p class="govuk-body">@messages("business.start_date.line_1")</p>
+        <h1 class="govuk-heading-l">@messages("business.start-date.heading")</h1>
+        <p class="govuk-body">@messages("business.start-date.line-1")</p>
 
         @dateHelper(
             field = businessStartDateForm(startDate),
-            legendContent = messages("business.start_date.heading"),
+            legendContent = messages("business.start-date.heading"),
             isLegendVisible = false,
             parentForm = businessStartDateForm,
-            hintText = Some(messages("business.start_date.hint")),
+            hintText = Some(messages("business.start-date.hint")),
             isPageHeading = false
         )
 

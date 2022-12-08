@@ -26,8 +26,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Accruals, Cash}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 
@@ -98,12 +97,12 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
         radioItems = Seq(
           RadioItem(
             content = Text(BusinessAccountingMethodMessages.cash),
-            value = Some(AccountingMethodMapping.option_cash),
+            value = Some(Cash.CASH),
             id = Some(BusinessAccountingMethodForm.businessAccountingMethod)
           ),
           RadioItem(
             content = Text(BusinessAccountingMethodMessages.accruals),
-            value = Some(AccountingMethodMapping.option_accruals),
+            value = Some(Accruals.ACCRUALS),
             id = Some(s"${BusinessAccountingMethodForm.businessAccountingMethod}-2")
           )
         )

@@ -31,14 +31,14 @@
 
 @(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.trade_name.title"), optForm = Some(businessTradeNameForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("business.trade-name.title"), optForm = Some(businessTradeNameForm), backLink = Some(backUrl)) {
 
     @form(action = postAction) {
 
         @textInputHelper(
             field = businessTradeNameForm(businessTradeName),
-            label = messages("business.trade_name.heading"),
-            hint = Some(messages("business.trade_name.hint")),
+            label = messages("business.trade-name.heading"),
+            hint = Some(messages("business.trade-name.hint")),
             classes = Some("govuk-!-width-one-half")
         )
 

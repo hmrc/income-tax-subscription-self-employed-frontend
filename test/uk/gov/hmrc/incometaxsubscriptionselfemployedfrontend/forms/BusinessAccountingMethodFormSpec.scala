@@ -20,9 +20,8 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Cash}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Accruals, Cash}
 
 class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
@@ -31,7 +30,7 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
   "The BusinessAccountingMethodForm" should {
     "transform a valid request to the case class" in {
 
-      val testInput = Map(businessAccountingMethod -> AccountingMethodMapping.option_cash)
+      val testInput = Map(businessAccountingMethod -> Cash.CASH)
 
       val expected = AccountingMethodModel(Cash)
 
@@ -42,8 +41,8 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
 
     "when testing the validation" should {
 
-      val empty = "error.business_accounting_method.empty"
-      val invalid = "error.business_accounting_method.invalid"
+      val empty = "error.business-accounting-method.empty"
+      val invalid = "error.business-accounting-method.invalid"
 
       "the map be empty" in {
         val emptyInput0 = DataMap.EmptyMap
@@ -64,14 +63,14 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
       }
 
       "The following Cash submission should be valid" in {
-        val valid = DataMap.businessAccountingMethod(AccountingMethodMapping.option_cash)
+        val valid = DataMap.businessAccountingMethod(Cash.CASH)
         val result = businessAccountingMethodForm.bind(valid)
         result.hasErrors shouldBe false
         result.hasGlobalErrors shouldBe false
       }
 
       "The following Accruals submission should be valid" in {
-        val valid = DataMap.businessAccountingMethod(AccountingMethodMapping.option_accruals)
+        val valid = DataMap.businessAccountingMethod(Accruals.ACCRUALS)
         val result = businessAccountingMethodForm.bind(valid)
         result.hasErrors shouldBe false
         result.hasGlobalErrors shouldBe false

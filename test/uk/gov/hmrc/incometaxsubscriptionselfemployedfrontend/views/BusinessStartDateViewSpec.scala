@@ -50,10 +50,10 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val backUrl: String = testBackUrl
   val action: Call = testCall
   val taxYearEnd: Int = 2020
-  private val testError: FormError = FormError("startDate", "error.business_start_date.day_month_year.empty")
+  private val testError: FormError = FormError("startDate", "error.business-start-date.day-month-year.empty")
 
-  private val dateTooLateError = FormError("startDate", "error.business_start_date.day_month_year.max_date", List("11 April 2021"))
-  private val dateTooEarlyError = FormError("startDate", "error.business_start_date.day_month_year.min_date", List("11 April 2021"))
+  private val dateTooLateError = FormError("startDate", "error.business-start-date.day-month-year.max-date", List("11 April 2021"))
+  private val dateTooEarlyError = FormError("startDate", "error.business-start-date.day-month-year.min-date", List("11 April 2021"))
 
   val businessStartDateView: BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
 
