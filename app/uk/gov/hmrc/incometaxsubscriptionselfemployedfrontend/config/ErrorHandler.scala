@@ -42,6 +42,15 @@ class ErrorHandler @Inject()( val errorTemplate: ErrorTemplate,
     Future.successful(resolveError(request, exception))
   }
 
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+    statusCode match {
+      case play.mvc.Http.Status.FORBIDDEN =>
+        val str = redirectUrlOf(appConfig.incomeTaxSubscriptionFrontendBaseUrl, request.path)
+        Future.successful(toGGLogin(str))
+      case _ => super.onClientError(request, statusCode, message)
+    }
+  }
+
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): HtmlFormat.Appendable =
     errorTemplate(pageTitle, heading, message)(implicitly, implicitly)
 

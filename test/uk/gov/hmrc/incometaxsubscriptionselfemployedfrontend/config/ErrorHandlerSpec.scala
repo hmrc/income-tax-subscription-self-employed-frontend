@@ -27,22 +27,40 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.template
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
 class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
+  private val anAgentPath = "/x/y/client/z"
+  private val anIndividualPath = "/x/y/z"
+  private val individualLoginAddress = "http://a.com/b/c"
+  private val agentLoginAddress = "http://a.com/b/c/client"
 
-  test("Will redirect agent to agent sign in") {
-    withErrorHandler(expected = "http://a.com/b/c/client") { errorHandler =>
-      val header = mock[RequestHeader]
-      when(header.path).thenReturn("/x/y/client/z")
-      errorHandler.resolveError(header, new InvalidBearerToken)
+  test("Will redirect agent to agent sign in if session not valid") {
+    withErrorHandler(expected = agentLoginAddress) {
+      _.resolveError(getMockHeader(anAgentPath), new InvalidBearerToken)
     }
   }
 
-  test("Will redirect individual to individual sign in") {
-    withErrorHandler(expected = "http://a.com/b/c") { errorHandler =>
-      val header = mock[RequestHeader]
-      when(header.path).thenReturn("/x/y/z")
-      errorHandler.resolveError(header, new InvalidBearerToken)
+  test("Will redirect individual to individual sign in if session not valid") {
+    withErrorHandler(expected = individualLoginAddress) {
+      _.resolveError(getMockHeader(anIndividualPath), new InvalidBearerToken)
     }
   }
+
+  test("Will redirect agent to agent sign in if session not exists") {
+    withErrorHandler(expected = agentLoginAddress) {
+      _.onClientError(
+        getMockHeader(anAgentPath),
+        play.mvc.Http.Status.FORBIDDEN,
+        "Bad agent, you logged out in another tab")
+    }
+  }
+
+  test("Will redirect individual to individual sign in if session not exists") {
+    withErrorHandler(expected = individualLoginAddress) {
+      _.onClientError(getMockHeader(anIndividualPath),
+        play.mvc.Http.Status.FORBIDDEN,
+        "Bad Individual, you logged out in another tab")
+    }
+  }
+
 
   private def withErrorHandler(expected: String)(testCode: ErrorHandler => Any): Unit = {
     val view = mock[ErrorTemplate]
@@ -67,6 +85,12 @@ class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
     ) with AuthRedirectsMock
 
     testCode(errorHandler)
+  }
+
+  private def getMockHeader(path: String) = {
+    val header = mock[RequestHeader]
+    when(header.path).thenReturn(path)
+    header
   }
 
 }
