@@ -40,7 +40,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val title = "What is the trade of your business?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
-    val hintText = "For example: plumbing, electrical work, consulting."
+    val hintText = "For example: plumbing, electrical work, consulting. The business trade name you enter must be 35 characters or fewer, and can only include upper or lower case letters, full stops, commas, digits, &, ’, \\, /, -."
     val update = "Update"
     val backLink = "Back"
     val saveAndContinue = "Save and continue"

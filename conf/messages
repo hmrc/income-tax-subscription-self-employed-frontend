@@ -48,23 +48,24 @@ error.business-start-date.year.length                           = The year must 
 # Business Name
 business.name.title                                             = What is the name of your business?
 business.name.heading                                           = What is the name of your business?
-business.name.hint                                              = This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name. The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, '', \, /, -.
+business.name.hint                                              = This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name. The business name you enter must be between 1 and 105 characters characters, and can only include upper or lower case letters, full stops, commas, digits, &, ’, \, /, -.
 
 # Business Name errors
 error.business-name.empty                                       = Enter your name or the name of your business.
-error.business-name.max-length                                  = Business name must be between 1 and 105 characters.
-error.business-name.invalid-character                           = Business name can only include characters listed.
+error.business-name.max-length                                  = Your business name must be 105 characters or fewer.
+error.business-name.invalid-character                           = Your business name can only include characters listed.
 
 # Business trade name
 business.trade-name.title                                       = What is the trade of your business?
 business.trade-name.heading                                     = What is the trade of your business?
-business.trade-name.hint                                        = For example: plumbing, electrical work, consulting.
+business.trade-name.hint                                        = For example: plumbing, electrical work, consulting. The business trade name you enter must be 35 characters or fewer, and can only include upper or lower case letters, full stops, commas, digits, &, ’, \, /, -.
 
 # Business trade name errors
 error.business-trade-name.empty                                 = Enter the trade of your business.
-error.business-trade-name.max-length                             = Business trade must be 35 characters or fewer.
+error.business-trade-name.max-length                            = Your business trade name must be 35 characters or fewer.
+error.business-trade-name.min-length                            = Your business trade name must be 2 characters long or more.
 error.business-trade-name.duplicate                             = You cannot enter the same trade and same business name.
-error.business-trade-name.invalid                               = Business trade must only include letters a to z, hyphens, spaces and apostrophes.
+error.business-trade-name.invalid                               = Business trade name can only include characters listed.
 
 #Business accounting method errors
 error.business-accounting-method.invalid                        = Select if you use cash basis accounting or traditional accounting.
@@ -148,22 +149,23 @@ agent.error.business-start-date.year.length                     = The year must 
 # Agent Business Name
 agent.business.name.title                                       = What is the name of your client’s business?
 agent.business.name.heading                                     = What is the name of your client’s business?
-agent.business.name.hint                                        = This is the business name they used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name.
+agent.business.name.hint                                        = This is the business name your client used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name. The business name you enter must be between 1 and 105 characters characters, and can only include upper or lower case letters, full stops, commas, digits, &, ’, \, /, -.
 
 # Agent Business Name errors
 error.agent.business-name.empty                                 = Enter your client’s name or the name of their business.
-error.agent.business-name.max-length                            = Business name must be between 1 and 105 characters.
-error.agent.business-name.invalid-character                     = Business name can only include characters listed.
+error.agent.business-name.max-length                            = Your client’s business name must be 105 characters or fewer.
+error.agent.business-name.invalid-character                     = Your client’s business name can only include characters listed.
 
 #Agent Trade Name
 business.agent.trade-name.title                                 = What is the trade of your client’s sole trader business?
 business.agent.trade-name.heading                               = What is the trade of your client’s sole trader business?
-business.agent.trade-name.hint                                  = For example: plumbing, electrical work, consulting.
+business.agent.trade-name.hint                                  = For example: plumbing, electrical work, consulting. The business trade name you enter must be 35 characters or fewer, and can only include upper or lower case letters, full stops, commas, digits, &, ’, \, /, -.
 
 #Agent Trade Name errors
 error.agent.business-trade-name.empty                           = Enter the trade of your client’s business.
-error.agent.business-trade-name.max-length                       = Business trade must be 35 characters or fewer.
-error.agent.business-trade-name.invalid                         = Business trade must only include letters a to z, hyphens, spaces and apostrophes.
+error.agent.business-trade-name.max-length                      = Your client’s business trade name must be 35 characters or fewer.
+error.agent.business-trade-name.min-length                      = Your client’s business trade name must be 2 characters or more.
+error.agent.business-trade-name.invalid                         = Your client’s trade name can only include characters listed.
 error.agent.business-trade-name.duplicate                       = You cannot enter the same trade and same business name.
 
 #Agent Business Address page

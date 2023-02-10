@@ -18,7 +18,6 @@ lazy val microservice = Project(AppDependencies.appName, file("."))
     majorVersion := 0,
     libraryDependencies ++= (AppDependencies.compile ++ AppDependencies.test)
   )
-  .settings(publishingSettings: _*)
   .configs(IntegrationTest)
   .settings(
     IntegrationTest / Keys.fork := false,

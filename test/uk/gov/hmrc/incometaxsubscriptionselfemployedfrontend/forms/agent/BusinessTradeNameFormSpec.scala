@@ -41,7 +41,7 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     Some(BusinessTradeNameModel(businessTrade))
   )
 
-  "The BusinessTradeNameForm" should {
+  "The agent BusinessTradeNameForm" should {
     "transform a valid request to the case class" in {
 
       val testInput = Map(businessTradeName -> testValidBusinessTradeName)
@@ -56,10 +56,13 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "when testing the validation" should {
 
       val maxLength = 35
+      val minLength = 2
 
       val empty = "error.agent.business-trade-name.empty"
       val maxLen = "error.agent.business-trade-name.max-length"
+      val minLen = "error.agent.business-trade-name.min-length"
       val duplicate = "error.agent.business-trade-name.duplicate"
+      val badChars = "error.agent.business-trade-name.invalid-characters"
 
       "the map be empty" in {
         val emptyInput0 = DataMap.EmptyMap
@@ -77,6 +80,12 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val maxLengthInput = DataMap.businessTradeNameMap("a" * maxLength + 1)
         val maxLengthTest = businessTradeForm().bind(maxLengthInput)
         maxLengthTest.errors must contain(FormError(businessTradeName, maxLen))
+      }
+
+      "the name is too short" in {
+        val maxLengthInput = DataMap.businessTradeNameMap("a" * (minLength - 1))
+        val maxLengthTest = businessTradeForm().bind(maxLengthInput)
+        maxLengthTest.errors must contain(FormError(businessTradeName, minLen))
       }
 
       "the name should not allow just a space" in {
@@ -99,6 +108,12 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         actual.errors must contain(FormError(businessTradeName, duplicate))
       }
 
+      "the name contains special characters" in {
+        val withinLimitInput = DataMap.businessTradeNameMap("banana&apple")
+        val withinLimitTest = businessTradeForm().bind(withinLimitInput)
+        withinLimitTest.errors mustNot contain(FormError(businessTradeName, badChars))
+      }
+
       "The following submission should be valid" when {
         "there are no other businesses" in {
           val valid = DataMap.businessTradeNameMap("Test business")
@@ -107,12 +122,6 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
           result.hasGlobalErrors shouldBe false
         }
 
-        "the name contains special characters" in {
-          val valid = DataMap.businessTradeNameMap("!()+{}?^~")
-          val result = businessTradeForm().bind(valid)
-          result.hasErrors shouldBe false
-          result.hasGlobalErrors shouldBe false
-        }
       }
     }
   }

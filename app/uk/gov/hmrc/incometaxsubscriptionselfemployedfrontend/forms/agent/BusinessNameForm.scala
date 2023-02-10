@@ -27,29 +27,28 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessName
 object BusinessNameForm {
 
   /**
-  Spec:
-    "tradingName": {
-      "description": "Trading name",
-      "type": "string",
-      "pattern": "^[A-Za-z0-9 ,.&'\/-]{1,105}$"
-    }
+   * Spec:
+   * "tradingName": {
+   * "description": "Trading name",
+   * "type": "string",
+   * "pattern": "^[A-Za-z0-9 ,.&'\/-]{1,105}$"
+   * }
    */
   val businessName = "businessName"
 
-  private val businessNameMaxLength: Int = 105
+  private val businessNameMaxLength = 105
 
   val nameNotEmpty: Constraint[String] = nonEmpty("error.agent.business-name.empty")
   val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, "error.agent.business-name.max-length")
-  val businessTradeNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
-  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, "error.agent.business-name.invalid-character")
+  val businessNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
+  val nameValidChars: Constraint[String] = validateCharAgainst(businessNameSpec, "error.agent.business-name.invalid-character")
 
   def nameIsNotExcluded(excludedNames: Seq[BusinessNameModel]): Constraint[String] = constraint[String] { name =>
     if (excludedNames.exists(_.businessName == name)) Invalid("error.agent.business-trade-name.duplicate")
     else Valid
   }
 
-  //Default value for excludedBusinessNames can be removed when multiple self-employed is implemented
-  def businessNameValidationForm(excludedBusinessNames: Seq[BusinessNameModel] = Seq()): Form[BusinessNameModel] = Form(
+  def businessNameValidationForm(excludedBusinessNames: Seq[BusinessNameModel]): Form[BusinessNameModel] = Form(
     mapping(
       businessName -> trimmedText.verifying(
         nameNotEmpty andThen nameMaxLength andThen nameValidChars andThen nameIsNotExcluded(excludedBusinessNames)

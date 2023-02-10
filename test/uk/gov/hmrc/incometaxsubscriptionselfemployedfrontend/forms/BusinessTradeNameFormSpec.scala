@@ -40,7 +40,7 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     Some(BusinessTradeNameModel(businessTrade))
   )
 
-  "The BusinessTradeNameForm" should {
+  "The individual BusinessTradeNameForm" should {
     "transform a valid request to the case class" in {
 
       val testInput = Map(businessTradeName -> testValidBusinessTradeName)
@@ -55,10 +55,13 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "when testing the validation" should {
 
       val maxLength = 35
+      val minLength = 2
 
       val empty = "error.business-trade-name.empty"
       val maxLen = "error.business-trade-name.max-length"
+      val minLen = "error.business-trade-name.min-length"
       val duplicate = "error.business-trade-name.duplicate"
+      val badChars = "error.business-trade-name.invalid-characters"
 
       "the map be empty" in {
         val emptyInput0 = DataMap.EmptyMap
@@ -78,8 +81,14 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         maxLengthTest.errors must contain(FormError(businessTradeName, maxLen))
       }
 
-      "the name should not allow just a space" in {
-        val emptyInput = DataMap.businessTradeNameMap(" ")
+      "the name is too short" in {
+        val maxLengthInput = DataMap.businessTradeNameMap("a" * (minLength - 1))
+        val maxLengthTest = businessTradeForm().bind(maxLengthInput)
+        maxLengthTest.errors must contain(FormError(businessTradeName, minLen))
+      }
+
+      "the name should not allow just spaces" in {
+        val emptyInput = DataMap.businessTradeNameMap("   ")
         val invalidTest = businessTradeForm().bind(emptyInput)
         invalidTest.errors must contain(FormError(businessTradeName, empty))
       }
@@ -98,16 +107,15 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         actual.errors must contain(FormError(businessTradeName, duplicate))
       }
 
+      "the name contains special characters" in {
+        val withinLimitInput = DataMap.businessTradeNameMap("banana&apple")
+        val withinLimitTest = businessTradeForm().bind(withinLimitInput)
+        withinLimitTest.errors mustNot contain(FormError(businessTradeName, badChars))
+      }
+
       "The following submission should be valid" when {
         "there are no other businesses" in {
           val valid = DataMap.businessTradeNameMap("Test business")
-          val result = businessTradeForm().bind(valid)
-          result.hasErrors shouldBe false
-          result.hasGlobalErrors shouldBe false
-        }
-
-        "the name contains special characters" in {
-          val valid = DataMap.businessTradeNameMap("!()+{}?^~")
           val result = businessTradeForm().bind(valid)
           result.hasErrors shouldBe false
           result.hasGlobalErrors shouldBe false

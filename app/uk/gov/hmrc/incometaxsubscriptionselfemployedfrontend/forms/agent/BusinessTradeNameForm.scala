@@ -29,9 +29,13 @@ object BusinessTradeNameForm {
   val businessTradeName: String = "businessTradeName"
 
   val businessTradeNameMaxLength = 35
+  val businessTradeNameMinLength = 2
 
   val tradeNameEmpty: Constraint[String] = nonEmpty("error.agent.business-trade-name.empty")
   val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.agent.business-trade-name.max-length")
+  val nameTooShort: Constraint[String] = minLength(businessTradeNameMinLength, "error.agent.business-trade-name.min-length")
+  val businessTradeNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
+  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, "error.agent.business-name.invalid-character")
 
   def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
     if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.agent.business-trade-name.duplicate")
@@ -41,7 +45,7 @@ object BusinessTradeNameForm {
   def businessTradeNameValidationForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel]): Form[BusinessTradeNameModel] = Form(
     mapping(
       businessTradeName -> trimmedText.verifying(
-        tradeNameEmpty andThen nameTooLong andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
+        tradeNameEmpty andThen nameTooLong andThen nameTooShort andThen nameValidChars andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
       )
     )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
   )

@@ -25,9 +25,11 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
   override val excludedKeys: Set[String] = Set.empty
 
   private val messageKeysEnglish: List[String] = getMessageKeys("messages").toList
+  private val messageTextEnglish: List[String] = getMessageText("messages").toList
   private lazy val messageKeySetEnglish = messageKeysEnglish.toSet
 
   private val messageKeysWelsh: List[String] = getMessageKeys("messages.cy").toList
+  private val messageTextWelsh: List[String] = getMessageText("messages.cy").toList
   private lazy val messageKeySetWelsh = messageKeysWelsh.toSet
 
   "Messages present in Welsh (conf/messages.cy)" should {
@@ -41,6 +43,10 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
 
     "contain only permitted characters" in {
       messageKeysWelsh must containOnlyPermittedCharacters
+    }
+
+    "not contain bad characters" in {
+      messageTextWelsh must notContainBadCharacters
     }
   }
 
@@ -56,14 +62,24 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
     "contain only permitted characters" in {
       messageKeysEnglish must containOnlyPermittedCharacters
     }
+    "not contain bad characters" in {
+      messageTextEnglish must notContainBadCharacters
+    }
   }
 
-  private def getMessageKeys(fileName: String) = {
+  private def getMessageKeys(fileName: String) =
     Source.fromResource(fileName)
       .getLines()
       .map(_.trim)
       .filter(!_.startsWith("#"))
       .filter(_.nonEmpty)
       .map(_.split(' ').head)
-  }
+
+  private def getMessageText(fileName: String) =
+    Source.fromResource(fileName)
+      .getLines()
+      .map(_.trim)
+      .filter(!_.startsWith("#"))
+      .filter(_.nonEmpty)
+      .map(_.split('=').drop(1).head)
 }

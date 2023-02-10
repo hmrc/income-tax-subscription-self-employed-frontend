@@ -39,7 +39,8 @@ class BusinessNameViewSpec extends ViewSpec {
     val backLink = "Back"
     val line1: String = "This is the business name you used to register for Self Assessment. " +
       "If your sole trader business does not have a separate name, enter your own first and last name. " +
-      "The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
+      "The business name you enter must be between 1 and 105 characters characters, and can only include " +
+      "upper or lower case letters, full stops, commas, digits, &, ’, \\, /, -."
     val emptyError = "Enter your name or the name of your business"
   }
 

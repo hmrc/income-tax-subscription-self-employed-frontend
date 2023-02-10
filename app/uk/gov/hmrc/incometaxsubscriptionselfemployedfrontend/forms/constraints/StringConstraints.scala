@@ -39,6 +39,10 @@ object StringConstraints {
     x => if (x.trim.length > length) Invalid(msgKey) else Valid
   )
 
+  val minLength: (Int, String) => Constraint[String] = (length, msgKey) => constraint[String](
+    x => if (x.trim.length < length) Invalid(msgKey) else Valid
+  )
+
   val noLeadingSpace: String => Constraint[String] = msgKey => constraint[String](
     x => if (x.headOption.contains(" ".head)) Invalid(msgKey) else Valid
   )

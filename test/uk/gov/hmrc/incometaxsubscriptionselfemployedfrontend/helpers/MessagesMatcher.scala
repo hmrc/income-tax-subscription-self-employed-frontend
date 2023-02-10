@@ -51,6 +51,16 @@ trait MessagesMatcher {
     )
   }
   
+  def notContainBadCharacters: Matcher[Seq[String]] = (left: Seq[String]) => {
+    val bad = left.filter(s => {s.matches("^.*'.*$")})
+    println(s"bad is $bad")
+    MatchResult(
+      bad.isEmpty,
+      s"${bad.size} bad text(s):${bad.mkString("\n  ", "\n  ", "\n")}",
+      ""
+    )
+  }
+
   // Only print the warning once by using a lazy fetch and check
   private lazy val getExcludedKeys = {
     if (excludedKeys.nonEmpty) {
