@@ -296,17 +296,13 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
     def mustHaveErrorSummary(errors: List[String]): Assertion = {
       element.getErrorSummary.attr("class") mustBe "flash error-summary error-summary--show"
       element.getErrorSummary.attr("role") mustBe "alert"
-      element.getErrorSummary.attr("aria-labelledby") mustBe "govuk-error-summary"
       element.getErrorSummary.attr("tabindex") mustBe "-1"
-      element.getErrorSummary.select("h2").attr("id") mustBe "govuk-error-summary"
       element.getErrorSummary.select("h2").text mustBe "There is a problem"
       element.getErrorSummary.select("ul > li").text mustBe errors.mkString(" ")
     }
 
     def mustHaveErrorSummaryByNewGovUkClass(errors: List[String]): Assertion = {
-      element.getErrorSummaryByNewGovUkClass.attr("role") mustBe "alert"
-      element.getErrorSummaryByNewGovUkClass.attr("aria-labelledby") mustBe "error-summary-title"
-      element.getErrorSummaryByNewGovUkClass.select("h2").attr("id") mustBe "error-summary-title"
+      element.getErrorSummaryByNewGovUkClass.select("div[role]").attr("role") mustBe "alert"
       element.getErrorSummaryByNewGovUkClass.select("h2").text mustBe "There is a problem"
       element.getErrorSummaryByNewGovUkClass.select("ul > li").text mustBe errors.mkString(" ")
     }

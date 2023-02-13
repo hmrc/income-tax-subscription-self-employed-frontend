@@ -155,7 +155,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
   }
 
-  "must display empty form error summary when submit with an empty form" in {
+  "display empty form error summary when submit with an empty form" in {
     document(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)).mustHaveErrorSummaryByNewGovUkClass(List[String](emptyError))
   }
 

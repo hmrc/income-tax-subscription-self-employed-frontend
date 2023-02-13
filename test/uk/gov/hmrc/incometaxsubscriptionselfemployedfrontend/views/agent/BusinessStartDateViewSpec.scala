@@ -102,21 +102,21 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
       "display form error on page" in {
         val doc = document(error = Some(emptyError))
-        doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+        doc.select("div[class=govuk-error-summary]").select("div[role=alert]").size() mustBe 1
         doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
         doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.empty}"
       }
 
       "display max date error on page" in {
         val doc = document(error = Some(dateTooLateError))
-        doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+        doc.select("div[class=govuk-error-summary]").select("div[role=alert]").size() mustBe 1
         doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
         doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.maxDate}"
       }
 
       "display min date error on page" in {
         val doc = document(error = Some(dateTooEarlyError))
-        doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+        doc.select("div[class=govuk-error-summary]").select("div[role=alert]").size() mustBe 1
         doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
         doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"
       }

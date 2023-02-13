@@ -125,11 +125,11 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
         appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-accounting-type"
     }
 
-    "must display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {
+    "display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {
       document.mustHaveErrorSummaryByNewGovUkClass(List[String](emptyError))
     }
 
-    "must display empty form error message when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)) {
+    "display empty form error message when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)) {
 
       document.mustHaveGovUkErrorNotificationMessage(emptyError)
     }
