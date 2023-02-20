@@ -66,9 +66,11 @@ business.trade-name.hint                                        = Er enghraifft:
 
 # Business trade name errors
 error.business-trade-name.empty                                 = Nodwch fasnach eich busnes.
-error.business-trade-name.max-length                             = Mae’n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.
+error.business-trade-name.max-length                            = Mae’n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.
+error.business-trade-name.min-length                            = Mae’n rhaid i enw masnachu’ch busnes gynnwys o leiaf dwy lythyren (llythrennau mawr neu lythrennau bach)
 error.business-trade-name.duplicate                             = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes.
-error.business-trade-name.invalid                               = Mae’n rhaid i fasnach y busnes gynnwys y llythrennau a i z, cysylltnodau, bylchau a chollnodau yn unig.
+error.business-trade-name.invalid                               = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, ', \, /, -
+
 
 #Business accounting method errors
 error.business-accounting-method.invalid                        = Dewiswch os ydych yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
@@ -166,8 +168,9 @@ business.agent.trade-name.hint                                  = Er enghraifft:
 
 #Agent Trade Name errors
 error.agent.business-trade-name.empty                           = Nodwch fasnach busnes eich cleient.
-error.agent.business-trade-name.max-length                       = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.
-error.agent.business-trade-name.invalid                         = Ni all enw‘r busnes gynnwys !, “ “ , * na?
+error.agent.business-trade-name.max-length                      = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.
+error.agent.business-trade-name.min-length                      = Mae’n rhaid i enw masnachu’ch busnes gynnwys o leiaf dwy lythyren (llythrennau mawr neu lythrennau bach)
+error.agent.business-trade-name.invalid                         = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, ', \, /, -
 error.agent.business-trade-name.duplicate                       = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes.
 
 #Agent Business Address page

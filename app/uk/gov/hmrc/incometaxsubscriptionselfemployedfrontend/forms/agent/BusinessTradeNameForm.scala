@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,12 @@ object BusinessTradeNameForm {
   val businessTradeName: String = "businessTradeName"
 
   val businessTradeNameMaxLength = 35
+  val businessTradeNameMinLength = 2
 
   val tradeNameEmpty: Constraint[String] = nonEmpty("error.agent.business-trade-name.empty")
   val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.agent.business-trade-name.max-length")
+  val nameTooShort: Constraint[String] = minLettersLength(businessTradeNameMinLength, "error.agent.business-trade-name.min-length")
+  val nameCharsValid: Constraint[String] = businessNameValidateChar("error.agent.business-trade-name.invalid")
 
   def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
     if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.agent.business-trade-name.duplicate")
@@ -41,7 +44,7 @@ object BusinessTradeNameForm {
   def businessTradeNameValidationForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel]): Form[BusinessTradeNameModel] = Form(
     mapping(
       businessTradeName -> trimmedText.verifying(
-        tradeNameEmpty andThen nameTooLong andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
+        tradeNameEmpty andThen nameCharsValid andThen nameTooLong andThen nameTooShort andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
       )
     )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
   )

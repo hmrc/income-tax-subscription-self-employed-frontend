@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{maxLength, nonEmpty}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.trimmedText
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
@@ -29,10 +29,12 @@ object BusinessTradeNameForm {
   val businessTradeName: String = "businessTradeName"
 
   val businessTradeNameMaxLength = 35
+  val businessTradeNameMinLength = 2
 
   val tradeNameEmpty: Constraint[String] = nonEmpty("error.business-trade-name.empty")
   val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.business-trade-name.max-length")
-
+  val nameTooShort: Constraint[String] = minLettersLength(businessTradeNameMinLength, "error.business-trade-name.min-length")
+  val nameCharsValid: Constraint[String] = businessNameValidateChar("error.business-trade-name.invalid")
   def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
     if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.business-trade-name.duplicate")
     else Valid
@@ -41,7 +43,7 @@ object BusinessTradeNameForm {
   def businessTradeNameValidationForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel]): Form[BusinessTradeNameModel] = Form(
     mapping(
       businessTradeName -> trimmedText.verifying(
-        tradeNameEmpty andThen nameTooLong andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
+        tradeNameEmpty andThen nameCharsValid andThen nameTooLong andThen nameTooShort andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
       )
     )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
   )

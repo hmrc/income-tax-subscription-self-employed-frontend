@@ -62,9 +62,10 @@ business.trade-name.hint                                        = For example: p
 
 # Business trade name errors
 error.business-trade-name.empty                                 = Enter the trade of your business.
-error.business-trade-name.max-length                             = Business trade must be 35 characters or fewer.
+error.business-trade-name.max-length                            = Business trade must be 35 characters or fewer.
+error.business-trade-name.min-length                            = Your business trade name must include at least two letters (upper or lower case)
 error.business-trade-name.duplicate                             = You cannot enter the same trade and same business name.
-error.business-trade-name.invalid                               = Business trade must only include letters a to z, hyphens, spaces and apostrophes.
+error.business-trade-name.invalid                               = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, ', \, /, -
 
 #Business accounting method errors
 error.business-accounting-method.invalid                        = Select if you use cash basis accounting or traditional accounting.
@@ -162,8 +163,9 @@ business.agent.trade-name.hint                                  = For example: p
 
 #Agent Trade Name errors
 error.agent.business-trade-name.empty                           = Enter the trade of your client’s business.
-error.agent.business-trade-name.max-length                       = Business trade must be 35 characters or fewer.
-error.agent.business-trade-name.invalid                         = Business trade must only include letters a to z, hyphens, spaces and apostrophes.
+error.agent.business-trade-name.max-length                      = Business trade must be 35 characters or fewer.
+error.agent.business-trade-name.min-length                      = Your business trade name must include at least two letters (upper or lower case)
+error.agent.business-trade-name.invalid                         = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, ', \, /, -
 error.agent.business-trade-name.duplicate                       = You cannot enter the same trade and same business name.
 
 #Agent Business Address page

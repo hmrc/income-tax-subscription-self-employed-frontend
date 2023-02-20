@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,9 +55,13 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "when testing the validation" should {
 
       val maxLength = 35
+      val minLength = 2
+      val testTradeInvalidChar = "!@£#$%^*()_+={}<>?~`"
 
       val empty = "error.business-trade-name.empty"
+      val invalidChar = "error.business-trade-name.invalid"
       val maxLen = "error.business-trade-name.max-length"
+      val minLen = "error.business-trade-name.min-length"
       val duplicate = "error.business-trade-name.duplicate"
 
       "the map be empty" in {
@@ -72,10 +76,26 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         emptyTest.errors must contain(FormError(businessTradeName, empty))
       }
 
+      "name has an invalid character" which {
+        for (char <- testTradeInvalidChar) {
+            s"is the $char symbol" in {
+              val invalidInput = DataMap.businessTradeNameMap(char.toString)
+              val invalidTest = businessTradeForm().bind(invalidInput)
+              invalidTest.errors must contain(FormError(businessTradeName, invalidChar))
+            }
+        }
+      }
+
       "the name is too long" in {
         val maxLengthInput = DataMap.businessTradeNameMap("a" * maxLength + 1)
         val maxLengthTest = businessTradeForm().bind(maxLengthInput)
         maxLengthTest.errors must contain(FormError(businessTradeName, maxLen))
+      }
+
+      "the name is too short" in {
+        val minLengthInput = DataMap.businessTradeNameMap("a" * (minLength - 1))
+        val minLengthTest = businessTradeForm().bind(minLengthInput)
+        minLengthTest.errors must contain(FormError(businessTradeName, minLen))
       }
 
       "the name should not allow just a space" in {
@@ -107,8 +127,9 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         }
 
         "the name contains special characters" in {
-          val valid = DataMap.businessTradeNameMap("!()+{}?^~")
+          val valid = DataMap.businessTradeNameMap("""aa&'/\.,-""")
           val result = businessTradeForm().bind(valid)
+          print(result.errors)
           result.hasErrors shouldBe false
           result.hasGlobalErrors shouldBe false
         }
