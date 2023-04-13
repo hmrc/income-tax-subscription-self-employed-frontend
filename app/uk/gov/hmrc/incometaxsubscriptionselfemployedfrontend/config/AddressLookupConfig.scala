@@ -44,8 +44,8 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
           "showSearchLinkAgain" -> true
         ),
         "confirmPageConfig" -> Json.obj(
-          "showChangeLink" -> false,
-          "showSubHeadingAndInfo" -> false,
+          "showChangeLink" -> true,
+          "showSubHeadingAndInfo" -> true,
           "showSearchAgainLink" -> false,
           "showConfirmChangeText" -> true
         ),

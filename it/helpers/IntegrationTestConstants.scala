@@ -76,8 +76,8 @@ object IntegrationTestConstants {
        |      "showSearchLinkAgain": true
        |    },
        |    "confirmPageConfig": {
-       |      "showChangeLink": false,
-       |      "showSubHeadingAndInfo": false,
+       |      "showChangeLink": true,
+       |      "showSubHeadingAndInfo": true,
        |      "showSearchAgainLink": false,
        |      "showConfirmChangeText": true
        |    },
