@@ -58,7 +58,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       "labels" -> Json.obj(
         "en" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("individual-service-name")(en)
+            "navTitle" -> messagesApi("base.service-name")(en)
           ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("address-lookup.select-page.title")(en),
@@ -80,7 +80,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         ),
         "cy" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("individual-service-name")(cy)
+            "navTitle" -> messagesApi("base.service-name")(cy)
           ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("address-lookup.select-page.title")(cy),
@@ -136,7 +136,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       "labels" -> Json.obj(
         "en" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("agent-service-name")(en)
+            "navTitle" -> messagesApi("base.agent.service-name")(en)
           ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("agent.address-lookup.select-page.title")(en),
@@ -158,7 +158,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         ),
         "cy" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("agent-service-name")(cy)
+            "navTitle" -> messagesApi("base.agent.service-name")(cy)
           ),
           "selectPageLabels" -> Json.obj(
             "title" -> messagesApi("agent.address-lookup.select-page.title")(cy),

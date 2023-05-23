@@ -22,6 +22,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.helpers.MessagesMat
 import scala.io.Source
 
 class MessagesSpec extends PlaySpec with MessagesMatcher {
+
   override val excludedKeys: Set[String] = Set.empty
 
   private val messageKeysEnglish: List[String] = getMessageKeys("messages").toList
