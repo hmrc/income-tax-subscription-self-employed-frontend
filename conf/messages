@@ -90,7 +90,7 @@ business.accounting-method.cash.label                           = Cash basis acc
 business.accounting-method.cash.hint                            = You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method.
 business.accounting-method.accruals                             = <span class="heading-small">Traditional accounting</span><br>You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
 business.accounting-method.accruals.label                       = Traditional accounting
-business.accounting-method.accruals.hint                        = You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
+business.accounting-method.accruals.hint                        = You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘standard accounting’.
 error.business-accounting-method.invalid                        = Select if you use cash basis accounting or traditional accounting.
 error.business-accounting-method.empty                          = Select if you use cash basis accounting or traditional accounting.
 
