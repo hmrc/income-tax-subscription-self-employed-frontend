@@ -46,7 +46,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val cash = "Cash basis accounting"
     val cashDescription = "You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method."
     val accruals = "Traditional accounting"
-    val accrualsDescription = "You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’."
+    val accrualsDescription = "You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘standard accounting’."
     val continue = "Continue"
     val update = "Update"
     val saveAndContinue = "Save and continue"
