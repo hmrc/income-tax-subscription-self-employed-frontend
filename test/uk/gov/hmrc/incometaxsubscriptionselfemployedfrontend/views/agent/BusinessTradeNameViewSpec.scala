@@ -27,6 +27,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
 
@@ -40,6 +41,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val title = "What is the trade of your client’s sole trader business?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
+    val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val hintText = "For example: plumbing, electrical work, consulting."
     val update = "Update"
     val backLink = "Back"
@@ -60,7 +62,8 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       businessTradeNameForm,
       testCall,
       isEditMode = isEditMode,
-      testBackUrl
+      testBackUrl,
+      ClientDetails("FirstName LastName", "ZZ111111Z")
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
@@ -73,6 +76,10 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     }
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessTradeNameMessages.heading
+    }
+    "have a caption" in new Setup() {
+      document.selectHead(".govuk-caption-l")
+        .text() mustBe BusinessTradeNameMessages.caption
     }
     "have a Form" in new Setup {
       document.getForm.attr("method") mustBe testCall.method

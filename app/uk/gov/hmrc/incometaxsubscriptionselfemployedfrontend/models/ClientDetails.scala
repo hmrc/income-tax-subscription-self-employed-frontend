@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 import play.api.mvc._
 
 import scala.util.matching.Regex
 
-package object models {
+object ClientDetails{
+  implicit class ClientInfoRequestUtil(request: Request[AnyContent]) {
+    def getClientDetails: ClientDetails = {
+      val clientName: String = Seq(request.session.get("FirstName"), request.session.get("LastName")).flatten.mkString(" ")
+      val clientNino: String = request.session.get("NINO").mkString("")
+
+      ClientDetails(clientName, clientNino)
+    }
+  }
+
+}
 
   case class ClientDetails(name: String, nino: String){
     private val ninoRegex: Regex = """^([a-zA-Z]{2})\s*(\d{2})\s*(\d{2})\s*(\d{2})\s*([a-zA-Z])$""".r
@@ -31,15 +41,6 @@ package object models {
       case other => other
     }
   }
-  implicit class ClientInfoRequestUtil(request: Request[AnyContent]) {
-
-  }
-
-  def getClientDetails(implicit request: Request[AnyContent]): ClientDetails = {
-    val clientName: String = Seq(request.session.get("FirstName"), request.session.get("LastName")).flatten.mkString(" ")
-    val clientNino: String = request.session.get("NINO").get
 
 
-    ClientDetails(clientName, clientNino)
-  }
-}
+

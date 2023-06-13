@@ -30,6 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +49,8 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
       businessTradeNameForm = businessTradeNameForm,
       postAction = routes.BusinessTradeNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
-      backUrl = backUrl(id, isEditMode)
+      backUrl = backUrl(id, isEditMode),
+      clientDetails = request.getClientDetails
     )
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>

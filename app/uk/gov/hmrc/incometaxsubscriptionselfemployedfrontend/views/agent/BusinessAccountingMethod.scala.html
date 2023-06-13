@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, RadioHelper, SaveAndContinueButtonHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Accruals, Cash}
-
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 @this(
         mainTemplate: AgentMainTemplate,
@@ -30,7 +30,7 @@
         continueButton: ContinueButton,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
-@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
+@(businessAccountingMethodForm: Form[AccountingMethodModel], postAction: Call, isEditMode: Boolean, backUrl: Option[String], clientDetails:ClientDetails )(implicit request: Request[_], messages: Messages)
 
 @handleBackUrl = @{
     backUrl match {
@@ -40,7 +40,10 @@
 }
 
 @mainTemplate(title = messages("agent.business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
-    <h1 class="govuk-heading-l">@messages("agent.business.accounting-method.heading")</h1>
+<span class="govuk-caption-l">
+    @messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)
+  </span>
+<h1 class="govuk-heading-l">@messages("agent.business.accounting-method.heading")</h1>
 
     @form(action = postAction) {
         @radioHelper(

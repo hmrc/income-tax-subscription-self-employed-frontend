@@ -156,7 +156,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   private def withController(testCode: BusinessAccountingMethodController => Any): Unit = {
     val businessAccountingMethodView = mock[BusinessAccountingMethod]
 
-    when(businessAccountingMethodView(any(), any(), any(), any())(any(), any()))
+    when(businessAccountingMethodView(any(), any(), any(), any(), any())(any(), any()))
       .thenReturn(HtmlFormat.empty)
 
     val controller = new BusinessAccountingMethodController(

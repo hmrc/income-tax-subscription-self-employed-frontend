@@ -26,6 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingM
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,7 +47,8 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
           Future.successful(Ok(checkYourAnswersView(
             answers = selfEmploymentCYAModel,
             postAction = routes.SelfEmployedCYAController.submit(id),
-            backUrl = backUrl(isEditMode)
+            backUrl = backUrl(isEditMode),
+            clientDetails = request.getClientDetails
           )))
         }
       }

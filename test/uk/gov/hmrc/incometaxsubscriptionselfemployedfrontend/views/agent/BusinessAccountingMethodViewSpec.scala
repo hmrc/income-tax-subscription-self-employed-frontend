@@ -29,6 +29,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Accruals, Cash}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
@@ -40,6 +41,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val title = "What accounting method does your client use for their sole trader businesses?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
+    val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val cash = "Cash basis accounting"
     val accruals = "Traditional accounting"
     val continue = "Continue"
@@ -58,7 +60,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       businessAccountingMethodForm,
       testCall,
       isEditMode,
-      backUrl = backLink
+      backUrl = backLink,
+      ClientDetails("FirstName LastName", "ZZ111111Z")
     )(FakeRequest(), implicitly)
 
 
@@ -86,6 +89,10 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
     }
 
+    "have a caption" in new Setup() {
+      document.selectHead(".govuk-caption-l")
+        .text() mustBe BusinessAccountingMethodMessages.caption
+    }
     "have a hidden legend" in new Setup {
       document.selectHead("legend").text mustBe BusinessAccountingMethodMessages.heading
       document.selectHead("legend").attr("class") mustBe "govuk-fieldset__legend govuk-visually-hidden"

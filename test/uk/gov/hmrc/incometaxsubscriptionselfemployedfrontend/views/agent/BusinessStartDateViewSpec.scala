@@ -24,11 +24,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
     val heading: String = "When did your client’s sole trader business start trading?"
+    val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val hint = "For example, 17 4 2018."
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
@@ -51,7 +53,8 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
       },
       postAction = testCall,
       isEditMode = isEditMode,
-      backUrl = testBackUrl
+      backUrl = testBackUrl,
+      ClientDetails("FirstName LastName", "ZZ111111Z")
     )(fakeTestRequest, implicitly)
   }
 
@@ -88,6 +91,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         form.attr("method") mustBe testCall.method
         form.attr("action") mustBe testCall.url
       }
+
 
       "has a correct date input field with the legend as the page heading" when {
         "there is no error on the page" in {
