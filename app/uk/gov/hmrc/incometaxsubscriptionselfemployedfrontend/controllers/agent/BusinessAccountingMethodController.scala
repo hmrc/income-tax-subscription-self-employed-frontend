@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 @Singleton
 class BusinessAccountingMethodController @Inject()(businessAccountingMethod: BusinessAccountingMethod,
                                                    mcc: MessagesControllerComponents,
@@ -50,7 +50,8 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
       businessAccountingMethodForm = businessAccountingMethodForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.submit(id, isEditMode),
       backUrl = backUrl(id, isEditMode),
-      isEditMode = isEditMode
+      isEditMode = isEditMode,
+      clientDetails = request.getClientDetails
     )
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>

@@ -129,6 +129,7 @@ agent.business.name.hint                                        = Dyma’r enw b
 error.agent.business-name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient.
 error.agent.business-name.max-length                            = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau.
 error.agent.business-name.invalid-character                     = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.
+agent.business.name.caption                                     = {0} | {1}
 
 # Agent Business start date
 business.agent.start-date.heading                               = Pryd y dechreuodd busnes unig fasnachwr eich cleient fasnachu?

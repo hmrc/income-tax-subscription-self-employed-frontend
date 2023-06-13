@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{SaveAndContinueButtonHelper, _}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
-
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 @this(
         mainTemplate: AgentMainTemplate,
         continueButton: ContinueButton,
@@ -28,11 +28,14 @@
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         form: FormWithCSRF
 )
-@(businessStartDateForm: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+@(businessStartDateForm: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.agent.start-date.heading"), optForm = Some(businessStartDateForm), backLink = Some(backUrl)) {
 
     @form(action = postAction) {
+        <span class="govuk-caption-l">
+            @messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)
+        </span>
         <h1 class="govuk-heading-l">@messages("business.agent.start-date.heading")</h1>
 
         @dateHelper(

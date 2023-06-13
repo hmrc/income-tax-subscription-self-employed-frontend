@@ -26,6 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessNameViewSpec extends ViewSpec {
 
@@ -33,6 +34,7 @@ class BusinessNameViewSpec extends ViewSpec {
     val title = "What is the name of your client’s business?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
+    val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val backLink = "Back"
     val update = "Update"
     val saveAndContinue = "Save and continue"
@@ -52,7 +54,8 @@ class BusinessNameViewSpec extends ViewSpec {
       businessNameForm,
       testCall,
       isEditMode = isEditMode,
-      testBackUrl
+      testBackUrl,
+      ClientDetails("FirstName LastName", "ZZ111111Z")
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
@@ -66,6 +69,10 @@ class BusinessNameViewSpec extends ViewSpec {
     "have a heading" in new Setup() {
       document.getH1Element.text mustBe BusinessNameMessages.heading
 
+    }
+    "have a caption" in new Setup(){
+      document.selectHead(".govuk-caption-l")
+        .text() mustBe BusinessNameMessages.caption
     }
 
     "have a Form" in new Setup() {

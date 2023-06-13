@@ -42,7 +42,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
 
   private val businessName = mock[BusinessName]
-  when(businessName(any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
+  when(businessName(any(), any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
 
   object TestBusinessNameController extends BusinessNameController(
     mockMessagesControllerComponents,

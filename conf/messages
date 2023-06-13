@@ -129,6 +129,7 @@ agent.business.name.hint                                        = This is the bu
 error.agent.business-name.empty                                 = Enter your client’s name or the name of their business.
 error.agent.business-name.max-length                            = Business name must be between 1 and 105 characters.
 error.agent.business-name.invalid-character                     = Business name can only include characters listed.
+agent.business.name.caption                                     = {0} | {1}
 
 # Agent Business start date
 business.agent.start-date.heading                               = When did your client’s sole trader business start trading?

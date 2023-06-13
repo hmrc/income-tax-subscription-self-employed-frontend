@@ -24,12 +24,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.r
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class SelfEmployedCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val captionHidden = "This section is"
-    val captionVisual = "Sole trader business you entered"
+    val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val heading = "Check your answers"
     val title = "Check your answers - sole trader business"
     val confirmAndContinue = "Confirm and continue"
@@ -83,7 +84,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
       testCall,
-      backUrl
+      backUrl,
+      ClientDetails("FirstName LastName", "ZZ111111Z")
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
@@ -103,7 +105,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
       testCall,
-      backUrl = None
+      backUrl = None,
+      ClientDetails("FirstName LastName", "ZZ111111Z")
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
@@ -116,7 +119,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
         view = checkYourAnswers(
           answers = testSelfEmploymentsCYAModel,
           postAction = testCall,
-          backUrl
+          backUrl,
+          ClientDetails("FirstName LastName", "ZZ111111Z")
         )(FakeRequest(), implicitly),
         title = CheckYourAnswersMessages.title,
         isAgent = true,
@@ -128,8 +132,13 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     "have a heading" in new SetupComplete {
       val header: Element = document.mainContent.getHeader
       header.getH1Element.text mustBe CheckYourAnswersMessages.heading
-      header.selectHead("p").text mustBe s"${CheckYourAnswersMessages.captionHidden} ${CheckYourAnswersMessages.captionVisual}"
     }
+
+    "have a caption" in new SetupComplete() {
+      document.selectHead(".govuk-caption-l")
+        .text() mustBe CheckYourAnswersMessages.caption
+    }
+
 
     "display a business check your answers" when {
       "all the answers have been completed" should {

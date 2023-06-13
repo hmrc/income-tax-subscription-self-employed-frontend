@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 @this(
         mainTemplate: AgentMainTemplate,
@@ -28,9 +29,10 @@
         hmrcPageHeading: HmrcPageHeadingHelper
 )
 
-@(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
+@(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @summaryRow(question: String, answer: Option[String], changeUrl: Option[ChangeLink]) = {
+
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">@question</dt>
         <dd class="govuk-summary-list__value">@answer.getOrElse("")</dd>
@@ -126,10 +128,12 @@
     title = messages("agent.self-employed-cya.title"),
     backLink = backUrl
 ) {
+    <span class="govuk-caption-l" style="margin:0;" >
+        @messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)
+    </span>
 
     @hmrcPageHeading(PageHeading(
         text = messages("agent.self-employed-cya.heading"),
-        section = Some(messages("agent.self-employed-cya.caption"))
     ))
 
     @contentTable(answers)

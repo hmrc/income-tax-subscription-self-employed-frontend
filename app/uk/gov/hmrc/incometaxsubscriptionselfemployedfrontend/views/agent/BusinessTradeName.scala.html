@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.ContinueButton
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 @this(
     mainTemplate: AgentMainTemplate,
@@ -30,10 +31,12 @@
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
 
-@(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call,isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+@(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call,isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.agent.trade-name.title"), optForm = Some(businessTradeNameForm), backLink = Some(backUrl)) {
-
+    <span class="govuk-caption-l">
+        @messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)
+    </span>
     @form(action = postAction) {
 
         @textInputHelper(

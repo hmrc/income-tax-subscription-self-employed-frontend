@@ -44,7 +44,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   private def withController(testCode: BusinessTradeNameController => Any): Unit = {
     val businessTradeNameView = mock[BusinessTradeName]
 
-    when(businessTradeNameView(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+    when(businessTradeNameView(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(),ArgumentMatchers.any())
     (ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
 
     val controller = new BusinessTradeNameController(
