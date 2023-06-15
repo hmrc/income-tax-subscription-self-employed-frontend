@@ -25,7 +25,8 @@ object FeatureSwitch {
   val prefix = "feature-switch"
 
   val switches: Set[FeatureSwitch] = Set(
-    EnableUseRealAddressLookup
+    EnableUseRealAddressLookup,
+    EnableTaskListRedesign
   )
 
 
@@ -40,6 +41,11 @@ object FeatureSwitch {
   case object EnableUseRealAddressLookup extends FeatureSwitch {
     override val name = s"$prefix.enable-use-real-AL"
     override val displayText = "Enable to use real Address Lookup"
+  }
+
+  case object EnableTaskListRedesign extends FeatureSwitch {
+    override val name = s"$prefix.enable-task-list-redesign"
+    override val displayText = "Enable the task list redesign"
   }
 
 }
