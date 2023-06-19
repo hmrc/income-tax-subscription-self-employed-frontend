@@ -25,6 +25,13 @@ agent-base.title.error                                          = Gwall: {0} - D
 ## Service name
 base.agent.service-name                                         = Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient
 
+# Business name confirmation
+individual.business-name-confirmation.heading                   = A yw enw masnachu eich busnes yr un peth â’ch enw chi?
+individual.business-name-confirmation.heading.caption           = Unig fasnachwr
+individual.business-name-confirmation.summary.business-name     = Enw’r busnes
+individual.business-name-confirmation.form.heading              = A yw’r enw hwn yn gywir?
+error.individual.business-name-confirmation.empty               = Dewiswch ‘Iawn’ os yw hyn yn gywir.
+
 # Business Name
 business.name.title                                             = Beth yw enw’ch busnes?
 business.name.heading                                           = Beth yw enw’ch busnes?

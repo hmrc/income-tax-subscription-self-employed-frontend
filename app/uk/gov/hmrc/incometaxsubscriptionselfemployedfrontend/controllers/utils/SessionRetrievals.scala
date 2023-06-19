@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils
 
-object ITSASessionKeys {
+import play.api.mvc.{AnyContent, Request}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.FullNameSessionKey
 
-  val UTR: String = "utr"
-  val REFERENCE: String = "reference"
-  val FullNameSessionKey: String = "FULLNAME"
+trait SessionRetrievals {
+
+  def fetchUsersName(implicit request: Request[AnyContent]): Option[String] = request.session.get(FullNameSessionKey)
 
 }

@@ -31,7 +31,7 @@
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
 
-@(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call,isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
+@(businessTradeNameForm: Form[BusinessTradeNameModel], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.agent.trade-name.title"), optForm = Some(businessTradeNameForm), backLink = Some(backUrl)) {
     <span class="govuk-caption-l">

@@ -26,7 +26,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessNameViewSpec extends ViewSpec {
 
@@ -41,13 +40,12 @@ class BusinessNameViewSpec extends ViewSpec {
     val line1: String = "This is the business name you used to register for Self Assessment. " +
       "If your sole trader business does not have a separate name, enter your own first and last name. " +
       "The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
-    val emptyError = "Enter your name or the name of your business"
+    val emptyError = "Enter your name or the name of your business."
   }
 
   val backUrl: String = testBackUrl
   val action: Call = testCall
-  val testError: FormError = FormError("businessName", "testError")
-  val testError2: FormError = FormError("businessName", "testError2")
+  val formError: FormError = FormError("businessName", "error.business-name.empty")
   val businessName: BusinessName = app.injector.instanceOf[BusinessName]
 
   class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
@@ -75,12 +73,12 @@ class BusinessNameViewSpec extends ViewSpec {
     }
 
     "have a text input field with hint" when {
-      "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
+      "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(formError)) {
         document.mustHaveTextInput(
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
           hint = Some(BusinessNameMessages.line1),
-          error = Some(testError)
+          error = Some(BusinessNameForm.businessName -> BusinessNameMessages.emptyError)
         )
       }
 

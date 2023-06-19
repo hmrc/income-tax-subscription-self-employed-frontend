@@ -40,13 +40,13 @@ class BusinessNameViewSpec extends ViewSpec {
     val saveAndContinue = "Save and continue"
     val line1: String = "This is the business name they used to register for Self Assessment. " +
       "If their sole trader business does not have a name, enter your client’s name."
-    val emptyError = "Enter your client’s name or the name of their business"
+    val emptyError = "Enter your client’s name or the name of their business."
   }
 
   val backUrl: String = testBackUrl
   val action: Call = testCall
-  val testError: FormError = FormError("businessName", "testError")
-  val testError2: FormError = FormError("businessName", "testError2")
+  val testError: FormError = FormError("businessName", "error.agent.business-name.empty")
+  val testError2: FormError = FormError("businessName", "error.agent.business-name.empty")
   val businessName: BusinessName = app.injector.instanceOf[BusinessName]
 
   class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
@@ -94,7 +94,7 @@ class BusinessNameViewSpec extends ViewSpec {
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
           hint = Some(BusinessNameMessages.line1),
-          error = Some(testError)
+          error = Some(BusinessNameForm.businessName -> BusinessNameMessages.emptyError)
         )
       }
 

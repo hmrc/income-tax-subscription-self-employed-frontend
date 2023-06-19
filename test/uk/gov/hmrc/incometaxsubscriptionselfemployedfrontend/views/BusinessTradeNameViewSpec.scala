@@ -47,12 +47,13 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
+    val emptyError = "Enter the trade of your business."
   }
 
   val backUrl: String = testBackUrl
   val action: Call = testCall
   val taxYearEnd: Int = 2020
-  val testError: FormError = FormError("businessTradeName", "testError")
+  val emptyFormError: FormError = FormError("businessTradeName", "error.business-trade-name.empty")
   val id: String = "testId"
 
   class Setup(isEditMode: Boolean = false,
@@ -106,8 +107,8 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
     "must display form error on page along with textInput and hintText" in
-      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
-        document.mustHaveErrorSummaryByNewGovUkClass(List[String](testError.message))
+      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(emptyFormError)) {
+        document.mustHaveErrorSummaryByNewGovUkClass(List[String](BusinessTradeNameMessages.emptyError))
         document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
         document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
       }
