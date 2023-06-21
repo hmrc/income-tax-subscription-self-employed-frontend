@@ -59,6 +59,7 @@ error.business-start-date.year.length                           = The year must 
 # Business trade name
 business.trade-name.title                                       = What is the trade of your business?
 business.trade-name.heading                                     = What is the trade of your business?
+business.trade-name.caption                                     = Sole trader
 business.trade-name.hint                                        = For example: plumbing, electrical work, consulting.
 error.business-trade-name.empty                                 = Enter the trade of your business.
 error.business-trade-name.max-length                            = Business trade must be 35 characters or fewer.

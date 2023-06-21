@@ -59,6 +59,7 @@ error.business-start-date.year.length                           = Mae’n rhaid 
 # Business trade name
 business.trade-name.title                                       = Beth yw masnach eich busnes?
 business.trade-name.heading                                     = Beth yw masnach eich busnes?
+business.trade-name.caption                                     = Unig fasnachwr
 business.trade-name.hint                                        = Er enghraifft: plymio, gwaith trydanol, ymgynghori.
 error.business-trade-name.empty                                 = Nodwch fasnach eich busnes.
 error.business-trade-name.max-length                            = Mae’n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.
