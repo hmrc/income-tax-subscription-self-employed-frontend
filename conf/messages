@@ -36,6 +36,7 @@ error.business-name.invalid-character                           = Business name 
 # Business start date
 business.start-date.title                                       = When did your sole trader business start trading?
 business.start-date.heading                                     = When did your sole trader business start trading?
+business.start-date.caption                                     = Sole trader
 business.start-date.line-1                                      = If you have multiple sole trader businesses, enter the start date of your main business.
 business.start-date.hint                                        = For example, 17 4 2018.
 error.business-start-date.day-month-year.empty                  = Enter the date your business started trading.

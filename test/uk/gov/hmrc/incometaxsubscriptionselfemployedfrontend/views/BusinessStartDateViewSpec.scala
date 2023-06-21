@@ -36,6 +36,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val title = "When did your sole trader business start trading?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
+    val caption = "This section is Sole trader"
     val line_1: String = "If you have multiple sole trader businesses, enter the start date of your main business."
     val hint = "For example, 17 4 2018."
     val backLink = "Back"
@@ -74,6 +75,9 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
     "have a title" in new Setup {
       document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
+    }
+    "have a caption" in new Setup{
+      document.selectHead(".hmrc-caption").text mustBe BusinessStartDateMessages.caption
     }
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessStartDateMessages.heading
