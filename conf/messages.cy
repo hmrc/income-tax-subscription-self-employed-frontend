@@ -36,6 +36,7 @@ error.business-name.invalid-character                           = Gall enw’r b
 # Business start date
 business.start-date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
 business.start-date.heading                                     = Pryd y dechreuodd eich busnes fasnachu?
+business.start-date.caption                                     = Unig fasnachwr
 business.start-date.line-1                                      = Os oes gennych nifer o fusnesau unig fasnachwr, nodwch ddyddiad dechrau eich prif fusnes.
 business.start-date.hint                                        = Er enghraifft, 17 4 2018.
 error.business-start-date.day-month-year.empty                  = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu.

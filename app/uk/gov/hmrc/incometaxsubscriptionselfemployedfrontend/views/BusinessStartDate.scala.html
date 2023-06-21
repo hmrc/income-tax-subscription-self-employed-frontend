@@ -25,6 +25,7 @@
         continueButton: ContinueButton,
         dateHelper: DateHelper,
         form: FormWithCSRF,
+        hmrcPageHeading: HmrcPageHeading,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
 @(businessStartDateForm: Form[BusinessStartDateModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
@@ -32,7 +33,14 @@
 @mainTemplate(title = messages("business.start-date.title"), optForm = Some(businessStartDateForm), backLink = Some(backUrl)) {
 
     @form(action = postAction) {
-        <h1 class="govuk-heading-l">@messages("business.start-date.heading")</h1>
+
+        @hmrcPageHeading(PageHeading(
+            text = messages("business.start-date.heading"),
+            section = Some(messages("business.start-date.caption")),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-l")
+        ))
+
         <p class="govuk-body">@messages("business.start-date.line-1")</p>
 
         @dateHelper(
