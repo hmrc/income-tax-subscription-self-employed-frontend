@@ -33,9 +33,11 @@ individual.business-name-confirmation.form.heading              = Is this name c
 error.individual.business-name-confirmation.empty               = Select ‘Yes’ if this is correct
 
 # Business Name
+business.name.caption                                           = Sole trader
 business.name.title                                             = What is the name of your business?
 business.name.heading                                           = What is the name of your business?
-business.name.hint                                              = This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name. The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, '', \, /, -.
+business.name.hint1                                             = This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name.
+business.name.hint2                                             = The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, '', \, /, -.
 error.business-name.empty                                       = Enter your name or the name of your business.
 error.business-name.max-length                                  = Business name must be between 1 and 105 characters.
 error.business-name.invalid-character                           = Business name can only include characters listed.

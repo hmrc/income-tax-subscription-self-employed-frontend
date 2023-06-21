@@ -22,7 +22,7 @@
         label: String,
         isLabelHidden: Boolean = false,
         isPageHeading: Boolean = true,
-        hint: Option[String] = None,
+        hint: Option[Html] = None,
         classes: Option[String] = None
 )(implicit messages: Messages)
 
@@ -39,7 +39,7 @@
         hint = hint.map{ text =>
             Hint(
                 id = Some(s"${field.name}-hint"),
-                content = Text(text)
+                content = HtmlContent(text)
             )
         },
         classes = classes.getOrElse("")
