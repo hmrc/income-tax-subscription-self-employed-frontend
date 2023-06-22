@@ -28,6 +28,7 @@
         continueButton: ContinueButton,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         detailsHelper: DetailsHelper,
+        hmrcPageHeading: HmrcPageHeading,
         radioHelper: RadioHelper
 )
 
@@ -49,7 +50,13 @@
 }
 
 @mainTemplate(title = messages("business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
-    <h1 class="govuk-heading-l">@messages("business.accounting-method.heading")</h1>
+
+    @hmrcPageHeading(PageHeading(
+        text = messages("business.accounting-method.heading"),
+        section = Some(messages("business.accounting-method.caption")),
+        headingClasses = Some("govuk-heading-l"),
+        captionClasses = Some("govuk-caption-l")
+    ))
 
     <p class="govuk-body">@messages("business.accounting-method.line-1")</p>
 

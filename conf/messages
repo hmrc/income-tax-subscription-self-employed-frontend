@@ -82,6 +82,7 @@ address-lookup.confirm-page.heading                               = Confirm busi
 # Business Accounting Method page
 business.accounting-method.title                                = What accounting method do you use for your sole trader business?
 business.accounting-method.heading                              = What accounting method do you use for your sole trader business?
+business.accounting-method.caption                              = Sole trader
 business.accounting-method.line-1                               = If you have more than one sole trader business, all your businesses need to have the same accounting method.
 business.accounting-method.accordion                            = Show me an example
 business.accounting-method.accordion.line-1                     = You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:
