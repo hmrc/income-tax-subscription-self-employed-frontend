@@ -82,6 +82,7 @@ address-lookup.confirm-page.heading                             = Cadarnhau cyfe
 # Business Accounting Method page
 business.accounting-method.title                                = Pa ddull cyfrifyddu a ydych yn ei ddefnyddio ar gyfer eich busnes unig fasnachwr?
 business.accounting-method.heading                              = Pa ddull cyfrifyddu a ydych yn ei ddefnyddio ar gyfer eich busnes unig fasnachwr?
+business.accounting-method.caption                              = Unig fasnachwr
 business.accounting-method.line-1                               = Os oes gennych fwy nag un busnes unig fasnachwr, mae angen i’ch holl fusnesau gael yr un dull cyfrifyddu.
 business.accounting-method.accordion                            = Rhowch enghraifft i mi
 business.accounting-method.accordion.line-1                     = Gwnaethoch greu anfoneb i rywun ym mis Mawrth 2017, ond ni chawsoch yr arian tan fis Mai 2017. Os ydych yn rhoi gwybod i CThEM eich bod wedi cael yr incwm hwn ym:

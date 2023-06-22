@@ -38,6 +38,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val title = "What accounting method do you use for your sole trader business?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
+    val captionHidden = "This section is"
+    val captionVisual = "Sole trader"
     val line_1: String = "If you have more than one sole trader business, all your businesses need to have the same accounting method."
     val accordion = "Show me an example"
     val accordionLine_1 = "You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:"
@@ -73,12 +75,16 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       testDoc.getBackLinkByClass.attr("href") mustBe "javascript:history.back()"
     }
 
+    "have a caption" in {
+      document().selectHead(".hmrc-caption").text mustBe s"${BusinessAccountingMethodMessages.captionHidden} ${BusinessAccountingMethodMessages.captionVisual}"
+    }
+
     "have a heading" in {
-      document().getH1Element.text mustBe BusinessAccountingMethodMessages.heading
+      document().selectHead(".govuk-heading-l").text mustBe BusinessAccountingMethodMessages.heading
     }
 
     "have a paragraph" in {
-      document().getParagraphNth(1) mustBe BusinessAccountingMethodMessages.line_1
+      document().getParagraphNth(2) mustBe BusinessAccountingMethodMessages.line_1
     }
 
     "have an accordion summary" in {
@@ -86,7 +92,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have an accordion heading" in {
-      document().getParagraphNth(2) mustBe BusinessAccountingMethodMessages.accordionLine_1
+      document().getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
     }
 
     "have an accordion bullets list 1" in {
