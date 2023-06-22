@@ -29,7 +29,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
   object CheckYourAnswersMessages {
     val captionHidden = "This section is"
-    val captionVisual = "Sole trader business you entered"
+    val captionVisual = "Sole trader"
     val heading = "Check your answers"
     val title = "Check your answers - sole trader business"
     val confirmAndContinue = "Confirm and continue"
