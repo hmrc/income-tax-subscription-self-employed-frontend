@@ -122,7 +122,7 @@ self-employed-cya.accounting-method.cash                        = Cash basis acc
 self-employed-cya.accounting-method.accruals                    = Traditional accounting
 self-employed-cya.title                                         = Check your answers - sole trader business
 self-employed-cya.heading                                       = Check your answers
-self-employed-cya.caption                                       = Sole trader business you entered
+self-employed-cya.caption                                       = Sole trader
 
 # Agent Business Name
 agent.business.name.title                                       = What is the name of your client’s business?

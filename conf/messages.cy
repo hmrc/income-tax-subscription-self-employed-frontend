@@ -122,7 +122,7 @@ self-employed-cya.accounting-method.cash                        = Cyfrifyddu ar 
 self-employed-cya.accounting-method.accruals                    = Cyfrifyddu traddodiadol
 self-employed-cya.title                                         = Gwiriwch eich atebion - busnes unig fasnachwr
 self-employed-cya.heading                                       = Gwiriwch eich atebion
-self-employed-cya.caption                                       = Y busnes unig fasnachwr a nodwyd gennych
+self-employed-cya.caption                                       = Unig fasnachwr
 
 # Agent Business Name
 agent.business.name.title                                       = Beth yw enw busnes eich cleient?
