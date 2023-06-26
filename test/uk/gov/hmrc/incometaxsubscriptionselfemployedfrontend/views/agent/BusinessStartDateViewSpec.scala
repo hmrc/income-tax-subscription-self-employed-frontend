@@ -22,9 +22,9 @@ import play.api.data.FormError
 import play.twirl.api.Html
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
@@ -35,9 +35,9 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
     val update = "Update"
-    val empty = "Enter the date your client’s business started trading."
-    val maxDate = "The date the business started trading must be on or before 11 April 2021."
-    val minDate = "The date your client’s business started must be on or after 11 April 2021."
+    val emptyError = "Enter the date your client’s business started trading."
+    val dateTooLateError = "The date the business started trading must be on or before 11 April 2021."
+    val dateTooEarlyError = "The date your client’s business started must be on or after 11 April 2021."
   }
 
   val taxYearEnd: Int = 2020
@@ -61,10 +61,9 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
   def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document =
     Jsoup.parse(page(isEditMode, error).body)
 
-  private val testError: FormError = FormError(BusinessStartDateForm.startDate, "test error message")
-  private val emptyError = FormError("startDate", "agent.error.business-start-date.day-month-year.empty")
-  private val dateTooLateError = FormError("startDate", "agent.error.business-start-date.day-month-year.max-date", List("11 April 2021"))
-  private val dateTooEarlyError = FormError("startDate", "agent.error.business-start-date.day-month-year.min-date", List("11 April 2021"))
+  private val emptyFormError = FormError(BusinessStartDateForm.startDate, "agent.error.business-start-date.day-month-year.empty")
+  private val dateTooLateFormError = FormError("startDate", "agent.error.business-start-date.day-month-year.max-date", List("11 April 2021"))
+  private val dateTooEarlyFormError = FormError("startDate", "agent.error.business-start-date.day-month-year.min-date", List("11 April 2021"))
 
   "BusinessStartDate" must {
     "have the correct template details" when {
@@ -76,12 +75,12 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         hasSignOutLink = true
       )
       "there is an error on the page" in new TemplateViewTest(
-        view = page(error = Some(testError)),
+        view = page(error = Some(emptyFormError)),
         title = BusinessStartDateMessages.heading,
         isAgent = true,
         backLink = Some(testBackUrl),
         hasSignOutLink = true,
-        error = Some(testError)
+        error = Some(emptyFormError.key -> BusinessStartDateMessages.emptyError)
       )
     }
 
@@ -105,24 +104,24 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
       }
 
       "display form error on page" in {
-        val doc = document(error = Some(emptyError))
+        val doc = document(error = Some(emptyFormError))
         doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
         doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.empty}"
+        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.emptyError}"
       }
 
       "display max date error on page" in {
-        val doc = document(error = Some(dateTooLateError))
+        val doc = document(error = Some(dateTooLateFormError))
         doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
         doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.maxDate}"
+        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.dateTooLateError}"
       }
 
       "display min date error on page" in {
-        val doc = document(error = Some(dateTooEarlyError))
+        val doc = document(error = Some(dateTooEarlyFormError))
         doc.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
         doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"
+        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.dateTooEarlyError}"
       }
 
       "has buttons" which {

@@ -25,6 +25,13 @@ agent-base.title.error                                          = Error: {0} - U
 ## Service Name
 base.agent.service-name                                         = Use software to report your client’s Income Tax
 
+# Business name confirmation
+individual.business-name-confirmation.heading                   = Is your business trading name the same as your own name?
+individual.business-name-confirmation.heading.caption           = Sole trader
+individual.business-name-confirmation.summary.business-name     = Business name
+individual.business-name-confirmation.form.heading              = Is this name correct?
+error.individual.business-name-confirmation.empty               = Select ‘Yes’ if this is correct
+
 # Business Name
 business.name.title                                             = What is the name of your business?
 business.name.heading                                           = What is the name of your business?

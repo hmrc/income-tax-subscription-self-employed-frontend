@@ -17,8 +17,11 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import _root_.uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -26,15 +29,24 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class InitialiseController @Inject()(mcc: MessagesControllerComponents, authService: AuthService, uuidGen: UUIDGenerator)
-                                    (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
+class InitialiseController @Inject()(mcc: MessagesControllerComponents,
+                                     authService:
+                                     AuthService,
+                                     uuidGen: UUIDGenerator)
+                                    (implicit val ec: ExecutionContext,
+                                     val appConfig: AppConfig) extends FrontendController(mcc) with FeatureSwitching {
 
   def initialise: Action[AnyContent] = Action.async { implicit request =>
-
     val id = uuidGen.generateId
 
     authService.authorised() {
-      Future.successful(Redirect(routes.BusinessNameController.show(id)))
+      Future.successful(Redirect(redirectLocation(id)))
     }
+  }
+
+  def redirectLocation(id: String): Call = if (isEnabled(EnableTaskListRedesign)) {
+    controllers.individual.routes.BusinessNameConfirmationController.show(id)
+  } else {
+    controllers.routes.BusinessNameController.show(id)
   }
 }

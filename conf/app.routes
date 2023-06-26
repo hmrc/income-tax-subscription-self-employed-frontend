@@ -10,6 +10,9 @@ GET        /details                             uk.gov.hmrc.incometaxsubscriptio
 GET        /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false)
 POST       /details/business-start-date         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false)
 
+GET        /details/confirm-business-name       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameConfirmationController.show(id: String)
+POST       /details/confirm-business-name       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameConfirmationController.submit(id: String)
+
 GET        /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
 POST       /details/business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
 

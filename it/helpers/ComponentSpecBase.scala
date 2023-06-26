@@ -184,6 +184,19 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getInitialise: WSResponse = get(s"/details")
 
+  def getBusinessNameConfirmation(id: String)(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
+    get(s"/details/confirm-business-name?id=$id", session)
+  }
+
+  def submitBusinessNameConfirmation(id: String, request: Option[YesNo])(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
+    post(s"/details/confirm-business-name?id=$id", session)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          BusinessNameConfirmationForm.businessNameConfirmationForm.fill(model).data.map { case (k, v) => (k, Seq(v)) }
+      )
+    )
+  }
+
   def getBusinessName(id: String): WSResponse = get(s"/details/business-name?id=$id")
 
   def submitBusinessName(id: String, inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {

@@ -24,7 +24,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{Assertion, BeforeAndAfterEach}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.{AnyContentAsEmpty, Call}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
@@ -41,7 +41,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
   implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
-  implicit lazy val mockMessages: Messages = messagesApi.preferred(FakeRequest())
+  implicit lazy val wrappedMessages: Messages = MessagesWrapper(Lang("en"), messagesApi)
 
   val testBackUrl = "/test-back-url"
   val testCall: Call = Call("POST", "/test-url")
@@ -52,7 +52,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
                          isAgent: Boolean = false,
                          backLink: Option[String] = None,
                          hasSignOutLink: Boolean = false,
-                         error: Option[FormError] = None) {
+                         error: Option[(String, String)] = None) {
 
     val document: Document = Jsoup.parse(view.body)
 
@@ -79,12 +79,12 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       document.selectOptionally(".hmrc-sign-out-nav__link") mustBe None
     }
 
-    error.map { formError =>
+    error.map { case (errorKey, errorMessage) =>
       val errorSummary: Element = document.selectHead(".govuk-error-summary")
       errorSummary.selectHead("h2").text mustBe "There is a problem"
       val errorLink: Element = errorSummary.selectHead("div > ul > li > a")
-      errorLink.text mustBe formError.message
-      errorLink.attr("href") mustBe s"#${formError.key}"
+      errorLink.text mustBe errorMessage
+      errorLink.attr("href") mustBe s"#$errorKey"
     }
 
   }
@@ -208,7 +208,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
     def mustHaveTextInput(name: String,
                           label: String,
                           hint: Option[String] = None,
-                          error: Option[FormError] = None,
+                          error: Option[(String, String)] = None,
                           autoComplete: Option[String] = None): Assertion = {
       val textInput: Element = element.selectHead(s"input[name=$name]")
       val textInputLabel: Element = element.selectHead(s"label[for=$name]")
@@ -222,9 +222,9 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
         textInput.attr("aria-describedby").contains(s"$name-hint") mustBe true
       }
 
-      error.foreach { value =>
-        element.selectHead(s"#${value.key}-error").text mustBe s"Error: ${value.message}"
-        textInput.attr("aria-describedby").contains(s"${value.key}-error") mustBe true
+      error.foreach { case (key, message) =>
+        element.selectHead(s"#$key-error").text mustBe s"Error: $message"
+        textInput.attr("aria-describedby").contains(s"$key-error") mustBe true
       }
 
       textInput.attr("type") mustBe "text"

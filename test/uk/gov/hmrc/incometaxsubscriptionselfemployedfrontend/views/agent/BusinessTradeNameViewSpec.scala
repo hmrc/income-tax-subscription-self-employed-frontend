@@ -23,11 +23,10 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessTradeNameModel, ClientDetails}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
 
@@ -47,12 +46,13 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
+    val emptyError = "Enter the trade of your client’s business."
   }
 
   val backUrl: String = testBackUrl
   val action: Call = testCall
   val taxYearEnd: Int = 2020
-  val testError: FormError = FormError("businessTradeName", "testError")
+  val emptyFormError: FormError = FormError(BusinessTradeNameForm.businessTradeName, "error.agent.business-trade-name.empty")
   val id: String = "testId"
 
   class Setup(isEditMode: Boolean = false,
@@ -108,9 +108,9 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
     "must display form error on page along with textInput and hintText" in
-      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(testError)) {
-        document.mustHaveErrorSummaryByNewGovUkClass(List[String](testError.message))
-        document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
+      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(emptyFormError)) {
+        document.mustHaveErrorSummaryByNewGovUkClass(List[String](BusinessTradeNameMessages.emptyError))
+        document.mustHaveTextField(BusinessTradeNameForm.businessTradeName, BusinessTradeNameMessages.title)
         document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
       }
 

@@ -32,7 +32,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.Business
 class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
   val backUrl: String = testBackUrl
   val action: Call = testCall
-  val emptyError = "Select if you use cash accounting or standard accounting"
+  val emptyErrorKey = "error.business-accounting-method.empty"
 
   object BusinessAccountingMethodMessages {
     val title = "What accounting method do you use for your sole trader business?"
@@ -54,6 +54,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
     val backLink = "Back"
+    val emptyError = "Select if you use cash basis accounting or traditional accounting."
   }
 
   private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
@@ -162,15 +163,19 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
   }
 
   "must display empty form error summary when submit with an empty form" in {
-    document(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)).mustHaveErrorSummaryByNewGovUkClass(List[String](emptyError))
+    document(
+      BusinessAccountingMethodForm
+        .businessAccountingMethodForm
+        .withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyErrorKey)
+    ).mustHaveErrorSummaryByNewGovUkClass(List[String](BusinessAccountingMethodMessages.emptyError))
   }
 
   "must display empty form error message when submit with an empty form" in {
     document(
       BusinessAccountingMethodForm
         .businessAccountingMethodForm
-        .withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)
-    ).mustHaveGovUkErrorNotificationMessage(emptyError)
+        .withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyErrorKey)
+    ).mustHaveGovUkErrorNotificationMessage(BusinessAccountingMethodMessages.emptyError)
   }
 
   private def page(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean, backLink: Option[String]) = {

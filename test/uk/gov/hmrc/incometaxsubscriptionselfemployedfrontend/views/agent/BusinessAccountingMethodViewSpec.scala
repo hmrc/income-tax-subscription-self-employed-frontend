@@ -26,16 +26,15 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Accruals, Cash}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Accruals, Cash, ClientDetails}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
   val backUrl: Option[String] = Some("/test-back-url")
   val action: Call = testCall
-  val emptyError = "Select if your client uses cash basis accounting or traditional accounting"
+  val emptyErrorKey = "agent.error.business-accounting-method.empty"
 
   object BusinessAccountingMethodMessages {
     val title = "What accounting method does your client use for their sole trader businesses?"
@@ -49,6 +48,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
+    val emptyError: String = "Select if your client uses cash basis accounting or traditional accounting."
   }
 
   private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
@@ -132,13 +132,16 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
         appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-accounting-type"
     }
 
-    "must display empty form error summary when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError("", emptyError)) {
-      document.mustHaveErrorSummaryByNewGovUkClass(List[String](emptyError))
+    "must display empty form error summary when submit with an empty form" in new Setup(
+      BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyErrorKey)
+    ) {
+      document.mustHaveErrorSummaryByNewGovUkClass(List[String](BusinessAccountingMethodMessages.emptyError))
     }
 
-    "must display empty form error message when submit with an empty form" in new Setup(BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyError)) {
-
-      document.mustHaveGovUkErrorNotificationMessage(emptyError)
+    "must display empty form error message when submit with an empty form" in new Setup(
+      BusinessAccountingMethodForm.businessAccountingMethodForm.withError(BusinessAccountingMethodForm.businessAccountingMethod, emptyErrorKey)
+    ) {
+      document.mustHaveGovUkErrorNotificationMessage(BusinessAccountingMethodMessages.emptyError)
     }
   }
 }

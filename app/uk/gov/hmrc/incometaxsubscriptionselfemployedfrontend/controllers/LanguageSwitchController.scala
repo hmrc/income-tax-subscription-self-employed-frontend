@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import com.google.inject.Inject
 import play.api.i18n.Lang
 import play.api.mvc._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class LanguageSwitchController @Inject()(appConfig: AppConfig,
