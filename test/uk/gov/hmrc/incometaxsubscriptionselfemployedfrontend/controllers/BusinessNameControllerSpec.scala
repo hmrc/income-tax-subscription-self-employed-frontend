@@ -18,10 +18,11 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Request}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser._
@@ -29,6 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.Mo
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
 
@@ -50,6 +52,11 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     mockMultipleSelfEmploymentsService,
     mockAuthService
   )
+
+  override def beforeEach(): Unit = {
+    disable(featureSwitch = EnableTaskListRedesign)
+    super.beforeEach()
+  }
 
   val selfEmploymentData: SelfEmploymentData = SelfEmploymentData(
     id = id,
@@ -205,13 +212,21 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   "The back url" when {
     "in edit mode" should {
       s"redirect to Self-Employment check your answer page" in {
-        TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+        TestBusinessNameController.backUrl(id, isEditMode = true)(fakeRequest) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
-    "not in edit mode" should {
-      "redirect to add business page" in {
-        TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/income-source"
+    "not in edit mode with feature switch is enabled" should {
+      "redirect to business name confirmation page if user name exists" in {
+        enable(featureSwitch = EnableTaskListRedesign)
+        TestBusinessNameController.backUrl(id, isEditMode = false)(fakeRequest.withSession(ITSASessionKeys.FullNameSessionKey -> "Selena Kyle")) contains appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/confirm-business-name"
       }
+      "redirect to new income source page if user name doesn't exists feature is enabled" in {
+        enable(featureSwitch = EnableTaskListRedesign)
+        TestBusinessNameController.backUrl(id, isEditMode = false)(fakeRequest) mustBe appConfig.yourIncomeSourcesUrl
+      }
+    }
+    "not in edit mode with feature switch disabled" in {
+      TestBusinessNameController.backUrl(id, isEditMode = false)(fakeRequest) mustBe appConfig.whatIncomeSourceToSignUpUrl
     }
   }
   authorisationTests()

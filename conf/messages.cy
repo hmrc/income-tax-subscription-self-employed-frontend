@@ -34,8 +34,10 @@ error.individual.business-name-confirmation.empty               = Dewiswch ‘Ia
 
 # Business Name
 business.name.title                                             = Beth yw enw’ch busnes?
+business.name.caption                                           = Unig fasnachwr
 business.name.heading                                           = Beth yw enw’ch busnes?
-business.name.hint                                              = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gwahanol ar eich busnes unig fasnachwr, nodwch eich enw cyntaf ac enw olaf. Gall enw’r busnes rydych yn ei nodi gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ’, \, /, - yn unig.
+business.name.hint1                                             = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gwahanol ar eich busnes unig fasnachwr, nodwch eich enw cyntaf ac enw olaf.
+business.name.hint2                                             = Gall enw’r busnes rydych yn ei nodi gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ’, \, /, - yn unig.
 error.business-name.empty                                       = Nodwch eich enw neu enw’ch busnes.
 error.business-name.max-length                                  = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau.
 error.business-name.invalid-character                           = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.

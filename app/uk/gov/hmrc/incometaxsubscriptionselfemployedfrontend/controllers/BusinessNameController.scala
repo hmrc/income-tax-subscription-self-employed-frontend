@@ -22,6 +22,8 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm._
@@ -41,7 +43,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                        authService: AuthService)
                                       (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching{
 
   def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html =
@@ -110,10 +112,24 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
+  def backUrl(id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): String = if (isEditMode) {
     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
-  } else {
+  } else if (isEnabled(EnableTaskListRedesign)) {
+      if(doesUserNameExists) {
+        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessNameConfirmationController.show(id).url
+      }
+      else {
+        appConfig.yourIncomeSourcesUrl
+      }
+  }
+  else {
     appConfig.whatIncomeSourceToSignUpUrl
+  }
+
+  private val FullNameSessionKey: String = "FULLNAME"
+
+  private def doesUserNameExists(implicit request: Request[AnyContent]): Boolean = {
+    request.session.get(FullNameSessionKey).isDefined
   }
 
 

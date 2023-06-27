@@ -25,6 +25,7 @@
         form: FormWithCSRF,
         textInputHelper: TextInputHelper,
         continueButton: ContinueButton,
+        hmrcPageHeading: HmrcPageHeading,
         buttonHelper: ButtonHelper
 )
 
@@ -32,15 +33,31 @@
 
 @mainTemplate(title = messages("business.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
 
+
     @form(action = postAction) {
+
+        @hmrcPageHeading(PageHeading(
+            text = messages("business.name.heading"),
+            section = Some(messages("business.name.caption")),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-l")
+        ))
 
         @textInputHelper(
             field = businessNameForm(businessName),
             label = messages("business.name.heading"),
-            hint = Some(messages("business.name.hint")),
-            classes = Some("govuk-!-width-one-half")
+            hint = Some(inputTextHint),
+            classes = Some("govuk-!-width-one-half"),
+            isPageHeading = false,
+            isLabelHidden = true
         )
 
         @buttonHelper(messages("save-and-continue-button"))
     }
+}
+
+@inputTextHint = {
+  <p>@messages("business.name.hint1")</p>
+  <p>@messages("business.name.hint2")</p>
+
 }

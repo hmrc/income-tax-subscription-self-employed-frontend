@@ -26,6 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessNameViewSpec extends ViewSpec {
 
@@ -33,13 +34,15 @@ class BusinessNameViewSpec extends ViewSpec {
     val title = "What is the name of your business?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
+    val captionHidden = "This section is"
+    val captionVisible = "Sole trader"
     val continue = "Continue"
     val update = "Update"
     val saveAndContinueButton = "Save and continue"
     val backLink = "Back"
     val line1: String = "This is the business name you used to register for Self Assessment. " +
-      "If your sole trader business does not have a separate name, enter your own first and last name. " +
-      "The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
+      "If your sole trader business does not have a separate name, enter your own first and last name."
+    val line2 = "The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
     val emptyError = "Enter your name or the name of your business."
   }
 
@@ -62,7 +65,8 @@ class BusinessNameViewSpec extends ViewSpec {
 
   "Business Name Page" must {
 
-    "have a heading" in new Setup() {
+    "have a heading with caption" in new Setup() {
+      document.selectHead(".hmrc-caption").text mustBe s"${BusinessNameMessages.captionHidden} ${BusinessNameMessages.captionVisible}"
       document.getH1Element.text mustBe BusinessNameMessages.heading
 
     }
@@ -77,7 +81,7 @@ class BusinessNameViewSpec extends ViewSpec {
         document.mustHaveTextInput(
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
-          hint = Some(BusinessNameMessages.line1),
+          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
           error = Some(BusinessNameForm.businessName -> BusinessNameMessages.emptyError)
         )
       }
@@ -86,7 +90,7 @@ class BusinessNameViewSpec extends ViewSpec {
         document.mustHaveTextInput(
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
-          hint = Some(BusinessNameMessages.line1),
+          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
           error = None
         )
       }

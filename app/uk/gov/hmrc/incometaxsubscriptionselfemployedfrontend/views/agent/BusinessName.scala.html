@@ -65,13 +65,17 @@
         @textInputHelper(
             field = businessNameForm(businessName),
             label = messages("agent.business.name.heading"),
-            hint = Some(messages("agent.business.name.hint")),
+            hint = Some(inputTextHint),
             classes = Some("govuk-!-width-one-half")
         )
 
         @buttonHelper(messages("save-and-continue-button"))
     }
 
+}
+
+@inputTextHint = {
+    @messages("agent.business.name.hint")
 }
 
 
