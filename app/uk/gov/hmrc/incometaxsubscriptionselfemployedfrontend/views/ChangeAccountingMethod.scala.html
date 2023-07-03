@@ -37,7 +37,7 @@
     <p class="govuk-body">@messages("business.change-accounting-method.line-1")</p>
 
     @govukWarningText(WarningText(
-      iconFallbackText = messages("business.change-accounting-method.warning"),
+      iconFallbackText = Some(messages("business.change-accounting-method.warning")),
       content = Text(messages("business.change-accounting-method.warning-text"))
     ))
 

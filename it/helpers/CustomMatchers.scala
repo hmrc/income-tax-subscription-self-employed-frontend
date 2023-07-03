@@ -74,6 +74,20 @@ trait CustomMatchers {
     }
   }
 
+  def elementSecondTextByClass(cssClass: String)(expectedValue: String): HavePropertyMatcher[WSResponse, String] = {
+    (response: WSResponse) => {
+      val body = Jsoup.parse(response.body)
+
+      val elementText = body.getElementsByClass(cssClass).get(1).text
+      HavePropertyMatchResult(
+        elementText == expectedValue,
+        s"elementByID($cssClass)",
+        expectedValue,
+        elementText
+      )
+    }
+  }
+
   def dateField(id: String, expectedValue: DateModel): HavePropertyMatcher[WSResponse, String] =
     (response: WSResponse) => {
       val body = Jsoup.parse(response.body)

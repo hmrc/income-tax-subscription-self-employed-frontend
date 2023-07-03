@@ -26,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configuration) {
 
-  private val assetsUrl = servicesConfig.getString("assets.url")
+
 
   protected lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
 
@@ -65,7 +65,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   val serviceIdentifier = "MTDIT"
 
   val contactFormServiceIdentifier = "MTDIT"
-  val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")
+
   val analyticsToken: String = servicesConfig.getString(s"google-analytics.token")
   val analyticsHost: String = servicesConfig.getString(s"google-analytics.host")
   val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"

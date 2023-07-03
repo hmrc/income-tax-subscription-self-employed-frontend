@@ -81,7 +81,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           res must have(
             httpStatus(OK),
             pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
-            elementTextByClass(cssClass = "govuk-button")("Save and continue"),
+            elementSecondTextByClass(cssClass ="govuk-button")("Save and continue"),
             govukRadioButtonSet(id = "businessAccountingMethod", expectedLabel, expectedHint)
           )
         }
@@ -104,7 +104,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           res must have(
             httpStatus(OK),
             pageTitle("What accounting method do you use for your sole trader business?" + titleSuffix),
-            elementTextByClass("govuk-button")("Save and continue"),
+            elementSecondTextByClass("govuk-button")("Save and continue"),
             govukRadioButtonSet(id = "businessAccountingMethod", expectedLabel, expectedHint)
           )
         }

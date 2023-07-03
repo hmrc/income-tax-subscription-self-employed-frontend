@@ -98,7 +98,7 @@ class BusinessNameViewSpec extends ViewSpec {
     }
 
     "have a save and continue button when not in edit mode" in new Setup(isEditMode = false) {
-      document.selectHead(".govuk-button").text mustBe BusinessNameMessages.saveAndContinueButton
+      document.mainContent.selectHead(".govuk-button").text mustBe BusinessNameMessages.saveAndContinueButton
     }
 
     "have save and continue button when in edit mode" in new Setup(isEditMode = true) {
