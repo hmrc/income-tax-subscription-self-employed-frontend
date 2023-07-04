@@ -123,7 +123,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
       isEditMode = false,
       businessStartDateForm = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).withError(testError)
     ) {
-      document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+      document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
       document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.empty}"
     }
@@ -131,7 +131,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     "must display max date error on page" in new Setup(
       businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooLateError)
     ) {
-      document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+      document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
       document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.maxDate}"
     }
@@ -139,7 +139,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     "must display min date error on page" in new Setup(
       businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooEarlyError)
     ) {
-      document.select("div[class=govuk-error-summary]").attr("role") mustBe "alert"
+      document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
       document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"
     }

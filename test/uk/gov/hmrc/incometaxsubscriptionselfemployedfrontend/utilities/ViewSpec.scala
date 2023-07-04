@@ -304,9 +304,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
     }
 
     def mustHaveErrorSummaryByNewGovUkClass(errors: List[String]): Assertion = {
-      element.getErrorSummaryByNewGovUkClass.attr("role") mustBe "alert"
-      element.getErrorSummaryByNewGovUkClass.attr("aria-labelledby") mustBe "error-summary-title"
-      element.getErrorSummaryByNewGovUkClass.select("h2").attr("id") mustBe "error-summary-title"
+      element.getErrorSummaryByNewGovUkClass.select("div").attr("role") mustBe "alert"
       element.getErrorSummaryByNewGovUkClass.select("h2").text mustBe "There is a problem"
       element.getErrorSummaryByNewGovUkClass.select("ul > li").text mustBe errors.mkString(" ")
     }
