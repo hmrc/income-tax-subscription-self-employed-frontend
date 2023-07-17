@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException

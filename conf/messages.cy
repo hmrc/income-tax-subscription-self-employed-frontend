@@ -134,6 +134,14 @@ self-employed-cya.title                                         = Gwiriwch eich 
 self-employed-cya.heading                                       = Gwiriwch eich atebion
 self-employed-cya.caption                                       = Unig fasnachwr
 
+# Agent business name confirmation
+agent.business-name-confirmation.heading                   = A yw enw masnachu busnes eich cleient yr un fath a’i enw ei hun?
+agent.business-name-confirmation.heading.caption           = {0} | {1}
+agent.business-name-confirmation.summary.business-name     = Enw’r busnes
+agent.business-name-confirmation.form.heading              = A yw’r enw hwn yn gywir?
+error.agent.business-name-confirmation.empty               = Dewiswch ‘Iawn’ os yw hyn yn gywir.
+
+
 # Agent Business Name
 agent.business.name.title                                       = Beth yw enw busnes eich cleient?
 agent.business.name.heading                                     = Beth yw enw busnes eich cleient?

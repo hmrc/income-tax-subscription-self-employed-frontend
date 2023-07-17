@@ -8,6 +8,10 @@ GET         /details                                   uk.gov.hmrc.incometaxsubs
 GET         /details/business-start-date               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/business-start-date               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false)
 
+# Confirm business name
+GET        /details/confirm-business-name              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameConfirmationController.show(id: String)
+POST       /details/confirm-business-name              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameConfirmationController.submit(id: String)
+
 # Business Name Page
 GET         /details/business-name                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/business-name                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)

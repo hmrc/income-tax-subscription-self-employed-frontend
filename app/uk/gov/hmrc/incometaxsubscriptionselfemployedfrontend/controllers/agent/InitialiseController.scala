@@ -18,22 +18,31 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class InitialiseController @Inject()(mcc: MessagesControllerComponents, authService: AuthService)
-                                    (implicit val ec: ExecutionContext, val appConfig: AppConfig) extends FrontendController(mcc) {
+class InitialiseController @Inject()(mcc: MessagesControllerComponents,
+                                     authService: AuthService,
+                                     uuidGen: UUIDGenerator)
+                                    (implicit val ec: ExecutionContext,
+                                     val appConfig: AppConfig)
+  extends FrontendController(mcc) with FeatureSwitching {
 
   val initialise: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      val id = UUID.randomUUID().toString
-
-      Future.successful(Redirect(routes.BusinessNameController.show(id)))
+      val id = uuidGen.generateId
+      if (isEnabled(EnableTaskListRedesign)) {
+        Future.successful(Redirect(routes.BusinessNameConfirmationController.show(id)))
+      } else {
+        Future.successful(Redirect(routes.BusinessNameController.show(id)))
+      }
     }
   }
 
