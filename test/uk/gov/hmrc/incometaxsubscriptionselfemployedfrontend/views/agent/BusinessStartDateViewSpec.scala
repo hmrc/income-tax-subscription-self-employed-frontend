@@ -29,7 +29,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.Bu
 class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
-    val heading: String = "When did your client’s sole trader business start trading?"
+    val heading: String = "When did your client’s business start trading?"
     val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val hint = "For example, 17 4 2018."
     val saveAndContinue = "Save and continue"

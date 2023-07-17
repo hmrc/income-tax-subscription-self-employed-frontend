@@ -144,7 +144,7 @@ error.agent.business-name.invalid-character                     = Business name 
 agent.business.name.caption                                     = {0} | {1}
 
 # Agent Business start date
-business.agent.start-date.heading                               = When did your client’s sole trader business start trading?
+business.agent.start-date.heading                               = When did your client’s business start trading?
 business.agent.start-date.hint                                  = For example, 17 4 2018.
 agent.error.business-start-date.day-month-year.empty            = Enter the date your client’s business started trading.
 agent.error.business-start-date.day.empty                       = The date must include a day.

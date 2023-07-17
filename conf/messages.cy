@@ -144,7 +144,7 @@ error.agent.business-name.invalid-character                     = Gall enw’r b
 agent.business.name.caption                                     = {0} | {1}
 
 # Agent Business start date
-business.agent.start-date.heading                               = Pryd y dechreuodd busnes unig fasnachwr eich cleient fasnachu?
+business.agent.start-date.heading                               = Pryd y dechreuodd busnes eich cleient fasnachu?
 business.agent.start-date.hint                                  = Er enghraifft, 17 4 2018.
 agent.error.business-start-date.day-month-year.empty            = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu.
 agent.error.business-start-date.day.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod.
