@@ -50,7 +50,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the business start date page")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your client’s sole trader business start trading?" + agentTitleSuffix),
+          pageTitle("When did your client’s business start trading?" + agentTitleSuffix),
           dateField("startDate", DateModel("", "", ""))
         )
       }
@@ -68,7 +68,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the business start date page")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your client’s sole trader business start trading?" + agentTitleSuffix),
+          pageTitle("When did your client’s business start trading?" + agentTitleSuffix),
           dateField("startDate", testValidStartDate)
         )
       }
