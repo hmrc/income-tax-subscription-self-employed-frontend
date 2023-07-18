@@ -26,7 +26,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessNameViewSpec extends ViewSpec {
 

@@ -21,5 +21,8 @@ object ITSASessionKeys {
   val UTR: String = "utr"
   val REFERENCE: String = "reference"
   val FullNameSessionKey: String = "FULLNAME"
+  val FirstName = "FirstName"
+  val LastName = "LastName"
+  val NINO = "NINO"
 
 }

@@ -32,14 +32,18 @@
     }
 }
 
-@buttonHelper(
-    buttonText = saveAndContinueText.getOrElse(messages("save-and-continue-button"))
-)
+<div class="govuk-button-group">
 
-@saveAndReturnReference.map { location =>
     @buttonHelper(
-        buttonText = messages("save-and-come-back-later"),
-        classes = Some("govuk-button govuk-button--secondary"),
-        href = Some(s"$href?location=$location")
+        buttonText = saveAndContinueText.getOrElse(messages("save-and-continue-button"))
     )
-}
+
+    @saveAndReturnReference.map { location =>
+        @buttonHelper(
+            buttonText = messages("save-and-come-back-later"),
+            classes = Some("govuk-button govuk-button--secondary"),
+            href = Some(s"$href?location=$location")
+        )
+    }
+
+</div>
