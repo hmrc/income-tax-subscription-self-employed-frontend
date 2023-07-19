@@ -40,6 +40,7 @@ class BusinessNameViewSpec extends ViewSpec {
     val saveAndContinue = "Save and continue"
     val line1: String = "This is the business name they used to register for Self Assessment. " +
       "If their sole trader business does not have a name, enter your client’s name."
+    val line2: String = "The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, ', \\, /, -."
     val emptyError = "Enter your client’s name or the name of their business."
   }
 
@@ -93,7 +94,7 @@ class BusinessNameViewSpec extends ViewSpec {
         document.mustHaveTextInput(
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
-          hint = Some(BusinessNameMessages.line1),
+          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
           error = Some(BusinessNameForm.businessName -> BusinessNameMessages.emptyError)
         )
       }
@@ -102,7 +103,7 @@ class BusinessNameViewSpec extends ViewSpec {
         document.mustHaveTextInput(
           name = BusinessNameForm.businessName,
           label = BusinessNameMessages.heading,
-          hint = Some(BusinessNameMessages.line1),
+          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
           error = None
         )
       }
