@@ -20,13 +20,15 @@ import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, SelfEmploymentsCYAModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +39,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
                                           multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                           mcc: MessagesControllerComponents)
                                          (implicit val appConfig: AppConfig, val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
@@ -61,15 +63,20 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
         if (selfEmploymentCYAModel.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
             case Right(_) =>
-              Redirect(appConfig.clientTaskListUrl)
+              Redirect(continueUrl)
             case Left(_) =>
               throw new InternalServerException("[SelfEmployedCYAController][submit] - Could not confirm self employment business")
           }
         } else {
-          Future.successful(Redirect(appConfig.clientTaskListUrl))
+          Future.successful(Redirect(continueUrl))
         }
       }
     }
+  }
+
+  private def continueUrl: String = {
+    if (isEnabled(EnableTaskListRedesign)) appConfig.clientYourIncomeSourcesUrl
+    else appConfig.clientTaskListUrl
   }
 
   private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])
