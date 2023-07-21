@@ -145,7 +145,8 @@ error.agent.business-name-confirmation.empty               = Dewiswch ‘Iawn’
 # Agent Business Name
 agent.business.name.title                                       = Beth yw enw busnes eich cleient?
 agent.business.name.heading                                     = Beth yw enw busnes eich cleient?
-agent.business.name.hint                                        = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gan ei fusnes unig fasnachwr, nodwch enw eich cleient.
+agent.business.name.hint1                                       = Dyma’r enw busnes a ddefnyddiodd i gofrestru ar gyfer Hunanasesiad. Os nad oes enw gan ei fusnes unig fasnachwr, nodwch enw eich cleient.
+agent.business.name.hint2                                       = Gall enw’r busnes rydych yn ei nodi gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ’, \, /, - yn unig.
 error.agent.business-name.empty                                 = Nodwch enw’ch cleient neu enw busnes eich cleient.
 error.agent.business-name.max-length                            = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau.
 error.agent.business-name.invalid-character                     = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.
