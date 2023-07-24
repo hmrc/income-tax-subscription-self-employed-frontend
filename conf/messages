@@ -173,8 +173,8 @@ agent.error.business-start-date.month-year.invalid              = The date must 
 agent.error.business-start-date.year.length                     = The year must be in four digits. For example, 2020.
 
 #Agent Trade Name
-business.agent.trade-name.title                                 = What is the trade of your client’s sole trader business?
-business.agent.trade-name.heading                               = What is the trade of your client’s sole trader business?
+business.agent.trade-name.title                                 = What is the trade of your client’s business?
+business.agent.trade-name.heading                               = What is the trade of your client’s business?
 business.agent.trade-name.hint                                  = For example: plumbing, electrical work, consulting.
 error.agent.business-trade-name.empty                           = Enter the trade of your client’s business.
 error.agent.business-trade-name.max-length                      = Business trade must be 35 characters or fewer.

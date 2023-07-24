@@ -72,7 +72,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the BusinessTradeNamePage")
         res must have(
           httpStatus(OK),
-          pageTitle("What is the trade of your client’s sole trader business?" + agentTitleSuffix),
+          pageTitle("What is the trade of your client’s business?" + agentTitleSuffix),
           textField("businessTradeName", "")
         )
       }
@@ -130,7 +130,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: What is the trade of your client’s sole trader business?" + agentTitleSuffix)
+          pageTitle("Error: What is the trade of your client’s business?" + agentTitleSuffix)
         )
       }
 

@@ -174,8 +174,8 @@ agent.error.business-start-date.year.invalid                    = Rhaid i’r dy
 agent.error.business-start-date.year.length                     = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
 
 # Agent Trade Name
-business.agent.trade-name.title                                 = Beth yw masnach busnes unig fasnachwr eich cleient?
-business.agent.trade-name.heading                               = Beth yw masnach busnes unig fasnachwr eich cleient?
+business.agent.trade-name.title                                 = Beth yw masnach busnes eich cleient?
+business.agent.trade-name.heading                               = Beth yw masnach busnes eich cleient?
 business.agent.trade-name.hint                                  = Er enghraifft: plymio, gwaith trydanol, ymgynghori.
 error.agent.business-trade-name.empty                           = Nodwch fasnach busnes eich cleient.
 error.agent.business-trade-name.max-length                      = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai.

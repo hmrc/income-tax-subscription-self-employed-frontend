@@ -37,7 +37,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
   val businessTradeName: BusinessTradeName = app.injector.instanceOf[BusinessTradeName]
 
   object BusinessTradeNameMessages {
-    val title = "What is the trade of your client’s sole trader business?"
+    val title = "What is the trade of your client’s business?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
     val caption = "FirstName LastName | ZZ 11 11 11 Z"
