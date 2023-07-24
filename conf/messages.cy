@@ -203,18 +203,18 @@ agent.error.business-accounting-method.invalid                  = Dewiswch a yw�
 agent.error.business-accounting-method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
 
 # Self Employed CYA
-agent.self-employed-cya.trading-start-date                      = Dyddiad dechrau masnachu’r busnes
-agent.self-employed-cya.trading-start-date.change               = Newid dyddiad dechrau masnachu’r busnes
-agent.self-employed-cya.trading-start-date.add                  = Ychwanegu dyddiad dechrau masnachu’r busnes
+agent.self-employed-cya.trading-start-date                      = Dyddiad dechrau masnachu
+agent.self-employed-cya.trading-start-date.change               = Newid dyddiad dechrau masnachu
+agent.self-employed-cya.trading-start-date.add                  = Ychwanegu dyddiad dechrau masnachu
 agent.self-employed-cya.business-name                           = Enw’r busnes
 agent.self-employed-cya.business-name.change                    = Newid enw’r busnes
 agent.self-employed-cya.business-name.add                       = Ychwanegu enw’r busnes
 agent.self-employed-cya.business-trade                          = Math o fasnach
 agent.self-employed-cya.business-trade.change                   = Newid y math o fasnach
 agent.self-employed-cya.business-trade.add                      = Ychwanegu'r math o fasnach
-agent.self-employed-cya.business-address                        = Cyfeiriad y busnes
-agent.self-employed-cya.business-address.change                 = Newid cyfeiriad y busnes
-agent.self-employed-cya.business-address.add                    = Ychwanegu cyfeiriad y busnes
+agent.self-employed-cya.business-address                        = Cyfeiriad
+agent.self-employed-cya.business-address.change                 = Newid cyfeiriad
+agent.self-employed-cya.business-address.add                    = Ychwanegu cyfeiriad
 agent.self-employed-cya.accounting-method                       = Dull cyfrifyddu ar gyfer incwm unig fasnachwr
 agent.self-employed-cya.accounting-method.change                = Newid y dull cyfrifyddu ar gyfer incwm unig fasnachwr
 agent.self-employed-cya.accounting-method.add                   = Ychwanegu’r dull cyfrifyddu ar gyfer incwm unig fasnachwr

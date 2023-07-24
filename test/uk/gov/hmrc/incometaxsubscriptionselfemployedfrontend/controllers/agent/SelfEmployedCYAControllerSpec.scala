@@ -20,6 +20,7 @@ import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -41,6 +42,11 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     "show" -> TestSelfEmployedCYAController.show(id, isEditMode = false),
     "submit" -> TestSelfEmployedCYAController.submit(id)
   )
+
+  override def beforeEach(): Unit = {
+    disable(EnableTaskListRedesign)
+    super.beforeEach()
+  }
 
   object TestSelfEmployedCYAController extends SelfEmployedCYAController(
     selfEmployedCYA,
@@ -114,21 +120,8 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
     }
 
-    "return 303, (SEE_OTHER)" when {
-      "the user submits valid full data" in {
-        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-        mockFetchBusiness(id)(Right(Some(selfEmployment)))
-        mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
-
-        val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
-      }
-      "the user submits valid incomplete data" in {
-        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-        mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
-      }
-      "return 303, (SEE_OTHER) and redirect to the task list page" when {
+    "return 303 (SEE_OTHER) to the task list" when {
+      "the task list redesign feature switch is disabled" when {
         "the user submits valid full data" in {
           mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
           mockFetchBusiness(id)(Right(Some(selfEmployment)))
@@ -145,6 +138,31 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
+        }
+      }
+    }
+    "return 303 (SEE_OTHER) to the your income sources page" when {
+      "the task list redesign feature switch is enabled" when {
+        "the user submits valid full data" in {
+          enable(EnableTaskListRedesign)
+
+          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+          mockFetchBusiness(id)(Right(Some(selfEmployment)))
+          mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
+
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
+        }
+        "the user submits valid incomplete data" in {
+          enable(EnableTaskListRedesign)
+
+          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+          mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
+
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
         }
       }
     }
