@@ -18,23 +18,25 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import play.api.http.Status.{BAD_REQUEST, OK, SEE_OTHER}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{HTML, await, contentType, defaultAwaitTimeout, redirectLocation, status}
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, ClientDetails}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, ClientDetails, SelfEmploymentData}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessNameConfirmation
 
+import java.util.UUID
 import scala.concurrent.Future
 
 class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
@@ -45,12 +47,15 @@ class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
     name = "FirstName LastName",
     nino = "ZZ111111Z"
   )
+
   val fakeRequestWithClientDetails: FakeRequest[AnyContentAsEmpty.type] = fakeRequest
     .withSession(
       ITSASessionKeys.FirstName -> "FirstName",
       ITSASessionKeys.LastName -> "LastName",
       ITSASessionKeys.NINO -> "ZZ111111Z"
     )
+
+  val testBusinessName = "test-business-name"
 
   object TestBusinessNameConfirmationController extends BusinessNameConfirmationController(
     mockMessagesControllerComponents,
@@ -78,23 +83,77 @@ class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
     )(mockIncomeTaxSubscriptionConnector)
   }
 
-  "show" when {
-    "there is a name in the users session" must {
-      "return OK with the page contents" in new Setup {
+  "show" must {
+    "return OK (200) with the page contents which has the already existing business name" when {
+      "a business has already been previously added" in new Setup {
         mockAuthSuccess()
-        when(
-          mockBusinessNameConfirmation(
-            ArgumentMatchers.any(),
-            ArgumentMatchers.eq(routes.BusinessNameConfirmationController.submit(id)),
-            ArgumentMatchers.eq(appConfig.clientYourIncomeSourcesUrl),
-            ArgumentMatchers.eq(clientDetails)
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
-        ).thenReturn(HtmlFormat.empty)
+        mockFetchAllBusinesses(Right(Seq(SelfEmploymentData(
+          id = UUID.randomUUID().toString,
+          businessName = Some(BusinessNameModel(testBusinessName))
+        ))))
+
+        when(mockBusinessNameConfirmation(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.eq(routes.BusinessNameConfirmationController.submit(id)),
+          ArgumentMatchers.eq(appConfig.clientYourIncomeSourcesUrl),
+          ArgumentMatchers.eq(clientDetails),
+          ArgumentMatchers.eq(testBusinessName),
+          ArgumentMatchers.eq(true)
+        )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
 
         val response: Future[Result] = controller.show(id)(fakeRequestWithClientDetails)
 
         status(response) mustBe OK
         contentType(response) mustBe Some(HTML)
+      }
+    }
+    "return OK (200) with the page contents which has the clients personal name" when {
+      "there is an incomplete previously added business without a business name" in new Setup {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq(SelfEmploymentData(
+          id = UUID.randomUUID().toString
+        ))))
+
+        when(mockBusinessNameConfirmation(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.eq(routes.BusinessNameConfirmationController.submit(id)),
+          ArgumentMatchers.eq(appConfig.clientYourIncomeSourcesUrl),
+          ArgumentMatchers.eq(clientDetails),
+          ArgumentMatchers.eq(clientDetails.name),
+          ArgumentMatchers.eq(false)
+        )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
+
+        val response: Future[Result] = controller.show(id)(fakeRequestWithClientDetails)
+
+        status(response) mustBe OK
+        contentType(response) mustBe Some(HTML)
+      }
+      "there is no previously added business" in new Setup {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Right(Seq()))
+
+        when(mockBusinessNameConfirmation(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.eq(routes.BusinessNameConfirmationController.submit(id)),
+          ArgumentMatchers.eq(appConfig.clientYourIncomeSourcesUrl),
+          ArgumentMatchers.eq(clientDetails),
+          ArgumentMatchers.eq(clientDetails.name),
+          ArgumentMatchers.eq(false)
+        )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
+
+        val response: Future[Result] = controller.show(id)(fakeRequestWithClientDetails)
+
+        status(response) mustBe OK
+        contentType(response) mustBe Some(HTML)
+      }
+    }
+    "throw an INTERNAL_SERVER_EXCEPTION" when {
+      "there was an error response fetching the sole trader businesses" in new Setup {
+        mockAuthSuccess()
+        mockFetchAllBusinesses(Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        intercept[InternalServerException](await(controller.show(id)(fakeRequestWithClientDetails)))
+          .message mustBe "[BusinessNameConfirmationController][withBusinessOrClientsName] - Unable to retrieve business details"
       }
     }
   }
@@ -104,13 +163,16 @@ class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
       "there is an error in the form submission" must {
         "return BAD_REQUEST with the page contents" in new Setup {
           mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq()))
 
           when(
             mockBusinessNameConfirmation(
               ArgumentMatchers.any(),
               ArgumentMatchers.eq(routes.BusinessNameConfirmationController.submit(id)),
               ArgumentMatchers.eq(appConfig.clientYourIncomeSourcesUrl),
-              ArgumentMatchers.eq(clientDetails)
+              ArgumentMatchers.eq(clientDetails),
+              ArgumentMatchers.eq(clientDetails.name),
+              ArgumentMatchers.eq(false)
             )(ArgumentMatchers.any(), ArgumentMatchers.any())
           ).thenReturn(HtmlFormat.empty)
 
@@ -123,6 +185,7 @@ class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
       "the form submitted Yes" must {
         "save the users name as the business name and redirect to the business start date page" in new Setup {
           mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq()))
           mockSaveBusinessName(id, BusinessNameModel(clientDetails.name))(Right(PostSubscriptionDetailsSuccessResponse))
 
           val response: Future[Result] = controller.submit(id)(fakeRequestWithClientDetails.withFormUrlEncodedBody(
@@ -146,6 +209,7 @@ class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
       "the form submitted No" must {
         "redirect the user to the business name page" in new Setup {
           mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq()))
 
           val response: Future[Result] = controller.submit(id)(fakeRequestWithClientDetails.withFormUrlEncodedBody(
             BusinessNameConfirmationForm.fieldName -> YesNoMapping.option_no

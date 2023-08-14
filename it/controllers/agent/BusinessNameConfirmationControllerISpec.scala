@@ -35,12 +35,34 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
+  val businessName: String = "test business name"
 
-  s"GET ${routes.BusinessNameConfirmationController.show(id).url}" when {
-    "there is a name in the users session" must {
-      "return the page" in {
+  s"GET ${routes.BusinessNameConfirmationController.show(id).url}" should {
+    "return the page" when {
+      "there is an existing business name" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessesKey)(
+          OK,
+          Json.toJson(Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName)))))
+        )
+
+        When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
+        val res = getClientBusinessNameConfirmation(id)(Map(
+          ITSASessionKeys.FirstName -> "FirstName",
+          ITSASessionKeys.LastName -> "LastName",
+          ITSASessionKeys.NINO -> "NINO"
+        ))
+
+        res must have(
+          httpStatus(OK),
+          pageTitle("Is your client’s business trading name the same as the first one you added?" + agentTitleSuffix)
+        )
+      }
+      "there is no existing business name, taking the name from session" in {
+        Given("I setup the wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
         When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
         val res = getClientBusinessNameConfirmation(id)(Map(
@@ -55,6 +77,11 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         )
       }
     }
+    "there is a name in the users session" must {
+      "return the page" in {
+
+      }
+    }
   }
 
   s"POST ${routes.BusinessNameConfirmationController.submit(id).url}" when {
@@ -63,6 +90,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         "return BAD_REQUEST with the page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
+          stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitClientBusinessNameConfirmation(id, None)(Map(

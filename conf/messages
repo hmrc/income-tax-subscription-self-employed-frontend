@@ -135,7 +135,8 @@ self-employed-cya.heading                                       = Check your ans
 self-employed-cya.caption                                       = Sole trader
 
 # Agent business name confirmation
-agent.business-name-confirmation.heading                   = Is your client’s business name the same as their own name?
+agent.business-name-confirmation.heading-personal          = Is your client’s business name the same as their own name?
+agent.business-name-confirmation.heading-secondary         = Is your client’s business trading name the same as the first one you added?
 agent.business-name-confirmation.heading.caption           = {0} | {1}
 agent.business-name-confirmation.summary.business-name     = Business name
 agent.business-name-confirmation.form.heading              = Is this name correct?

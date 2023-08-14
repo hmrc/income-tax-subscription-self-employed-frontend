@@ -31,15 +31,15 @@
     govukSummaryList : GovukSummaryList
 )
 
-@(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
+@(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, clientDetails: ClientDetails, displayName: String, isBusinessName: Boolean)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("agent.business-name-confirmation.heading"), optForm = Some(confirmationForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages(headingKey), optForm = Some(confirmationForm), backLink = Some(backUrl)) {
 
     <span class="govuk-caption-l">
         @messages("agent.business-name-confirmation.heading.caption", clientDetails.name, clientDetails.formattedNino)
     </span>
 
-    <h1 class="govuk-heading-l">@messages("agent.business-name-confirmation.heading")</h1>
+    <h1 class="govuk-heading-l">@messages(headingKey)</h1>
 
     @govukSummaryList(SummaryList(
         rows = Seq(
@@ -48,7 +48,7 @@
                     content = Text(messages("agent.business-name-confirmation.summary.business-name"))
                 ),
                 value = Value(
-                    content = Text(clientDetails.name)
+                    content = Text(displayName)
                 )
             )
         )
@@ -56,6 +56,10 @@
 
     @yesNoFormAndButtons()
 
+}
+
+@headingKey = @{
+    if(isBusinessName) "agent.business-name-confirmation.heading-secondary" else "agent.business-name-confirmation.heading-personal"
 }
 
 @yesNoFormAndButtons() = {
