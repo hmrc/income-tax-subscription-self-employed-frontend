@@ -34,37 +34,61 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val id: String = "testId"
+  val id2: String = "testId2"
   val name: String = "FirstName LastName"
+  val businessName: String = "business name"
 
-  s"GET ${routes.BusinessNameConfirmationController.show(id).url}" when {
-    "there is no name in the users session" must {
-      "redirect to the business name page" in {
+  s"GET ${routes.BusinessNameConfirmationController.show(id).url}" should {
+    "return the page" when {
+      "there is an existing business name" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-
-        When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
-        val res = getBusinessNameConfirmation(id)()
-
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(BusinessNameUri)
+        stubGetSubscriptionData(reference, businessesKey)(
+          OK,
+          Json.toJson(Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName)))))
         )
-      }
-    }
-    "there is a name in the users session" must {
-      "return the page" in {
-        Given("I setup the wiremock stubs")
-        stubAuthSuccess()
 
         When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
         val res = getBusinessNameConfirmation(id)(Map(ITSASessionKeys.FullNameSessionKey -> name))
 
         res must have(
           httpStatus(OK),
+          pageTitle("Is your business trading name the same as the first one you added?" + titleSuffix)
+        )
+      }
+
+      "there is no existing business name, taking the name from session" in {
+        Given("I setup the wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+
+        When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
+        val res = getBusinessNameConfirmation(id)(Map(
+          ITSASessionKeys.FullNameSessionKey -> "name"
+        ))
+        res must have(
+          httpStatus(OK),
           pageTitle("Is your business trading name the same as your own name?" + titleSuffix)
         )
       }
+
+      "No business name and no session name" must {
+        "return the page" in {
+          Given("I setup the wiremock stubs")
+          stubAuthSuccess()
+          stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+
+          When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
+          val res = submitBusinessNameConfirmation(id, None)()
+
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessNameUri)
+          )
+        }
+      }
     }
+
   }
 
   s"POST ${routes.BusinessNameConfirmationController.submit(id).url}" when {
@@ -72,7 +96,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
       "redirect to the business name page" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-
+        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
         When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
         val res = submitBusinessNameConfirmation(id, None)()
 
@@ -82,11 +106,14 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         )
       }
     }
+
+
     "there is a name in the users session" when {
       "the user submits no answer" must {
         "return BAD_REQUEST with the page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
+          stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitBusinessNameConfirmation(id, None)(Map(ITSASessionKeys.FullNameSessionKey -> name))
@@ -114,12 +141,34 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
             redirectURI(BusinessStartDateUri)
           )
         }
+        "save the business name and redirect to the business start date page" in {
+          Given("I setup the wiremock stubs")
+          stubAuthSuccess()
+          stubGetSubscriptionData(reference, businessesKey)(
+            OK,
+            Json.toJson(Seq(SelfEmploymentData(id2, businessName = Some(BusinessNameModel(businessName)))))
+          )
+          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(
+            Seq(
+              SelfEmploymentData(id2, businessName = Some(BusinessNameModel(businessName))),
+              SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName)))
+            )
+          ))(OK)
+
+          When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
+          val res = submitBusinessNameConfirmation(id, Some(Yes))(Map(ITSASessionKeys.FullNameSessionKey -> name))
+
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessStartDateUri)
+          )
+        }
       }
       "the user submits No" must {
         "redirect to the business name page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
-
+          stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitBusinessNameConfirmation(id, Some(No))(Map(ITSASessionKeys.FullNameSessionKey -> name))
 

@@ -20,6 +20,8 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 
+
+
 @this(
     mainTemplate: PrincipalMainTemplate,
     form: FormWithCSRF,
@@ -30,16 +32,16 @@
     govukSummaryList : GovukSummaryList
 )
 
-@(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, name: String)(implicit request: Request[_], messages: Messages)
+@(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, name: String, isBusinessName:Boolean)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.business-name-confirmation.heading"), optForm = Some(confirmationForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages(headingKey), optForm = Some(confirmationForm), backLink = Some(backUrl)) {
 
-    @hmrcPageHeading(PageHeading(
-        text = messages("individual.business-name-confirmation.heading"),
-        section = Some(messages("individual.business-name-confirmation.heading.caption")),
-        headingClasses = Some("govuk-heading-l"),
-        captionClasses = Some("govuk-caption-l")
-    ))
+            @hmrcPageHeading(PageHeading(
+                    text = messages(headingKey),
+                    section = Some(messages("individual.business-name-confirmation.heading.caption")),
+                    headingClasses = Some("govuk-heading-l"),
+                    captionClasses = Some("govuk-caption-l")
+                ))
 
     @govukSummaryList(SummaryList(
         rows = Seq(
@@ -54,9 +56,15 @@
         )
     ))
 
+
     @yesNoFormAndButtons()
 
 }
+
+@headingKey = @{
+    if(isBusinessName) "individual.business-name-confirmation.heading.second"  else "individual.business-name-confirmation.heading"
+}
+
 
 @yesNoFormAndButtons() = {
     @form(action = postAction) {

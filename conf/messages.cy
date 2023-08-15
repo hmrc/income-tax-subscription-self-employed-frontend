@@ -27,6 +27,7 @@ base.agent.service-name                                         = Defnyddiwch fe
 
 # Business name confirmation
 individual.business-name-confirmation.heading                   = A yw enw masnachu eich busnes yr un peth â’ch enw chi?
+individual.business-name-confirmation.heading.second            = A yw’r enw masnachu busnes hwn yr un peth â’r enw cyntaf i chi ei ychwanegu?
 individual.business-name-confirmation.heading.caption           = Unig fasnachwr
 individual.business-name-confirmation.summary.business-name     = Enw’r busnes
 individual.business-name-confirmation.form.heading              = A yw’r enw hwn yn gywir?
