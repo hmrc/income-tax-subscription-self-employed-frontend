@@ -22,10 +22,12 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
@@ -39,6 +41,11 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessTradeNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
+
+  override def beforeEach(): Unit = {
+    disable(EnableTaskListRedesign)
+    super.beforeEach()
+  }
 
   private def withController(testCode: BusinessTradeNameController => Any): Unit = {
     val businessTradeNameView = mock[BusinessTradeName]
@@ -125,9 +132,8 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
   "Submit" when {
     "not in edit mode" should {
-
       "return 303, SEE_OTHER and redirect to Business Address Look Up Page" when {
-        "the user submits valid data" in withController { controller => {
+        "the task list redesign feature switch is disabled and the user submits valid data" in withController { controller =>
           mockAuthSuccess()
           mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
           mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
@@ -140,12 +146,45 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
         }
+        "the task list redesign feature switch is enabled, they have no previous address, and the user submits valid data" in withController { controller =>
+          enable(EnableTaskListRedesign)
+
+          mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None, businessAddress = None))))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+
+          val result = controller.submit(id, isEditMode = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        }
+      }
+      "return 303, SEE_OTHER and redirect to the business address confirmation page" when {
+        "the task list redesign feature switch is enabled, they have a previous address, and the user submits valid data" in withController { controller =>
+          enable(EnableTaskListRedesign)
+
+          mockAuthSuccess()
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+
+          val result = controller.submit(id, isEditMode = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(
+            controllers.individual.routes.BusinessAddressConfirmationController.show(id).url
+          )
         }
       }
     }
 
     "return 400, SEE_OTHER)" when {
-      "the user submits invalid data" in withController { controller => {
+      "the user submits invalid data" in withController { controller =>
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessTradeName = None))))
         mockSaveBusinessTrade(id, testInvalidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
@@ -156,8 +195,8 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
-      }
-      "the user submits a trade which causes a duplicate business name/trade combo" in withController { controller => {
+
+      "the user submits a trade which causes a duplicate business name/trade combo" in withController { controller =>
         mockAuthSuccess()
         mockFetchAllBusinesses(Right(Seq(
           selfEmploymentData.copy(
@@ -178,7 +217,6 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
-      }
       }
     }
   }

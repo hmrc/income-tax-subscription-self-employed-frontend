@@ -92,18 +92,25 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
   implicit class CustomSelectors(element: Element) {
 
     def selectHead(selector: String): Element = {
-      element.select(selector).asScala.headOption match {
+      selectOptionally(selector) match {
         case Some(element) => element
         case None => fail(s"No elements returned for selector: $selector")
       }
     }
 
     def selectOptionally(selector: String): Option[Element] = {
-      element.select(selector).asScala.headOption
+      selectSeq(selector).headOption
     }
 
     def selectNth(selector: String, nth: Int): Element = {
-      element.selectHead(s"$selector:nth-of-type($nth)")
+      element.selectSeq(selector).lift(nth - 1) match {
+        case Some(element) => element
+        case None => fail(s"$selector number $nth was not found")
+      }
+    }
+
+    def selectSeq(selector: String): Seq[Element] = {
+      element.select(selector).asScala.toSeq
     }
 
     def content: Element = element.getElementsByTag("article").asScala.head

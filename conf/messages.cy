@@ -78,6 +78,14 @@ error.business-trade-name.min-length                            = Mae’n rhaid 
 error.business-trade-name.duplicate                             = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes.
 error.business-trade-name.invalid                               = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, ', \, /, -
 
+# Business address confirmation
+individual.business-address-confirmation.heading                = Cadarnhau cyfeiriad busnes
+individual.business-address-confirmation.heading.caption        = Unig fasnachwr
+individual.business-address-confirmation.para                   = A oes gan y busnes hwn yr un cyfeiriad â’r un cyntaf i chi ei ychwanegu?
+individual.business-address-confirmation.summary.address        = Cyfeiriad
+individual.business-address-confirmation.form.heading           = A yw’r cyfeiriad hwn yn gywir?
+error.individual.business-address-confirmation.empty            = Dewiswch ‘Iawn’ os mai dyma gyfeiriad eich busnes.
+
 # Business Address page
 address-lookup.select-page.title                                = Dewiswch gyfeiriad busnes
 address-lookup.select-page.heading                              = Dewiswch gyfeiriad busnes

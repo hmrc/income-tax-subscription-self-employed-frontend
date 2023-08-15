@@ -22,7 +22,10 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
@@ -41,7 +44,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
                                             val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService)
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
   def view(businessTradeNameForm: Form[BusinessTradeNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     businessTradeName(
@@ -80,7 +83,8 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
               businessTradeNameData =>
                 multipleSelfEmploymentsService.saveBusinessTrade(reference, id, businessTradeNameData).map {
                   case Right(_) =>
-                    next(id, isEditMode)
+                    val addressExists: Boolean = businesses.flatMap(_.businessAddress).nonEmpty
+                    Redirect(next(id, isEditMode, addressExists))
                   case Left(_) =>
                     throw new InternalServerException("[BusinessTradeNameController][submit] - Could not save business trade")
                 }
@@ -90,13 +94,15 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
       }
   }
 
-  private def next(id: String, isEditMode: Boolean) = Redirect(
-    if (isEditMode) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SelfEmployedCYAController.show(id, isEditMode)
+  private def next(id: String, isEditMode: Boolean, addressExists: Boolean) = if (isEditMode) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+  } else {
+    if (isEnabled(EnableTaskListRedesign) && addressExists) {
+      controllers.individual.routes.BusinessAddressConfirmationController.show(id)
     } else {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)
+      routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, isEditMode)
     }
-  )
+  }
 
   private def getExcludedBusinessTradeNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessTradeNameModel] = {
     val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
