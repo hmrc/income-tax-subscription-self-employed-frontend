@@ -50,7 +50,17 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      Future.successful(Ok(view(confirmationForm, id, request.getClientDetails)))
+      withReference { reference =>
+        withBusinessOrClientsName(reference) { (name, isBusinessName) =>
+          Future.successful(Ok(view(
+            form = confirmationForm,
+            id = id,
+            clientDetails = request.getClientDetails,
+            displayName = name,
+            isBusinessName = isBusinessName
+          )))
+        }
+      }
     }
   }
 
@@ -63,12 +73,18 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
     }
   }
 
-  private def view(form: Form[YesNo], id: String, clientDetails: ClientDetails)(implicit request: Request[AnyContent]): Html = {
+  private def view(form: Form[YesNo],
+                   id: String,
+                   clientDetails: ClientDetails,
+                   displayName: String,
+                   isBusinessName: Boolean)(implicit request: Request[AnyContent]): Html = {
     businessNameConfirmation(
       confirmationForm = form,
       postAction = routes.BusinessNameConfirmationController.submit(id),
       backUrl = backUrl,
-      clientDetails = clientDetails
+      clientDetails = clientDetails,
+      displayName = displayName,
+      isBusinessName = isBusinessName
     )
   }
 
@@ -77,7 +93,16 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
     withReference { reference =>
       val clientDetails: ClientDetails = request.getClientDetails
       confirmationForm.bindFromRequest().fold(
-        hasError => Future.successful(BadRequest(view(hasError, id, clientDetails))),
+        hasError =>
+          withBusinessOrClientsName(reference) { (name, isBusinessName) =>
+            Future.successful(BadRequest(view(
+              form = hasError,
+              id = id,
+              clientDetails = clientDetails,
+              displayName = name,
+              isBusinessName = isBusinessName
+            )))
+          },
         {
           case Yes =>
             saveBusinessName(reference, id, clientDetails.name) {
@@ -87,9 +112,7 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
             Future.successful(onNo)
         }
       )
-
     }
-
   }
 
   private def saveBusinessName(reference: String, id: String, name: String)
@@ -99,6 +122,21 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
       case Right(_) => onSaveSuccessful
       case Left(_) => throw new InternalServerException("[BusinessNameConfirmationController][submit] - Unable to save business name")
     }
+  }
+
+  private def withBusinessOrClientsName(reference: String)
+                                       (f: (String, Boolean) => Future[Result])
+                                       (implicit request: Request[AnyContent]): Future[Result] = {
+
+    multipleSelfEmploymentsService.fetchAllBusinesses(reference) flatMap {
+      case Right(businesses) =>
+        businesses.headOption.flatMap(_.businessName) match {
+          case Some(name) => f(name.businessName, true)
+          case None => f(request.getClientDetails.name, false)
+        }
+      case Left(_) => throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrClientsName] - Unable to retrieve business details")
+    }
+
   }
 
 }
