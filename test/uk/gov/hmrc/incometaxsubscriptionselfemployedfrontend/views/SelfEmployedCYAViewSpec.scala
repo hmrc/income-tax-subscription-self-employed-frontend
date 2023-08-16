@@ -38,12 +38,12 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val change = "Change"
     val back = "Back"
     val add = "Add"
-    val tradingStartDate = "Business trading start date"
-    val changeTradingStartDate = "Change Business trading start date"
+    val tradingStartDate = "Trading start date"
+    val changeTradingStartDate = "Change trading start date"
     val businessName = "Business name"
     val changeBusinessName = "Change Business name"
-    val businessAddress = "Business address"
-    val changeBusinessAddress = "Change Business address"
+    val businessAddress = "Address"
+    val changeBusinessAddress = "Change address"
     val businessTrade = "Type of trade"
     val changeBusinessTrade = "Change type of trade"
     val accountingMethod = "Accounting method for sole trader income"
@@ -52,6 +52,9 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val addAnotherBusinessHeading = "Do you want to add another sole trader business?"
     val yes = "Yes"
     val no = "No"
+
+    val addTradingStartDate = "Add trading start date"
+    val addBusinessAddress = "Add address"
   }
 
   def testSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
@@ -147,6 +150,11 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
               changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "testId", isEditMode = true).url
             }
+            "has an add link with correct content" in new SetupIncomplete(SelfEmploymentsCYAModel(testId, totalSelfEmployments = 1)) {
+              val addLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
+              addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
+              addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addTradingStartDate
+            }
           }
 
           "has a row for the business name" which {
@@ -191,6 +199,12 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
               changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
+            }
+
+            "has an add link with correct content" in new SetupIncomplete(SelfEmploymentsCYAModel(testId, totalSelfEmployments = 1)) {
+              val addLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
+              addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
+              addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addBusinessAddress
             }
           }
 

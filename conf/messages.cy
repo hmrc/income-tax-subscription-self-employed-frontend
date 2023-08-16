@@ -113,18 +113,18 @@ business.change-accounting-method.warning                       = Rhybudd
 business.change-accounting-method.warning-text                  = Os byddwch yn newid y dull cyfrifyddu ar gyfer y busnes hwn, bydd gwneud hynny’n diweddaru’r dull cyfrifyddu yn awtomatig ar gyfer pob un o’ch busnesau fel unig fasnachwr.
 
 # Self Employed CYA
-self-employed-cya.trading-start-date                            = Dyddiad dechrau masnachu’r busnes
-self-employed-cya.trading-start-date.change                     = Newid dyddiad dechrau masnachu’r busnes
-self-employed-cya.trading-start-date.add                        = Ychwanegu dyddiad dechrau masnachu’r busnes
+self-employed-cya.trading-start-date                            = Dyddiad dechrau masnachu
+self-employed-cya.trading-start-date.change                     = Newid dyddiad dechrau masnachu
+self-employed-cya.trading-start-date.add                        = Ychwanegu dyddiad dechrau masnachu
 self-employed-cya.business-name                                 = Enw’r busnes
 self-employed-cya.business-name.change                          = Newid enw’r busnes
 self-employed-cya.business-name.add                             = Ychwanegu enw’r busnes
 self-employed-cya.business-trade                                = Math o fasnach
 self-employed-cya.business-trade.change                         = Newid y math o fasnach
 self-employed-cya.business-trade.add                            = Ychwanegu'r math o fasnach
-self-employed-cya.business-address                              = Cyfeiriad y busnes
-self-employed-cya.business-address.change                       = Newid cyfeiriad y busnes
-self-employed-cya.business-address.add                          = Ychwanegu cyfeiriad y busnes
+self-employed-cya.business-address                              = Cyfeiriad
+self-employed-cya.business-address.change                       = Newid cyfeiriad
+self-employed-cya.business-address.add                          = Ychwanegu cyfeiriad
 self-employed-cya.accounting-method                             = Dull cyfrifyddu ar gyfer incwm unig fasnachwr
 self-employed-cya.accounting-method.change                      = Newid y dull cyfrifyddu ar gyfer incwm unig fasnachwr
 self-employed-cya.accounting-method.add                         = Ychwanegu’r dull cyfrifyddu ar gyfer incwm unig fasnachwr
