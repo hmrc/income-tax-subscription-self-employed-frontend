@@ -113,18 +113,18 @@ business.change-accounting-method.warning                       = Warning
 business.change-accounting-method.warning-text                  = If you change the accounting method for this business, it will automatically update the accounting method across all your sole trader businesses.
 
 #Self Employed CYA
-self-employed-cya.trading-start-date                            = Business trading start date
-self-employed-cya.trading-start-date.change                     = Change Business trading start date
-self-employed-cya.trading-start-date.add                        = Add Business trading start date
+self-employed-cya.trading-start-date                            = Trading start date
+self-employed-cya.trading-start-date.change                     = Change trading start date
+self-employed-cya.trading-start-date.add                        = Add trading start date
 self-employed-cya.business-name                                 = Business name
 self-employed-cya.business-name.change                          = Change Business name
 self-employed-cya.business-name.add                             = Add Business name
 self-employed-cya.business-trade                                = Type of trade
 self-employed-cya.business-trade.change                         = Change type of trade
 self-employed-cya.business-trade.add                            = Add type of trade
-self-employed-cya.business-address                              = Business address
-self-employed-cya.business-address.change                       = Change Business address
-self-employed-cya.business-address.add                          = Add Business address
+self-employed-cya.business-address                              = Address
+self-employed-cya.business-address.change                       = Change address
+self-employed-cya.business-address.add                          = Add address
 self-employed-cya.accounting-method                             = Accounting method for sole trader income
 self-employed-cya.accounting-method.change                      = Change Accounting method for sole trader income
 self-employed-cya.accounting-method.add                         = Add Accounting method for sole trader income
