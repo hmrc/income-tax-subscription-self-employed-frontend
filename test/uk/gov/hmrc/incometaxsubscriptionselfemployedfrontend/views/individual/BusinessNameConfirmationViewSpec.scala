@@ -30,8 +30,10 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
   val businessNameConfirmation: BusinessNameConfirmation = app.injector.instanceOf[BusinessNameConfirmation]
   val testFormError: FormError = FormError(key = fieldName, message = "error.individual.business-name-confirmation.empty")
   val testName: String = "FirstName LastName"
+  val testBusinessName: String = "Business name"
 
-  def page(hasFormError: Boolean = false): Html = {
+
+  def page(hasFormError: Boolean = false, isBusinessName: Boolean = false): Html = {
     businessNameConfirmation(
       if (hasFormError) {
         businessNameConfirmationForm.withError(testFormError)
@@ -40,16 +42,20 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
       },
       testCall,
       backUrl = testBackUrl,
-      name = testName
+      isBusinessName =  isBusinessName,
+      name = if (isBusinessName) testBusinessName else testName,
     )(fakeTestRequest, implicitly)
   }
 
-  def document(hasFormError: Boolean = false): Document = {
-    Jsoup.parse(page(hasFormError).body)
+
+
+  def document(hasFormError: Boolean = false, isBusinessName:Boolean = false): Document = {
+    Jsoup.parse(page(hasFormError, isBusinessName).body)
   }
 
   object BusinessNameConfirmationMessages {
     val heading: String = "Is your business trading name the same as your own name?"
+    val headingSecond: String = "Is your business trading name the same as the first one you added?"
     val caption: String = "This section is Sole trader"
 
     object Summary {
@@ -68,27 +74,50 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
 
   "Business Name Confirmation" must {
     "use the correct page template" when {
-      "there is no error on the page" in new TemplateViewTest(
-        page(),
-        title = BusinessNameConfirmationMessages.heading,
-        isAgent = false,
-        backLink = Some(testBackUrl),
-        hasSignOutLink = true
-      )
-      "there is an error on the page" in new TemplateViewTest(
-        page(hasFormError = true),
-        title = BusinessNameConfirmationMessages.heading,
-        isAgent = false,
-        backLink = Some(testBackUrl),
-        hasSignOutLink = true,
-        error = Some(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError)
-      )
+      "the page is for a personal name" when {
+        "there is no error on the page" in new TemplateViewTest(
+          page(),
+          title = BusinessNameConfirmationMessages.heading,
+          backLink = Some(testBackUrl),
+          hasSignOutLink = true
+        )
+        "there is an error on the page" in new TemplateViewTest(
+          page(hasFormError = true),
+          title = BusinessNameConfirmationMessages.heading,
+          backLink = Some(testBackUrl),
+          hasSignOutLink = true,
+          error = Some(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError)
+        )
+      }
+
+      "the page is for a secondary business" when {
+        "there is no error on the page" in new TemplateViewTest(
+          page(isBusinessName = true),
+          title = BusinessNameConfirmationMessages.headingSecond,
+          backLink = Some(testBackUrl),
+          hasSignOutLink = true
+        )
+        "there is an error on the page" in new TemplateViewTest(
+          page(hasFormError = true, isBusinessName = true),
+          title = BusinessNameConfirmationMessages.headingSecond,
+          backLink = Some(testBackUrl),
+          hasSignOutLink = true,
+          error = Some(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError)
+        )
+      }
     }
 
-    "have a page heading with caption" in {
-      val heading: Element = document().mainContent.selectHead(".hmrc-page-heading")
-      heading.selectHead("h1.govuk-heading-l").text() mustBe BusinessNameConfirmationMessages.heading
-      heading.selectHead("p.govuk-caption-l").text() mustBe BusinessNameConfirmationMessages.caption
+    "have a page heading with caption" when {
+      "the page is for a personal name" in {
+        val heading: Element = document().mainContent.selectHead(".hmrc-page-heading")
+        heading.selectHead("h1.govuk-heading-l").text() mustBe BusinessNameConfirmationMessages.heading
+        heading.selectHead("p.govuk-caption-l").text() mustBe BusinessNameConfirmationMessages.caption
+      }
+      "the page is for a secondary business" in {
+        val heading: Element = document(isBusinessName = true).mainContent.selectHead(".hmrc-page-heading")
+        heading.selectHead("h1.govuk-heading-l").text() mustBe BusinessNameConfirmationMessages.headingSecond
+        heading.selectHead("p.govuk-caption-l").text() mustBe BusinessNameConfirmationMessages.caption
+      }
     }
 
     "have a summary list detailing their name as the business name" in {

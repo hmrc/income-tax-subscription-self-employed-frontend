@@ -27,6 +27,7 @@ base.agent.service-name                                         = Use software t
 
 # Business name confirmation
 individual.business-name-confirmation.heading                   = Is your business trading name the same as your own name?
+individual.business-name-confirmation.heading.second            = Is your business trading name the same as the first one you added?
 individual.business-name-confirmation.heading.caption           = Sole trader
 individual.business-name-confirmation.summary.business-name     = Business name
 individual.business-name-confirmation.form.heading              = Is this name correct?

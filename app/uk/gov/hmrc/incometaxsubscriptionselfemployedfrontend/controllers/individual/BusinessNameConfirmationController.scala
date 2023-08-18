@@ -48,10 +48,14 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
 
   val backUrl: String = appConfig.yourIncomeSourcesUrl
 
+
+
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withUsersName(id) { name =>
-        Future.successful(Ok(view(confirmationForm, id, name)))
+      withReference { reference =>
+        withBusinessOrUsersName(id, reference) { (name, isBusinessName) =>
+          Future.successful(Ok(view(confirmationForm, id, name, isBusinessName)))
+        }
       }
     }
   }
@@ -65,21 +69,24 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
     }
   }
 
-  private def view(form: Form[YesNo], id: String, name: String)(implicit request: Request[AnyContent]): Html = {
+
+  private def view(form: Form[YesNo], id: String, name: String,  isBusinessName:Boolean)
+                  (implicit request: Request[AnyContent]): Html = {
     businessNameConfirmation(
       confirmationForm = form,
       postAction = routes.BusinessNameConfirmationController.submit(id),
       backUrl = backUrl,
-      name = name
+      name = name,
+      isBusinessName = isBusinessName
     )
   }
 
   private def handleForm(id: String)(onYes: Result, onNo: Result)
                         (implicit request: Request[AnyContent]): Future[Result] = {
     withReference { reference =>
-      withUsersName(id) { name =>
+      withBusinessOrUsersName(id, reference) { (name, isBusinessName) =>
         confirmationForm.bindFromRequest().fold(
-          hasError => Future.successful(BadRequest(view(hasError, id, name))),
+          hasError => Future.successful(BadRequest(view(hasError, id, name, isBusinessName))),
           {
             case Yes =>
               saveBusinessName(reference, id, name) {
@@ -103,13 +110,29 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
     }
   }
 
-  private def withUsersName(id: String)
-                           (onSuccessfulRetrieval: String => Future[Result])
+
+  private def withBusinessOrUsersName(id: String, reference:String)
+                           (onSuccessfulRetrieval: (String,Boolean) => Future[Result])
                            (implicit request: Request[AnyContent]): Future[Result] = {
-    fetchUsersName match {
-      case Some(name) => onSuccessfulRetrieval(name)
-      case None => Future.successful(Redirect(controllers.routes.BusinessNameController.submit(id)))
+    fetchFirstBusinessName(reference) flatMap {
+      case Some(businessName) => onSuccessfulRetrieval(businessName.businessName, true)
+      case None => fetchUsersName match {
+        case Some(name) => onSuccessfulRetrieval(name, false)
+        case None => Future.successful(Redirect(controllers.routes.BusinessNameController.show(id)))
+      }
+    }
+
+  }
+
+  private def fetchFirstBusinessName(reference: String)(implicit request: Request[AnyContent]): Future[Option[BusinessNameModel]] = {
+    multipleSelfEmploymentsService.fetchAllBusinesses(reference) map {
+      case Left(_) => throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrUsersName] - Unexpected error retrieving all business details")
+      case Right(businesses) =>
+        businesses.headOption flatMap (_.businessName)
     }
   }
 
+
+
 }
+
