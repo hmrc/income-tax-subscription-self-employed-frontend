@@ -22,6 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -32,6 +33,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessi
 class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -103,7 +105,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
           stubAuthSuccess()
           stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
           stubSaveSubscriptionData(reference, businessesKey, Json.toJson(
-            Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(name))))
+            Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(name).encrypt(crypto.QueryParameterCrypto))))
           ))(OK)
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")

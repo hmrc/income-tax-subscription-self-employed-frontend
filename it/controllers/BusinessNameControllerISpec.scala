@@ -22,6 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -30,6 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNam
 class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
   val businessId: String = "testId"
 
@@ -37,7 +39,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
 
-  val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testBusinessNameModel)))
+  val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testBusinessNameModel.encrypt(crypto.QueryParameterCrypto))))
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-name" when {
     "the Connector is empty" should {
@@ -116,7 +118,10 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
         " redirect to Self-employment Check Your Answers" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+          stubGetSubscriptionData(reference, businessesKey)(
+            OK,
+            Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name").encrypt(crypto.QueryParameterCrypto)))))
+          )
           stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
           When("Post /details/business-name is called")
@@ -134,7 +139,10 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
         "redirect to Business Check Your Answers" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name"))))))
+          stubGetSubscriptionData(reference, businessesKey)(
+            OK,
+            Json.toJson(testBusinesses.map(_.copy(businessName = Some(BusinessNameModel("test name").encrypt(crypto.QueryParameterCrypto)))))
+          )
           stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testBusinesses))(OK)
 
           When("Post /details/business-name is called")

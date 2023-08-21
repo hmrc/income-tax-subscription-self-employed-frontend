@@ -22,6 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -32,6 +33,7 @@ import java.time.LocalDate
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val cyrpto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
   val businessId: String = "testId"
 
   val testBusinessName: String = "businessName"
@@ -46,15 +48,15 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   val testBusinesses: Seq[SelfEmploymentData] = Seq(
     SelfEmploymentData(
       "testId",
-      businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessName = Some(testBusinessNameModel.encrypt(cyrpto.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel),
-      businessAddress = Some(testBusinessAddressModel)
+      businessAddress = Some(testBusinessAddressModel.encrypt(cyrpto.QueryParameterCrypto))
     ))
 
   val testIncompleteBusinesses: Seq[SelfEmploymentData] = Seq(
     SelfEmploymentData(
       "testId",
-      businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessName = Some(testBusinessNameModel.encrypt(cyrpto.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel)
     ))
 
@@ -62,9 +64,9 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
     SelfEmploymentData(
       "testId",
       confirmed = true,
-      businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessName = Some(testBusinessNameModel.encrypt(cyrpto.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel),
-      businessAddress = Some(testBusinessAddressModel)
+      businessAddress = Some(testBusinessAddressModel.encrypt(cyrpto.QueryParameterCrypto))
     ))
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {

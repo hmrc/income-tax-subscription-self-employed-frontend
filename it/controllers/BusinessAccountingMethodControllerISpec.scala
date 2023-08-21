@@ -22,6 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -30,15 +31,17 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Bu
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val crypto:ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+
   val id: String = "test-id"
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(
     SelfEmploymentData(
       id = id,
       businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
-      businessName = Some(BusinessNameModel("testBusinessName")),
+      businessName = Some(BusinessNameModel("testBusinessName").encrypt(crypto.QueryParameterCrypto)),
       businessTradeName = Some(BusinessTradeNameModel("testBusinessTrade")),
-      businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))))
+      businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))).encrypt(crypto.QueryParameterCrypto))
     )
   )
 

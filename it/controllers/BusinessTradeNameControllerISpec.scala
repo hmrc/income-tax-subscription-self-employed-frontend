@@ -22,6 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -30,6 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
   val businessId: String = "testId"
 
@@ -42,7 +44,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
   val testBusiness: SelfEmploymentData = SelfEmploymentData(
     id = businessId,
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1"))),
-    businessName = Some(BusinessNameModel("testName")),
+    businessName = Some(BusinessNameModel("testName").encrypt(crypto.QueryParameterCrypto)),
     businessTradeName = Some(testValidBusinessTradeNameModel)
   )
 

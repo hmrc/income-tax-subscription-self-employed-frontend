@@ -21,17 +21,20 @@ import helpers.ComponentSpecBase
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, SelfEmploymentData}
 
 
 class BusinessNameControllerISpec extends ComponentSpecBase {
+
+  val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
   val businessId: String = "testId"
 
   val testBusinessName: String = "testBusinessName"
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
-  val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testBusinessNameModel)))
+  val testBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testBusinessNameModel.encrypt(crypto.QueryParameterCrypto))))
   val testEmptyBusinessNameModel: BusinessNameModel = BusinessNameModel("")
   val testEmptyBusinesses: Seq[SelfEmploymentData] = Seq(SelfEmploymentData(businessId, businessName = Some(testEmptyBusinessNameModel)))
 
@@ -55,7 +58,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
     }
 
     "Connector returns a previously filled in ClientBusinessName" should {
-      "show the current date of commencement page with date values entered" in {
+      "show the current business name page with date values entered" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))

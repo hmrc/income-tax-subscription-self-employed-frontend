@@ -24,6 +24,7 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -34,6 +35,8 @@ import java.net.URLEncoder
 class AddressLookupRoutingControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val crytpo: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+
   private val addressId = "testId1"
 
   val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(addressId, Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
@@ -50,7 +53,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
 
   private val addressLookupInitialise = "/address-lookup-initialise"
 
-  val testBusiness: SelfEmploymentData = SelfEmploymentData(id = businessId, businessAddress = Some(testBusinessAddressModel))
+  val testBusiness: SelfEmploymentData = SelfEmploymentData(id = businessId, businessAddress = Some(testBusinessAddressModel.encrypt(crytpo.QueryParameterCrypto)))
 
   s"GET $baseUrl$clientOrIndividual$addressLookupInitialise/$businessId" when {
 
