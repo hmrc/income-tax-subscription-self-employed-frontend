@@ -18,6 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
@@ -25,8 +26,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubscriptionConnector {
 
+  val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+
   trait Setup {
-    val service: MultipleSelfEmploymentsService = new MultipleSelfEmploymentsService(mockIncomeTaxSubscriptionConnector)
+    val service: MultipleSelfEmploymentsService = new MultipleSelfEmploymentsService(mockIncomeTaxSubscriptionConnector, crypto)
   }
 
   def businessStartDate(id: String): BusinessStartDate = BusinessStartDate(DateModel(id, "1", "2017"))
@@ -35,9 +38,25 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
   def businessTrade(id: String): BusinessTradeNameModel = BusinessTradeNameModel(s"Plumbing $id")
 
-  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(s"Audit Ref $id", Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
+  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(s"Audit Ref $id",
+    Address(
+      Seq(
+        crypto.QueryParameterCrypto.encrypt(PlainText("line1")).value,
+        crypto.QueryParameterCrypto.encrypt(PlainText("line2")).value,
+        crypto.QueryParameterCrypto.encrypt(PlainText("line3")).value),
+      Some(crypto.QueryParameterCrypto.encrypt(PlainText("TF3 4NT")).value
+      )
+    ))
 
-  def fullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
+  def encryptedFullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
+    id = id,
+    businessStartDate = Some(businessStartDate(id)),
+    businessName = Some(businessName(id).encrypt(crypto.QueryParameterCrypto)),
+    businessTradeName = Some(businessTrade(id)),
+    businessAddress = Some(businessAddress(id).encrypt(crypto.QueryParameterCrypto))
+  )
+
+  def decryptedFullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
     id = id,
     businessStartDate = Some(businessStartDate(id)),
     businessName = Some(businessName(id)),
@@ -52,8 +71,8 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the searched business is present in the returned businesses and has the required data" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1"),
-            fullSelfEmploymentData("2")
+            encryptedFullSelfEmploymentData("1"),
+            encryptedFullSelfEmploymentData("2")
           )))
         )
 
@@ -65,7 +84,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the searched business is present in the returned businesses but does not have the required data" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1").copy(businessName = None)
+            encryptedFullSelfEmploymentData("1").copy(businessName = None)
           )))
         )
 
@@ -74,7 +93,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the searched business is not present in the returned businesses" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1")
+            encryptedFullSelfEmploymentData("1")
           )))
         )
 
@@ -104,7 +123,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the business has the business start date" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1")
+            encryptedFullSelfEmploymentData("1")
           )))
         )
 
@@ -118,7 +137,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the business has the business name" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1")
+            encryptedFullSelfEmploymentData("1")
           )))
         )
 
@@ -132,7 +151,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the business has the business trade" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1")
+            encryptedFullSelfEmploymentData("1")
           )))
         )
 
@@ -146,7 +165,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the business has the business name" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1")
+            encryptedFullSelfEmploymentData("1")
           )))
         )
 
@@ -160,12 +179,15 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the business is returned with data already present for the field being saved" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1")
+            encryptedFullSelfEmploymentData("1")
           )))
         )
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
-          value = Seq(fullSelfEmploymentData("1").copy(businessName = Some(businessName("2"))))
+          value = Seq(
+            encryptedFullSelfEmploymentData("1")
+              .copy(businessName = Some(businessName("2").encrypt(crypto.QueryParameterCrypto)))
+          )
         )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
         await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("2"))))) mustBe
@@ -174,12 +196,12 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "the business is returned with no data for the field being saved" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("1").copy(businessName = None)
+            encryptedFullSelfEmploymentData("1").copy(businessName = None)
           )))
         )
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
-          value = Seq(fullSelfEmploymentData("1"))
+          value = Seq(encryptedFullSelfEmploymentData("1"))
         )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
         await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
@@ -188,12 +210,15 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "no business matches the business id to save against" in new Setup {
         mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
           response = Right(Some(Seq(
-            fullSelfEmploymentData("2")
+            encryptedFullSelfEmploymentData("2")
           )))
         )
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
-          value = Seq(fullSelfEmploymentData("2"), SelfEmploymentData("1", businessName = Some(businessName("1"))))
+          value = Seq(
+            encryptedFullSelfEmploymentData("2"),
+            SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto)))
+          )
         )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
         await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
@@ -205,7 +230,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1"))))
+          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto))))
         )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
         await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
@@ -219,7 +244,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1"))))
+          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto))))
         )(Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
@@ -260,7 +285,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1"))))
+          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto))))
         )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
         await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
@@ -294,7 +319,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSelfEmployments[Seq[SelfEmploymentData]](
           id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessAddress = Some(businessAddress("1"))))
+          value = Seq(SelfEmploymentData("1", businessAddress = Some(businessAddress("1").encrypt(crypto.QueryParameterCrypto))))
         )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
         await(service.saveData(testReference, "1", _.copy(businessAddress = Some(businessAddress("1"))))) mustBe

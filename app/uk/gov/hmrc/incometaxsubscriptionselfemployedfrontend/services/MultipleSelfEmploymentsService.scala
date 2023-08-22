@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
+import org.graalvm.compiler.replacements.amd64.PluginFactory_AMD64StringIndexOfNode
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, PlainText}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
@@ -28,7 +30,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
+class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
+                                               applicationCrypto: ApplicationCrypto)
                                               (implicit ec: ExecutionContext) {
 
   def fetchBusinessStartDate(reference: String, businessId: String)
@@ -77,8 +80,22 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
   }
 
   def fetchAllBusinesses(reference: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Seq[SelfEmploymentData]]] = {
+
+    def decryptBusinessList(businesses: Seq[SelfEmploymentData]) : Seq[SelfEmploymentData] = {
+      businesses map {
+        business => business.copy(
+          businessName = business.businessName.map(name =>
+            name.decrypt(applicationCrypto.QueryParameterCrypto)
+          ),
+          businessAddress = business.businessAddress.map(address =>
+            address.decrypt(applicationCrypto.QueryParameterCrypto)
+          )
+        )
+      }
+    }
+
     incomeTaxSubscriptionConnector.getSubscriptionDetails[Seq[SelfEmploymentData]](reference, businessesKey) map {
-      case Right(Some(data)) => Right(data)
+      case Right(Some(data)) => Right(decryptBusinessList(data))
       case Right(None) => Right(Seq.empty[SelfEmploymentData])
       case Left(error) => Left(error)
     }
@@ -91,13 +108,11 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     }
   }
 
-  private[services] def findData[T](reference: String, businessId: String, modelToData: SelfEmploymentData => Option[T])(implicit hc: HeaderCarrier) = {
-    incomeTaxSubscriptionConnector.getSubscriptionDetails[Seq[SelfEmploymentData]](reference, businessesKey) map {
-      case Right(Some(businesses)) => Right(businesses.find(_.id == businessId).flatMap(modelToData))
-      case Right(None) => Right(None)
+  private[services] def findData[T](reference: String, businessId: String, modelToData: SelfEmploymentData => Option[T])(implicit hc: HeaderCarrier) =
+    fetchAllBusinesses(reference) map {
+      case Right(businesses) => Right(businesses.find(_.id == businessId).flatMap(modelToData))
       case Left(failure) => Left(failure)
     }
-  }
 
   private[services] def saveData(reference: String, businessId: String, businessUpdate: SelfEmploymentData => SelfEmploymentData)
                                 (implicit hc: HeaderCarrier) = {
@@ -113,10 +128,24 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
       }
     }
 
-    incomeTaxSubscriptionConnector.getSubscriptionDetails[Seq[SelfEmploymentData]](reference, businessesKey) flatMap {
+    def encryptBusinessList(businesses: Seq[SelfEmploymentData]) : Seq[SelfEmploymentData] = {
+      businesses map {
+        business => business.copy(
+          businessName = business.businessName.map(name =>
+            name.encrypt(applicationCrypto.QueryParameterCrypto)
+          ),
+          businessAddress = business.businessAddress.map(address =>
+            address.encrypt(applicationCrypto.QueryParameterCrypto)
+          )
+        )
+      }
+    }
+
+    fetchAllBusinesses(reference) flatMap {
       case Right(data) =>
-        val updatedBusinessList: Seq[SelfEmploymentData] = updateBusinessList(data.toSeq.flatten)
-        incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessesKey, updatedBusinessList) map {
+        val updatedBusinessList: Seq[SelfEmploymentData] = updateBusinessList(data)
+        val encryptedBusinessList = encryptBusinessList(updatedBusinessList)
+        incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessesKey, encryptedBusinessList) map {
           case Right(result) => Right(result)
           case Left(_) => Left(SaveSelfEmploymentDataFailure)
         }

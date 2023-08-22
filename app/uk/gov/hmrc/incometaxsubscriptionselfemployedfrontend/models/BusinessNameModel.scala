@@ -17,10 +17,16 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
 
-case class BusinessNameModel(businessName: String)
+case class BusinessNameModel(businessName: String) {
+
+  def encrypt(encrypter: Encrypter): BusinessNameModel = BusinessNameModel(encrypter.encrypt(PlainText(this.businessName)).value)
+
+  def decrypt(decrypter: Decrypter): BusinessNameModel = BusinessNameModel(decrypter.decrypt(Crypted(this.businessName)).value)
+
+}
 
 object BusinessNameModel {
   implicit val format: OFormat[BusinessNameModel] = Json.format[BusinessNameModel]
-
 }

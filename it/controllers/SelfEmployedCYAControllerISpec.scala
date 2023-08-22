@@ -22,6 +22,7 @@ import helpers.IntegrationTestConstants.{taskListURI, testAccountingMethodModel}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -30,9 +31,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import java.time.LocalDate
 
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
   val businessId: String = "testId"
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val crytpo: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
   val testBusinessName: String = "businessName"
   val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
@@ -46,15 +49,15 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   val testBusinesses: Seq[SelfEmploymentData] = Seq(
     SelfEmploymentData(
       "testId",
-      businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessName = Some(testBusinessNameModel.encrypt(crytpo.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel),
-      businessAddress = Some(testBusinessAddressModel)
+      businessAddress = Some(testBusinessAddressModel.encrypt((crytpo.QueryParameterCrypto)))
     ))
 
   val testIncompleteBusinesses: Seq[SelfEmploymentData] = Seq(
     SelfEmploymentData(
       "testId",
-      businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessName = Some(testBusinessNameModel.encrypt((crytpo.QueryParameterCrypto))), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel)
     ))
 
@@ -62,9 +65,9 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
     SelfEmploymentData(
       "testId",
       confirmed = true,
-      businessName = Some(testBusinessNameModel), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessName = Some(testBusinessNameModel.encrypt(crytpo.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel),
-      businessAddress = Some(testBusinessAddressModel)
+      businessAddress = Some(testBusinessAddressModel.encrypt(crytpo.QueryParameterCrypto))
     ))
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-check-your-answers" should {
