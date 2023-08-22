@@ -47,7 +47,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         stubAuthSuccess()
         stubGetSubscriptionData(reference, businessesKey)(
           OK,
-          Json.toJson(Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName)))))
+          Json.toJson(Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName).encrypt(crypto.QueryParameterCrypto)))))
         )
 
         When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
@@ -148,12 +148,12 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
           stubAuthSuccess()
           stubGetSubscriptionData(reference, businessesKey)(
             OK,
-            Json.toJson(Seq(SelfEmploymentData(id2, businessName = Some(BusinessNameModel(businessName)))))
+            Json.toJson(Seq(SelfEmploymentData(id2, businessName = Some(BusinessNameModel(businessName).encrypt(crypto.QueryParameterCrypto)))))
           )
           stubSaveSubscriptionData(reference, businessesKey, Json.toJson(
             Seq(
-              SelfEmploymentData(id2, businessName = Some(BusinessNameModel(businessName))),
-              SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName)))
+              SelfEmploymentData(id2, businessName = Some(BusinessNameModel(businessName).encrypt(crypto.QueryParameterCrypto))),
+              SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName).encrypt(crypto.QueryParameterCrypto)))
             )
           ))(OK)
 
