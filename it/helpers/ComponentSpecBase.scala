@@ -197,6 +197,19 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getBusinessAddressConfirmation(id: String)(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
+    get(s"/details/confirm-business-address?id=$id", session)
+  }
+
+  def submitBusinessAddressConfirmation(id: String, request: Option[YesNo])(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
+    post(s"/details/confirm-business-address?id=$id", session)(
+      request.fold(Map.empty[String, Seq[String]])(
+        model =>
+          BusinessAddressConfirmationForm.businessAddressConfirmationForm.fill(model).data.map { case (k, v) => (k, Seq(v)) }
+      )
+    )
+  }
+
   def getClientBusinessNameConfirmation(id: String)(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
     get(s"/client/details/confirm-business-name?id=$id", session)
   }

@@ -25,10 +25,16 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    disable(EnableTaskListRedesign)
+    super.beforeEach()
+  }
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
@@ -45,7 +51,14 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
     id = businessId,
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1"))),
     businessName = Some(BusinessNameModel("testName").encrypt(crypto.QueryParameterCrypto)),
-    businessTradeName = Some(testValidBusinessTradeNameModel)
+    businessTradeName = Some(testValidBusinessTradeNameModel),
+    businessAddress = Some(BusinessAddressModel("test-ref", Address(
+      Seq(
+        "1 Long Road",
+        "Lonely town"
+      ),
+      Some("ZZ11ZZ")
+    )).encrypt(crypto.QueryParameterCrypto))
   )
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
@@ -108,20 +121,41 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
     "not in edit mode" when {
       "the form data is valid and connector stores it successfully" should {
-        "redirect to Business Address Look Up page" in {
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
-          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+        "redirect to Business Address Look Up page" when {
+          "the task list redesign feature switch is disabled" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
 
-          When("POST /details/business-trade is called")
-          val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
+            When("POST /details/business-trade is called")
+            val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
 
-          Then("Should return a SEE_OTHER")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(businessAddressInitialiseUri(businessId))
-          )
+            Then("Should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(businessAddressInitialiseUri(businessId))
+            )
+          }
+        }
+        "redirect to business address confirmation page" when {
+          "the task list redesign feature switch is enabled" in {
+            enable(EnableTaskListRedesign)
+
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(Seq(testBusiness.copy(businessTradeName = None))))
+            stubSaveSubscriptionData(reference, businessesKey, Json.toJson(Seq(testBusiness)))(OK)
+
+            When("POST /details/business-trade is called")
+            val res = submitBusinessTradeName(businessId, inEditMode = false, Some(testValidBusinessTradeNameModel))
+
+            Then("Should return a SEE_OTHER")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessAddressConfirmationUri)
+            )
+          }
         }
       }
 

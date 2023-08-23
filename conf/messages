@@ -78,16 +78,24 @@ error.business-trade-name.min-length                            = Your business 
 error.business-trade-name.duplicate                             = You cannot enter the same trade and same business name.
 error.business-trade-name.invalid                               = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, ', \, /, -
 
+# Business address confirmation
+individual.business-address-confirmation.heading                = Confirm business address
+individual.business-address-confirmation.heading.caption        = Sole trader
+individual.business-address-confirmation.para                   = Does this business have the same address as the first one you added?
+individual.business-address-confirmation.summary.address        = Address
+individual.business-address-confirmation.form.heading           = Is this address correct?
+error.individual.business-address-confirmation.empty            = Select ‘Yes’ if this is is your business’s address.
+
 # Business Address page
-address-lookup.select-page.title                                  = Select business address
-address-lookup.select-page.heading                                = Select business address
-address-lookup.lookup-page.title                                  = What is your business address?
-address-lookup.lookup-page.heading                                = What is your business address?
-address-lookup.edit-page.title                                    = Enter business address
-address-lookup.edit-page.heading                                  = Enter business address
-address-lookup.edit-page.postcode-label                            = Postcode (optional)
-address-lookup.confirm-page.title                                 = Confirm business address
-address-lookup.confirm-page.heading                               = Confirm business address
+address-lookup.select-page.title                                = Select business address
+address-lookup.select-page.heading                              = Select business address
+address-lookup.lookup-page.title                                = What is your business address?
+address-lookup.lookup-page.heading                              = What is your business address?
+address-lookup.edit-page.title                                  = Enter business address
+address-lookup.edit-page.heading                                = Enter business address
+address-lookup.edit-page.postcode-label                         = Postcode (optional)
+address-lookup.confirm-page.title                               = Confirm business address
+address-lookup.confirm-page.heading                             = Confirm business address
 
 # Business Accounting Method page
 business.accounting-method.title                                = What accounting method do you use for your sole trader business?
