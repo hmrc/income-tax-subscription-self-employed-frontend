@@ -20,6 +20,7 @@ import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -32,6 +33,11 @@ import scala.concurrent.Future
 
 class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector with FeatureSwitchingTestUtils with MockSelfEmployedCYA {
+
+  override def beforeEach(): Unit = {
+    disable(EnableTaskListRedesign)
+    super.beforeEach()
+  }
 
   val id: String = "testId"
 
@@ -154,9 +160,17 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   }
 
   "backUrl" should {
-    "return the task list page" when {
-      "in edit mode" in {
-        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.taskListUrl)
+    "in edit mode" when {
+      "TaskList is not Enabled " should {
+          "return the task list page" in {
+            TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.taskListUrl)
+          }
+        }
+      " TaskList is Enabled" should {
+        "return the your income source page" in {
+          enable(EnableTaskListRedesign)
+          TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.yourIncomeSourcesUrl)
+        }
       }
     }
     "return nothing" when {

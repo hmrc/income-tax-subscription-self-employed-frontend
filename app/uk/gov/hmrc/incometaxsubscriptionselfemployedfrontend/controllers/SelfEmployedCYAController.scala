@@ -26,6 +26,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingM
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +38,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
                                           multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                           mcc: MessagesControllerComponents)
                                          (implicit val appConfig: AppConfig, val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
@@ -99,7 +101,8 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
 
   def backUrl(isEditMode: Boolean): Option[String] = {
     if (isEditMode) {
-      Some(appConfig.taskListUrl)
+        if (isEnabled(EnableTaskListRedesign)) Some(appConfig.yourIncomeSourcesUrl)
+        else Some(appConfig.taskListUrl)
     } else {
       None
     }
