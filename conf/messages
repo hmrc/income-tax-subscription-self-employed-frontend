@@ -206,10 +206,11 @@ agent.address-lookup.confirm-page.heading                         = Confirm clie
 # Agent Business Accounting Method page
 agent.business.accounting-method.title                          = What accounting method does your client use for their sole trader businesses?
 agent.business.accounting-method.heading                        = What accounting method does your client use for their sole trader businesses?
+agent.business.accounting-method.hint                           = All your client’s sole trader businesses must use the same accounting method.
 agent.business.accounting-method.cash                           = Cash basis accounting
 agent.business.accounting-method.accruals                       = Traditional accounting
-agent.error.business-accounting-method.invalid                  = Select if your client uses cash basis accounting or traditional accounting.
-agent.error.business-accounting-method.empty                    = Select if your client uses cash basis accounting or traditional accounting.
+agent.error.business-accounting-method.invalid                  = Select an accounting method.
+agent.error.business-accounting-method.empty                    = Select an accounting method.
 
 #Self Employed CYA
 agent.self-employed-cya.trading-start-date                      = Trading start date
