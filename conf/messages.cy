@@ -207,10 +207,11 @@ agent.address-lookup.confirm-page.heading                       = Cadarnhau cyfe
 # Agent Business Accounting Method page
 agent.business.accounting-method.title                          = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
 agent.business.accounting-method.heading                        = Pa ddull cyfrifo y mae’ch cleient yn ei ddefnyddio ar gyfer ei fusnes hunangyflogedig?
+agent.business.accounting-method.hint                           = Rhaid i bob busnes masnachwr unigol eich cleient ddefnyddio’r un dull cyfrifyddu.
 agent.business.accounting-method.cash                           = Cyfrifyddu ar sail arian parod
 agent.business.accounting-method.accruals                       = Cyfrifyddu traddodiadol
-agent.error.business-accounting-method.invalid                  = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
-agent.error.business-accounting-method.empty                    = Dewiswch a yw’ch cleient yn defnyddio cyfrifyddu ar sail arian parod neu cyfrifyddu traddodiadol.
+agent.error.business-accounting-method.invalid                  = Dewiswch ddull cyfrifyddu.
+agent.error.business-accounting-method.empty                    = Dewiswch ddull cyfrifyddu.
 
 # Self Employed CYA
 agent.self-employed-cya.trading-start-date                      = Dyddiad dechrau masnachu

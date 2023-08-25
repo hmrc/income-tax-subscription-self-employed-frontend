@@ -41,6 +41,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
     val caption = "FirstName LastName | ZZ 11 11 11 Z"
+    val hint = "All your client’s sole trader businesses must use the same accounting method."
     val cash = "Cash basis accounting"
     val accruals = "Traditional accounting"
     val continue = "Continue"
@@ -48,7 +49,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
-    val emptyError: String = "Select if your client uses cash basis accounting or traditional accounting."
+    val emptyError: String = "Select an accounting method."
   }
 
   private val businessAccountingMethodView = app.injector.instanceOf[BusinessAccountingMethod]
@@ -104,6 +105,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
         radioItems = Seq(
           RadioItem(
             content = Text(BusinessAccountingMethodMessages.cash),
+
             value = Some(Cash.CASH),
             id = Some(BusinessAccountingMethodForm.businessAccountingMethod)
           ),
@@ -114,6 +116,10 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
           )
         )
       )
+    }
+
+    "have hint text for radio buttons" in new Setup {
+      document.select(".govuk-hint").text() mustBe BusinessAccountingMethodMessages.hint
     }
 
     "have a Form" in new Setup {
