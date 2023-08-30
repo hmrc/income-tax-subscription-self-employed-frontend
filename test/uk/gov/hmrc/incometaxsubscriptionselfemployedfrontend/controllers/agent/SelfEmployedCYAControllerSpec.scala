@@ -169,11 +169,19 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   }
 
   "backUrl" should {
-    "return the task list page" when {
-      "in edit mode" in {
+    "in edit mode" when {
+    "TaskList is not Enabled " should {
+      "return the task list page" in {
         TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientTaskListUrl)
       }
     }
+    " TaskList is Enabled" should {
+      "return the your income source page" in {
+        enable(EnableTaskListRedesign)
+        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
+      }
+    }
+  }
     "return nothing" when {
       "not in edit mode" in {
         TestSelfEmployedCYAController.backUrl(false) mustBe None

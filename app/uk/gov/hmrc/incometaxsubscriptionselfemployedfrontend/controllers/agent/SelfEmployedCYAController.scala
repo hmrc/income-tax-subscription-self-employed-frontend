@@ -105,7 +105,8 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
 
   def backUrl(isEditMode: Boolean): Option[String] = {
     if (isEditMode) {
-      Some(appConfig.clientTaskListUrl)
+        if (isEnabled(EnableTaskListRedesign)) Some(appConfig.clientYourIncomeSourcesUrl)
+        else  Some(appConfig.clientTaskListUrl)
     } else {
       None
     }
