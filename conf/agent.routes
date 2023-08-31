@@ -30,6 +30,9 @@ POST        /details/business-accounting-method        uk.gov.hmrc.incometaxsubs
 GET         /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.submit(id: String)
 
+GET        /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.show(id: String)
+POST       /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.submit(id: String)
+
 #Welsh Language
 GET         /language/:lang                            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AgentLanguageSwitchController.switchToLanguage(lang: String)
 

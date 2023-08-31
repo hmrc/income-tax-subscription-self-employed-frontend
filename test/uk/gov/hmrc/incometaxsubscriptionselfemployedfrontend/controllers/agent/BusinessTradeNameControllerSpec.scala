@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -35,6 +36,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.Bu
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with FeatureSwitchingTestUtils with MockIncomeTaxSubscriptionConnector {
+
+  override def beforeEach(): Unit = {
+    disable(EnableTaskListRedesign)
+    super.beforeEach()
+  }
 
   val id: String = "testId"
 
@@ -230,35 +236,78 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   }
 
   "Submit when not in edit mode" should {
+    "return 303, SEE_OTHER and redirect to Business Address Look Up page" when {
+      "the task list redesign feature switch is disabled and user submits valid data" in withController {
+          controller => {
+            mockAuthSuccess()
+            mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
+            mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-    "return 303, SEE_OTHER" when {
-      "the user submits valid data in non-edit mode" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+            val result = controller.submit(id, isEditMode = false)(
+              fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+            )
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+          }
+        }
+      "the task list redesign feature switch is enabled and they have no previous address, the user submits valid data" in withController {
+          controller => {
+            enable(EnableTaskListRedesign)
+            mockFetchAllBusinesses(Right(Seq(selfEmploymentData.copy(businessAddress = None))))
+            mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-        val result = controller.submit(id, isEditMode = false)(
-          fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
-
+            val result = controller.submit(id, isEditMode = false)(
+              fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+            )
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        }
       }
-      }
-      "the user does not update their trade in non-edit mode" in withController { controller => {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData))
-        )
-        mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+      "the task list redesign feature switch is enabled and they have previous address, the user submits valid data" in withController {
+        controller => {
+          enable(EnableTaskListRedesign)
+          mockFetchAllBusinesses(Right(Seq(selfEmploymentData)))
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-        val result = controller.submit(id, isEditMode = false)(
-          fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
-        )
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+          val result = controller.submit(id, isEditMode = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.BusinessAddressConfirmationController.show(id).url)
+        }
       }
+      "the task list redesign feature switch is disabled and the user does not update their trade in non-edit mode with no previous address" in withController {
+        controller => {
+          mockAuthSuccess()
+          mockFetchAllBusinesses(
+            Right(Seq(selfEmploymentData))
+          )
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+          val result = controller.submit(id, isEditMode = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        }
+      }
+      "the task list redesign feature switch is enabled and the user does not update their trade in non-edit mode with previous address" in withController {
+        controller => {
+          enable(EnableTaskListRedesign)
+          mockAuthSuccess()
+          mockFetchAllBusinesses(
+            Right(Seq(selfEmploymentData))
+          )
+          mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+          val result = controller.submit(id, isEditMode = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
+          )
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.BusinessAddressConfirmationController.show(id).url)
+        }
       }
     }
     "return 400, SEE_OTHER" when {
