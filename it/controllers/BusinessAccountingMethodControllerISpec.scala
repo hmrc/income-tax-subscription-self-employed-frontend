@@ -41,7 +41,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
       businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
       businessName = Some(BusinessNameModel("testBusinessName").encrypt(crypto.QueryParameterCrypto)),
       businessTradeName = Some(BusinessTradeNameModel("testBusinessTrade")),
-      businessAddress = Some(BusinessAddressModel(auditRef = "testAuditRef", address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))).encrypt(crypto.QueryParameterCrypto))
+      businessAddress = Some(BusinessAddressModel(address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))).encrypt(crypto.QueryParameterCrypto))
     )
   )
 

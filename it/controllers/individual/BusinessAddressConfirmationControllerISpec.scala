@@ -45,7 +45,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
   )
   val existingBusinesses: Seq[SelfEmploymentData] = {
     Seq(
-      SelfEmploymentData(id = "old-id", businessAddress = Some(BusinessAddressModel("test-audit-ref", address).encrypt(crypto.QueryParameterCrypto)))
+      SelfEmploymentData(id = "old-id", businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto)))
     )
   }
 

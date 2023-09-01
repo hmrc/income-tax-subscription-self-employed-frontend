@@ -38,7 +38,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
   def businessTrade(id: String): BusinessTradeNameModel = BusinessTradeNameModel(s"Plumbing $id")
 
-  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(s"Audit Ref $id",
+  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(
     Address(
       Seq(
         crypto.QueryParameterCrypto.encrypt(PlainText("line1")).value,
@@ -46,7 +46,8 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         crypto.QueryParameterCrypto.encrypt(PlainText("line3")).value),
       Some(crypto.QueryParameterCrypto.encrypt(PlainText("TF3 4NT")).value
       )
-    ))
+    )
+  )
 
   def encryptedFullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
     id = id,

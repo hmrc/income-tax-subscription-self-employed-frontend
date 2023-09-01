@@ -65,7 +65,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     businessStartDate = Some(BusinessStartDate(DateModel("8", "8", "2016"))),
     businessName = Some(BusinessNameModel("testBusinessName")),
     businessTradeName = Some(BusinessTradeNameModel("testTrade")),
-    businessAddress = Some(BusinessAddressModel("12345", Address(Seq("line1"), Some("TF3 4NT"))))
+    businessAddress = Some(BusinessAddressModel(Address(Seq("line1"), Some("TF3 4NT"))))
   )
 
   "Show" should {

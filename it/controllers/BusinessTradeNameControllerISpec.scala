@@ -52,7 +52,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
     businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1"))),
     businessName = Some(BusinessNameModel("testName").encrypt(crypto.QueryParameterCrypto)),
     businessTradeName = Some(testValidBusinessTradeNameModel),
-    businessAddress = Some(BusinessAddressModel("test-ref", Address(
+    businessAddress = Some(BusinessAddressModel(Address(
       Seq(
         "1 Long Road",
         "Lonely town"

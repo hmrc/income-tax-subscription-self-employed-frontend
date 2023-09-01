@@ -40,7 +40,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
 
   private val addressId = "testId1"
 
-  val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(addressId, Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
+  val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
 
   override def beforeEach(): Unit = {
     disable(EnableUseRealAddressLookup)
