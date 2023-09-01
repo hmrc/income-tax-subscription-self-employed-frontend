@@ -43,7 +43,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   val testValidBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
   val testValidBusinessTradeName: String = "Plumbing"
   val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
-  val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel("testId1", Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
+  val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
 
   val testBusinesses: Seq[SelfEmploymentData] = Seq(
     SelfEmploymentData(

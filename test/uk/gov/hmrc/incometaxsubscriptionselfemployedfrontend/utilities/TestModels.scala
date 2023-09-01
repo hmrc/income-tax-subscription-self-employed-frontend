@@ -33,7 +33,8 @@ object TestModels {
 
   val mockBusinessNameModel: BusinessNameModel = BusinessNameModel("ITSA me, Mario")
 
-  val testValidBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(auditRef = "1",
-    Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT")))
+  val testValidBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(
+    Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
+  )
 
 }

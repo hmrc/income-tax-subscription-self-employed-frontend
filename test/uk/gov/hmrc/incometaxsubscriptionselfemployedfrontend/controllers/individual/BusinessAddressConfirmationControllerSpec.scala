@@ -117,7 +117,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(Right(Seq(
           SelfEmploymentData(
             id = id,
-            businessAddress = Some(BusinessAddressModel(auditRef = "test-reference", address = address))
+            businessAddress = Some(BusinessAddressModel(address = address))
           )
         )))
 
@@ -150,10 +150,10 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(Right(Seq(
           SelfEmploymentData(
             id = id,
-            businessAddress = Some(BusinessAddressModel(auditRef = "test-reference", address = address))
+            businessAddress = Some(BusinessAddressModel(address = address))
           )
         )))
-        mockSaveBusinessAddress(id, BusinessAddressModel("test-reference", address))(Left(SaveSelfEmploymentDataFailure))
+        mockSaveBusinessAddress(id, BusinessAddressModel(address))(Left(SaveSelfEmploymentDataFailure))
 
         intercept[InternalServerException](await(controller.submit(id)(
           fakeRequest.withFormUrlEncodedBody(BusinessAddressConfirmationForm.fieldName -> YesNoMapping.option_yes)
@@ -186,7 +186,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(Right(Seq(
           SelfEmploymentData(
             id = id,
-            businessAddress = Some(BusinessAddressModel(auditRef = "test-reference", address = address))
+            businessAddress = Some(BusinessAddressModel(address = address))
           )
         )))
 
@@ -204,10 +204,10 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(Right(Seq(
           SelfEmploymentData(
             id = id,
-            businessAddress = Some(BusinessAddressModel(auditRef = "test-reference", address = address))
+            businessAddress = Some(BusinessAddressModel(address = address))
           )
         )))
-        mockSaveBusinessAddress(id, BusinessAddressModel("test-reference", address))(Right(PostSubscriptionDetailsSuccessResponse))
+        mockSaveBusinessAddress(id, BusinessAddressModel(address))(Right(PostSubscriptionDetailsSuccessResponse))
 
         val response: Future[Result] = controller.submit(id)(
           fakeRequest.withFormUrlEncodedBody(BusinessAddressConfirmationForm.fieldName -> YesNoMapping.option_yes)
@@ -223,7 +223,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         mockFetchAllBusinesses(Right(Seq(
           SelfEmploymentData(
             id = id,
-            businessAddress = Some(BusinessAddressModel(auditRef = "test-reference", address = address))
+            businessAddress = Some(BusinessAddressModel(address = address))
           )
         )))
 
