@@ -193,6 +193,14 @@ error.agent.business-trade-name.min-length                      = Mae’n rhaid 
 error.agent.business-trade-name.invalid                         = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, ', \, /, -
 error.agent.business-trade-name.duplicate                       = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes.
 
+#Agent Business Address Confirmation
+agent.business-address-confirmation.heading                     = adarnhau cyfeiriad busnes
+agent.business-address-confirmation.heading.caption             = {0} | {1}
+agent.business-address-confirmation.para                        = A yw enw masnachu busnes eich cleient yr un peth â’r enw cyntaf i chi ei ychwanegu?
+agent.business-address-confirmation.summary.address             = Cyfeiriad
+agent.business-address-confirmation.form.heading                = A yw’r cyfeiriad hwn yn gywir?
+error.agent.business-address-confirmation.empty                 = Dewiswch ‘Iawn’ os mai dyma gyfeiriad busnes eich cleient.
+
 # Agent Business Address page
 agent.address-lookup.select-page.title                          = dewis cyfeiriad busnes y cleient
 agent.address-lookup.select-page.heading                        = dewis cyfeiriad busnes y cleient

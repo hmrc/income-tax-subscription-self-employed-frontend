@@ -192,6 +192,14 @@ error.agent.business-trade-name.min-length                      = Your business 
 error.agent.business-trade-name.invalid                         = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, ', \, /, -
 error.agent.business-trade-name.duplicate                       = You cannot enter the same trade and same business name.
 
+#Agent Business Address Confirmation
+agent.business-address-confirmation.heading                     = Confirm business address
+agent.business-address-confirmation.heading.caption             = {0} | {1}
+agent.business-address-confirmation.para                        = Does this business have the same address as the first one you added?
+agent.business-address-confirmation.summary.address             = Address
+agent.business-address-confirmation.form.heading                = Is this address correct?
+error.agent.business-address-confirmation.empty                 = Select ’Yes’ if this is your client’s business address.
+
 #Agent Business Address page
 agent.address-lookup.select-page.title                            = Select client’s business address
 agent.address-lookup.select-page.heading                          = Select client’s business address
