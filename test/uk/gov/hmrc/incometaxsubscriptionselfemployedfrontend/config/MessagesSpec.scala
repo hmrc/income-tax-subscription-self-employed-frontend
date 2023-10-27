@@ -24,10 +24,11 @@ import scala.io.Source
 class MessagesSpec extends PlaySpec with MessagesMatcher {
 
   override val excludedKeys: Set[String] = Set.empty
-
+  private val messageLinesEnglish: List[String] = getMessageLines("messages").toList
   private val messageKeysEnglish: List[String] = getMessageKeys("messages").toList
   private lazy val messageKeySetEnglish = messageKeysEnglish.toSet
 
+  private val messageLinesWelsh: List[String] = getMessageLines("messages.cy").toList
   private val messageKeysWelsh: List[String] = getMessageKeys("messages.cy").toList
   private lazy val messageKeySetWelsh = messageKeysWelsh.toSet
 
@@ -43,6 +44,10 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
     "contain only permitted characters" in {
       messageKeysWelsh must containOnlyPermittedCharacters
     }
+
+    "not contain single quotes" in {
+      messageLinesWelsh must containNoSingleQuotes
+    }
   }
 
   "Messages present in English (conf/messages)" should {
@@ -57,6 +62,10 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
     "contain only permitted characters" in {
       messageKeysEnglish must containOnlyPermittedCharacters
     }
+
+    "not contain single quotes" in {
+      messageLinesEnglish must containNoSingleQuotes
+    }
   }
 
   private def getMessageKeys(fileName: String) = {
@@ -67,4 +76,13 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
       .filter(_.nonEmpty)
       .map(_.split(' ').head)
   }
+
+  private def getMessageLines(fileName: String) = {
+    Source.fromResource(fileName)
+      .getLines()
+      .map(_.trim)
+      .filterNot(_.startsWith("#"))
+      .filter(_.nonEmpty)
+  }
 }
+

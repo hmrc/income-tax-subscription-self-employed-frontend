@@ -50,6 +50,30 @@ trait MessagesMatcher {
       ""
     )
   }
+
+  def containNoSingleQuotes: Matcher[Seq[String]] = (left: Seq[String]) => {
+    val messageLinesWithStraightQuotes = left.filter(_.contains("'"))
+    val excludedMessageKeys: Seq[String] = Seq(
+      "error.business-trade-name.invalid",
+      "agent.business.name.hint2",
+      "error.agent.business-trade-name.invalid",
+      "self-employed-cya.business-trade.add",
+      "agent.self-employed-cya.business-trade.add",
+      "business.name.hint2"
+    )
+
+    val nonExcludedMessagesWithStraightQuotes = messageLinesWithStraightQuotes.filterNot { messageLine =>
+      val messageKey = messageLine.split(" ").head
+      excludedMessageKeys.contains(messageKey)
+    }
+
+    MatchResult(
+      nonExcludedMessagesWithStraightQuotes.isEmpty,
+      s"${nonExcludedMessagesWithStraightQuotes.size} messages containing a straight quote (') :${nonExcludedMessagesWithStraightQuotes.mkString("\n  ", "\n  ", "\n")}",
+      ""
+    )
+
+  }
   
   // Only print the warning once by using a lazy fetch and check
   private lazy val getExcludedKeys = {
