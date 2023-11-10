@@ -18,19 +18,25 @@ package controllers
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants.{taskListURI, testAccountingMethodModel}
+import helpers.IntegrationTestConstants.{taskListURI, testAccountingMethodModel, yourIncomeSources}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 import java.time.LocalDate
 
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(EnableTaskListRedesign)
+  }
 
   val businessId: String = "testId"
 
@@ -51,13 +57,13 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "testId",
       businessName = Some(testBusinessNameModel.encrypt(crytpo.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel),
-      businessAddress = Some(testBusinessAddressModel.encrypt((crytpo.QueryParameterCrypto)))
+      businessAddress = Some(testBusinessAddressModel.encrypt(crytpo.QueryParameterCrypto))
     ))
 
   val testIncompleteBusinesses: Seq[SelfEmploymentData] = Seq(
     SelfEmploymentData(
       "testId",
-      businessName = Some(testBusinessNameModel.encrypt((crytpo.QueryParameterCrypto))), businessStartDate = Some(testValidBusinessStartDateModel),
+      businessName = Some(testBusinessNameModel.encrypt(crytpo.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
       businessTradeName = Some(testValidBusinessTradeNameModel)
     ))
 
@@ -78,7 +84,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("GET /details/business-check-your-answers is called")
-      val res = getBusinessCheckYourAnswers(businessId, false)
+      val res = getBusinessCheckYourAnswers(businessId, isEditMode = false)
 
       Then("should return an OK with the SelfEmployedCYA page")
       res must have(
@@ -93,7 +99,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubAuthSuccess()
 
         When("GET /details/business-check-your-answers is called")
-        val res = getBusinessCheckYourAnswers(businessId, false)
+        val res = getBusinessCheckYourAnswers(businessId, isEditMode = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -107,7 +113,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
         When("GET /details/business-check-your-answers is called")
-        val res = getBusinessCheckYourAnswers(businessId, false)
+        val res = getBusinessCheckYourAnswers(businessId, isEditMode = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -118,7 +124,45 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-check-your-answers" should {
-    "redirect to the task list page" when {
+    "redirect to the your income source page if the task list redesign feature switch is enabled" when {
+      "the user submits valid full data" in {
+        enable(EnableTaskListRedesign)
+
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
+
+        When("GET /details/business-check-your-answers is called")
+        val res = submitBusinessCheckYourAnswers(businessId)
+
+        Then("Should return a SEE_OTHER with a redirect location of task list page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(yourIncomeSources)
+        )
+      }
+
+      "the user submits valid incomplete data" in {
+        enable(EnableTaskListRedesign)
+
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
+
+        When("GET /details/business-check-your-answers is called")
+        val res = submitBusinessCheckYourAnswers(businessId)
+
+        Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(yourIncomeSources)
+        )
+      }
+    }
+    "redirect to the task list page if the task list redesign feature switch is disabled" when {
       "the user submits valid full data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()

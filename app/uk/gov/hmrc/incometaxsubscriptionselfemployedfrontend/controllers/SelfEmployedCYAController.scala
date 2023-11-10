@@ -20,14 +20,14 @@ import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, SelfEmploymentsCYAModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,14 +61,22 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
         if (selfEmploymentCYAModel.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
             case Right(_) =>
-              Redirect(appConfig.taskListUrl)
+              Redirect(continueUrl)
             case Left(_) =>
               throw new InternalServerException("[SelfEmployedCYAController][submit] - Could not confirm self employment business")
           }
         } else {
-          Future.successful(Redirect(appConfig.taskListUrl))
+          Future.successful(Redirect(continueUrl))
         }
       }
+    }
+  }
+
+  def continueUrl: String = {
+    if (isEnabled(EnableTaskListRedesign)) {
+      appConfig.yourIncomeSourcesUrl
+    } else {
+      appConfig.taskListUrl
     }
   }
 
@@ -101,8 +109,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
 
   def backUrl(isEditMode: Boolean): Option[String] = {
     if (isEditMode) {
-        if (isEnabled(EnableTaskListRedesign)) Some(appConfig.yourIncomeSourcesUrl)
-        else Some(appConfig.taskListUrl)
+      Some(continueUrl)
     } else {
       None
     }

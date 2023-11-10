@@ -122,7 +122,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
     }
 
-    "return 303, (SEE_OTHER)" when {
+    "return 303, (SEE_OTHER) and redirect to the task list page if the task list redesign feature switch is disabled" when {
       "the user submits valid full data" in {
         mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
         mockFetchAllBusinesses(Right(Seq(selfEmployment)))
@@ -134,27 +134,36 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
       "the user submits valid incomplete data" in {
         mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-        mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
+        mockFetchAllBusinesses(Right(Seq(incompleteSelfEmployment)))
+
+        val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(appConfig.taskListUrl)
+      }
+    }
+
+    "return 303, (SEE_OTHER) and redirect to the your income sources page if the task list redesign feature switch is enabled" when {
+      "the user submits valid full data" in {
+        enable(EnableTaskListRedesign)
+
+        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+        mockFetchAllBusinesses(Right(Seq(selfEmployment)))
+        mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
+
+        val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(appConfig.yourIncomeSourcesUrl)
       }
 
-      "return 303, (SEE_OTHER) and redirect to the task list page" when {
-        "the user submits valid full data" in {
-          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-          mockFetchAllBusinesses(Right(Seq(selfEmployment)))
-          mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
+      "the user submits valid incomplete data" in {
+        enable(EnableTaskListRedesign)
 
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.taskListUrl)
-        }
-        "the user submits valid incomplete data" in {
-          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-          mockFetchAllBusinesses(Right(Seq(incompleteSelfEmployment)))
+        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
+        mockFetchAllBusinesses(Right(Seq(incompleteSelfEmployment)))
 
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.taskListUrl)
-        }
+        val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(appConfig.yourIncomeSourcesUrl)
       }
     }
   }
@@ -162,10 +171,10 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   "backUrl" should {
     "in edit mode" when {
       "TaskList is not Enabled " should {
-          "return the task list page" in {
-            TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.taskListUrl)
-          }
+        "return the task list page" in {
+          TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.taskListUrl)
         }
+      }
       " TaskList is Enabled" should {
         "return the your income source page" in {
           enable(EnableTaskListRedesign)
