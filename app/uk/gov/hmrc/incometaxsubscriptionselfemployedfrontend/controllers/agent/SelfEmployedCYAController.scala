@@ -41,7 +41,6 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
                                          (implicit val appConfig: AppConfig, val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
-
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
@@ -75,8 +74,11 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
   }
 
   private def continueUrl: String = {
-    if (isEnabled(EnableTaskListRedesign)) appConfig.clientYourIncomeSourcesUrl
-    else appConfig.clientTaskListUrl
+    if (isEnabled(EnableTaskListRedesign)) {
+      appConfig.clientYourIncomeSourcesUrl
+    } else {
+      appConfig.clientTaskListUrl
+    }
   }
 
   private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])
@@ -105,8 +107,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
 
   def backUrl(isEditMode: Boolean): Option[String] = {
     if (isEditMode) {
-        if (isEnabled(EnableTaskListRedesign)) Some(appConfig.clientYourIncomeSourcesUrl)
-        else  Some(appConfig.clientTaskListUrl)
+      Some(continueUrl)
     } else {
       None
     }

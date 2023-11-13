@@ -25,12 +25,18 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 import java.time.LocalDate
 
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(EnableTaskListRedesign)
+  }
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val cyrpto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
@@ -77,7 +83,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
 
       When("GET /client/details/business-check-your-answers is called")
-      val res = getClientBusinessCheckYourAnswers(businessId, false)
+      val res = getClientBusinessCheckYourAnswers(businessId, isEditMode = false)
 
       Then("should return an OK with the SelfEmployedCYA page")
       res must have(
@@ -92,7 +98,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubAuthSuccess()
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = getClientBusinessCheckYourAnswers(businessId, false)
+        val res = getClientBusinessCheckYourAnswers(businessId, isEditMode = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -106,7 +112,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = getClientBusinessCheckYourAnswers(businessId, false)
+        val res = getClientBusinessCheckYourAnswers(businessId, isEditMode = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -117,7 +123,45 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {
-    "redirect to the task list page" when {
+    "redirect to the your income sources page if the task list redesign feature switch is enabled" when {
+      "the user submits valid full data" in {
+        enable(EnableTaskListRedesign)
+
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
+        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
+
+        When("GET /client/details/business-check-your-answers is called")
+        val res = submitClientBusinessCheckYourAnswers(businessId)
+
+        Then("Should return a SEE_OTHER with a redirect location of task list page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(clientYourIncomeSources)
+        )
+      }
+
+      "the user submits valid incomplete data" in {
+        enable(EnableTaskListRedesign)
+
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
+        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
+
+        When("GET /client/details/business-check-your-answers is called")
+        val res = submitClientBusinessCheckYourAnswers(businessId)
+
+        Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(clientYourIncomeSources)
+        )
+      }
+    }
+    "redirect to the task list page if the task list redesign feature switch is disabled" when {
       "the user submits valid full data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
