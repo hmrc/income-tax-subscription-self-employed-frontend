@@ -13,4 +13,4 @@ addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "1.9.3")
 
 addSbtPlugin("com.beautiful-scala" % "sbt-scalastyle" % "1.5.1")
 
-addSbtPlugin("org.irundaia.sbt" % "sbt-sassify" % "1.4.13")
+addSbtPlugin("io.github.irundaia" % "sbt-sassify" % "1.5.2")

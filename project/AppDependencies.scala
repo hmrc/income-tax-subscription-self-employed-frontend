@@ -7,13 +7,13 @@ object AppDependencies {
   val appName = "income-tax-subscription-self-employed-frontend"
 
   private val bootstrapVersion = "7.19.0"
-  private val playHmrcFrontendVersion = "7.16.0-play-28"
+  private val playHmrcFrontendVersion = "8.1.0"
   private val scalatestplusVersion = "5.1.0"
   private val catsVersion = "2.8.0"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapVersion,
-    "uk.gov.hmrc" %% "play-frontend-hmrc" % playHmrcFrontendVersion,
+    "uk.gov.hmrc" %% "play-frontend-hmrc-play-28" % playHmrcFrontendVersion,
     "org.typelevel" %% "cats-core" % catsVersion
   )
 
