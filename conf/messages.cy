@@ -103,7 +103,7 @@ business.accounting-method.heading                              = Pa ddull cyfri
 business.accounting-method.caption                              = Unig fasnachwr
 business.accounting-method.line-1                               = Os oes gennych fwy nag un busnes unig fasnachwr, mae angen i’ch holl fusnesau gael yr un dull cyfrifyddu.
 business.accounting-method.accordion                            = Rhowch enghraifft i mi
-business.accounting-method.accordion.line-1                     = Gwnaethoch greu anfoneb i rywun ym mis Mawrth 2017, ond ni chawsoch yr arian tan fis Mai 2017. Os ydych yn rhoi gwybod i CThEM eich bod wedi cael yr incwm hwn ym:
+business.accounting-method.accordion.line-1                     = Gwnaethoch greu anfoneb i rywun ym mis Mawrth 2017, ond ni chawsoch yr arian tan fis Mai 2017. Os ydych yn rhoi gwybod i CThEF eich bod wedi cael yr incwm hwn ym:
 business.accounting-method.accordion.bullet-1                   = mis Mai 2017, rydych yn defnyddio ‘cyfrifyddu ar sail arian parod’
 business.accounting-method.accordion.bullet-2                   = mis Mawrth 2017, rydych yn defnyddio ‘cyfrifyddu traddodiadol’
 business.accounting-method.cash                                 = <span class="heading-small">Cyfrifyddu ar sail arian parod</span><br>Rydych yn cofnodi naill ai ar y dyddiad yr ydych yn cael taliad gan eich tenantiaid i mewn i’ch cyfrif banc, neu ar y dyddiad yr ydych yn talu bil, er enghraifft ar gyfer atgyweirio a chynnal a chadw. Mae’r rhan fwyaf o fusnesau bach yn defnyddio’r dull hwn.
