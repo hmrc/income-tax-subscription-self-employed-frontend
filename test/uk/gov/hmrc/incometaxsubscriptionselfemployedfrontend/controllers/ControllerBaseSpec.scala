@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import org.mockito.Mockito
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
