@@ -26,6 +26,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetail
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 
+import java.time.LocalDate
+
 class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
@@ -36,7 +38,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
     val saveAndComeBackLater = "Save and come back later"
     val update = "Update"
     val emptyError = "Enter the date your client’s business started trading."
-    val dateTooLateError = "The date the business started trading must be on or before 11 April 2021."
+    val dateTooLateError = s"The date the business started trading must be before 11 April 2021."
     val dateTooEarlyError = "The date your client’s business started must be on or after 11 April 2021."
   }
 

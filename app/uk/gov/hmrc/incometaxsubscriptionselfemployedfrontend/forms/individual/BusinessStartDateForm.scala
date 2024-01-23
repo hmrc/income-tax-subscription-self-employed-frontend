@@ -25,7 +25,7 @@ import java.time.LocalDate
 
 object BusinessStartDateForm {
 
-  def maxStartDate: LocalDate = LocalDate.now().minusYears(2)
+  def maxStartDate: LocalDate = LocalDate.now().plusDays(6)
 
   def minStartDate: LocalDate = LocalDate.of(1900, 1, 1)
 

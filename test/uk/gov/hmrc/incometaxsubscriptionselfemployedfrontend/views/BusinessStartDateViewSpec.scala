@@ -45,7 +45,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
     val empty = "Enter the date your business started trading."
-    val maxDate = "The date your business started trading must be the same as or before 11 April 2021."
+    val maxDate = s"The date your business started trading must be before 11 April 2021."
     val minDate = "The date your business started must be on or after 11 April 2021."
   }
 

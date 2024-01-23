@@ -69,15 +69,16 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         "the date is not supplied to the map" in {
           form.bind(DataMap.EmptyMap).errors must contain(FormError(dayKeyError, empty))
         }
-        "it is older than 2 years" in {
-          val oneYearAgo: LocalDate = LocalDate.now.minusYears(1)
+        "it is not within 7 days from the current date" in {
+          val sevenDaysInFuture: LocalDate = LocalDate.now.plusDays(7)
           val maxTest = form.bind(DataMap.date(startDate)(
-            oneYearAgo.getDayOfMonth.toString,
-            oneYearAgo.getMonthValue.toString,
-            oneYearAgo.getYear.toString
+            sevenDaysInFuture.getDayOfMonth.toString,
+            sevenDaysInFuture.getMonthValue.toString,
+            sevenDaysInFuture.getYear.toString
           ))
           maxTest.errors must contain(FormError(dayKeyError, beforeMax, Seq(BusinessStartDateForm.maxStartDate.toString)))
         }
+
         "it is before 1900" in {
           val minTest = form.bind(DataMap.date(startDate)("31", "12", "1899"))
           minTest.errors must contain(FormError(dayKeyError, beforeMin, Seq(BusinessStartDateForm.minStartDate.toString)))
@@ -128,17 +129,18 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     }
 
     "accept a valid date" when {
-      "the date is exactly two years ago" in {
-        val twoYearsAgo: LocalDate = LocalDate.now.minusYears(2)
-        val testData = DataMap.date(startDate)(
-          day = twoYearsAgo.getDayOfMonth.toString,
-          month = twoYearsAgo.getMonthValue.toString,
-          year = twoYearsAgo.getYear.toString
-        )
-        val validated = form.bind(testData)
-        validated.hasErrors shouldBe false
-        validated.hasGlobalErrors shouldBe false
+      "the date is within 7 days from the current date" in {
+        val sevenDaysInPresent: LocalDate = LocalDate.now.plusDays(6)
+        val maxTest = form.bind(DataMap.date(startDate)(
+          sevenDaysInPresent.getDayOfMonth.toString,
+          sevenDaysInPresent.getMonthValue.toString,
+          sevenDaysInPresent.getYear.toString
+        ))
+        maxTest.errors mustBe List()
+        maxTest.value mustBe Some(BusinessStartDate(DateModel.dateConvert(sevenDaysInPresent)))
       }
+
+
       "the date is the first of january 1900" in {
         val earliestAllowedDate: LocalDate = LocalDate.of(1900, 1, 1)
         val testData = DataMap.date(startDate)(
@@ -147,8 +149,8 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
           year = earliestAllowedDate.getYear.toString
         )
         val validated = form.bind(testData)
-        validated.hasErrors shouldBe false
-        validated.hasGlobalErrors shouldBe false
+        validated.errors mustBe List()
+        validated.value mustBe Some(BusinessStartDate(DateModel.dateConvert(earliestAllowedDate)))
       }
     }
   }
