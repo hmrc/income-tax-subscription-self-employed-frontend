@@ -34,7 +34,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   val businessId: String = "testId"
 
-  val testStartDate: DateModel = DateModel.dateConvert(LocalDate.now)
+  val testStartDate: DateModel = DateModel.dateConvert(LocalDate.now.plusDays(7))
   val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
   val testBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testStartDate)
   val testValidBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
