@@ -21,7 +21,6 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
@@ -39,8 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerComponents,
                                                       authService: AuthService,
                                                       multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                                      businessAddressConfirmation: BusinessAddressConfirmation,
-                                                      appConfig: AppConfig)
+                                                      businessAddressConfirmation: BusinessAddressConfirmation)
                                                      (val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
                                                      (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with SessionRetrievals with I18nSupport {
@@ -53,7 +51,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
     authService.authorised() {
       withReference { reference =>
         withFirstAddress(reference, id) { address =>
-          Future.successful(Ok(view(confirmationForm, id, address.address, clientDetails = request.getClientDetails)))
+          Future.successful(Ok(view(confirmationForm, id, address, clientDetails = request.getClientDetails)))
         }
       }
     }
@@ -83,7 +81,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
     withReference { reference =>
       withFirstAddress(reference, id) { address =>
         confirmationForm.bindFromRequest().fold(
-          hasError => Future.successful(BadRequest(view(hasError, id, address.address, clientDetails = request.getClientDetails))),
+          hasError => Future.successful(BadRequest(view(hasError, id, address, clientDetails = request.getClientDetails))),
           {
             case Yes =>
               saveBusinessAddress(reference, id, address) {
@@ -98,21 +96,22 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
 
   }
 
-  private def saveBusinessAddress(reference: String, id: String, address: BusinessAddressModel)
+  private def saveBusinessAddress(reference: String, id: String, address: Address)
                                  (onSaveSuccessful: => Result)
                                  (implicit request: Request[AnyContent]): Future[Result] = {
-    multipleSelfEmploymentsService.saveBusinessAddress(reference, id, address) map {
+    multipleSelfEmploymentsService.saveAddress(reference, id, address) map {
       case Right(_) => onSaveSuccessful
       case Left(_) => throw new InternalServerException("[BusinessAddressConfirmationController][saveBusinessAddress] - Unable to save business address")
     }
   }
 
   private def withFirstAddress(reference: String, id: String)
-                              (onSuccessfulRetrieval: BusinessAddressModel => Future[Result])
+                              (onSuccessfulRetrieval: Address => Future[Result])
                               (implicit request: Request[AnyContent]): Future[Result] = {
-    multipleSelfEmploymentsService.fetchAllBusinesses(reference) flatMap {
-      case Left(_) => throw new InternalServerException("[BusinessAddressConfirmationController][withFirstBusiness] - Unable to retrieve businesses")
-      case Right(businesses) => businesses.flatMap(_.businessAddress).headOption match {
+    multipleSelfEmploymentsService.fetchFirstAddress(reference).flatMap { result =>
+      result.getOrElse(
+        throw new InternalServerException("[BusinessAddressConfirmationController][withFirstBusiness] - Unable to retrieve businesses")
+      ) match {
         case Some(address) => onSuccessfulRetrieval(address)
         case None => Future.successful(Redirect(controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)))
       }

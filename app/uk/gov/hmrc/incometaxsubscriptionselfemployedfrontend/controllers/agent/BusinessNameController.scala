@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.twirl.api.Html
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -28,15 +28,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTa
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
 
 
 @Singleton
@@ -46,9 +44,9 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                        authService: AuthService,
                                        businessName: BusinessName)
                                       (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching{
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
-  def view(businessNameForm: Form[BusinessNameModel], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessNameForm: Form[String], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     businessName(
       businessNameForm = businessNameForm,
       postAction = routes.BusinessNameController.submit(id, isEditMode = isEditMode),
@@ -58,15 +56,12 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     )
 
 
-
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
-        withAllBusinesses(reference) { businesses =>
-          val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
-          val currentBusinessName = businesses.find(_.id == id).flatMap(_.businessName)
+        getCurrentNameAndExcludedNames(reference, id) flatMap { case (currentName, excludedBusinessNames) =>
           Future.successful(Ok(
-            view(businessNameValidationForm(excludedBusinessNames).fill(currentBusinessName), id, isEditMode = isEditMode)
+            view(businessNameValidationForm(excludedBusinessNames).fill(currentName), id, isEditMode = isEditMode)
           ))
         }
       }
@@ -76,13 +71,12 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
-        withAllBusinesses(reference) { businesses =>
-          val excludedBusinessNames = getExcludedBusinessNames(id, businesses)
+        getCurrentNameAndExcludedNames(reference, id) flatMap { case (_, excludedBusinessNames) =>
           businessNameValidationForm(excludedBusinessNames).bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
-            businessNameData =>
-              multipleSelfEmploymentsService.saveBusinessName(reference, id, businessNameData) map {
+            name =>
+              multipleSelfEmploymentsService.saveName(reference, id, name) map {
                 case Right(_) =>
                   next(id, isEditMode)
                 case Left(_) =>
@@ -100,29 +94,35 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     routes.BusinessStartDateController.show(id)
   })
 
-  private def getExcludedBusinessNames(id: String, businesses: Seq[SelfEmploymentData]): Seq[BusinessNameModel] = {
-    val currentBusinessTrade = businesses.find(_.id == id).flatMap(_.businessTradeName)
-    businesses.filterNot(_.id == id).filter {
-      case SelfEmploymentData(_, _, _, _, Some(trade), _) if currentBusinessTrade contains trade => true
-      case _ => false
-    }.flatMap(_.businessName)
-  }
+  private def getCurrentNameAndExcludedNames(reference: String, businessId: String)
+                                            (implicit request: Request[AnyContent]): Future[(Option[String], Seq[String])] = {
+    multipleSelfEmploymentsService.fetchAllNameTradeCombos(reference) map {
+      case Right(combos) =>
+        val currentBusinessTrade: Option[String] = combos.collectFirst {
+          case (id, _, trade) if id == businessId => trade
+        }.flatten
 
-  private def withAllBusinesses(reference: String)(f: Seq[SelfEmploymentData] => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
-    multipleSelfEmploymentsService.fetchAllBusinesses(reference).flatMap {
-      case Right(businesses) => f(businesses)
-      case Left(error) => throw new InternalServerException(s"[BusinessNameController][withAllBusinesses] - Error retrieving businesses, error: $error")
+        val currentBusinessName: Option[String] = combos.collectFirst {
+          case (id, name, _) if id == businessId => name
+        }.flatten
+
+        val excludedNames = combos collect {
+          case (id, Some(name), Some(trade)) if id != businessId && currentBusinessTrade.contains(trade) => name
+        }
+
+        (currentBusinessName, excludedNames)
+      case _ =>
+        throw new InternalServerException("[BusinessNameController][getCurrentNameAndExcludedNames] - Unable to retrieve name trade combos")
     }
   }
 
   def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
     routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
   } else if (isEnabled(EnableTaskListRedesign)) {
-      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameConfirmationController.show(id).url
+    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameConfirmationController.show(id).url
   } else {
     appConfig.clientWhatIncomeSourceToSignUpUrl
   }
-
 
 
 }

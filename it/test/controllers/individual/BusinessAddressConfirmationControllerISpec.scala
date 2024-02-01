@@ -22,8 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
@@ -32,29 +31,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
-
-  val id: String = "testId"
-  val name: String = "FirstName LastName"
-  val address: Address = Address(
-    Seq(
-      "1 Long Road",
-      "Lonely town"
-    ),
-    Some("ZZ11ZZ")
-  )
-  val existingBusinesses: Seq[SelfEmploymentData] = {
-    Seq(
-      SelfEmploymentData(id = "old-id", businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto)))
-    )
-  }
 
   s"GET ${routes.BusinessAddressConfirmationController.show(id).url}" should {
     "return INTERNAL_SERVER_ERROR" when {
       "there was an issue fetching the businesses data" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(INTERNAL_SERVER_ERROR)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = getBusinessAddressConfirmation(id)()
@@ -68,7 +51,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "there is no existing business address" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = getBusinessAddressConfirmation(id)()
@@ -83,10 +66,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "there is an existing business address" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(
-          OK,
-          Json.toJson(existingBusinesses)
-        )
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = getBusinessAddressConfirmation(id)()
@@ -104,7 +84,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "there was an issue fetching the businesses data" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(INTERNAL_SERVER_ERROR)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = submitBusinessAddressConfirmation(id, None)()
@@ -118,7 +98,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "there is no existing business address" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
 
         When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = submitBusinessAddressConfirmation(id, None)()
@@ -131,10 +111,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "the user selects their business address is not the same as presented" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(
-          OK,
-          Json.toJson(existingBusinesses)
-        )
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
         When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = submitBusinessAddressConfirmation(id, Some(No))()
@@ -149,15 +126,8 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "the user selects their address matches the one presented" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(
-          OK,
-          Json.toJson(existingBusinesses)
-        )
-        stubSaveSubscriptionData(
-          reference,
-          businessesKey,
-          Json.toJson(existingBusinesses :+ SelfEmploymentData(id, businessAddress = existingBusinesses.head.businessAddress))
-        )(OK)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
 
         When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = submitBusinessAddressConfirmation(id, Some(Yes))()

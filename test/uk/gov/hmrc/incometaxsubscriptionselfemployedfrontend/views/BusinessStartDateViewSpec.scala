@@ -24,7 +24,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 
@@ -59,10 +59,15 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
   val businessStartDateView: BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
 
-  class Setup(isEditMode: Boolean = false,
-              businessStartDateForm: Form[BusinessStartDate] = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString)) {
+  class Setup(
+               isEditMode: Boolean = false,
+               form: Form[DateModel] = BusinessStartDateForm.businessStartDateForm(
+                 BusinessStartDateForm.minStartDate,
+                 BusinessStartDateForm.maxStartDate, d => d.toString
+               )
+             ) {
     val page: HtmlFormat.Appendable = businessStartDateView(
-      businessStartDateForm,
+      form,
       testCall,
       isEditMode,
       testBackUrl
@@ -77,7 +82,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     "have a title" in new Setup {
       document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
     }
-    "have a caption" in new Setup{
+    "have a caption" in new Setup {
       document.selectHead(".hmrc-caption").text mustBe s"${BusinessStartDateMessages.captionHidden} ${BusinessStartDateMessages.captionVisual}"
     }
     "have a heading" in new Setup {
@@ -121,7 +126,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
 
     "must display form error on page" in new Setup(
       isEditMode = false,
-      businessStartDateForm = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).withError(testError)
+      form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).withError(testError)
     ) {
       document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
@@ -129,7 +134,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     }
 
     "must display max date error on page" in new Setup(
-      businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooLateError)
+      form = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooLateError)
     ) {
       document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
@@ -137,7 +142,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     }
 
     "must display min date error on page" in new Setup(
-      businessStartDateForm = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooEarlyError)
+      form = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooEarlyError)
     ) {
       document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
       document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"

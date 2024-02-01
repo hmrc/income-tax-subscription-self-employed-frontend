@@ -5,38 +5,39 @@
 GET        /assets/*file                                controllers.Assets.versioned(path = "/public", file: Asset)
 
 
-GET        /details                                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.InitialiseController.initialise
+GET        /details                                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.InitialiseController.initialise
 
-GET        /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false)
+GET        /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false)
 
 GET        /details/confirm-business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameConfirmationController.show(id: String)
 POST       /details/confirm-business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameConfirmationController.submit(id: String)
 
-GET        /details/business-name                       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-name                       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
+GET        /details/business-name                       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-name                       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
 
-GET        /details/business-trade                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-trade                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
+GET        /details/business-trade                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-trade                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)
 
-GET        /details/change-accounting-method            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ChangeAccountingMethodController.show(id: String)
-POST       /details/change-accounting-method            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ChangeAccountingMethodController.submit(id: String)
+GET        /details/change-accounting-method            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.ChangeAccountingMethodController.show(id: String)
+POST       /details/change-accounting-method            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.ChangeAccountingMethodController.submit(id: String)
 
-GET        /details/business-accounting-method          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-accounting-method          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.BusinessAccountingMethodController.submit(id: String, isEditMode: Boolean ?= false)
+GET        /details/business-accounting-method          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAccountingMethodController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-accounting-method          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAccountingMethodController.submit(id: String, isEditMode: Boolean ?= false)
 
-GET        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false)
-POST       /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SelfEmployedCYAController.submit(id: String)
+GET        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false)
+POST       /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SelfEmployedCYAController.submit(id: String)
 
 GET        /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAddressConfirmationController.show(id: String)
 POST       /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAddressConfirmationController.submit(id: String)
 
-GET        /address-lookup-initialise/:businessId       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
-GET        /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false)
+GET        /address-lookup-check/:businessId            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.checkAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
+GET        /address-lookup-initialise/:businessId       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
+GET        /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false)
 
-GET        /language/:lang                              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET        /language/:lang                              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.LanguageSwitchController.switchToLanguage(lang: String)
 
 GET        /logout                                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut
 
-GET         /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SessionTimeoutController.keepAlive
-GET         /timeout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SessionTimeoutController.timeout
+GET         /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.keepAlive
+GET         /timeout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.timeout

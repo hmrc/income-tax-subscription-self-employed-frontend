@@ -23,10 +23,9 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
 class BusinessNameViewSpec extends ViewSpec {
 
@@ -50,7 +49,7 @@ class BusinessNameViewSpec extends ViewSpec {
   val testError2: FormError = FormError("businessName", "error.agent.business-name.empty")
   val businessName: BusinessName = app.injector.instanceOf[BusinessName]
 
-  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
+  class Setup(isEditMode: Boolean = false, businessNameForm: Form[String] = BusinessNameForm.businessNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = businessName(
       businessNameForm,
       testCall,
@@ -71,7 +70,7 @@ class BusinessNameViewSpec extends ViewSpec {
       document.getH1Element.text mustBe BusinessNameMessages.heading
 
     }
-    "have a caption" in new Setup(){
+    "have a caption" in new Setup() {
       document.selectHead(".govuk-caption-l")
         .text() mustBe BusinessNameMessages.caption
     }

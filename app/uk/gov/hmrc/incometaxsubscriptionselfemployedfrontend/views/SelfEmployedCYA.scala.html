@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate => BusinessStartDateModel, _}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
@@ -49,10 +49,10 @@
     </div>
 }
 
-@businessName(businessName: Option[BusinessNameModel], businessId: String) = @{
+@businessName(businessName: Option[String], businessId: String) = @{
     val question: String = messages("self-employed-cya.business-name")
-    val answer: Option[String] = businessName.map(_.businessName)
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessNameController.show(businessId, isEditMode = true).url
+    val answer: Option[String] = businessName
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessNameController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
         hiddenContent = if(answer.isDefined) messages("self-employed-cya.business-name.change") else messages("self-employed-cya.business-name.add")
@@ -60,11 +60,11 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@tradingStartDate(businessStartDate: Option[BusinessStartDateModel], businessId: String) = @{
+@tradingStartDate(businessStartDate: Option[DateModel], businessId: String) = @{
     import implicitDateFormatter.LongDate
     val question: String = messages("self-employed-cya.trading-start-date")
-    val answer: Option[String] = businessStartDate.map(_.startDate.toLocalDate.toLongDate())
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
+    val answer: Option[String] = businessStartDate.map(_.toLocalDate.toLongDate())
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
         hiddenContent = if(answer.isDefined) messages("self-employed-cya.trading-start-date.change") else messages("self-employed-cya.trading-start-date.add")
@@ -72,10 +72,10 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@businessTrade(businessTrade: Option[BusinessTradeNameModel], businessId: String) = @{
+@businessTrade(businessTrade: Option[String], businessId: String) = @{
     val question: String = messages("self-employed-cya.business-trade")
-    val answer: Option[String] = businessTrade.map(_.businessTradeName)
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
+    val answer: Option[String] = businessTrade
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
         hiddenContent = if(answer.isDefined) messages("self-employed-cya.business-trade.change") else messages("self-employed-cya.business-trade.add")
@@ -83,10 +83,10 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@businessAddress(businessAddress: Option[BusinessAddressModel], businessId: String) = @{
+@businessAddress(businessAddress: Option[Address], businessId: String) = @{
     val question: String = messages("self-employed-cya.business-address")
-    val answer: Option[String] = businessAddress.map(_.address.toString)
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url
+    val answer: Option[String] = businessAddress.map(_.toString)
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
         hiddenContent = if(answer.isDefined) messages("self-employed-cya.business-address.change") else messages("self-employed-cya.business-address.add")
@@ -94,18 +94,16 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@accountingMethod(accountingMethod: Option[AccountingMethodModel], businessCount: Int, businessId: String) = @{
+@accountingMethod(accountingMethod: Option[AccountingMethod], businessCount: Int, businessId: String) = @{
     val question: String = messages("self-employed-cya.accounting-method")
-    val answer: Option[String] = accountingMethod.map { accountingMethodModel =>
-        accountingMethodModel.accountingMethod match {
-            case Cash => messages("self-employed-cya.accounting-method.cash")
-            case Accruals => messages("self-employed-cya.accounting-method.accruals")
-        }
+    val answer: Option[String] = accountingMethod map {
+        case Cash => messages("self-employed-cya.accounting-method.cash")
+        case Accruals => messages("self-employed-cya.accounting-method.accruals")
     }
     val changeUrl: String = if(businessCount > 1) {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.ChangeAccountingMethodController.show(businessId).url
+        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.ChangeAccountingMethodController.show(businessId).url
     } else {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
+        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
     }
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppar
 import play.api.http.Status._
 import play.api.libs.json.JsSuccess
 import uk.gov.hmrc.http.HttpReads
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessAddressModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 
 
 object GetAddressLookupDetailsHttpParser {
 
-  type GetAddressLookupDetailsResponse = Either[GetAddressLookupDetailsFailure, Option[BusinessAddressModel]]
+  type GetAddressLookupDetailsResponse = Either[GetAddressLookupDetailsFailure, Option[Address]]
 
   implicit def getAddressLookupDetailsHttpReads: HttpReads[GetAddressLookupDetailsResponse] = HttpReads { (_, _, response) =>
     response.status match {
-      case OK => response.json.validate[BusinessAddressModel] match {
+      case OK => (response.json \ "address").validate[Address](Address.format) match {
         case JsSuccess(value, _) => Right(Some(value))
         case _ => Left(InvalidJson)
       }

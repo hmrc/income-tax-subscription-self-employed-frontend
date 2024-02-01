@@ -23,10 +23,12 @@ import play.api.http.HeaderNames
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.crypto.DefaultCookieSigner
+import play.api.libs.json.OFormat
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
@@ -40,6 +42,9 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     .in(Environment.simple(mode = Mode.Dev))
     .configure(config)
     .build()
+
+  implicit lazy val crypto: Encrypter with Decrypter = app.injector.instanceOf[ApplicationCrypto].JsonCrypto
+  implicit lazy val soleTraderBusinessesFormat: OFormat[SoleTraderBusinesses] = SoleTraderBusinesses.encryptedFormat
 
   implicit def ws(implicit app: Application): WSClient = app.injector.instanceOf[WSClient]
 
@@ -86,7 +91,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     super.beforeEach()
   }
 
-  def get[T](uri: String, additionalCookies: Map[String, String] = Map.empty)(implicit ws: WSClient, portNumber: PortNumber): WSResponse = {
+  def get(uri: String, additionalCookies: Map[String, String] = Map.empty)(implicit ws: WSClient, portNumber: PortNumber): WSResponse = {
     await(
       buildClient(uri)
         .withHttpHeaders(HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies))
@@ -102,10 +107,13 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def post[T](uri: String, additionalCookies: Map[String, String] = Map.empty)(body: Map[String, Seq[String]]): WSResponse = {
+  def post(uri: String, additionalCookies: Map[String, String] = Map.empty)
+          (body: Map[String, Seq[String]]): WSResponse = {
     await(
       buildClient(uri)
-        .withHttpHeaders(HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies), "Csrf-Token" -> "nocheck")
+        .withHttpHeaders(
+          HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies), "Csrf-Token" -> "nocheck"
+        )
         .post(body)
     )
   }
@@ -122,7 +130,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientBusinessStartDate(id: String): WSResponse = get(s"/client/details/business-start-date?id=$id")
 
-  def submitClientBusinessStartDate(id: String, request: Option[BusinessStartDate], inEditMode: Boolean = false): WSResponse = {
+  def submitClientBusinessStartDate(id: String, request: Option[DateModel], inEditMode: Boolean = false): WSResponse = {
     val uri = s"/client/details/business-start-date?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
@@ -139,7 +147,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientBusinessName(id: String): WSResponse = get(s"/client/details/business-name?id=$id")
 
-  def submitClientBusinessName(id: String, inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {
+  def submitClientBusinessName(id: String, inEditMode: Boolean, request: Option[String]): WSResponse = {
     val uri = s"/client/details/business-name?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
@@ -154,7 +162,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientTradeName(id: String): WSResponse = get(s"/client/details/business-trade?id=$id")
 
-  def submitClientTradeName(id: String, request: Option[BusinessTradeNameModel], inEditMode: Boolean = false): WSResponse = {
+  def submitClientTradeName(id: String, request: Option[String], inEditMode: Boolean = false): WSResponse = {
     val uri = s"/client/details/business-trade?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
@@ -167,7 +175,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def submitBusinessStartDate(request: Option[BusinessStartDate], id: String, inEditMode: Boolean = false): WSResponse = {
+  def submitBusinessStartDate(request: Option[DateModel], id: String, inEditMode: Boolean = false): WSResponse = {
     val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
@@ -238,7 +246,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getBusinessName(id: String): WSResponse = get(s"/details/business-name?id=$id")
 
-  def submitBusinessName(id: String, inEditMode: Boolean, request: Option[BusinessNameModel]): WSResponse = {
+  def submitBusinessName(id: String, inEditMode: Boolean, request: Option[String]): WSResponse = {
     val uri = s"/details/business-name?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
@@ -250,7 +258,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getBusinessTradeName(id: String): WSResponse = get(s"/details/business-trade?id=$id")
 
-  def submitBusinessTradeName(id: String, inEditMode: Boolean, request: Option[BusinessTradeNameModel]): WSResponse = {
+  def submitBusinessTradeName(id: String, inEditMode: Boolean, request: Option[String]): WSResponse = {
     val uri = s"/details/business-trade?id=$id&isEditMode=$inEditMode"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
@@ -274,7 +282,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getBusinessAccountingMethod(id: String, inEditMode: Boolean = false): WSResponse = get(s"/details/business-accounting-method?id=$id&isEditMode=$inEditMode")
 
-  def submitBusinessAccountingMethod(request: Option[AccountingMethodModel],
+  def submitBusinessAccountingMethod(request: Option[AccountingMethod],
                                      inEditMode: Boolean = false,
                                      id: String): WSResponse = {
     val uri = s"/details/business-accounting-method?isEditMode=$inEditMode&id=$id"
@@ -295,7 +303,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientBusinessAccountingMethod(id: String): WSResponse = get(s"/client/details/business-accounting-method?id=$id")
 
-  def submitClientBusinessAccountingMethod(request: Option[AccountingMethodModel],
+  def submitClientBusinessAccountingMethod(request: Option[AccountingMethod],
                                            inEditMode: Boolean = false,
                                            id: String): WSResponse = {
     val uri = s"/client/details/business-accounting-method?id=$id&isEditMode=$inEditMode"

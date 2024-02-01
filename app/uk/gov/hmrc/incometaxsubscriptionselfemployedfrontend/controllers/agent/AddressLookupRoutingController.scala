@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.{AddressLookupConnector, IncomeTaxSubscriptionConnector}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, BusinessAddressModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Address}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -39,11 +40,24 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                                val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService)
                                               (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
   private def addressLookupContinueUrl(businessId: String, isEditMode: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
       routes.AddressLookupRoutingController.addressLookupRedirect(businessId, isEditMode = isEditMode)
+
+  def checkAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+    withReference { reference =>
+      multipleSelfEmploymentsService.fetchFirstAddress(reference) map {
+        case Right(Some(_)) if isEnabled(EnableTaskListRedesign) =>
+          Redirect(routes.BusinessAddressConfirmationController.show(businessId))
+        case Right(_) =>
+          Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode))
+        case Left(_) =>
+          throw new InternalServerException("[AddressLookupRoutingController][checkAddressLookupJourney] - Error when retrieving any address")
+      }
+    }
+  }
 
   def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
@@ -67,7 +81,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         for {
           addressDetails <- fetchAddress(addressId)
           accountingMethod <- fetchAccountMethod(reference)
-          saveResult <- multipleSelfEmploymentsService.saveBusinessAddress(reference, businessId, addressDetails)
+          saveResult <- multipleSelfEmploymentsService.saveAddress(reference, businessId, addressDetails)
         } yield {
           saveResult match {
             case Right(_) =>
@@ -82,15 +96,15 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier): Future[Option[AccountingMethodModel]] = {
-    incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey) map {
+  private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier): Future[Option[AccountingMethod]] = {
+    multipleSelfEmploymentsService.fetchAccountingMethod(reference) map {
       case Left(_) =>
         throw new InternalServerException("[AddressLookupRoutingController][fetchAccountMethod] - Failure retrieving accounting method")
       case Right(accountingMethod) => accountingMethod
     }
   }
 
-  private def fetchAddress(id: Option[String])(implicit hc: HeaderCarrier): Future[BusinessAddressModel] = id match {
+  private def fetchAddress(id: Option[String])(implicit hc: HeaderCarrier): Future[Address] = id match {
     case None =>
       throw new InternalServerException(s"[AddressLookupRoutingController][fetchAddress] - Id not returned from address service")
     case Some(addressId) => addressLookupConnector.getAddressDetails(addressId) map {

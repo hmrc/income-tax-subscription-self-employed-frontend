@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ sealed trait YesNo {
   def toMessageString(implicit messages: Messages): String
 }
 
-object Yes extends YesNo {
+case object Yes extends YesNo {
   private[models] val YES = "Yes"
 
   override def toString: String = YES
@@ -33,7 +33,7 @@ object Yes extends YesNo {
   override def toMessageString(implicit messages: Messages): String = Messages("base.yes")
 }
 
-object No extends YesNo {
+case object No extends YesNo {
   private[models] val NO = "No"
 
   override def toString: String = NO

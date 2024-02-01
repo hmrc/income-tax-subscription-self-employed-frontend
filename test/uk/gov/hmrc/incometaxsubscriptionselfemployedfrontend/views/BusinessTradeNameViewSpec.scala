@@ -24,7 +24,6 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessTradeName
 
@@ -57,7 +56,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
   val id: String = "testId"
 
   class Setup(isEditMode: Boolean = false,
-              businessTradeNameForm: Form[BusinessTradeNameModel] = BusinessTradeNameForm.businessTradeNameValidationForm(Nil)) {
+              businessTradeNameForm: Form[String] = BusinessTradeNameForm.businessTradeNameValidationForm(Nil)) {
 
     val page: HtmlFormat.Appendable = businessTradeName(
       businessTradeNameForm,
@@ -74,7 +73,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     "have a title" in new Setup {
       document.title mustBe BusinessTradeNameMessages.title + BusinessTradeNameMessages.titleSuffix
     }
-    "have a caption" in new Setup{
+    "have a caption" in new Setup {
       document.selectHead(".hmrc-caption").text mustBe s"${BusinessTradeNameMessages.captionHidden} ${BusinessTradeNameMessages.captionVisual}"
     }
     "have a heading" in new Setup {

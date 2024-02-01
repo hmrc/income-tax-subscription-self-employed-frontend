@@ -17,9 +17,10 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
 import org.scalatestplus.play.PlaySpec
-import play.api.test.Helpers._
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
@@ -29,303 +30,904 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
   val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
   trait Setup {
-    val service: MultipleSelfEmploymentsService = new MultipleSelfEmploymentsService(mockIncomeTaxSubscriptionConnector, crypto)
+    val service: MultipleSelfEmploymentsService = new MultipleSelfEmploymentsService(mockIncomeTaxSubscriptionConnector)(crypto)
   }
-
-  def businessStartDate(id: String): BusinessStartDate = BusinessStartDate(DateModel(id, "1", "2017"))
-
-  def businessName(id: String): BusinessNameModel = BusinessNameModel(s"ABC Limited $id")
-
-  def businessTrade(id: String): BusinessTradeNameModel = BusinessTradeNameModel(s"Plumbing $id")
-
-  def businessAddress(id: String): BusinessAddressModel = BusinessAddressModel(
-    Address(
-      Seq(
-        crypto.QueryParameterCrypto.encrypt(PlainText("line1")).value,
-        crypto.QueryParameterCrypto.encrypt(PlainText("line2")).value,
-        crypto.QueryParameterCrypto.encrypt(PlainText("line3")).value),
-      Some(crypto.QueryParameterCrypto.encrypt(PlainText("TF3 4NT")).value
-      )
-    )
-  )
-
-  def encryptedFullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
-    id = id,
-    businessStartDate = Some(businessStartDate(id)),
-    businessName = Some(businessName(id).encrypt(crypto.QueryParameterCrypto)),
-    businessTradeName = Some(businessTrade(id)),
-    businessAddress = Some(businessAddress(id).encrypt(crypto.QueryParameterCrypto))
-  )
-
-  def decryptedFullSelfEmploymentData(id: String): SelfEmploymentData = SelfEmploymentData(
-    id = id,
-    businessStartDate = Some(businessStartDate(id)),
-    businessName = Some(businessName(id)),
-    businessTradeName = Some(businessTrade(id)),
-    businessAddress = Some(businessAddress(id))
-  )
 
   val testReference: String = "test-reference"
 
-  "findData[T]" must {
-    "return the specified data" when {
-      "the searched business is present in the returned businesses and has the required data" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1"),
-            encryptedFullSelfEmploymentData("2")
-          )))
+  val id: String = "id"
+  val date: DateModel = DateModel("1", "1", "1980")
+  val name: String = "test name"
+  val trade: String = "test trade"
+  val address: Address = Address(
+    lines = Seq("1 Long Road", "Lonely Town"),
+    postcode = Some("ZZ1 1ZZ")
+  )
+  val accountingMethod: AccountingMethod = Cash
+
+  val soleTraderBusiness: SoleTraderBusiness = SoleTraderBusiness(
+    id = id,
+    startDate = Some(date),
+    name = Some(name),
+    trade = Some(trade),
+    address = Some(address)
+  )
+
+  def soleTraderBusinessTwo(
+                             startDate: Option[DateModel] = None,
+                             name: Option[String] = None,
+                             trade: Option[String] = None,
+                             address: Option[Address] = None
+                           ): SoleTraderBusiness = SoleTraderBusiness(
+    id = s"$id-2",
+    startDate = startDate,
+    name = name,
+    trade = trade,
+    address = address
+  )
+
+  val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
+    businesses = Seq(soleTraderBusiness),
+    accountingMethod = Some(accountingMethod)
+  )
+
+  def multipleSoleTraderBusinesses(
+                                    otherBusiness: SoleTraderBusiness = soleTraderBusinessTwo()
+                                  ): SoleTraderBusinesses = SoleTraderBusinesses(
+    businesses = Seq(soleTraderBusiness, otherBusiness),
+    accountingMethod = Some(accountingMethod)
+  )
+
+  "fetchSoleTraderBusinesses" must {
+    "return sole trader businesses" when {
+      "the connector returns sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses))
         )
 
-        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(Some(businessName("1")))
-        await(service.findData[BusinessNameModel](testReference, "2", _.businessName)) mustBe Right(Some(businessName("2")))
+        await(service.fetchSoleTraderBusinesses(testReference)) mustBe Right(Some(soleTraderBusinesses))
       }
     }
-    "return no data" when {
-      "the searched business is present in the returned businesses but does not have the required data" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1").copy(businessName = None)
-          )))
+    "return no sole trader businesses" when {
+      "the connector returns no data" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
         )
 
-        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(None)
-      }
-      "the searched business is not present in the returned businesses" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1")
-          )))
-        )
-
-        await(service.findData[BusinessNameModel](testReference, "2", _.businessName)) mustBe Right(None)
-      }
-      "no data for the user was returned" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(None)
-        )
-
-        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(None)
+        await(service.fetchSoleTraderBusinesses(testReference)) mustBe Right(None)
       }
     }
-    "return a failure" when {
-      "a failure is returned from the connector" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+    "return an error" when {
+      "the connector returns an error" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
-        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-      }
-    }
-  }
-
-  "fetchBusinessStartDate" must {
-    "return the business start date" when {
-      "the business has the business start date" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1")
-          )))
-        )
-
-        await(service.findData[BusinessStartDate](testReference, "1", _.businessStartDate)) mustBe Right(Some(businessStartDate("1")))
-      }
-    }
-  }
-
-  "fetchBusinessName" must {
-    "return the business name" when {
-      "the business has the business name" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1")
-          )))
-        )
-
-        await(service.findData[BusinessNameModel](testReference, "1", _.businessName)) mustBe Right(Some(businessName("1")))
+        await(service.fetchSoleTraderBusinesses(testReference)) mustBe
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
       }
     }
   }
 
-  "fetchBusinessTrade" must {
-    "return the business trade" when {
-      "the business has the business trade" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1")
-          )))
-        )
-
-        await(service.findData[BusinessTradeNameModel](testReference, "1", _.businessTradeName)) mustBe Right(Some(businessTrade("1")))
-      }
-    }
-  }
-
-  "fetchBusinessAddress" must {
-    "return the business address" when {
-      "the business has the business name" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1")
-          )))
-        )
-
-        await(service.findData[BusinessAddressModel](testReference, "1", _.businessAddress)) mustBe Right(Some(businessAddress("1")))
-      }
-    }
-  }
-
-  "saveData" must {
-    "return the save result" when {
-      "the business is returned with data already present for the field being saved" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1")
-          )))
-        )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(
-            encryptedFullSelfEmploymentData("1")
-              .copy(businessName = Some(businessName("2").encrypt(crypto.QueryParameterCrypto)))
-          )
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
-
-        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("2"))))) mustBe
+  "saveSoleTraderBusinesses" must {
+    "return a save successful response" when {
+      "the sole trader businesses was saved successfully" in new Setup {
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, soleTraderBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "the business is returned with no data for the field being saved" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("1").copy(businessName = None)
-          )))
         )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(encryptedFullSelfEmploymentData("1"))
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "no business matches the business id to save against" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(Some(Seq(
-            encryptedFullSelfEmploymentData("2")
-          )))
-        )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(
-            encryptedFullSelfEmploymentData("2"),
-            SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto)))
-          )
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
-
-        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there are no businesses currently saved" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(None)
-        )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
-
-        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
+        await(service.saveSoleTraderBusinesses(testReference, soleTraderBusinesses)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
-    "return a failure" when {
-      "a failure is returned from the save" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(None)
+    "return a save failure" when {
+      "there was a problem when saving the sole trader businesses" in new Setup {
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, soleTraderBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto))))
-        )(Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-      "a failure is returned from the fetch" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
+        await(service.saveSoleTraderBusinesses(testReference, soleTraderBusinesses)) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
     }
   }
 
-  "saveBusinessStartDate" must {
-    "return a save success" when {
-      "business start date was successfully saved" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(None)
+  "fetchStartDate" must {
+    "return a start data" when {
+      "there are multiple businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(multipleSoleTraderBusinesses()))
         )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessStartDate = Some(businessStartDate("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
 
-        await(service.saveData(testReference, "1", _.copy(businessStartDate = Some(businessStartDate("1"))))) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        await(service.fetchStartDate(testReference, id)) mustBe Right(Some(date))
+      }
+      "the business specified exists and has a start date" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses))
+        )
+
+        await(service.fetchStartDate(testReference, id)) mustBe Right(Some(date))
+      }
+    }
+    "return no start date" when {
+      "the business specified exists but has no start date" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None)))))
+        )
+
+        await(service.fetchStartDate(testReference, id)) mustBe Right(None)
+      }
+      "the business specified does not exist" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(id = "other-id")))))
+        )
+
+        await(service.fetchStartDate(testReference, id)) mustBe Right(None)
+      }
+      "there are no businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])))
+        )
+
+        await(service.fetchStartDate(testReference, id)) mustBe Right(None)
+      }
+    }
+    "return an error" when {
+      "an error was returned when retrieving sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.fetchStartDate(testReference, id)) mustBe
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
       }
     }
   }
 
-  "saveBusinessName" must {
-    "return a save success" when {
-      "business name was successfully saved" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(None)
-        )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessName = Some(businessName("1").encrypt(crypto.QueryParameterCrypto))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
+  "saveStartDate" must {
+    "return a save successful response" when {
+      "there was an already existing business which had its start date updated" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = Some(saveData))))
 
-        await(service.saveData(testReference, "1", _.copy(businessName = Some(businessName("1"))))) mustBe
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveStartDate(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was an already existing business which had its start date added" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveStartDate(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there is an already existing business which does not match the saved data id" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = multipleSoleTraderBusinesses(soleTraderBusinessTwo(startDate = Some(saveData)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveStartDate(testReference, s"$id-2", saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was no existing business matching the id, one was created with the id and start date" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(SoleTraderBusiness(id, startDate = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveStartDate(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "no sole trader businesses were returned" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id, startDate = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveStartDate(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+    }
+    "return an error" when {
+      "there was an error fetching the sole trader businesses" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveStartDate(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error saving the sole trader businesses" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveStartDate(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
     }
   }
 
-  "saveBusinessTrade" must {
-    "return a save success" when {
-      "business trade was successfully saved" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(None)
-        )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessTradeName = Some(businessTrade("1"))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
+  "saveName" must {
+    "return a save successful response" when {
+      "there was an already existing business which had its start date updated" in new Setup {
+        val saveData: String = "test other name"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = Some(saveData))))
 
-        await(service.saveData(testReference, "1", _.copy(businessTradeName = Some(businessTrade("1"))))) mustBe
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveName(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was an already existing business which had its start date added" in new Setup {
+        val saveData: String = "test other name"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveName(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there is an already existing business which does not match the saved data id" in new Setup {
+        val saveData: String = "test other name"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = multipleSoleTraderBusinesses(soleTraderBusinessTwo(name = Some(saveData)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveName(testReference, s"$id-2", saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was no existing business matching the id, one was created with the id and start date" in new Setup {
+        val saveData: String = "test other name"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(SoleTraderBusiness(id, name = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveName(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "no sole trader businesses were returned" in new Setup {
+        val saveData: String = "test other name"
+        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id, name = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveName(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+    }
+    "return an error" when {
+      "there was an error fetching the sole trader businesses" in new Setup {
+        val saveData: String = "test other name"
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveName(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error saving the sole trader businesses" in new Setup {
+        val saveData: String = "test other name"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveName(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
     }
   }
 
-  "saveBusinessAddress" must {
-    "return a save success" when {
-      "business address was successfully saved" in new Setup {
-        mockGetSelfEmployments[Seq[SelfEmploymentData]](businessesKey)(
-          response = Right(None)
-        )
-        mockSaveSelfEmployments[Seq[SelfEmploymentData]](
-          id = businessesKey,
-          value = Seq(SelfEmploymentData("1", businessAddress = Some(businessAddress("1").encrypt(crypto.QueryParameterCrypto))))
-        )(Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse))
+  "saveTrade" must {
+    "return a save successful response" when {
+      "there was an already existing business which had its start date updated" in new Setup {
+        val saveData: String = "test other trade"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
 
-        await(service.saveData(testReference, "1", _.copy(businessAddress = Some(businessAddress("1"))))) mustBe
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveTrade(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was an already existing business which had its start date added" in new Setup {
+        val saveData: String = "test other trade"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = None)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveTrade(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there is an already existing business which does not match the saved data id" in new Setup {
+        val saveData: String = "test other trade"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = multipleSoleTraderBusinesses(soleTraderBusinessTwo(trade = Some(saveData)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveTrade(testReference, s"$id-2", saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was no existing business matching the id, one was created with the id and start date" in new Setup {
+        val saveData: String = "test other trade"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(SoleTraderBusiness(id, trade = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveTrade(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "no sole trader businesses were returned" in new Setup {
+        val saveData: String = "test other trade"
+        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id, trade = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveTrade(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
+    "return an error" when {
+      "there was an error fetching the sole trader businesses" in new Setup {
+        val saveData: String = "test other trade"
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveTrade(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error saving the sole trader businesses" in new Setup {
+        val saveData: String = "test other trade"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveTrade(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+    }
   }
+
+  "saveAddress" must {
+    "return a save successful response" when {
+      "there was an already existing business which had its start date updated" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAddress(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was an already existing business which had its start date added" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = None)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAddress(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there is an already existing business which does not match the saved data id" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = multipleSoleTraderBusinesses(soleTraderBusinessTwo(address = Some(saveData)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAddress(testReference, s"$id-2", saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was no existing business matching the id, one was created with the id and start date" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(SoleTraderBusiness(id, address = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAddress(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "no sole trader businesses were returned" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id, address = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAddress(testReference, id, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+    }
+    "return an error" when {
+      "there was an error fetching the sole trader businesses" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveAddress(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error saving the sole trader businesses" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveAddress(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+    }
+  }
+
+  "confirmBusiness" must {
+    "return a save successful response" when {
+      "there was an already existing business which was already confirmed" in new Setup {
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.confirmBusiness(testReference, id)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there was an already existing business which was not confirmed" in new Setup {
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.confirmBusiness(testReference, id)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+    }
+    "return an error" when {
+      "there was an error fetching the sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.confirmBusiness(testReference, id)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error saving the sole trader businesses" in new Setup {
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.confirmBusiness(testReference, id)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+    }
+  }
+
+  "fetchAccountingMethod" must {
+    "return an accounting method" when {
+      "there are sole trader businesses and the accounting method exists" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses))
+        )
+
+        await(service.fetchAccountingMethod(testReference)) mustBe Right(Some(accountingMethod))
+      }
+    }
+    "return no accounting method" when {
+      "there are sole trader businesses but no accounting method set" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(accountingMethod = None)))
+        )
+
+        await(service.fetchAccountingMethod(testReference)) mustBe Right(None)
+      }
+      "there are no sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+
+        await(service.fetchAccountingMethod(testReference)) mustBe Right(None)
+      }
+    }
+    "return an error" when {
+      "an error was returned when retrieving sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.fetchAccountingMethod(testReference)) mustBe
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+  }
+
+  "saveAccountingMethod" must {
+    "return a save successful response" when {
+      "there are already existing sole trader businesses with an accounting method" in new Setup {
+        val saveData: AccountingMethod = Accruals
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "there are already existing sole trader businesses without an accounting method" in new Setup {
+        val saveData: AccountingMethod = Accruals
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+      "no sole trader businesses were returned" in new Setup {
+        val saveData: AccountingMethod = Accruals
+        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq.empty[SoleTraderBusiness], accountingMethod = Some(saveData))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+
+        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+      }
+    }
+    "return an error" when {
+      "there was an error fetching the sole trader businesses" in new Setup {
+        val saveData: AccountingMethod = Accruals
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error saving the sole trader businesses" in new Setup {
+        val saveData: AccountingMethod = Accruals
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+    }
+  }
+
+  "fetchFirstAddress" must {
+    "return an address" when {
+      "an address already exists" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
+
+        await(service.fetchFirstAddress(testReference)) mustBe Right(Some(address))
+      }
+    }
+    "return no address" when {
+      "there are multiple businesses without addresses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = None), soleTraderBusinessTwo()))))
+        )
+
+        await(service.fetchFirstAddress(testReference)) mustBe Right(None)
+      }
+      "there is a single business without addresses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = None)))))
+        )
+
+        await(service.fetchFirstAddress(testReference)) mustBe Right(None)
+      }
+      "there are no remaining businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])))
+        )
+
+        await(service.fetchFirstAddress(testReference)) mustBe Right(None)
+      }
+      "there are no sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(None))
+
+        await(service.fetchFirstAddress(testReference)) mustBe Right(None)
+      }
+    }
+    "return an error" when {
+      "there was a problem getting the sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.fetchFirstAddress(testReference)) mustBe
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+  }
+
+  "fetchFirstBusinessName" must {
+    "return a business name" when {
+      "a business name already exists" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
+
+        await(service.fetchFirstBusinessName(testReference)) mustBe Right(Some(name))
+      }
+    }
+    "return no business name" when {
+      "there are multiple businesses without business names" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None), soleTraderBusinessTwo()))))
+        )
+
+        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
+      }
+      "there is a single business without a business name" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None)))))
+        )
+
+        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
+      }
+      "there are no remaining businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])))
+        )
+
+        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
+      }
+      "there are no sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(None))
+
+        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
+      }
+    }
+    "return an error" when {
+      "there was a problem getting the sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.fetchFirstBusinessName(testReference)) mustBe
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+  }
+
+  "fetchAllNameTradeCombos" must {
+    "return the trade name combos list" when {
+      "a business exists with all information" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
+
+        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq(
+          (id, Some(name), Some(trade))
+        ))
+      }
+      "a business exists with minimal information" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None, trade = None)))))
+        )
+
+        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq(
+          (id, None, None)
+        ))
+      }
+      "multiple businesses exist" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(multipleSoleTraderBusinesses(soleTraderBusinessTwo())))
+        )
+
+        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq(
+          (id, Some(name), Some(trade)),
+          (s"$id-2", None, None)
+        ))
+      }
+      "no businesses are present in the sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])))
+        )
+
+        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq())
+      }
+      "no sole trader businesses was found" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+
+        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq())
+      }
+    }
+    "return an error" when {
+      "there was a problem fetching the sole trader businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.fetchAllNameTradeCombos(testReference)) mustBe
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+  }
+
 }

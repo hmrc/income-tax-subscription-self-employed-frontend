@@ -23,34 +23,24 @@ import play.api.data.{Form, FormError}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm.businessTradeName
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 
 class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
 
-  def businessTradeForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel] = Nil): Form[BusinessTradeNameModel] = {
-    businessTradeNameValidationForm(excludedBusinessTradeNames)
+  def businessTradeForm(excludedBusinessTradeNames: Seq[String] = Nil): Form[String] = {
+    tradeValidationForm(excludedBusinessTradeNames)
   }
-
-  def testSelfEmploymentData(id: String, businessName: String, businessTrade: String): SelfEmploymentData = SelfEmploymentData(
-    id,
-    confirmed = false,
-    Some(BusinessStartDate(DateModel("1", "1", "1"))),
-    Some(BusinessNameModel(businessName)),
-    Some(BusinessTradeNameModel(businessTrade))
-  )
 
   "The BusinessTradeNameForm" should {
     "transform a valid request to the case class" in {
-
       val testInput = Map(businessTradeName -> testValidBusinessTradeName)
+      val expected = testValidBusinessTradeName
 
-      val expected = BusinessTradeNameModel(testValidBusinessTradeName)
+      val boundForm = businessTradeForm().bind(testInput)
 
-      val actual = businessTradeForm().bind(testInput).value
-
-      actual shouldBe Some(expected)
+      boundForm.errors mustBe Seq.empty[FormError]
+      boundForm.value shouldBe Some(expected)
     }
 
     "when testing the validation" should {
@@ -114,7 +104,7 @@ class BusinessTradeNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       "invalidate a business trade which is in the list of excluded business trade" in {
         val testInput = Map(businessTradeName -> "nameOne")
         val actual = businessTradeForm(excludedBusinessTradeNames = Seq(
-          BusinessTradeNameModel("nameOne"), BusinessTradeNameModel("nameTwo")
+          "nameOne", "nameTwo"
         )).bind(testInput)
         actual.errors must contain(FormError(businessTradeName, duplicate))
       }

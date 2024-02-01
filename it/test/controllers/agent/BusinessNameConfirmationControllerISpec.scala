@@ -22,32 +22,27 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, No, SelfEmploymentData, Yes}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{No, SoleTraderBusinesses, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  val crypto : ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
-  val id: String = "testId"
-  val name: String = "FirstName LastName"
-  val businessName: String = "test business name"
+  val soleTraderBusinessesWithoutName: SoleTraderBusinesses = soleTraderBusinesses.copy(
+    businesses = soleTraderBusinesses.businesses.map(_.copy(name = None))
+  )
 
   s"GET ${routes.BusinessNameConfirmationController.show(id).url}" should {
     "return the page" when {
       "there is an existing business name" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(
-          OK,
-          Json.toJson(Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(businessName).encrypt(crypto.QueryParameterCrypto)))))
-        )
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
         When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
         val res = getClientBusinessNameConfirmation(id)(Map(
@@ -64,7 +59,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
       "there is no existing business name, taking the name from session" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
 
         When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
         val res = getClientBusinessNameConfirmation(id)(Map(
@@ -87,7 +82,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         "return BAD_REQUEST with the page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitClientBusinessNameConfirmation(id, None)(Map(
@@ -106,15 +101,13 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         "save the name and redirect to the business start date page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
-          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(
-            Seq(SelfEmploymentData(id, businessName = Some(BusinessNameModel(name).encrypt(crypto.QueryParameterCrypto))))
-          ))(OK)
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitClientBusinessNameConfirmation(id, Some(Yes))(Map(
-            ITSASessionKeys.FirstName -> "FirstName",
-            ITSASessionKeys.LastName -> "LastName",
+            ITSASessionKeys.FirstName -> "test",
+            ITSASessionKeys.LastName -> "name",
             ITSASessionKeys.NINO -> "NINO"
           ))
 
@@ -128,6 +121,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         "redirect to the business name page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitClientBusinessNameConfirmation(id, Some(No))(Map(

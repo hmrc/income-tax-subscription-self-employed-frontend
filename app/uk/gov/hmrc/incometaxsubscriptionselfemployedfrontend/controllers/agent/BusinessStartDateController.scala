@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.R
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -47,7 +48,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                            (implicit val ec: ExecutionContext, val appConfig: AppConfig)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
-  def view(businessStartDateForm: Form[BusinessStartDate], id: String, isEditMode: Boolean)
+  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html = {
     businessStartDate(
       businessStartDateForm = businessStartDateForm,
@@ -61,7 +62,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
-        multipleSelfEmploymentsService.fetchBusinessStartDate(reference, id).map {
+        multipleSelfEmploymentsService.fetchStartDate(reference, id).map {
           case Right(businessStartDateData) =>
             Ok(view(form.fill(businessStartDateData), id, isEditMode))
           case Left(error) => throw new InternalServerException(error.toString)
@@ -77,7 +78,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessStartDateData =>
-            multipleSelfEmploymentsService.saveBusinessStartDate(reference, id, businessStartDateData) map {
+            multipleSelfEmploymentsService.saveStartDate(reference, id, businessStartDateData) map {
               case Right(_) =>
                 next(id, isEditMode)
               case Left(_) =>
@@ -102,7 +103,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     routes.BusinessNameController.show(id).url
   }
 
-  def form(implicit request: Request[_]): Form[BusinessStartDate] = {
+  def form(implicit request: Request[_]): Form[DateModel] = {
     businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.plusDays(1).toLongDate())
   }
 

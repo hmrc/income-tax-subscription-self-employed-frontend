@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 @import play.api.data.Form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ButtonHelper, ContinueButton, TextInputHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController
@@ -31,7 +30,7 @@
         hmrcPageHeading:HmrcPageHeading,
 )
 
-@(businessNameForm: Form[BusinessNameModel], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
+@(businessNameForm: Form[String], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("agent.business.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
 

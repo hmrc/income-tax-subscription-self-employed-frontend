@@ -31,7 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.Mo
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.{ControllerBaseSpec, agent}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, BusinessStartDate => BusinessStartDateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
@@ -69,7 +69,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     )(any(), any())) thenReturn HtmlFormat.empty
   }
 
-  def businessStartDateForm(fill: Option[BusinessStartDateModel] = None, bind: Option[Map[String, String]] = None): Form[BusinessStartDateModel] = {
+  def businessStartDateForm(fill: Option[DateModel] = None, bind: Option[Map[String, String]] = None): Form[DateModel] = {
     val filledForm = BusinessStartDateForm.businessStartDateForm(
       minStartDate = BusinessStartDateForm.minStartDate,
       maxStartDate = BusinessStartDateForm.maxStartDate,
@@ -90,14 +90,14 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     businessStartDate
   )
 
-  def modelToFormData(model: BusinessStartDateModel): Seq[(String, String)] = {
+  def modelToFormData(model: DateModel): Seq[(String, String)] = {
     BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).fill(model).data.toSeq
   }
 
   "Show" should {
     "return ok (200)" when {
       "the connector returns data" in {
-        val returnedModel: BusinessStartDateModel = BusinessStartDateModel(DateModel("01", "01", "2000"))
+        val returnedModel: DateModel = DateModel("01", "01", "2000")
 
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(Some(returnedModel)))
@@ -125,7 +125,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         contentType(result) mustBe Some(HTML)
       }
       "the page is in edit mode" in {
-        val returnedModel: BusinessStartDateModel = BusinessStartDateModel(DateModel("01", "01", "2000"))
+        val returnedModel: DateModel = DateModel("01", "01", "2000")
 
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(Some(returnedModel)))

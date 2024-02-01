@@ -19,9 +19,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.address
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
 class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
 
@@ -40,9 +40,9 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
 
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
-        res mustBe Right(Some(BusinessAddressModel(
+        res mustBe Right(Some(
           Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
-        )))
+        ))
       }
       "parse an incorrectly formatted Ok response as an invalid Json" in {
         val httpResponse = HttpResponse(OK, json = Json.obj(), headers = Map.empty)
