@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,21 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import play.api.data.Forms.single
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 
 object BusinessNameForm {
 
   /**
-  Spec:
-    "tradingName": {
-      "description": "Trading name",
-      "type": "string",
-      "pattern": "^[A-Za-z0-9 ,.&'\/-]{1,105}$"
-    }
+   * Spec:
+   * "tradingName": {
+   * "description": "Trading name",
+   * "type": "string",
+   * "pattern": "^[A-Za-z0-9 ,.&'\/-]{1,105}$"
+   * }
    */
   val businessName = "businessName"
 
@@ -43,17 +42,17 @@ object BusinessNameForm {
   val businessTradeNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
   val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, "error.agent.business-name.invalid-character")
 
-  def nameIsNotExcluded(excludedNames: Seq[BusinessNameModel]): Constraint[String] = constraint[String] { name =>
-    if (excludedNames.exists(_.businessName == name)) Invalid("error.agent.business-trade-name.duplicate")
+  def nameIsNotExcluded(excludedNames: Seq[String]): Constraint[String] = constraint[String] { name =>
+    if (excludedNames.contains(name)) Invalid("error.agent.business-trade-name.duplicate")
     else Valid
   }
 
   //Default value for excludedBusinessNames can be removed when multiple self-employed is implemented
-  def businessNameValidationForm(excludedBusinessNames: Seq[BusinessNameModel] = Seq()): Form[BusinessNameModel] = Form(
-    mapping(
+  def businessNameValidationForm(excludedBusinessNames: Seq[String] = Seq()): Form[String] = Form(
+    single(
       businessName -> trimmedText.verifying(
         nameNotEmpty andThen nameMaxLength andThen nameValidChars andThen nameIsNotExcluded(excludedBusinessNames)
       )
-    )(BusinessNameModel.apply)(BusinessNameModel.unapply)
+    )
   )
 }

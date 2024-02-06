@@ -24,7 +24,7 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessTradeNameModel, ClientDetails}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 
@@ -56,7 +56,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
   val id: String = "testId"
 
   class Setup(isEditMode: Boolean = false,
-              businessTradeNameForm: Form[BusinessTradeNameModel] = BusinessTradeNameForm.businessTradeNameValidationForm(Nil)) {
+              businessTradeNameForm: Form[String] = BusinessTradeNameForm.tradeValidationForm(Nil)) {
 
     val page: HtmlFormat.Appendable = businessTradeName(
       businessTradeNameForm,
@@ -108,7 +108,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
     "must display form error on page along with textInput and hintText" in
-      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(emptyFormError)) {
+      new Setup(false, BusinessTradeNameForm.tradeValidationForm(Nil).withError(emptyFormError)) {
         document.mustHaveErrorSummaryByNewGovUkClass(List[String](BusinessTradeNameMessages.emptyError))
         document.mustHaveTextField(BusinessTradeNameForm.businessTradeName, BusinessTradeNameMessages.title)
         document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText

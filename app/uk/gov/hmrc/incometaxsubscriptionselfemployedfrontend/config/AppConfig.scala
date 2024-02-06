@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configuration) {
-
 
 
   protected lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
@@ -88,7 +87,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   def betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
 
   def routeToSwitchLanguage(language: String): Call = {
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.LanguageSwitchController.switchToLanguage(language)
+    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.LanguageSwitchController.switchToLanguage(language)
   }
 
   def routeToSwitchAgentLanguage(language: String): Call = {

@@ -26,8 +26,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetail
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 
-import java.time.LocalDate
-
 class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {

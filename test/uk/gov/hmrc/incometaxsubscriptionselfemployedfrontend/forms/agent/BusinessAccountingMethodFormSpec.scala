@@ -22,7 +22,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Accruals, Cash}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Accruals, Cash}
 
 class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
@@ -32,7 +32,7 @@ class BusinessAccountingMethodFormSpec extends PlaySpec with GuiceOneAppPerSuite
 
       val testInput = Map(businessAccountingMethod -> Cash.CASH)
 
-      val expected = AccountingMethodModel(Cash)
+      val expected = Cash
 
       val actual = businessAccountingMethodForm.bind(testInput).value
 

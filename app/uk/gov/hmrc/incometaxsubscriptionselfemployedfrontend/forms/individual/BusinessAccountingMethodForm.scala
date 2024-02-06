@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,22 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import play.api.data.Forms.single
 import play.api.data.validation.Invalid
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethodModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
 
 object BusinessAccountingMethodForm {
 
   val businessAccountingMethod = "businessAccountingMethod"
 
-  val businessAccountingMethodForm: Form[AccountingMethodModel] = Form(
-    mapping(
+  val businessAccountingMethodForm: Form[AccountingMethod] = Form(
+    single(
       businessAccountingMethod -> AccountingMethodMapping(
         errInvalid = Invalid("error.business-accounting-method.invalid"),
         errEmpty = Some(Invalid("error.business-accounting-method.empty"))
       )
-    )(AccountingMethodModel.apply)(AccountingMethodModel.unapply)
+    )
   )
 
 }

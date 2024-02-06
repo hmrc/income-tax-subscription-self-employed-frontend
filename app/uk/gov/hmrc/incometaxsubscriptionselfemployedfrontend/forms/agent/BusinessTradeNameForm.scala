@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import play.api.data.Forms.single
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessTradeNameModel
 
 object BusinessTradeNameForm {
 
@@ -36,16 +35,16 @@ object BusinessTradeNameForm {
   val nameTooShort: Constraint[String] = minLettersLength(businessTradeNameMinLength, "error.agent.business-trade-name.min-length")
   val nameCharsValid: Constraint[String] = businessNameValidateChar("error.agent.business-trade-name.invalid")
 
-  def hasDuplicateTradeNames(excludedNames: Seq[BusinessTradeNameModel]): Constraint[String] = constraint[String] { tradeName =>
-    if (excludedNames.exists(_.businessTradeName == tradeName)) Invalid("error.agent.business-trade-name.duplicate")
+  def hasDuplicateTradeNames(excludedNames: Seq[String]): Constraint[String] = constraint[String] { trade =>
+    if (excludedNames.contains(trade)) Invalid("error.agent.business-trade-name.duplicate")
     else Valid
   }
 
-  def businessTradeNameValidationForm(excludedBusinessTradeNames: Seq[BusinessTradeNameModel]): Form[BusinessTradeNameModel] = Form(
-    mapping(
+  def tradeValidationForm(excludedBusinessTradeNames: Seq[String]): Form[String] = Form(
+    single(
       businessTradeName -> trimmedText.verifying(
         tradeNameEmpty andThen nameCharsValid andThen nameTooLong andThen nameTooShort andThen hasDuplicateTradeNames(excludedBusinessTradeNames)
       )
-    )(BusinessTradeNameModel.apply)(BusinessTradeNameModel.unapply)
+    )
   )
 }

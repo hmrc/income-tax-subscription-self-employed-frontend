@@ -22,26 +22,23 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel, BusinessNameModel, No, SelfEmploymentData, Yes}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, No, SoleTraderBusiness, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  val crypto : ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
-  val id: String = "testId"
   val address: Address = Address(
     Seq(
       "1 Long Road",
-      "Lonely town"
+      "Lonely Town"
     ),
-    Some("ZZ11ZZ")
+    Some("ZZ1 1ZZ")
   )
 
   s"GET ${routes.BusinessAddressConfirmationController.show(id).url}" should {
@@ -49,10 +46,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "there is an existing business address" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(
-          OK,
-          Json.toJson(Seq(SelfEmploymentData(id, businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto)))))
-        )
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = getClientBusinessAddressConfirmation(id)(Map(
@@ -69,7 +63,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "there is no existing business address" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessesKey)(NO_CONTENT)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = getClientBusinessAddressConfirmation(id)(Map(
@@ -92,10 +86,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         "return BAD_REQUEST with the page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(
-            OK,
-            Json.toJson(Seq(SelfEmploymentData(id, businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto)))))
-          )
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
           When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
           val res = submitClientBusinessAddressConfirmation(id, None)(Map(
@@ -112,21 +103,17 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       }
       "the user submits Yes" must {
         "save the address and redirect to the Check your answers page" in {
+          val expectedSave = soleTraderBusinesses.copy(
+            businesses = soleTraderBusinesses.businesses :+ SoleTraderBusiness("id2", address = Some(address))
+          )
+
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(
-            OK,
-            Json.toJson(Seq(SelfEmploymentData("id2", businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto)))))
-          )
-          stubSaveSubscriptionData(reference, businessesKey, Json.toJson(
-            Seq(
-              SelfEmploymentData("id2", businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto))),
-              SelfEmploymentData(id, businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto)))
-            )
-          ))(OK)
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(expectedSave))(OK)
 
-          When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
-          val res = submitClientBusinessAddressConfirmation(id, Some(Yes))(Map(
+          When(s"POST ${routes.BusinessAddressConfirmationController.show("id2").url} is called")
+          val res = submitClientBusinessAddressConfirmation("id2", Some(Yes))(Map(
             ITSASessionKeys.FirstName -> "FirstName",
             ITSASessionKeys.LastName -> "LastName",
             ITSASessionKeys.NINO -> "NINO"
@@ -142,10 +129,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         "redirect to the business address look up page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
-          stubGetSubscriptionData(reference, businessesKey)(
-            OK,
-            Json.toJson(Seq(SelfEmploymentData(id, businessAddress = Some(BusinessAddressModel(address).encrypt(crypto.QueryParameterCrypto)))))
-          )
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
           When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
           val res = submitClientBusinessAddressConfirmation(id, Some(No))(Map(

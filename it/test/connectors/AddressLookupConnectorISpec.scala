@@ -17,8 +17,8 @@
 package connectors
 
 import connectors.stubs.AddressLookupConnectorStub._
-import helpers.{ComponentSpecBase, IntegrationTestConstants}
 import helpers.IntegrationTestConstants._
+import helpers.{ComponentSpecBase, IntegrationTestConstants}
 import org.mockito.Mockito
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.libs.json.{JsObject, Json}
@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 
 
 class AddressLookupConnectorISpec extends ComponentSpecBase {
@@ -36,9 +36,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
   lazy val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  val businessAddressModel: BusinessAddressModel = BusinessAddressModel(
-    Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
-  )
+  val businessAddressModel: Address = Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
 
   val successJson: JsObject = Json.obj(
     "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> Some("TF3 4NT"))

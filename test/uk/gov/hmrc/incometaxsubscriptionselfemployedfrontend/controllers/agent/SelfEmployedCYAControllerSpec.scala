@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
@@ -56,75 +55,58 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     mockMessagesControllerComponents
   )
 
-  val selfEmployment: SelfEmploymentData = SelfEmploymentData(
-    id = id,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
-    businessName = Some(BusinessNameModel("testBusinessName")),
-    businessTradeName = Some(BusinessTradeNameModel("testBusinessTrade")),
-    businessAddress = Some(BusinessAddressModel(address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))))
+  val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
+    businesses = Seq(
+      SoleTraderBusiness(
+        id = id,
+        startDate = Some(DateModel("1", "1", "1980")),
+        name = Some("testBusinessName"),
+        trade = Some("testBusinessTrade"),
+        address = Some(Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))
+      )
+    ),
+    accountingMethod = Some(Cash)
   )
 
-  val incompleteSelfEmployment: SelfEmploymentData = SelfEmploymentData(
-    id = id,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1980"))),
-    businessName = Some(BusinessNameModel("testBusinessName")),
-    businessTradeName = None,
-    businessAddress = Some(BusinessAddressModel(address = Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))))
-  )
-
-  "throw an internal server exception" when {
-    "there was a problem retrieving the users accounting method" in {
-      mockAuthSuccess()
-      mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-
-      intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-        .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method"
-    }
-    "there was a problem retrieving the users self employment data" in {
-      mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-      mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-
-      intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-        .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data"
-    }
-  }
-  "return OK" when {
-    "all data is retrieved successfully" in {
-      mockAuthSuccess()
-      mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-      mockFetchBusiness(id)(Right(Some(selfEmployment)))
-      mockSelfEmployedCYA()
-
-      val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)
-
-      status(result) mustBe OK
-      contentType(result) mustBe Some(HTML)
-    }
-  }
-
-  "submit" when {
+  "show" should {
     "throw an internal server exception" when {
-      "there was a problem retrieving the users accounting method" in {
+      "there was a problem retrieving the users sole trader businesses" in {
         mockAuthSuccess()
-        mockGetSelfEmployments(businessAccountingMethodKey)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method"
+          .message mustBe "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
       }
-      "there was a problem retrieving the users self employment data" in {
-        mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-        mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+    }
+    "return OK" when {
+      "all data is retrieved successfully" in {
+        mockAuthSuccess()
+        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
+        mockSelfEmployedCYA()
+
+        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)
+
+        status(result) mustBe OK
+        contentType(result) mustBe Some(HTML)
+      }
+    }
+  }
+
+  "submit" should {
+    "throw an internal server exception" when {
+      "there was a problem retrieving the users sole trader businesses" in {
+        mockAuthSuccess()
+        mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data"
+          .message mustBe "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
       }
     }
 
     "return 303 (SEE_OTHER) to the task list" when {
       "the task list redesign feature switch is disabled" when {
         "the user submits valid full data" in {
-          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-          mockFetchBusiness(id)(Right(Some(selfEmployment)))
+          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
           mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
@@ -132,8 +114,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
           redirectLocation(result) mustBe Some(appConfig.clientTaskListUrl)
         }
         "the user submits valid incomplete data" in {
-          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-          mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
+          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
 
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
           status(result) mustBe SEE_OTHER
@@ -146,8 +127,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         "the user submits valid full data" in {
           enable(EnableTaskListRedesign)
 
-          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-          mockFetchBusiness(id)(Right(Some(selfEmployment)))
+          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
           mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
@@ -157,8 +137,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         "the user submits valid incomplete data" in {
           enable(EnableTaskListRedesign)
 
-          mockGetSelfEmployments[AccountingMethodModel](businessAccountingMethodKey)(Right(Some(AccountingMethodModel(Cash))))
-          mockFetchBusiness(id)(Right(Some(incompleteSelfEmployment)))
+          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
 
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
           status(result) mustBe SEE_OTHER
@@ -170,18 +149,18 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
   "backUrl" should {
     "in edit mode" when {
-    "TaskList is not Enabled " should {
-      "return the task list page" in {
-        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientTaskListUrl)
+      "TaskList is not Enabled " should {
+        "return the task list page" in {
+          TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientTaskListUrl)
+        }
+      }
+      " TaskList is Enabled" should {
+        "return the your income source page" in {
+          enable(EnableTaskListRedesign)
+          TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
+        }
       }
     }
-    " TaskList is Enabled" should {
-      "return the your income source page" in {
-        enable(EnableTaskListRedesign)
-        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
-      }
-    }
-  }
     "return nothing" when {
       "not in edit mode" in {
         TestSelfEmployedCYAController.backUrl(false) mustBe None

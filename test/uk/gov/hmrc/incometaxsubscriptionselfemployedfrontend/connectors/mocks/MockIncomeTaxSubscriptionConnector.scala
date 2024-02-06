@@ -18,12 +18,11 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks
 
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.{reset, when}
-import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.{PostSubscriptionDetailsFailure, PostSubscriptionDetailsSuccess}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.RetrieveReferenceResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
@@ -38,24 +37,27 @@ trait MockIncomeTaxSubscriptionConnector extends UnitTestTrait with MockitoSugar
     reset(mockIncomeTaxSubscriptionConnector)
   }
 
-  def mockRetrieveReference(utr: String)(response: RetrieveReferenceResponse): OngoingStubbing[Future[RetrieveReferenceResponse]] = {
+  def mockRetrieveReference(utr: String)(response: RetrieveReferenceResponse): Unit = {
     when(mockIncomeTaxSubscriptionConnector.retrieveReference(ArgumentMatchers.eq(utr))(ArgumentMatchers.any()))
       .thenReturn(Future.successful(response))
   }
 
-  def mockGetSelfEmployments[T](id: String)
-                               (response: GetSelfEmploymentsResponse[T]): OngoingStubbing[Future[GetSelfEmploymentsResponse[T]]] = {
-    when(mockIncomeTaxSubscriptionConnector.getSubscriptionDetails[T](
-      ArgumentMatchers.any(),
-      ArgumentMatchers.eq(id)
-    )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
+  def mockGetSubscriptionDetails[T](reference: String, id: String)
+                                   (result: Either[GetSelfEmploymentsFailure, Option[T]]): Unit = {
+    when(mockIncomeTaxSubscriptionConnector
+      .getSubscriptionDetails[T]
+        (ArgumentMatchers.eq(reference), ArgumentMatchers.eq(id))
+        (ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(result))
   }
 
-  def mockSaveSelfEmployments[T](id: String, value: T)
-                                (response: PostSubscriptionDetailsResponse): OngoingStubbing[Future[PostSubscriptionDetailsResponse]] = {
-    when(mockIncomeTaxSubscriptionConnector.saveSubscriptionDetails[T](
-      ArgumentMatchers.any(), ArgumentMatchers.eq(id), ArgumentMatchers.eq(value)
-    )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
+  def mockSaveSubscriptionDetails[T](reference: String, id: String, data: T)
+                                    (result: Either[PostSubscriptionDetailsFailure, PostSubscriptionDetailsSuccess]): Unit = {
+    when(mockIncomeTaxSubscriptionConnector
+      .saveSubscriptionDetails[T]
+        (ArgumentMatchers.eq(reference), ArgumentMatchers.eq(id), ArgumentMatchers.eq(data))
+        (ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(result))
   }
 
 }

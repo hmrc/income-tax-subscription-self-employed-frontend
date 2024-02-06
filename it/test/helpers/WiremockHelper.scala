@@ -19,6 +19,7 @@ package helpers
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
@@ -90,15 +91,15 @@ trait WiremockHelper {
 
   import WiremockHelper._
 
-  lazy val wmConfig = wireMockConfig().port(wiremockPort)
+  lazy val wmConfig: WireMockConfiguration = wireMockConfig().port(wiremockPort)
   lazy val wireMockServer = new WireMockServer(wmConfig)
 
-  def startWiremock() = {
+  def startWiremock(): Unit = {
     wireMockServer.start()
     WireMock.configureFor(wiremockHost, wiremockPort)
   }
 
-  def stopWiremock() = wireMockServer.stop()
+  def stopWiremock(): Unit = wireMockServer.stop()
 
-  def resetWiremock() = WireMock.reset()
+  def resetWiremock(): Unit = WireMock.reset()
 }

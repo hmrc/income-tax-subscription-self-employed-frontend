@@ -59,11 +59,11 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
   def testSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
     id = testId,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
-    businessName = Some(BusinessNameModel(s"ABC Limited")),
-    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-    businessAddress = Some(BusinessAddressModel(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
-    accountingMethod = Some(AccountingMethodModel(Cash)),
+    businessStartDate = Some(DateModel("1", "1", "2018")),
+    businessName = Some(s"ABC Limited"),
+    businessTradeName = Some(s"Plumbing"),
+    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
+    accountingMethod = Some(Cash),
     totalSelfEmployments = 1
   )
 
@@ -77,10 +77,10 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
   class SetupIncomplete(answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
     id = testId,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
-    businessName = Some(BusinessNameModel(s"ABC Limited")),
-    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-    businessAddress = Some(BusinessAddressModel(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
+    businessStartDate = Some(DateModel("1", "1", "2018")),
+    businessName = Some(s"ABC Limited"),
+    businessTradeName = Some(s"Plumbing"),
+    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
     totalSelfEmployments = 1
   )) {
     val page: HtmlFormat.Appendable = checkYourAnswers(
@@ -96,12 +96,12 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
   class SetupComplete(confirmed: Boolean = false) {
     val answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
       id = testId,
-      businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
-      businessName = Some(BusinessNameModel(s"ABC Limited")),
-      businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-      businessAddress = Some(BusinessAddressModel(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
+      businessStartDate = Some(DateModel("1", "1", "2018")),
+      businessName = Some(s"ABC Limited"),
+      businessTradeName = Some(s"Plumbing"),
+      businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
       confirmed = confirmed,
-      accountingMethod = Some(AccountingMethodModel(Cash)),
+      accountingMethod = Some(Cash),
       totalSelfEmployments = 1
     )
     val page: HtmlFormat.Appendable = checkYourAnswers(
@@ -347,7 +347,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = "testId", isEditMode = true).url
             }
             "has a change link with correct content" in new SetupIncomplete(
-              SelfEmploymentsCYAModel(testId, accountingMethod = Some(AccountingMethodModel(Cash)), totalSelfEmployments = 1)
+              SelfEmploymentsCYAModel(testId, accountingMethod = Some(Cash), totalSelfEmployments = 1)
             ) {
               val addLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
               addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change

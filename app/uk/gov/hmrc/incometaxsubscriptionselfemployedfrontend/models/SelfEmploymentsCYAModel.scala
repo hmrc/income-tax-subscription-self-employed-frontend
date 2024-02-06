@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,20 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import play.api.libs.json._
-
 case class SelfEmploymentsCYAModel(id: String,
                                    confirmed: Boolean = false,
-                                   businessStartDate: Option[BusinessStartDate] = None,
-                                   businessName: Option[BusinessNameModel] = None,
-                                   businessTradeName: Option[BusinessTradeNameModel] = None,
-                                   businessAddress: Option[BusinessAddressModel] = None,
-                                   accountingMethod: Option[AccountingMethodModel] = None,
+                                   businessStartDate: Option[DateModel] = None,
+                                   businessName: Option[String] = None,
+                                   businessTradeName: Option[String] = None,
+                                   businessAddress: Option[Address] = None,
+                                   accountingMethod: Option[AccountingMethod] = None,
                                    totalSelfEmployments: Int) {
 
-  val businessStartDateComplete: Boolean = businessStartDate.isDefined
-
-  val businessNameComplete: Boolean = businessName.isDefined
-
-  val businessTradeNameComplete: Boolean = businessTradeName.isDefined
-
-  val businessAddressComplete: Boolean = businessAddress.isDefined
-
-  val accountingMethodComplete: Boolean = accountingMethod.isDefined
+  private val businessStartDateComplete: Boolean = businessStartDate.isDefined
+  private val businessNameComplete: Boolean = businessName.isDefined
+  private val businessTradeNameComplete: Boolean = businessTradeName.isDefined
+  private val businessAddressComplete: Boolean = businessAddress.isDefined
+  private val accountingMethodComplete: Boolean = accountingMethod.isDefined
 
   val isComplete: Boolean = {
     businessStartDateComplete &&
@@ -48,20 +42,16 @@ case class SelfEmploymentsCYAModel(id: String,
 }
 
 object SelfEmploymentsCYAModel {
-
-  implicit val format: Format[SelfEmploymentsCYAModel] = Json.format[SelfEmploymentsCYAModel]
-
-  def apply(id: String, selfEmployment: Option[SelfEmploymentData], accountingMethod: Option[AccountingMethodModel], businessCount: Int): SelfEmploymentsCYAModel = {
+  def apply(id: String, soleTraderBusiness: Option[SoleTraderBusiness], accountingMethod: Option[AccountingMethod], totalSelfEmployments: Int): SelfEmploymentsCYAModel = {
     SelfEmploymentsCYAModel(
       id = id,
-      confirmed = selfEmployment.exists(_.confirmed),
-      businessStartDate = selfEmployment.flatMap(_.businessStartDate),
-      businessName = selfEmployment.flatMap(_.businessName),
-      businessTradeName = selfEmployment.flatMap(_.businessTradeName),
-      businessAddress = selfEmployment.flatMap(_.businessAddress),
+      confirmed = soleTraderBusiness.exists(_.confirmed),
+      businessStartDate = soleTraderBusiness.flatMap(_.startDate),
+      businessName = soleTraderBusiness.flatMap(_.name),
+      businessTradeName = soleTraderBusiness.flatMap(_.trade),
+      businessAddress = soleTraderBusiness.flatMap(_.address),
       accountingMethod = accountingMethod,
-      totalSelfEmployments = businessCount
+      totalSelfEmployments = totalSelfEmployments
     )
   }
-
 }

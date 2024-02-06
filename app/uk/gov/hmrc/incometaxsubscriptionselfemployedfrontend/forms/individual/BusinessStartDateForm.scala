@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import play.api.data.Forms.single
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessStartDate
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 
 import java.time.LocalDate
 
@@ -33,10 +33,15 @@ object BusinessStartDateForm {
 
   val errorContext: String = "business-start-date"
 
-  def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String): Form[BusinessStartDate] = Form(
-    mapping(
-      startDate -> DateModelMapping.dateModelMapping(errorContext = errorContext, minDate = Some(minStartDate), maxDate = Some(maxStartDate), dateFormatter = Some(f))
-    )(BusinessStartDate.apply)(BusinessStartDate.unapply)
+  def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String): Form[DateModel] = Form(
+    single(
+      startDate -> DateModelMapping.dateModelMapping(
+        errorContext = errorContext,
+        minDate = Some(minStartDate),
+        maxDate = Some(maxStartDate),
+        dateFormatter = Some(f)
+      )
+    )
   )
 
 }

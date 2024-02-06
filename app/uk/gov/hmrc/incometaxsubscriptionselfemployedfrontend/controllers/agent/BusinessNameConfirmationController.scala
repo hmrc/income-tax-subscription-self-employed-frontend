@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,34 +91,34 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
   private def handleForm(id: String)(onYes: Result, onNo: Result)
                         (implicit request: Request[AnyContent]): Future[Result] = {
     withReference { reference =>
-      val clientDetails: ClientDetails = request.getClientDetails
-      confirmationForm.bindFromRequest().fold(
-        hasError =>
-          withBusinessOrClientsName(reference) { (name, isBusinessName) =>
+      withBusinessOrClientsName(reference) { (name, isBusinessName) =>
+        val clientDetails: ClientDetails = request.getClientDetails
+        confirmationForm.bindFromRequest().fold(
+          hasError =>
             Future.successful(BadRequest(view(
               form = hasError,
               id = id,
               clientDetails = clientDetails,
               displayName = name,
               isBusinessName = isBusinessName
-            )))
-          },
-        {
-          case Yes =>
-            saveBusinessName(reference, id, clientDetails.name) {
-              onYes
-            }
-          case No =>
-            Future.successful(onNo)
-        }
-      )
+            ))),
+          {
+            case Yes =>
+              saveBusinessName(reference, id, name) {
+                onYes
+              }
+            case No =>
+              Future.successful(onNo)
+          }
+        )
+      }
     }
   }
 
   private def saveBusinessName(reference: String, id: String, name: String)
                               (onSaveSuccessful: => Result)
                               (implicit request: Request[AnyContent]): Future[Result] = {
-    multipleSelfEmploymentsService.saveBusinessName(reference, id, BusinessNameModel(name)) map {
+    multipleSelfEmploymentsService.saveName(reference, id, name) map {
       case Right(_) => onSaveSuccessful
       case Left(_) => throw new InternalServerException("[BusinessNameConfirmationController][submit] - Unable to save business name")
     }
@@ -127,16 +127,14 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
   private def withBusinessOrClientsName(reference: String)
                                        (f: (String, Boolean) => Future[Result])
                                        (implicit request: Request[AnyContent]): Future[Result] = {
-
-    multipleSelfEmploymentsService.fetchAllBusinesses(reference) flatMap {
-      case Right(businesses) =>
-        businesses.headOption.flatMap(_.businessName) match {
-          case Some(name) => f(name.businessName, true)
-          case None => f(request.getClientDetails.name, false)
-        }
-      case Left(_) => throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrClientsName] - Unable to retrieve business details")
+    multipleSelfEmploymentsService.fetchFirstBusinessName(reference).flatMap { result =>
+      result.getOrElse(
+        throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrClientsName] - Unable to retrieve businesses")
+      ) match {
+        case Some(name) => f(name, true)
+        case None => f(request.getClientDetails.name, false)
+      }
     }
-
   }
 
 }

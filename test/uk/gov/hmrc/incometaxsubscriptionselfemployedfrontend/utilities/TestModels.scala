@@ -23,18 +23,16 @@ import java.time.LocalDate
 object TestModels {
 
   val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
-  val testBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
-  val testBusinessNameModel: BusinessNameModel = BusinessNameModel("Business")
+  val testBusinessStartDateModel: DateModel = testValidStartDate
+  val testBusinessNameModel: String = "Business"
   val testValidBusinessTradeName: String = "Plumbing"
   val testInvalidBusinessTradeName: String = "!()+{}?^~"
-  val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
-  val testInvalidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testInvalidBusinessTradeName)
-  val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
+  val testValidBusinessTradeNameModel: String = testValidBusinessTradeName
+  val testInvalidBusinessTradeNameModel: String = testInvalidBusinessTradeName
+  val testAccountingMethodModel: AccountingMethod = Cash
 
-  val mockBusinessNameModel: BusinessNameModel = BusinessNameModel("ITSA me, Mario")
+  val mockBusinessNameModel: String = "ITSA me, Mario"
 
-  val testValidBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(
-    Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
-  )
+  val testValidBusinessAddressModel: Address = Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
 
 }

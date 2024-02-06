@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmployedCYA
@@ -59,11 +59,11 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
   def testSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
     id = testId,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
-    businessName = Some(BusinessNameModel(s"ABC Limited")),
-    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-    businessAddress = Some(BusinessAddressModel(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
-    accountingMethod = Some(AccountingMethodModel(Cash)),
+    businessStartDate = Some(DateModel("1", "1", "2018")),
+    businessName = Some(s"ABC Limited"),
+    businessTradeName = Some(s"Plumbing"),
+    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
+    accountingMethod = Some(Cash),
     totalSelfEmployments = 1
   )
 
@@ -77,10 +77,10 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
 
   class SetupIncomplete(answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
     id = testId,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
-    businessName = Some(BusinessNameModel(s"ABC Limited")),
-    businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-    businessAddress = Some(BusinessAddressModel(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
+    businessStartDate = Some(DateModel("1", "1", "2018")),
+    businessName = Some(s"ABC Limited"),
+    businessTradeName = Some(s"Plumbing"),
+    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
     totalSelfEmployments = 1
   )) {
     val page: HtmlFormat.Appendable = checkYourAnswers(
@@ -95,12 +95,12 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
   class SetupComplete(confirmed: Boolean = false, totalSelfEmployments: Int = 1) {
     val answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
       id = testId,
-      businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "2018"))),
-      businessName = Some(BusinessNameModel(s"ABC Limited")),
-      businessTradeName = Some(BusinessTradeNameModel(s"Plumbing")),
-      businessAddress = Some(BusinessAddressModel(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT")))),
+      businessStartDate = Some(DateModel("1", "1", "2018")),
+      businessName = Some(s"ABC Limited"),
+      businessTradeName = Some(s"Plumbing"),
+      businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
       confirmed = confirmed,
-      accountingMethod = Some(AccountingMethodModel(Cash)),
+      accountingMethod = Some(Cash),
       totalSelfEmployments = totalSelfEmployments
     )
     val page: HtmlFormat.Appendable = checkYourAnswers(

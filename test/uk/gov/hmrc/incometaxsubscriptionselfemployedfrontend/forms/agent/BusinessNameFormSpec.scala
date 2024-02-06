@@ -21,11 +21,10 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.{Form, FormError}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 
 class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  def form(excludedBusinessNames: Seq[BusinessNameModel] = Nil): Form[BusinessNameModel] = {
+  def form(excludedBusinessNames: Seq[String] = Nil): Form[String] = {
     businessNameValidationForm(excludedBusinessNames)
   }
 
@@ -41,16 +40,16 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     "correctly validate a business name" when {
       "there are no excluded names" in {
         val testInput = Map(businessName -> testNameValid)
-        val expected = BusinessNameModel(testNameValid)
+        val expected = testNameValid
         val actual = form().bind(testInput).value
 
         actual shouldBe Some(expected)
       }
       "there are excluded names but the user does not enter one of them" in {
         val testInput = Map(businessName -> testNameValid)
-        val expected = BusinessNameModel(testNameValid)
+        val expected = testNameValid
         val actual = form(excludedBusinessNames = Seq(
-          BusinessNameModel("nameOne"), BusinessNameModel("nameTwo")
+          "nameOne", "nameTwo"
         )).bind(testInput).value
 
         actual shouldBe Some(expected)
@@ -75,7 +74,7 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       val testInput = Map(businessName -> testNameNotTooLong)
 
       val tooLongTest = form().bind(testInput)
-      tooLongTest.errors must not contain(FormError(businessName, "error.agent.business-name.max-length"))
+      tooLongTest.errors must not contain (FormError(businessName, "error.agent.business-name.max-length"))
     }
 
     "invalidate a business name that includes invalid characters" in {
@@ -84,7 +83,7 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val testInput = Map(businessName -> s"Some valid name except for ${invalidChar.toString} which is not allowed")
 
         val invalidCharTest = form().bind(testInput)
-        if (!invalidCharTest.errors.nonEmpty)
+        if (invalidCharTest.errors.isEmpty)
           println(s"$invalidChar is not allowed")
         invalidCharTest.errors must contain(FormError(businessName, "error.agent.business-name.invalid-character"))
       }
@@ -96,16 +95,16 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         val testInput = Map(businessName -> s"Some valid name except for ${validChar.toString} which is not allowed")
 
         val validCharTest = form().bind(testInput)
-        if (!validCharTest.errors.isEmpty)
+        if (validCharTest.errors.nonEmpty)
           println(s"${validChar.toString} should be allowed")
-        validCharTest.errors must not contain(FormError(businessName, "error.agent.business-name.invalid-character"))
+        validCharTest.errors must not contain (FormError(businessName, "error.agent.business-name.invalid-character"))
       }
     }
 
     "invalidate a business name which is in the list of excluded business names" in {
       val testInput = Map(businessName -> "nameOne")
       val actual = form(excludedBusinessNames = Seq(
-        BusinessNameModel("nameOne"), BusinessNameModel("nameTwo")
+        "nameOne", "nameTwo"
       )).bind(testInput)
 
       actual.errors must contain(FormError(businessName, "error.agent.business-trade-name.duplicate"))
@@ -113,7 +112,7 @@ class BusinessNameFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
     "remove a leading space from business name" in {
       val testInput = Map(businessName -> (" " + testNameValid))
-      val expected = BusinessNameModel(testNameValid)
+      val expected = testNameValid
       val leadingSpaceTest = form().bind(testInput).value
 
       leadingSpaceTest shouldBe Some(expected)

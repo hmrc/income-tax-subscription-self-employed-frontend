@@ -27,11 +27,10 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, BusinessAddressModel, SelfEmploymentData}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
@@ -57,9 +56,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
     mockMessagesControllerComponents,
     mockAuthService,
     mockMultipleSelfEmploymentsService,
-    mock[BusinessAddressConfirmation],
-    appConfig
-  )(mockIncomeTaxSubscriptionConnector)
+    mock[BusinessAddressConfirmation])(mockIncomeTaxSubscriptionConnector)
 
   override val controllerName: String = "BusinessNameConfirmationController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
@@ -74,36 +71,23 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       mockMessagesControllerComponents,
       mockAuthService,
       mockMultipleSelfEmploymentsService,
-      mockBusinessAddressConfirmation,
-      appConfig
-    )(mockIncomeTaxSubscriptionConnector)
+      mockBusinessAddressConfirmation)(mockIncomeTaxSubscriptionConnector)
   }
 
   "show" should {
     "throw an exception" when {
-      "there was an error fetching all businesses" in new Setup {
+      "there was an error fetching the first address" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchFirstAddress(Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(controller.show(id)(fakeRequest)))
           .message mustBe "[BusinessAddressConfirmationController][withFirstBusiness] - Unable to retrieve businesses"
       }
     }
     "redirect the user to the address lookup initialise" when {
-      "there are no previous businesses" in new Setup {
+      "there are no previously added addresses" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
-
-        val response: Future[Result] = controller.show(id)(fakeRequest)
-
-        status(response) mustBe SEE_OTHER
-        redirectLocation(response) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
-      }
-      "there is a previous business but it has no address" in new Setup {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(
-          SelfEmploymentData(id = id))
-        ))
+        mockFetchFirstAddress(Right(None))
 
         val response: Future[Result] = controller.show(id)(fakeRequest)
 
@@ -114,12 +98,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
     "return OK with the page content" when {
       "a previous business address was found" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(
-          SelfEmploymentData(
-            id = id,
-            businessAddress = Some(BusinessAddressModel(address))
-          )
-        )))
+        mockFetchFirstAddress(Right(Some(address)))
 
         when(mockBusinessAddressConfirmation(
           ArgumentMatchers.any(),
@@ -139,22 +118,17 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
 
   "submit" must {
     "throw an internal server exception" when {
-      "there was an error fetching all businesses" in new Setup {
+      "there was an error fetching the first address" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchFirstAddress(Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(controller.submit(id)(fakeRequest)))
           .message mustBe "[BusinessAddressConfirmationController][withFirstBusiness] - Unable to retrieve businesses"
       }
       "there was an error saving the business address" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(
-          SelfEmploymentData(
-            id = id,
-            businessAddress = Some(BusinessAddressModel(address))
-          )
-        )))
-        mockSaveBusinessAddress(id, BusinessAddressModel(address))(Left(SaveSelfEmploymentDataFailure))
+        mockFetchFirstAddress(Right(Some(address)))
+        mockSaveBusinessAddress(id, address)(Left(SaveSelfEmploymentDataFailure))
 
         intercept[InternalServerException](await(controller.submit(id)(
           fakeRequest.withFormUrlEncodedBody(BusinessAddressConfirmationForm.fieldName -> YesNoMapping.option_yes)
@@ -162,20 +136,9 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       }
     }
     "redirect the user to the address lookup initialise" when {
-      "there are no previous businesses" in new Setup {
+      "there are no previously added addresses" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq.empty[SelfEmploymentData]))
-
-        val response: Future[Result] = controller.submit(id)(fakeRequest)
-
-        status(response) mustBe SEE_OTHER
-        redirectLocation(response) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
-      }
-      "there is a previous business but it has no address" in new Setup {
-        mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(
-          SelfEmploymentData(id = id))
-        ))
+        mockFetchFirstAddress(Right(None))
 
         val response: Future[Result] = controller.submit(id)(fakeRequest)
 
@@ -184,12 +147,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       }
       "the user selects 'No' that their address is not the same" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(
-          SelfEmploymentData(
-            id = id,
-            businessAddress = Some(BusinessAddressModel(address))
-          )
-        )))
+        mockFetchFirstAddress(Right(Some(address)))
 
         val response: Future[Result] = controller.submit(id)(
           fakeRequest.withFormUrlEncodedBody(BusinessAddressConfirmationForm.fieldName -> YesNoMapping.option_no)
@@ -202,13 +160,8 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
     "save the business address and redirect the user to the check your answers" when {
       "the user selects 'Yes' that their address is the same" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(
-          SelfEmploymentData(
-            id = id,
-            businessAddress = Some(BusinessAddressModel(address))
-          )
-        )))
-        mockSaveBusinessAddress(id, BusinessAddressModel(address))(Right(PostSubscriptionDetailsSuccessResponse))
+        mockFetchFirstAddress(Right(Some(address)))
+        mockSaveBusinessAddress(id, address)(Right(PostSubscriptionDetailsSuccessResponse))
 
         val response: Future[Result] = controller.submit(id)(
           fakeRequest.withFormUrlEncodedBody(BusinessAddressConfirmationForm.fieldName -> YesNoMapping.option_yes)
@@ -221,12 +174,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
     "return BAD_REQUEST with the page content" when {
       "the user does not select an option" in new Setup {
         mockAuthSuccess()
-        mockFetchAllBusinesses(Right(Seq(
-          SelfEmploymentData(
-            id = id,
-            businessAddress = Some(BusinessAddressModel(address))
-          )
-        )))
+        mockFetchFirstAddress(Right(Some(address)))
 
         when(mockBusinessAddressConfirmation(
           ArgumentMatchers.any(),

@@ -23,7 +23,6 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
 
@@ -50,7 +49,7 @@ class BusinessNameViewSpec extends ViewSpec {
   val formError: FormError = FormError("businessName", "error.business-name.empty")
   val businessName: BusinessName = app.injector.instanceOf[BusinessName]
 
-  class Setup(isEditMode: Boolean = false, businessNameForm: Form[BusinessNameModel] = BusinessNameForm.businessNameValidationForm(Nil)) {
+  class Setup(isEditMode: Boolean = false, businessNameForm: Form[String] = BusinessNameForm.businessNameValidationForm(Nil)) {
     val page: HtmlFormat.Appendable = businessName(
       businessNameForm,
       testCall,

@@ -22,14 +22,11 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{businessAccountingMethodKey, businessesKey}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-
-import java.time.LocalDate
 
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
@@ -39,51 +36,23 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   }
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  val cyrpto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
-  val businessId: String = "testId"
 
-  val testBusinessName: String = "businessName"
-  val testBusinessNameModel: BusinessNameModel = BusinessNameModel(testBusinessName)
-  val testStartDate: DateModel = DateModel.dateConvert(LocalDate.now)
-  val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
-  val testValidBusinessStartDateModel: BusinessStartDate = BusinessStartDate(testValidStartDate)
-  val testValidBusinessTradeName: String = "Plumbing"
-  val testValidBusinessTradeNameModel: BusinessTradeNameModel = BusinessTradeNameModel(testValidBusinessTradeName)
-  val testBusinessAddressModel: BusinessAddressModel = BusinessAddressModel(Address(Seq("line1", "line2", "line3"), Some("TF3 4NT")))
+  val incompleteSoleTraderBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
+    accountingMethod = None
+  )
 
-  val testBusinesses: Seq[SelfEmploymentData] = Seq(
-    SelfEmploymentData(
-      "testId",
-      businessName = Some(testBusinessNameModel.encrypt(cyrpto.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
-      businessTradeName = Some(testValidBusinessTradeNameModel),
-      businessAddress = Some(testBusinessAddressModel.encrypt(cyrpto.QueryParameterCrypto))
-    ))
-
-  val testIncompleteBusinesses: Seq[SelfEmploymentData] = Seq(
-    SelfEmploymentData(
-      "testId",
-      businessName = Some(testBusinessNameModel.encrypt(cyrpto.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
-      businessTradeName = Some(testValidBusinessTradeNameModel)
-    ))
-
-  val testConfirmedBusinesses: Seq[SelfEmploymentData] = Seq(
-    SelfEmploymentData(
-      "testId",
-      confirmed = true,
-      businessName = Some(testBusinessNameModel.encrypt(cyrpto.QueryParameterCrypto)), businessStartDate = Some(testValidBusinessStartDateModel),
-      businessTradeName = Some(testValidBusinessTradeNameModel),
-      businessAddress = Some(testBusinessAddressModel.encrypt(cyrpto.QueryParameterCrypto))
-    ))
+  val completeSoleTraderBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
+    businesses = soleTraderBusinesses.businesses.map(_.copy(confirmed = true))
+  )
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {
     "return OK" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
-      stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-      stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
+      stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
       When("GET /client/details/business-check-your-answers is called")
-      val res = getClientBusinessCheckYourAnswers(businessId, isEditMode = false)
+      val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
 
       Then("should return an OK with the SelfEmployedCYA page")
       res must have(
@@ -93,26 +62,13 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
     }
 
     "return INTERNAL_SERVER_ERROR" when {
-      "the accounting method cannot be retrieved" in {
+      "the sole trader businesses could not be retrieved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = getClientBusinessCheckYourAnswers(businessId, isEditMode = false)
-
-        Then("Should return INTERNAL_SERVER_ERROR")
-        res must have(
-          httpStatus(INTERNAL_SERVER_ERROR)
-        )
-      }
-
-      "self employment data cannot be retrieved" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-
-        When("GET /client/details/business-check-your-answers is called")
-        val res = getClientBusinessCheckYourAnswers(businessId, isEditMode = false)
+        val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -129,12 +85,11 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
 
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
-        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(businessId)
+        val res = submitClientBusinessCheckYourAnswers(id)
 
         Then("Should return a SEE_OTHER with a redirect location of task list page")
         res must have(
@@ -148,11 +103,10 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
 
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(businessId)
+        val res = submitClientBusinessCheckYourAnswers(id)
 
         Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
         res must have(
@@ -165,12 +119,11 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "the user submits valid full data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
-        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(OK)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(businessId)
+        val res = submitClientBusinessCheckYourAnswers(id)
 
         Then("Should return a SEE_OTHER with a redirect location of task list page")
         res must have(
@@ -182,11 +135,10 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "the user submits valid incomplete data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testIncompleteBusinesses))
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(businessId)
+        val res = submitClientBusinessCheckYourAnswers(id)
 
         Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
         res must have(
@@ -197,26 +149,13 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
     }
 
     "return INTERNAL_SERVER_ERROR" when {
-      "the accounting method cannot be retrieved" in {
+      "the sole trader businesses could not be retrieved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(businessId)
-
-        Then("Should return INTERNAL_SERVER_ERROR")
-        res must have(
-          httpStatus(INTERNAL_SERVER_ERROR)
-        )
-      }
-
-      "self employment data cannot be retrieved" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-
-        When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(businessId)
+        val res = submitClientBusinessCheckYourAnswers(id)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -227,12 +166,11 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "self employment data cannot be saved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubGetSubscriptionData(reference, businessAccountingMethodKey)(OK, Json.toJson(testAccountingMethodModel))
-        stubGetSubscriptionData(reference, businessesKey)(OK, Json.toJson(testBusinesses))
-        stubSaveSubscriptionData(reference, businessesKey, Json.toJson(testConfirmedBusinesses))(INTERNAL_SERVER_ERROR)
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(INTERNAL_SERVER_ERROR)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(businessId)
+        val res = submitClientBusinessCheckYourAnswers(id)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(

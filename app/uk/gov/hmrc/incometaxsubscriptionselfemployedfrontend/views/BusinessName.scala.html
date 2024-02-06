@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 @import play.api.data.Form
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm._
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.BusinessNameModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ButtonHelper, ContinueButton, TextInputHelper}
 
@@ -29,10 +28,9 @@
         buttonHelper: ButtonHelper
 )
 
-@(businessNameForm: Form[BusinessNameModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+@(businessNameForm: Form[String], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
-
 
     @form(action = postAction) {
 
@@ -59,5 +57,4 @@
 @inputTextHint = {
   <p>@messages("business.name.hint1")</p>
   <p>@messages("business.name.hint2")</p>
-
 }

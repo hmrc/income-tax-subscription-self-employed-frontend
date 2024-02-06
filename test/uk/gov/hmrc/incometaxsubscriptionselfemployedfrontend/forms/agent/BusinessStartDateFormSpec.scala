@@ -23,13 +23,13 @@ import play.api.data.{Form, FormError}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.{businessStartDateForm, startDate}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessStartDate, DateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 
 import java.time.LocalDate
 
 class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  def form: Form[BusinessStartDate] = {
+  def form: Form[DateModel] = {
     businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString)
   }
 
@@ -44,9 +44,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         s"$startDate-$day" -> testDateDay, s"$startDate-$month" -> testDateMonth, s"$startDate-$year" -> testDateYear
       )
 
-      val expected = BusinessStartDate(
-        DateModel(testDateDay, testDateMonth, testDateYear)
-      )
+      val expected = DateModel(testDateDay, testDateMonth, testDateYear)
 
       val actual = form.bind(testInput).value
 
@@ -137,7 +135,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
           sevenDaysInPresent.getYear.toString
         ))
         maxTest.errors mustBe List()
-        maxTest.value mustBe Some(BusinessStartDate(DateModel.dateConvert(sevenDaysInPresent)))
+        maxTest.value mustBe Some(DateModel.dateConvert(sevenDaysInPresent))
       }
 
 
@@ -150,7 +148,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         )
         val validated = form.bind(testData)
         validated.errors mustBe List()
-        validated.value mustBe Some(BusinessStartDate(DateModel.dateConvert(earliestAllowedDate)))
+        validated.value mustBe Some(DateModel.dateConvert(earliestAllowedDate))
       }
     }
   }

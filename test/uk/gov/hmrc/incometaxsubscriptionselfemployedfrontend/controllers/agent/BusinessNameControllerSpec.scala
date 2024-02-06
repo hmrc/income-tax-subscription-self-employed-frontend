@@ -29,9 +29,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.mockBusinessNameModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.{mockBusinessNameModel, testBusinessNameModel, testValidBusinessTradeNameModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
@@ -48,6 +47,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
 
   private val businessName = mock[BusinessName]
+
   when(businessName(any(), any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
 
   object TestBusinessNameController extends BusinessNameController(
@@ -58,34 +58,24 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     businessName
   )
 
-  val selfEmploymentData: SelfEmploymentData = SelfEmploymentData(
-    id = id,
-    businessStartDate = Some(BusinessStartDate(DateModel("1", "1", "1"))),
-    businessName = Some(BusinessNameModel("testName")),
-    businessTradeName = Some(BusinessTradeNameModel("testTrade"))
-  )
-
-  def modelToFormData(businessNameModel: BusinessNameModel): Seq[(String, String)] = {
-    BusinessNameForm.businessNameValidationForm(Nil).fill(businessNameModel).data.toSeq
+  def modelToFormData(businessName: String): Seq[(String, String)] = {
+    BusinessNameForm.businessNameValidationForm(Nil).fill(businessName).data.toSeq
   }
 
   "Show" should {
     "return ok (200)" when {
       "the connector returns data" in {
-
         mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData))
-        )
+        mockFetchAllNameTradeCombos(Right(Seq(
+          (id, Some(testBusinessNameModel), Some(testValidBusinessTradeNameModel))
+        )))
         val result = TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
       "the connector returns no data" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData.copy(businessName = None)))
-        )
+        mockFetchAllNameTradeCombos(Right(Seq()))
 
         val result = TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
@@ -95,7 +85,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     "Throw an internal exception error" when {
       "the connector returns an error" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(
+        mockFetchAllNameTradeCombos(
           Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
         intercept[InternalServerException](await(TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)))
@@ -109,21 +99,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       "return 303, SEE_OTHER" when {
         "the user submits valid data and is saved successfully" in {
           mockAuthSuccess()
-          mockFetchAllBusinesses(
-            Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
-          )
-          mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
-
-          val result = TestBusinessNameController.submit(id, isEditMode = false)(
-            fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
-          )
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessStartDateController.show(id).url)
-        }
-        "the user submits valid data in S&R mode and is saved successfully" in {
-          mockAuthSuccess()
-          mockFetchAllBusinesses(
-            Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
+          mockFetchAllNameTradeCombos(
+            Right(Seq((id, None, None)))
           )
           mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
@@ -138,40 +115,31 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData.copy(businessName = None, businessTradeName = None)))
+        mockFetchAllNameTradeCombos(
+          Right(Seq((id, None, None)))
         )
         val result = TestBusinessNameController.submit(id, isEditMode = false)(fakeRequest)
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
       }
-    }
-    "the user enters a business name which would cause a duplicate business name / trade combination" in {
-      mockAuthSuccess()
-      mockFetchAllBusinesses(
-        Right(Seq(
-          selfEmploymentData.copy(
-            id = "idOne",
-            businessName = Some(BusinessNameModel("nameOne")),
-            businessTradeName = Some(BusinessTradeNameModel("tradeOne"))
-          ),
-          selfEmploymentData.copy(
-            id = "idTwo",
-            businessName = None,
-            businessTradeName = Some(BusinessTradeNameModel("tradeOne"))
-          )
-        ))
-      )
-      val result = TestBusinessNameController.submit("idTwo", isEditMode = false)(
-        fakeRequest.withFormUrlEncodedBody(modelToFormData(BusinessNameModel("nameOne")): _*)
-      )
-      status(result) mustBe BAD_REQUEST
-      contentType(result) mustBe Some("text/html")
+      "the user enters a business name which would cause a duplicate business name / trade combination" in {
+        mockAuthSuccess()
+        mockFetchAllNameTradeCombos(Right(Seq(
+          ("idOne", Some("nameOne"), Some("tradeOne")),
+          ("idTwo", None, Some("tradeOne"))
+        )))
+
+        val result = TestBusinessNameController.submit("idTwo", isEditMode = false)(
+          fakeRequest.withFormUrlEncodedBody(modelToFormData("nameOne"): _*)
+        )
+        status(result) mustBe BAD_REQUEST
+        contentType(result) mustBe Some("text/html")
+      }
     }
     "throw an exception" when {
-      "an error is returned when retrieving all businesses" in {
+      "an error is returned when retrieving business name trade combos" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(
+        mockFetchAllNameTradeCombos(
           Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
@@ -183,8 +151,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER" when {
       "the user submits valid data and answer is updated correctly" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData.copy(businessName = Some(BusinessNameModel("nameOne")))))
+        mockFetchAllNameTradeCombos(
+          Right(Seq((id, Some("nameOne"), None)))
         )
         mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
         val result = TestBusinessNameController.submit(id, isEditMode = true)(
@@ -196,8 +164,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
       }
       "the user does not update their answer" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData))
+        mockFetchAllNameTradeCombos(
+          Right(Seq((id, Some(mockBusinessNameModel), None)))
         )
         mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
         val result = TestBusinessNameController.submit(id, isEditMode = true)(
@@ -210,8 +178,8 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
-        mockFetchAllBusinesses(
-          Right(Seq(selfEmploymentData))
+        mockFetchAllNameTradeCombos(
+          Right(Seq((id, Some(mockBusinessNameModel), None)))
         )
         val result = TestBusinessNameController.submit(id, isEditMode = true)(fakeRequest)
         status(result) mustBe BAD_REQUEST

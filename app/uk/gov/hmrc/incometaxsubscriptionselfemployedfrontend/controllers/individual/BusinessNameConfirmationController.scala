@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameConfirmationForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{BusinessNameModel, No, Yes, YesNo}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{No, Yes, YesNo}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessNameConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -48,8 +47,6 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
 
   val backUrl: String = appConfig.yourIncomeSourcesUrl
 
-
-
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withReference { reference =>
@@ -63,14 +60,14 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
   def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       handleForm(id)(
-        onYes = Redirect(controllers.routes.BusinessStartDateController.show(id)),
-        onNo = Redirect(controllers.routes.BusinessNameController.show(id))
+        onYes = Redirect(routes.BusinessStartDateController.show(id)),
+        onNo = Redirect(routes.BusinessNameController.show(id))
       )
     }
   }
 
 
-  private def view(form: Form[YesNo], id: String, name: String,  isBusinessName:Boolean)
+  private def view(form: Form[YesNo], id: String, name: String, isBusinessName: Boolean)
                   (implicit request: Request[AnyContent]): Html = {
     businessNameConfirmation(
       confirmationForm = form,
@@ -104,35 +101,27 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
   private def saveBusinessName(reference: String, id: String, name: String)
                               (onSaveSuccessful: => Result)
                               (implicit request: Request[AnyContent]): Future[Result] = {
-    multipleSelfEmploymentsService.saveBusinessName(reference, id, BusinessNameModel(name)) map {
+    multipleSelfEmploymentsService.saveName(reference, id, name) map {
       case Right(_) => onSaveSuccessful
       case Left(_) => throw new InternalServerException("[BusinessNameConfirmationController][submit] - Unable to save business name")
     }
   }
 
-
-  private def withBusinessOrUsersName(id: String, reference:String)
-                           (onSuccessfulRetrieval: (String,Boolean) => Future[Result])
-                           (implicit request: Request[AnyContent]): Future[Result] = {
-    fetchFirstBusinessName(reference) flatMap {
-      case Some(businessName) => onSuccessfulRetrieval(businessName.businessName, true)
-      case None => fetchUsersName match {
-        case Some(name) => onSuccessfulRetrieval(name, false)
-        case None => Future.successful(Redirect(controllers.routes.BusinessNameController.show(id)))
+  private def withBusinessOrUsersName(id: String, reference: String)
+                                     (f: (String, Boolean) => Future[Result])
+                                     (implicit request: Request[AnyContent]): Future[Result] = {
+    multipleSelfEmploymentsService.fetchFirstBusinessName(reference).flatMap { result =>
+      result.getOrElse(
+        throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrUsersName] - Unable to retrieve businesses")
+      ) match {
+        case Some(businessName) => f(businessName, true)
+        case None => fetchUsersName match {
+          case Some(name) => f(name, false)
+          case None => Future.successful(Redirect(routes.BusinessNameController.show(id)))
+        }
       }
     }
-
   }
-
-  private def fetchFirstBusinessName(reference: String)(implicit request: Request[AnyContent]): Future[Option[BusinessNameModel]] = {
-    multipleSelfEmploymentsService.fetchAllBusinesses(reference) map {
-      case Left(_) => throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrUsersName] - Unexpected error retrieving all business details")
-      case Right(businesses) =>
-        businesses.headOption flatMap (_.businessName)
-    }
-  }
-
-
 
 }
 

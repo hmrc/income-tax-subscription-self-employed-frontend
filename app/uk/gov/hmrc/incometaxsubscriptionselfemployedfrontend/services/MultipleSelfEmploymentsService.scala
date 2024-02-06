@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
-import org.graalvm.compiler.replacements.amd64.PluginFactory_AMD64StringIndexOfNode
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, PlainText}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccess
@@ -30,48 +29,98 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
-                                               applicationCrypto: ApplicationCrypto)
+class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
+                                              (applicationCrypto: ApplicationCrypto)
                                               (implicit ec: ExecutionContext) {
 
-  def fetchBusinessStartDate(reference: String, businessId: String)
-                            (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessStartDate]]] = {
-    findData[BusinessStartDate](reference, businessId, _.businessStartDate)
+  implicit val jsonCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+
+  def fetchSoleTraderBusinesses(reference: String)
+                               (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[SoleTraderBusinesses]]] = {
+    incomeTaxSubscriptionConnector.getSubscriptionDetails[SoleTraderBusinesses](
+      reference = reference,
+      id = SelfEmploymentDataKeys.soleTraderBusinessesKey
+    )(implicitly, SoleTraderBusinesses.encryptedFormat)
   }
 
-  def saveBusinessStartDate(reference: String, businessId: String, businessStartDate: BusinessStartDate)
-                           (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(reference, businessId, _.copy(businessStartDate = Some(businessStartDate), confirmed = false))
+  private[services] def saveSoleTraderBusinesses(reference: String, soleTraderBusinesses: SoleTraderBusinesses)
+                                                (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    incomeTaxSubscriptionConnector.saveSubscriptionDetails[SoleTraderBusinesses](
+      reference = reference,
+      id = SelfEmploymentDataKeys.soleTraderBusinessesKey,
+      data = soleTraderBusinesses
+    )(implicitly, SoleTraderBusinesses.encryptedFormat) map {
+      case Right(value) =>
+        Right(value)
+      case Left(_) =>
+        Left(SaveSelfEmploymentDataFailure)
+    }
   }
 
-  def fetchBusinessName(reference: String, businessId: String)
-                       (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessNameModel]]] = {
-    findData[BusinessNameModel](reference, businessId, _.businessName)
+  private def findData[T](reference: String, id: String, modelToData: SoleTraderBusiness => Option[T])
+                                   (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[T]]] = {
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result map {
+        case Some(soleTraderBusinesses) => soleTraderBusinesses.businesses
+        case None => Seq.empty[SoleTraderBusiness]
+      } map { businesses =>
+        businesses.find(_.id == id).flatMap(modelToData)
+      }
+    }
   }
 
-  def saveBusinessName(reference: String, businessId: String, businessName: BusinessNameModel)
-                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(reference, businessId, _.copy(businessName = Some(businessName), confirmed = false))
+  private def saveData(reference: String, id: String, businessUpdate: SoleTraderBusiness => SoleTraderBusiness)
+                                (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+
+    def updateSoleTraderBusinesses(soleTraderBusinesses: SoleTraderBusinesses): SoleTraderBusinesses = {
+      val updatedBusinessesList: Seq[SoleTraderBusiness] = if (soleTraderBusinesses.businesses.exists(_.id == id)) {
+        soleTraderBusinesses.businesses map {
+          case business if business.id == id => businessUpdate(business)
+          case business => business
+        }
+      } else {
+        soleTraderBusinesses.businesses :+ businessUpdate(SoleTraderBusiness(id = id))
+      }
+
+      soleTraderBusinesses.copy(businesses = updatedBusinessesList)
+    }
+
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result map {
+        case Some(soleTraderBusinesses) => soleTraderBusinesses
+        case None => SoleTraderBusinesses(businesses = Seq.empty[SoleTraderBusiness])
+      } map updateSoleTraderBusinesses
+    } flatMap {
+      case Right(soleTraderBusinesses) =>
+        saveSoleTraderBusinesses(reference, soleTraderBusinesses)
+      case Left(_) => Future.successful(Left(SaveSelfEmploymentDataFailure))
+    }
+
   }
 
-  def fetchBusinessTrade(reference: String, businessId: String)
-                        (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessTradeNameModel]]] = {
-    findData[BusinessTradeNameModel](reference, businessId, _.businessTradeName)
+  def fetchStartDate(reference: String, businessId: String)
+                    (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[DateModel]]] = {
+    findData[DateModel](reference, businessId, _.startDate)
   }
 
-  def saveBusinessTrade(reference: String, businessId: String, businessTrade: BusinessTradeNameModel)
-                       (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(reference, businessId, _.copy(businessTradeName = Some(businessTrade), confirmed = false))
+  def saveStartDate(reference: String, businessId: String, startDate: DateModel)
+                   (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    saveData(reference, businessId, _.copy(startDate = Some(startDate), confirmed = false))
   }
 
-  def fetchBusinessAddress(reference: String, businessId: String)
-                          (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[BusinessAddressModel]]] = {
-    findData[BusinessAddressModel](reference, businessId, _.businessAddress)
+  def saveName(reference: String, businessId: String, name: String)
+              (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    saveData(reference, businessId, _.copy(name = Some(name), confirmed = false))
   }
 
-  def saveBusinessAddress(reference: String, businessId: String, businessAddress: BusinessAddressModel)
-                         (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(reference, businessId, _.copy(businessAddress = Some(businessAddress), confirmed = false))
+  def saveTrade(reference: String, businessId: String, trade: String)
+               (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    saveData(reference, businessId, _.copy(trade = Some(trade), confirmed = false))
+  }
+
+  def saveAddress(reference: String, businessId: String, address: Address)
+                 (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    saveData(reference, businessId, _.copy(address = Some(address), confirmed = false))
   }
 
   def confirmBusiness(reference: String, businessId: String)
@@ -79,79 +128,56 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     saveData(reference, businessId, _.copy(confirmed = true))
   }
 
-  def fetchAllBusinesses(reference: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Seq[SelfEmploymentData]]] = {
-
-    def decryptBusinessList(businesses: Seq[SelfEmploymentData]) : Seq[SelfEmploymentData] = {
-      businesses map {
-        business => business.copy(
-          businessName = business.businessName.map(name =>
-            name.decrypt(applicationCrypto.QueryParameterCrypto)
-          ),
-          businessAddress = business.businessAddress.map(address =>
-            address.decrypt(applicationCrypto.QueryParameterCrypto)
-          )
-        )
-      }
-    }
-
-    incomeTaxSubscriptionConnector.getSubscriptionDetails[Seq[SelfEmploymentData]](reference, businessesKey) map {
-      case Right(Some(data)) => Right(decryptBusinessList(data))
-      case Right(None) => Right(Seq.empty[SelfEmploymentData])
-      case Left(error) => Left(error)
-    }
-  }
-
-  def fetchBusiness(reference: String, id: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[SelfEmploymentData]]] = {
-    fetchAllBusinesses(reference).map {
+  def fetchAccountingMethod(reference: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[AccountingMethod]]] = {
+    fetchSoleTraderBusinesses(reference) map {
+      case Right(soleTraderBusinesses) => Right(soleTraderBusinesses.flatMap(_.accountingMethod))
       case Left(value) => Left(value)
-      case Right(value) => Right(value.find(_.id == id))
     }
   }
 
-  private[services] def findData[T](reference: String, businessId: String, modelToData: SelfEmploymentData => Option[T])(implicit hc: HeaderCarrier) =
-    fetchAllBusinesses(reference) map {
-      case Right(businesses) => Right(businesses.find(_.id == businessId).flatMap(modelToData))
-      case Left(failure) => Left(failure)
-    }
-
-  private[services] def saveData(reference: String, businessId: String, businessUpdate: SelfEmploymentData => SelfEmploymentData)
-                                (implicit hc: HeaderCarrier) = {
-
-    def updateBusinessList(businesses: Seq[SelfEmploymentData]): Seq[SelfEmploymentData] = {
-      if (businesses.exists(_.id == businessId)) {
-        businesses map {
-          case business if business.id == businessId => businessUpdate(business)
-          case business => business
-        }
-      } else {
-        businesses :+ businessUpdate(SelfEmploymentData(businessId))
+  def saveAccountingMethod(reference: String, accountingMethod: AccountingMethod)
+                          (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result.map {
+        case Some(soleTraderBusinesses) => soleTraderBusinesses.copy(accountingMethod = Some(accountingMethod))
+        case None => SoleTraderBusinesses(Seq.empty[SoleTraderBusiness], accountingMethod = Some(accountingMethod))
       }
-    }
-
-    def encryptBusinessList(businesses: Seq[SelfEmploymentData]) : Seq[SelfEmploymentData] = {
-      businesses map {
-        business => business.copy(
-          businessName = business.businessName.map(name =>
-            name.encrypt(applicationCrypto.QueryParameterCrypto)
-          ),
-          businessAddress = business.businessAddress.map(address =>
-            address.encrypt(applicationCrypto.QueryParameterCrypto)
-          )
-        )
-      }
-    }
-
-    fetchAllBusinesses(reference) flatMap {
-      case Right(data) =>
-        val updatedBusinessList: Seq[SelfEmploymentData] = updateBusinessList(data)
-        val encryptedBusinessList = encryptBusinessList(updatedBusinessList)
-        incomeTaxSubscriptionConnector.saveSubscriptionDetails(reference, businessesKey, encryptedBusinessList) map {
-          case Right(result) => Right(result)
-          case Left(_) => Left(SaveSelfEmploymentDataFailure)
-        }
+    } flatMap {
+      case Right(businesses) => saveSoleTraderBusinesses(reference, businesses)
       case Left(_) => Future.successful(Left(SaveSelfEmploymentDataFailure))
     }
+  }
 
+  def fetchFirstAddress(reference: String)
+                       (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[Address]]] = {
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result.map { maybeBusinesses =>
+        maybeBusinesses.flatMap { soleTraderBusinesses =>
+          soleTraderBusinesses.businesses.flatMap(_.address).headOption
+        }
+      }
+    }
+  }
+
+  def fetchFirstBusinessName(reference: String)
+                            (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[String]]] = {
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result.map { maybeBusinesses =>
+        maybeBusinesses.flatMap { soleTraderBusinesses =>
+          soleTraderBusinesses.businesses.flatMap(_.name).headOption
+        }
+      }
+    }
+  }
+
+  def fetchAllNameTradeCombos(reference: String)
+                             (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Seq[(String, Option[String], Option[String])]]] = {
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result map {
+        case Some(soleTraderBusinesses) => soleTraderBusinesses.businesses.map(business => (business.id, business.name, business.trade))
+        case None => Seq.empty[(String, Option[String], Option[String])]
+      }
+    }
   }
 
 }

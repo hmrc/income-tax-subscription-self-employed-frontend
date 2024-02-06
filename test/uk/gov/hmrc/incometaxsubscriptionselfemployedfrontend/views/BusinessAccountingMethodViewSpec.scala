@@ -25,7 +25,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, Accruals, Cash}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Accruals, Cash}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
 
@@ -178,7 +178,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     ).mustHaveGovUkErrorNotificationMessage(BusinessAccountingMethodMessages.emptyError)
   }
 
-  private def page(businessAccountingMethodForm: Form[AccountingMethodModel], isEditMode: Boolean, backLink: Option[String]) = {
+  private def page(businessAccountingMethodForm: Form[AccountingMethod], isEditMode: Boolean, backLink: Option[String]) = {
     businessAccountingMethodView(
       businessAccountingMethodForm,
       testCall,
@@ -188,7 +188,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
   }
 
   private def document(
-                        businessAccountingMethodForm: Form[AccountingMethodModel] = BusinessAccountingMethodForm.businessAccountingMethodForm,
+                        businessAccountingMethodForm: Form[AccountingMethod] = BusinessAccountingMethodForm.businessAccountingMethodForm,
                         isEditMode: Boolean = false,
                         backLink: Option[String] = Some(testBackUrl)
                       ): Document = {

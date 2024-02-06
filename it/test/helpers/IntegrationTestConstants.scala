@@ -22,7 +22,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 object IntegrationTestConstants {
 
-  lazy val id: String = "AA111111A"
+  val id: String = "test-id"
   val incomeTaxSubscriptionFrontendBaseUrl = "/report-quarterly/income-and-expenses/sign-up"
   val baseURI = "/report-quarterly/income-and-expenses/sign-up/self-employments"
   val BusinessStartDateUri = s"$baseURI/details/business-start-date"
@@ -30,6 +30,7 @@ object IntegrationTestConstants {
   val ClientBusinessNameUri = s"$baseURI/client/details/business-name"
   val ClientBusinessTradeNameUri = s"$baseURI/client/details/business-trade"
   val ClientBusinessAddressInitialiseUri = s"$baseURI/client/address-lookup-initialise"
+  val ClientBusinessAddressCheckUri = s"$baseURI/client/address-lookup-check"
   val BusinessNameUri = s"$baseURI/details/business-name"
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
   val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
@@ -47,7 +48,9 @@ object IntegrationTestConstants {
   val ClientInitialiseUri = s"$baseURI/client/details"
   val ggSignInURI = s"/bas-gateway/sign-in"
   val ggSignOutURI = s"/bas-gateway/sign-out-without-state"
+
   def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
+  def businessAddressCheckUri(itsaId: String): String = s"$baseURI/address-lookup-check/$itsaId"
   def businessAddressLookupRedirectUri(itsaId: String): String = s"$baseURI/details/address-lookup/$itsaId"
 
   object Auth {
@@ -58,10 +61,28 @@ object IntegrationTestConstants {
         }""")
   }
 
-  val testAccountingMethodModel: AccountingMethodModel = AccountingMethodModel(Cash)
+  val testAccountingMethodModel: AccountingMethod = Cash
 
   val referrerPath = "dummyPath"
   val referrerQueryString = "dummyQueryString"
+
+  val address: Address = Address(
+    lines = Seq("1 Long Road", "Lonely Town"),
+    postcode = Some("ZZ1 1ZZ")
+  )
+
+  val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
+    businesses = Seq(
+      SoleTraderBusiness(
+        id = id,
+        startDate = Some(DateModel("1", "1", "1980")),
+        name = Some("test name"),
+        trade = Some("test trade"),
+        address = Some(address)
+      )
+    ),
+    accountingMethod = Some(Cash)
+  )
 
   def testAddressLookupConfig(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
     val referrerUrl = referrerUrlMaybe.getOrElse(referrerPath + "%3F" + referrerQueryString)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.businessAccountingMethodKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethodModel, SelfEmploymentsCYAModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SelfEmploymentsCYAModel, SoleTraderBusiness}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -84,26 +83,23 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
   private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])
                                         (implicit hc: HeaderCarrier): Future[Result] =
     for {
-      accountingMethod <- fetchAccountMethod(reference)
-      business <- fetchSelfEmployment(reference, id)
-      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, 0)) //todo: set business count to actual value when agent side is implemented
+      (businesses, accountingMethod) <- fetchBusinessListAndAccountingMethod(reference)
+      business = businesses.find(_.id == id)
+      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, businesses.length))
     } yield result
 
-  private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier) = {
-    incomeTaxSubscriptionConnector.getSubscriptionDetails[AccountingMethodModel](reference, businessAccountingMethodKey) map {
-      case Left(_) =>
-        throw new InternalServerException("[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving accounting method")
-      case Right(accountingMethod) => accountingMethod
-    }
+  private def fetchBusinessListAndAccountingMethod(reference: String)(implicit hc: HeaderCarrier) = {
+    multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference)
+      .map(_.getOrElse(throw new FetchSoleTraderBusinessesException))
+      .map {
+        case Some(soleTraderBusinesses) => (soleTraderBusinesses.businesses, soleTraderBusinesses.accountingMethod)
+        case None => (Seq.empty[SoleTraderBusiness], None)
+      }
   }
 
-  private def fetchSelfEmployment(reference: String, id: String)(implicit hc: HeaderCarrier) = {
-    multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
-      case Left(_) =>
-        throw new InternalServerException("[SelfEmployedCYAController][withSelfEmploymentCYAModel] - Failure retrieving self employment data")
-      case Right(business) => business
-    }
-  }
+  private class FetchSoleTraderBusinessesException extends InternalServerException(
+    "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
+  )
 
   def backUrl(isEditMode: Boolean): Option[String] = {
     if (isEditMode) {

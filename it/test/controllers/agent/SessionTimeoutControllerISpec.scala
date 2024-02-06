@@ -25,7 +25,6 @@ class SessionTimeoutControllerISpec extends ComponentSpecBase with CustomMatcher
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/keep-alive" when {
     "an agent chooses to not time out" should {
       "return an OK and keep the session" in {
-
         val res = getClientKeepAlive
         Then("Should return a OK")
         res must have(
