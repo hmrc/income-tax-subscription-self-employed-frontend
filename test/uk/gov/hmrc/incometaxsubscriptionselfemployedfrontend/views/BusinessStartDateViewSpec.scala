@@ -33,19 +33,19 @@ import java.time.LocalDate
 class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
-    val title = "When did your sole trader business start trading?"
+    val title = "When did your business start trading?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
     val captionHidden = "This section is"
     val captionVisual = "Sole trader"
-    val line_1: String = "If you have multiple sole trader businesses, enter the start date of your main business."
+    val line_1: String = "This is the date we’ll use to calculate Class 2 National Insurance charge, if appropriate."
     val hint = "For example, 17 4 2018."
     val backLink = "Back"
     val update = "Update"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
     val empty = "Enter the date your business started trading."
-    val maxDate = s"The date your business started trading must be before 11 April 2021."
+    val maxDate = s"The date the business started trading must be on or before 11 April 2021."
     val minDate = "The date your business started must be on or after 11 April 2021."
   }
 
