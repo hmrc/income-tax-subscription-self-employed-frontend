@@ -34,9 +34,6 @@ POST        /details/business-check-your-answers       uk.gov.hmrc.incometaxsubs
 GET        /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.show(id: String)
 POST       /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.submit(id: String)
 
-#Welsh Language
-GET         /language/:lang                            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AgentLanguageSwitchController.switchToLanguage(lang: String)
-
 #Session timeout
 GET         /keep-alive                                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.keepAlive
 GET         /timeout                                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.timeout

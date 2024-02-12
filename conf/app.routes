@@ -35,8 +35,6 @@ GET        /address-lookup-check/:businessId            uk.gov.hmrc.incometaxsub
 GET        /address-lookup-initialise/:businessId       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
 GET        /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false)
 
-GET        /language/:lang                              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.LanguageSwitchController.switchToLanguage(lang: String)
-
 GET        /logout                                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut
 
 GET         /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.keepAlive
