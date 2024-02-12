@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcTimeoutDialogHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 
 @this(
         appConfig: AppConfig,
@@ -31,7 +32,8 @@
         standardBetaBanner: StandardBetaBanner,
         hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
         hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
+        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
+        hmrcStandardPage: HmrcStandardPage
 )
 
 @(title: String, serviceName: String, serviceUrl: String, optForm: Option[Form[_]] = None, backLink: Option[String] = None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
@@ -65,14 +67,22 @@
 
 }
 
-@hmrcLayout(
-    pageTitle = Some(title),
-    additionalHeadBlock = Some(additionalHeadBlock),
-    isWelshTranslationAvailable = true,
+@hmrcStandardPage(HmrcStandardPageParams
+  (
+    serviceURLs = ServiceURLs(
+      serviceUrl = Some(serviceUrl),
+      signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
+    ),
+    banners = Banners(
+      phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl)),
+      userResearchBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl))
+    ),
+    templateOverrides = TemplateOverrides(
+      additionalHeadBlock = Some(additionalHeadBlock)
+    ),
     serviceName = Some(serviceName),
-    serviceUrl = Some(serviceUrl),
-    backLinkUrl = backLink,
-    signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
-    phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl)),
-    userResearchBannerUrl = Some(appConfig.urBannerUrl)
+    isWelshTranslationAvailable = true,
+    pageTitle = Some(title),
+    backLink = backLink.map(url => BackLink(href = url))
+  )
 )(content)

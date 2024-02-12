@@ -77,22 +77,11 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
 
   def ggSignOutUrl(redirectionUrl: String = incomeTaxSubscriptionFrontendBaseUrl): String = s"$ggUrl/bas-gateway/sign-out-without-state?continue=$redirectionUrl"
 
-  def languageMap: Map[String, Lang] = Map(
-    "english" -> Lang("en"),
-    "cymraeg" -> Lang("cy")
-  )
 
   def betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier"
 
   def betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
 
-  def routeToSwitchLanguage(language: String): Call = {
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.LanguageSwitchController.switchToLanguage(language)
-  }
-
-  def routeToSwitchAgentLanguage(language: String): Call = {
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AgentLanguageSwitchController.switchToLanguage(language)
-  }
 
   val govukGuidanceLink: String = servicesConfig.getString("govuk-guidance.url")
   val govukGuidanceITSASignUpIndivLink: String = s"$govukGuidanceLink/sign-up-your-business-for-making-tax-digital-for-income-tax"
