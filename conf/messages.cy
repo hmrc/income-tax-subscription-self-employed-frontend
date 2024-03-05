@@ -56,8 +56,8 @@ error.business-start-date.year.empty                            = Mae’n rhaid 
 error.business-start-date.day-month.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis.
 error.business-start-date.day-year.empty                        = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn.
 error.business-start-date.month-year.empty                      = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn.
-error.business-start-date.day-month-year.max-date               = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}.
-error.business-start-date.day-month-year.min-date               = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl {0}.
+error.business-start-date.day-month-year.max-date               = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn <span class="govuk-nowrap">{0}</span>.
+error.business-start-date.day-month-year.min-date               = Mae’n rhaid i’r dyddiad y dechreuodd eich busnes fod ar neu ar ôl <span class="govuk-nowrap">{0}</span>.
 error.business-start-date.day-month-year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 error.business-start-date.day.invalid                           = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 error.business-start-date.month.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
@@ -172,8 +172,8 @@ agent.error.business-start-date.year.empty                      = Mae’n rhaid 
 agent.error.business-start-date.day-month.empty                 = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis.
 agent.error.business-start-date.day-year.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn.
 agent.error.business-start-date.month-year.empty                = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn.
-agent.error.business-start-date.day-month-year.max-date         = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn {0}.
-agent.error.business-start-date.day-month-year.min-date         = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl {0}.
+agent.error.business-start-date.day-month-year.max-date         = Mae’n rhaid i’r dyddiad y dechreuodd y busnes fasnachu fod ar neu cyn <span class="govuk-nowrap">{0}</span>.
+agent.error.business-start-date.day-month-year.min-date         = Mae’n rhaid i’r dyddiad y dechreuodd busnes eich cleient fod ar neu ar ôl <span class="govuk-nowrap">{0}</span>.
 agent.error.business-start-date.day.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 agent.error.business-start-date.day-month.invalid               = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 agent.error.business-start-date.day-year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
