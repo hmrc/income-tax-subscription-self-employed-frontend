@@ -55,7 +55,7 @@
     @optForm.map { form =>
         @if(form.hasErrors) {
             @govukErrorSummary(ErrorSummary(
-                errorList = form.errors.asTextErrorLinks,
+                errorList = form.errors.asHtmlErrorLinks,
                 title = Text(messages("base.error-heading"))
             ))
         }

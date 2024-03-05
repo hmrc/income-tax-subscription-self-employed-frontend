@@ -39,7 +39,7 @@
 
 @errorMessage = @{
   error map { error =>
-      ErrorMessage(content = Text(messages(error.message, error.args: _*)))
+      ErrorMessage(content = HtmlContent(messages(error.message, error.args: _*)))
   }
 }
 
