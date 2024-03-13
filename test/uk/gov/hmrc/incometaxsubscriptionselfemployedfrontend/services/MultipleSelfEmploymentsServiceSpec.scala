@@ -20,8 +20,8 @@ import org.scalatestplus.play.PlaySpec
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{DeleteSubscriptionDetailsHttpParser, GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
@@ -111,9 +111,12 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
   "saveSoleTraderBusinesses" must {
     "return a save successful response" when {
-      "the sole trader businesses was saved successfully" in new Setup {
+      "the sole trader businesses was saved successfully and the income source confirmation was deleted" in new Setup {
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, soleTraderBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveSoleTraderBusinesses(testReference, soleTraderBusinesses)) mustBe
@@ -124,6 +127,17 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "there was a problem when saving the sole trader businesses" in new Setup {
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, soleTraderBusinesses)(
           Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveSoleTraderBusinesses(testReference, soleTraderBusinesses)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was a problem when deleting the income source completion field" in new Setup {
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, soleTraderBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
         await(service.saveSoleTraderBusinesses(testReference, soleTraderBusinesses)) mustBe
@@ -197,6 +211,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveStartDate(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -211,6 +228,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveStartDate(testReference, id, saveData)) mustBe
@@ -227,6 +247,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveStartDate(testReference, s"$id-2", saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -242,6 +265,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveStartDate(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -255,6 +281,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveStartDate(testReference, id, saveData)) mustBe
@@ -287,6 +316,24 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         await(service.saveStartDate(testReference, id, saveData)) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
+      "there was an error when deleting the income source completion field" in new Setup {
+        val saveData: DateModel = DateModel("2", "2", "1980")
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveStartDate(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
     }
   }
 
@@ -303,6 +350,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveName(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -317,6 +367,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveName(testReference, id, saveData)) mustBe
@@ -333,6 +386,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveName(testReference, s"$id-2", saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -348,6 +404,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveName(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -361,6 +420,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveName(testReference, id, saveData)) mustBe
@@ -409,6 +471,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveTrade(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -423,6 +488,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveTrade(testReference, id, saveData)) mustBe
@@ -439,6 +507,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveTrade(testReference, s"$id-2", saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -454,6 +525,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveTrade(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -467,6 +541,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveTrade(testReference, id, saveData)) mustBe
@@ -494,6 +571,24 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveTrade(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error deleting the income source completed field" in new Setup {
+        val saveData: String = "test other trade"
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
         await(service.saveTrade(testReference, id, saveData)) mustBe
@@ -515,6 +610,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveAddress(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -529,6 +627,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveAddress(testReference, id, saveData)) mustBe
@@ -545,6 +646,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveAddress(testReference, s"$id-2", saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -560,6 +664,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveAddress(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -573,6 +680,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveAddress(testReference, id, saveData)) mustBe
@@ -600,6 +710,24 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveAddress(testReference, id, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error deleting the income source completed field" in new Setup {
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
         await(service.saveAddress(testReference, id, saveData)) mustBe
@@ -620,6 +748,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.confirmBusiness(testReference, id)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -633,6 +764,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.confirmBusiness(testReference, id)) mustBe
@@ -657,6 +791,23 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.confirmBusiness(testReference, id)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error deleting the income source completed field" in new Setup {
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
         await(service.confirmBusiness(testReference, id)) mustBe
@@ -716,6 +867,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveAccountingMethod(testReference, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -731,6 +885,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
         )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
+        )
 
         await(service.saveAccountingMethod(testReference, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
@@ -744,6 +901,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
         await(service.saveAccountingMethod(testReference, saveData)) mustBe
@@ -771,6 +931,24 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
         mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
           Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
+      }
+      "there was an error deleting the income source completed field" in new Setup {
+        val saveData: AccountingMethod = Accruals
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(oldBusinesses))
+        )
+        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
+          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
+        )
+        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
+          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
         await(service.saveAccountingMethod(testReference, saveData)) mustBe

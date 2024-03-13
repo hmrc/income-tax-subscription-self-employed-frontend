@@ -22,7 +22,7 @@ import helpers.IntegrationTestConstants.{id, soleTraderBusinesses}
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
 
@@ -76,6 +76,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(id, inEditMode = false, Some("test name"))
@@ -107,6 +108,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(id, inEditMode = true, Some("test name"))

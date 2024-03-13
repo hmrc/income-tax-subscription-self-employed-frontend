@@ -22,7 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 class BusinessTradeNameControllerISpec extends ComponentSpecBase {
@@ -78,6 +78,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
 
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutTrade))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/details/business-trade is called")
         val res = submitClientTradeName(id, Some("test trade"))
@@ -132,6 +133,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
 
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutTrade))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/details/business-trade is called")
         val res = submitClientTradeName(id, Some("test trade"), inEditMode = true)

@@ -49,16 +49,22 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
       reference = reference,
       id = SelfEmploymentDataKeys.soleTraderBusinessesKey,
       data = soleTraderBusinesses
-    )(implicitly, SoleTraderBusinesses.encryptedFormat) map {
+    )(implicitly, SoleTraderBusinesses.encryptedFormat) flatMap {
       case Right(value) =>
-        Right(value)
+        incomeTaxSubscriptionConnector.deleteSubscriptionDetails(
+          reference = reference,
+          key = SelfEmploymentDataKeys.incomeSourcesComplete
+        ) map {
+          case Right(_) => Right(value)
+          case Left(_) => Left(SaveSelfEmploymentDataFailure)
+        }
       case Left(_) =>
-        Left(SaveSelfEmploymentDataFailure)
+        Future.successful(Left(SaveSelfEmploymentDataFailure))
     }
   }
 
   private def findData[T](reference: String, id: String, modelToData: SoleTraderBusiness => Option[T])
-                                   (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[T]]] = {
+                         (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[T]]] = {
     fetchSoleTraderBusinesses(reference) map { result =>
       result map {
         case Some(soleTraderBusinesses) => soleTraderBusinesses.businesses
@@ -70,7 +76,7 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
   }
 
   private def saveData(reference: String, id: String, businessUpdate: SoleTraderBusiness => SoleTraderBusiness)
-                                (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
 
     def updateSoleTraderBusinesses(soleTraderBusinesses: SoleTraderBusinesses): SoleTraderBusinesses = {
       val updatedBusinessesList: Seq[SoleTraderBusiness] = if (soleTraderBusinesses.businesses.exists(_.id == id)) {

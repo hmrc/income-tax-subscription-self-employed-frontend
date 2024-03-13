@@ -22,7 +22,7 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -87,6 +87,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("GET /client/details/business-check-your-answers is called")
         val res = submitClientBusinessCheckYourAnswers(id)
@@ -121,6 +122,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("GET /client/details/business-check-your-answers is called")
         val res = submitClientBusinessCheckYourAnswers(id)

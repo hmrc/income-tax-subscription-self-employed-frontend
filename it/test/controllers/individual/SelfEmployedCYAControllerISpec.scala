@@ -16,13 +16,13 @@
 
 package controllers.individual
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubGetSubscriptionData, stubSaveSubscriptionData}
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.{id, soleTraderBusinesses, taskListURI, yourIncomeSources}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.libs.json.Json
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -87,6 +87,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(id)
@@ -121,6 +122,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(id)

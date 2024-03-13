@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
-import play.api.libs.json.{JsObject, JsValue, Json, Reads, Writes}
+import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.RetrieveReferenceResponse
@@ -50,6 +51,11 @@ class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
 
   def retrieveReference(utr: String)(implicit hc: HeaderCarrier): Future[RetrieveReferenceResponse] = {
     http.POST[JsObject, RetrieveReferenceResponse](retrieveReferenceUrl, Json.obj("utr" -> utr))
+  }
+
+  def deleteSubscriptionDetails(reference: String, key: String)
+                               (implicit hc: HeaderCarrier): Future[DeleteSubscriptionDetailsResponse] = {
+    http.DELETE[DeleteSubscriptionDetailsResponse](subscriptionURL(reference, key))
   }
 
 }
