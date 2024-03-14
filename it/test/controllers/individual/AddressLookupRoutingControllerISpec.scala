@@ -17,14 +17,14 @@
 package controllers.individual
 
 import connectors.stubs.AddressLookupConnectorStub._
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubGetSubscriptionData, stubSaveSubscriptionData}
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableUseRealAddressLookup
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -92,6 +92,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
             stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
             stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
             stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
+            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
             When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")
             val res = getAddressLookupResponse(id, addressId, isEditMode = false)
@@ -163,6 +164,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
               stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
               stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
               stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
+              stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
               When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")
               val res = getAddressLookupResponse(id, addressId, isEditMode = false)
@@ -184,7 +186,6 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
 
                 stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
                 getAddressDetailsUrlNoId(OK, Json.toJson(address)(Address.format))
-                stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
 
                 When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")
                 val res = getAddressLookupResponse(id, addressId, isEditMode = false)
@@ -207,6 +208,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
                 stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
                 stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
                 stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+                stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
                 When("GET /details/address-lookup/" + id + " is called")
                 val res = getAddressLookupResponse(id, addressId, isEditMode = false)
@@ -230,6 +232,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
               stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
               stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
               stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+              stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
               When("GET /details/address-lookup/" + id + " is called")
               val res = getAddressLookupResponse(id, addressId, isEditMode = true)

@@ -18,4 +18,5 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend
 
 object SelfEmploymentDataKeys {
   val soleTraderBusinessesKey: String = "SoleTraderBusinesses"
+  val incomeSourcesComplete: String = "IncomeSourceConfirmation"
 }

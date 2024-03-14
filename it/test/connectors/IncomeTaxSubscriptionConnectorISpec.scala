@@ -23,8 +23,9 @@ import play.api.libs.json.{JsObject, Json, OFormat}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{DeleteSubscriptionDetailsHttpParser, GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
 
 class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
 
@@ -94,5 +95,25 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
     }
   }
 
+  "deleteSubscriptionDetails" should {
+    "return a DeleteSubscriptionDetailsSuccessResponse" when {
+      "the call returned an OK response" in {
+        stubDeleteSubscriptionData(reference, id)(OK)
+
+        val res = connector.deleteSubscriptionDetails(reference, id)
+
+        await(res) mustBe Right(DeleteSubscriptionDetailsSuccessResponse)
+      }
+    }
+    "return an UnexpectedStatusFailure(status)" when {
+      "an non OK status was returned" in {
+        stubDeleteSubscriptionData(reference, id)(INTERNAL_SERVER_ERROR)
+
+        val res = connector.deleteSubscriptionDetails(reference, id)
+
+        await(res) mustBe Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+  }
 
 }

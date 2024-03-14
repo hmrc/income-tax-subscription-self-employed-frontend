@@ -39,4 +39,11 @@ object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
     ).thenReturn(responseStatus, responseBody)
   }
 
+  def stubDeleteSubscriptionData(reference: String, id: String)(responseStatus: Int): Unit = {
+    when(
+      method = DELETE,
+      uri = subscriptionDataUri(reference, id)
+    ).thenReturn(responseStatus)
+  }
+
 }

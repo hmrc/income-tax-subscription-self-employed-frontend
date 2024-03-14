@@ -21,6 +21,7 @@ import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.DeleteSubscriptionDetailsHttpParser.{DeleteSubscriptionDetailsFailure, DeleteSubscriptionDetailsSuccess}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.{PostSubscriptionDetailsFailure, PostSubscriptionDetailsSuccess}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.RetrieveReferenceResponse
@@ -58,6 +59,14 @@ trait MockIncomeTaxSubscriptionConnector extends UnitTestTrait with MockitoSugar
         (ArgumentMatchers.eq(reference), ArgumentMatchers.eq(id), ArgumentMatchers.eq(data))
         (ArgumentMatchers.any(), ArgumentMatchers.any()))
       .thenReturn(Future.successful(result))
+  }
+
+  def mockDeleteSubscriptionDetails(reference: String, id: String)
+                                   (result: Either[DeleteSubscriptionDetailsFailure, DeleteSubscriptionDetailsSuccess]): Unit = {
+    when(mockIncomeTaxSubscriptionConnector.deleteSubscriptionDetails(
+      ArgumentMatchers.eq(reference),
+      ArgumentMatchers.eq(id)
+    )(ArgumentMatchers.any())).thenReturn(Future.successful(result))
   }
 
 }
