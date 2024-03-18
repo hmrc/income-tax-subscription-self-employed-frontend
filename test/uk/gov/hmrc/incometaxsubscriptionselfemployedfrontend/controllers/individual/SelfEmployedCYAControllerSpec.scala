@@ -23,16 +23,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.individual.MockSelfEmployedCYA
 
 import scala.concurrent.Future
 
 class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector with FeatureSwitchingTestUtils with MockSelfEmployedCYA {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService with FeatureSwitchingTestUtils with MockSelfEmployedCYA {
 
   override def beforeEach(): Unit = {
     disable(EnableTaskListRedesign)
@@ -50,9 +49,11 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   object TestSelfEmployedCYAController extends SelfEmployedCYAController(
     selfEmployedCYA,
     mockAuthService,
-    mockIncomeTaxSubscriptionConnector,
     mockMultipleSelfEmploymentsService,
     mockMessagesControllerComponents
+  )(
+    mockSessionDataService,
+    appConfig
   )
 
   val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(

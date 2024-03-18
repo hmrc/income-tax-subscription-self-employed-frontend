@@ -25,15 +25,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addressl
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.{PostAddressLookupSuccessResponse, UnexpectedStatusFailure}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
-  with MockIncomeTaxSubscriptionConnector
+  with MockSessionDataService
   with MockMultipleSelfEmploymentsService
   with FeatureSwitching {
 
@@ -56,8 +55,10 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
     mockMessagesControllerComponents,
     mockAuthService,
     mockAddressLookupConnector,
-    mockIncomeTaxSubscriptionConnector,
     mockMultipleSelfEmploymentsService
+  )(
+    mockSessionDataService,
+    appConfig
   )
 
   val continueUrl = s"http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/details/address-lookup/$businessId"

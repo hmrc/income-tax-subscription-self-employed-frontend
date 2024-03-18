@@ -21,11 +21,11 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessAddressConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -37,7 +37,8 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
                                                       authService: AuthService,
                                                       multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                       businessAddressConfirmation: BusinessAddressConfirmation)
-                                                     (val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
+                                                     (val sessionDataService: SessionDataService,
+                                                      val appConfig: AppConfig)
                                                      (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with SessionRetrievals with I18nSupport {
 
@@ -47,7 +48,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withIndividualReference { reference =>
         withFirstAddress(reference, id) { address =>
           Future.successful(Ok(view(confirmationForm, id, address)))
         }
@@ -75,7 +76,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
 
   private def handleForm(id: String)(onYes: Result, onNo: Result)
                         (implicit request: Request[AnyContent]): Future[Result] = {
-    withReference { reference =>
+    withIndividualReference { reference =>
       withFirstAddress(reference, id) { address =>
         confirmationForm.bindFromRequest().fold(
           hasError => Future.successful(BadRequest(view(hasError, id, address))),

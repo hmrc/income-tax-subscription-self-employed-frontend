@@ -32,8 +32,8 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
                                      authService:
                                      AuthService,
                                      uuidGen: UUIDGenerator)
-                                    (implicit val ec: ExecutionContext,
-                                     val appConfig: AppConfig) extends FrontendController(mcc) with FeatureSwitching {
+                                    (val appConfig: AppConfig)
+                                    (implicit val ec: ExecutionContext) extends FrontendController(mcc) with FeatureSwitching {
 
   def initialise: Action[AnyContent] = Action.async { implicit request =>
     val id = uuidGen.generateId

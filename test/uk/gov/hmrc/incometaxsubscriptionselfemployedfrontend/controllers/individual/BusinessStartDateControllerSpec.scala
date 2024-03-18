@@ -25,16 +25,15 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testBusinessStartDateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with FeatureSwitching with MockIncomeTaxSubscriptionConnector {
+  with MockMultipleSelfEmploymentsService with FeatureSwitching with MockSessionDataService {
 
   val id: String = "testId"
 
@@ -50,10 +49,12 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
-    mockIncomeTaxSubscriptionConnector,
     mockAuthService,
-    mockLanguageUtils,
     businessStartDate
+  )(
+    mockSessionDataService,
+    mockLanguageUtils,
+    appConfig
   )
 
   def modelToFormData(businessStartDateModel: DateModel): Seq[(String, String)] = {
@@ -83,7 +84,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockFetchBusinessStartDate(id)(Right(None))
 
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
-        
+
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
       }

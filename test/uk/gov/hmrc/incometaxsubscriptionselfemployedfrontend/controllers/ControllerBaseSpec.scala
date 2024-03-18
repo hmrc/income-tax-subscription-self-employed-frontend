@@ -39,8 +39,7 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
     .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
     .withMethod(POST)
     .withSession(
-    ITSASessionKeys.UTR -> "1234567890",
-    ITSASessionKeys.REFERENCE -> "test-reference",
+    ITSASessionKeys.UTR -> "1234567890"
   )
 
   final def authorisationTests(): Unit = {

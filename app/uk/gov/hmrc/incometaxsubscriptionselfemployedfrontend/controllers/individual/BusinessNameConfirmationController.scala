@@ -22,11 +22,10 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{No, Yes, YesNo}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessNameConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -37,9 +36,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerComponents,
                                                    authService: AuthService,
                                                    multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                                   businessNameConfirmation: BusinessNameConfirmation,
-                                                   appConfig: AppConfig)
-                                                  (val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
+                                                   businessNameConfirmation: BusinessNameConfirmation)
+                                                  (val sessionDataService: SessionDataService,
+                                                   val appConfig: AppConfig)
                                                   (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with SessionRetrievals with I18nSupport {
 
@@ -49,7 +48,7 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withIndividualReference { reference =>
         withBusinessOrUsersName(id, reference) { (name, isBusinessName) =>
           Future.successful(Ok(view(confirmationForm, id, name, isBusinessName)))
         }
@@ -80,7 +79,7 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
 
   private def handleForm(id: String)(onYes: Result, onNo: Result)
                         (implicit request: Request[AnyContent]): Future[Result] = {
-    withReference { reference =>
+    withIndividualReference { reference =>
       withBusinessOrUsersName(id, reference) { (name, isBusinessName) =>
         confirmationForm.bindFromRequest().fold(
           hasError => Future.successful(BadRequest(view(hasError, id, name, isBusinessName))),

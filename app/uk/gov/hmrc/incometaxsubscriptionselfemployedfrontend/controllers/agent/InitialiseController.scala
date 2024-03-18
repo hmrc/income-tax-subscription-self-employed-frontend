@@ -31,8 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
                                      authService: AuthService,
                                      uuidGen: UUIDGenerator)
-                                    (implicit val ec: ExecutionContext,
-                                     val appConfig: AppConfig)
+                                    (val appConfig: AppConfig)
+                                    (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with FeatureSwitching {
 
   val initialise: Action[AnyContent] = Action.async { implicit request =>

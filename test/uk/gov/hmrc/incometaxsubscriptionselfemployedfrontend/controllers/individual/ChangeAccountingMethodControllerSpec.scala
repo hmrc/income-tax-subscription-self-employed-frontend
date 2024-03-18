@@ -22,12 +22,12 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockSessionDataService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.ChangeAccountingMethod
 
 class ChangeAccountingMethodControllerSpec extends ControllerBaseSpec
-  with MockIncomeTaxSubscriptionConnector
+  with MockSessionDataService
   with FeatureSwitching {
 
   private val id: String = "testId"

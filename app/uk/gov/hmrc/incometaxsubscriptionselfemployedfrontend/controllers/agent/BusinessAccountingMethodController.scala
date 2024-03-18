@@ -22,14 +22,13 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -41,8 +40,9 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
                                                    mcc: MessagesControllerComponents,
                                                    multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                    authService: AuthService)
-                                                  (val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
-                                                  (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+                                                  (val sessionDataService: SessionDataService,
+                                                   val appConfig: AppConfig)
+                                                  (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, isEditMode: Boolean)
@@ -57,7 +57,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withAgentReference { reference =>
         multipleSelfEmploymentsService.fetchAccountingMethod(reference) map {
           case Right(accountingMethod) =>
             Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, isEditMode))
@@ -72,7 +72,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withAgentReference { reference =>
         businessAccountingMethodForm.bindFromRequest().fold(
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
@@ -93,10 +93,6 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     else None
   }
 
-}
-
-object BusinessAccountingMethodController {
-  val businessAccountingMethodKey: String = "BusinessAccountingMethod"
 }
 
 

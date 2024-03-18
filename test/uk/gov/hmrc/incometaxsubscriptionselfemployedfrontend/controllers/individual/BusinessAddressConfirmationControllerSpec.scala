@@ -26,20 +26,19 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessAddressConfirmation
 
 import scala.concurrent.Future
 
 class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockIncomeTaxSubscriptionConnector with MockMultipleSelfEmploymentsService {
+  with MockSessionDataService with MockMultipleSelfEmploymentsService {
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -57,7 +56,10 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
     mockAuthService,
     mockMultipleSelfEmploymentsService,
     mock[BusinessAddressConfirmation]
-  )(mockIncomeTaxSubscriptionConnector)
+  )(
+    mockSessionDataService,
+    appConfig
+  )
 
   override val controllerName: String = "BusinessNameConfirmationController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
@@ -73,7 +75,10 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       mockAuthService,
       mockMultipleSelfEmploymentsService,
       mockBusinessAddressConfirmation
-    )(mockIncomeTaxSubscriptionConnector)
+    )(
+      mockSessionDataService,
+      appConfig
+    )
   }
 
   "show" should {

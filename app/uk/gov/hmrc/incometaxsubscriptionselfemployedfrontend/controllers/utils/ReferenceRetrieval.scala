@@ -16,36 +16,41 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils
 
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.Logging
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.{InvalidJsonFailure, UnexpectedStatusFailure}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.SessionDataService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait ReferenceRetrieval {
+trait ReferenceRetrieval extends Logging {
 
-  val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector
+  val sessionDataService: SessionDataService
+  val appConfig: AppConfig
+
   implicit val ec: ExecutionContext
 
-  def withReference(f: String => Future[Result])
-                   (implicit request: Request[AnyContent],
-                    hc: HeaderCarrier): Future[Result] = {
-    request.session.get(ITSASessionKeys.REFERENCE) match {
-      case Some(value) => f(value)
-      case None =>
-        val utr: String = request.session.get(ITSASessionKeys.UTR).getOrElse(
-          throw new InternalServerException("[ReferenceRetrieval][withReference] - Unable to retrieve users utr")
-        )
-        incomeTaxSubscriptionConnector.retrieveReference(utr) flatMap {
-          case Left(InvalidJsonFailure) =>
-            throw new InternalServerException("[ReferenceRetrieval][withReference] - Unable to parse json returned")
-          case Left(UnexpectedStatusFailure(status)) =>
-            throw new InternalServerException(s"[ReferenceRetrieval][withReference] - Unexpected status returned: $status")
-          case Right(value) =>
-            f(value) map (_.addingToSession(ITSASessionKeys.REFERENCE -> value))
-        }
+  def withIndividualReference(f: String => Future[Result])
+                             (implicit hc: HeaderCarrier): Future[Result] = {
+    withReference(f, Redirect(appConfig.taskListUrl))
+  }
+
+  def withAgentReference(f: String => Future[Result])
+                        (implicit hc: HeaderCarrier): Future[Result] = {
+    withReference(f, Redirect(appConfig.clientTaskListUrl))
+  }
+
+  private def withReference(f: String => Future[Result], redirectIfNotPresent: Result)
+                           (implicit hc: HeaderCarrier): Future[Result] = {
+
+    sessionDataService.fetchReference flatMap {
+      case Right(Some(value)) => f(value)
+      case Right(None) => Future.successful(redirectIfNotPresent)
+      case Left(GetSessionDataHttpParser.UnexpectedStatusFailure(status)) =>
+        throw new InternalServerException(s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session. Status: $status")
     }
   }
 

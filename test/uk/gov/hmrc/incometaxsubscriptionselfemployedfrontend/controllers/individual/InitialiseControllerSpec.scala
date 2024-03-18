@@ -45,6 +45,8 @@ class InitialiseControllerSpec extends ControllerBaseSpec
     mockMessagesControllerComponents,
     mockAuthService,
     mockUuid
+  )(
+    appConfig
   )
 
   "initialise" when {

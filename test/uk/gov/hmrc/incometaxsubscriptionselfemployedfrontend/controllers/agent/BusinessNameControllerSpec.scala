@@ -26,15 +26,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.{mockBusinessNameModel, testBusinessNameModel, testValidBusinessTradeNameModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockIncomeTaxSubscriptionConnector with FeatureSwitchingTestUtils {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService with FeatureSwitchingTestUtils {
 
   override def beforeEach(): Unit = {
     disable(featureSwitch = EnableTaskListRedesign)
@@ -53,9 +52,11 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   object TestBusinessNameController extends BusinessNameController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
-    mockIncomeTaxSubscriptionConnector,
     mockAuthService,
     businessName
+  )(
+    mockSessionDataService,
+    appConfig
   )
 
   def modelToFormData(businessName: String): Seq[(String, String)] = {
