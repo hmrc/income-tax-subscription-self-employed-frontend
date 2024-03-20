@@ -26,15 +26,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.{testBusinessNameModel, testValidBusinessTradeName, testValidBusinessTradeNameModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with FeatureSwitchingTestUtils with MockIncomeTaxSubscriptionConnector {
+  with MockMultipleSelfEmploymentsService with FeatureSwitchingTestUtils with MockSessionDataService {
 
   override def beforeEach(): Unit = {
     disable(EnableTaskListRedesign)
@@ -56,8 +55,10 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
       mockMessagesControllerComponents,
       businessTradeNameView,
       mockMultipleSelfEmploymentsService,
-      mockIncomeTaxSubscriptionConnector,
       mockAuthService
+    )(
+      mockSessionDataService,
+      appConfig
     )
 
     testCode(controller)

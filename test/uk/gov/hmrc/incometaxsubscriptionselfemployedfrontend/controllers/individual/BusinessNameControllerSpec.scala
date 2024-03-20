@@ -26,16 +26,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with FeatureSwitching with MockIncomeTaxSubscriptionConnector {
+  with MockMultipleSelfEmploymentsService with FeatureSwitching with MockSessionDataService {
 
   val id: String = "testId"
 
@@ -48,9 +47,11 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   object TestBusinessNameController extends BusinessNameController(
     mockMessagesControllerComponents,
     businessName,
-    mockIncomeTaxSubscriptionConnector,
     mockMultipleSelfEmploymentsService,
     mockAuthService
+  )(
+    mockSessionDataService,
+    appConfig
   )
 
   override def beforeEach(): Unit = {

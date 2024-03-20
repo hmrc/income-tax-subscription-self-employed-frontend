@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.ChangeAccountingMethod
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -31,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChangeAccountingMethodController @Inject()(changeAccountingMethod: ChangeAccountingMethod,
                                                  mcc: MessagesControllerComponents,
                                                  authService: AuthService)
-                                                (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+                                                (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
   def view(id: String)

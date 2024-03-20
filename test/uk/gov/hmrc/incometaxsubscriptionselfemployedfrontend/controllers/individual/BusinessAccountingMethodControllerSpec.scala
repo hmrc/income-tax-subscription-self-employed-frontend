@@ -25,16 +25,15 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
 
 class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
-  with MockIncomeTaxSubscriptionConnector with MockMultipleSelfEmploymentsService
+  with MockSessionDataService with MockMultipleSelfEmploymentsService
   with FeatureSwitching {
 
   override val controllerName: String = "BusinessAccountingMethodController"
@@ -48,9 +47,11 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   private object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
     mock[BusinessAccountingMethod],
     mockMessagesControllerComponents,
-    mockIncomeTaxSubscriptionConnector,
     mockMultipleSelfEmploymentsService,
     mockAuthService
+  )(
+    mockSessionDataService,
+    appConfig
   )
 
   def modelToFormData(accountingMethodModel: AccountingMethod): Seq[(String, String)] = {
@@ -190,9 +191,11 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     val controller = new BusinessAccountingMethodController(
       businessAccountingMethodView,
       mockMessagesControllerComponents,
-      mockIncomeTaxSubscriptionConnector,
       mockMultipleSelfEmploymentsService,
       mockAuthService
+    )(
+      mockSessionDataService,
+      appConfig
     )
 
     testCode(controller)

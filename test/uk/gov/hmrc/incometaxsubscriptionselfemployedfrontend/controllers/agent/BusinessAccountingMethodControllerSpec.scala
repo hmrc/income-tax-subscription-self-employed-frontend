@@ -25,16 +25,15 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testAccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 
 class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
-  with MockIncomeTaxSubscriptionConnector
+  with MockSessionDataService
   with MockMultipleSelfEmploymentsService
   with FeatureSwitching {
 
@@ -52,7 +51,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     mockMultipleSelfEmploymentsService,
     mockAuthService
   )(
-    mockIncomeTaxSubscriptionConnector
+    mockSessionDataService,
+    appConfig
   )
 
   def modelToFormData(accountingMethodModel: AccountingMethod): Seq[(String, String)] = {
@@ -172,7 +172,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       mockMultipleSelfEmploymentsService,
       mockAuthService
     )(
-      mockIncomeTaxSubscriptionConnector
+      mockSessionDataService,
+      appConfig
     )
 
     testCode(controller)

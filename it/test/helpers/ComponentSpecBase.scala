@@ -16,6 +16,7 @@
 
 package helpers
 
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import org.scalatestplus.play.{PlaySpec, PortNumber}
@@ -23,7 +24,7 @@ import play.api.http.HeaderNames
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.crypto.DefaultCookieSigner
-import play.api.libs.json.OFormat
+import play.api.libs.json.{JsString, OFormat}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -36,7 +37,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessi
 import java.time.LocalDate
 
 trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServerPerSuite
-  with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen with SessionCookieBaker {
+  with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach
+  with GivenWhenThen with SessionCookieBaker {
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
@@ -89,12 +91,14 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   override def beforeEach(): Unit = {
     resetWiremock()
     super.beforeEach()
+
+    stubGetSessionData(REFERENCE)(OK, JsString(reference))
   }
 
   def get(uri: String, additionalCookies: Map[String, String] = Map.empty)(implicit ws: WSClient, portNumber: PortNumber): WSResponse = {
     await(
       buildClient(uri)
-        .withHttpHeaders(HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies))
+        .withHttpHeaders(HeaderNames.COOKIE -> bakeSessionCookie(additionalCookies))
         .get()
     )
   }
@@ -112,7 +116,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     await(
       buildClient(uri)
         .withHttpHeaders(
-          HeaderNames.COOKIE -> bakeSessionCookie(Map(REFERENCE -> "test-reference") ++ additionalCookies), "Csrf-Token" -> "nocheck"
+          HeaderNames.COOKIE -> bakeSessionCookie(additionalCookies), "Csrf-Token" -> "nocheck"
         )
         .post(body)
     )

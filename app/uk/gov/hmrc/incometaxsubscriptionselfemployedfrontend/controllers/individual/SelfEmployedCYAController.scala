@@ -21,28 +21,28 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SelfEmploymentsCYAModel, SoleTraderBusiness}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployedCYA,
-                                          val authService: AuthService,
-                                          val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
+class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
+                                          authService: AuthService,
                                           multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                           mcc: MessagesControllerComponents)
-                                         (implicit val appConfig: AppConfig, val ec: ExecutionContext)
+                                         (val sessionDataService: SessionDataService,
+                                          val appConfig: AppConfig)
+                                         (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withIndividualReference { reference =>
         withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
           Future.successful(Ok(checkYourAnswersView(
             answers = selfEmploymentCYAModel,
@@ -55,7 +55,7 @@ class SelfEmployedCYAController @Inject()(val checkYourAnswersView: SelfEmployed
   }
 
   def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
-    withReference { reference =>
+    withIndividualReference { reference =>
       withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
         if (selfEmploymentCYAModel.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {

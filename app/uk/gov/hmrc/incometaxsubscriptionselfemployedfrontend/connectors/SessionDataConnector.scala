@@ -29,7 +29,7 @@ class SessionDataConnector @Inject()(appConfig: AppConfig,
                                      http: HttpClient)
                                     (implicit ec: ExecutionContext) {
 
-  def sessionDataUrl(id: String): String = {
+  private def sessionDataUrl(id: String): String = {
     appConfig.protectedMicroServiceUrl + s"/income-tax-subscription/session-data/id/$id"
   }
 

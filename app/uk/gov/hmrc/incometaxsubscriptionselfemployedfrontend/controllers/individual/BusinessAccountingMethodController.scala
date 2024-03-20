@@ -22,12 +22,11 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -37,10 +36,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BusinessAccountingMethodController @Inject()(businessAccountingMethod: BusinessAccountingMethod,
                                                    mcc: MessagesControllerComponents,
-                                                   val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                    multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                    authService: AuthService)
-                                                  (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+                                                  (val sessionDataService: SessionDataService,
+                                                   val appConfig: AppConfig)
+                                                  (implicit val ec: ExecutionContext)
+
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, businessCount: Int, isEditMode: Boolean)
@@ -54,7 +55,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withIndividualReference { reference =>
         withAccountingMethod(reference) { accountingMethod =>
           withSelfEmploymentsCount(reference) { businessCount =>
             Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, businessCount, isEditMode))
@@ -66,7 +67,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withIndividualReference { reference =>
         businessAccountingMethodForm.bindFromRequest().fold(
           formWithErrors =>
             withSelfEmploymentsCount(reference) { businessCount =>

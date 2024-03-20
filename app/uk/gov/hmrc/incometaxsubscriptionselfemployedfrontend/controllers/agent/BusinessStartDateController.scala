@@ -22,14 +22,13 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -41,11 +40,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                            val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService,
-                                            val languageUtils: LanguageUtils,
                                             businessStartDate: BusinessStartDateView)
-                                           (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+                                           (val sessionDataService: SessionDataService,
+                                            val languageUtils: LanguageUtils,
+                                            val appConfig: AppConfig)
+                                           (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
   def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean)
@@ -61,7 +61,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withAgentReference { reference =>
         multipleSelfEmploymentsService.fetchStartDate(reference, id).map {
           case Right(businessStartDateData) =>
             Ok(view(form.fill(businessStartDateData), id, isEditMode))
@@ -73,7 +73,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withAgentReference { reference =>
         form.bindFromRequest().fold(
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),

@@ -16,81 +16,110 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils
 
-import org.scalatest.matchers.must.Matchers
+import org.mockito.Mockito.when
 import org.scalatestplus.play.PlaySpec
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
-import play.api.mvc.{AnyContent, Request, Results}
-import play.api.test.FakeRequest
-import play.api.test.Helpers.{await, defaultAwaitTimeout, status}
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
+import play.api.mvc.Results._
+import play.api.test.Helpers.{await, contentAsString, defaultAwaitTimeout, redirectLocation, status}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.{InvalidJsonFailure, UnexpectedStatusFailure}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.mocks.MockAppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.SessionDataService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockSessionDataService
 
+import scala.concurrent.ExecutionContext.Implicits
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReferenceRetrievalSpec extends PlaySpec with Matchers with MockIncomeTaxSubscriptionConnector with Results {
+class ReferenceRetrievalSpec extends PlaySpec with MockSessionDataService with MockAppConfig {
 
   object TestReferenceRetrieval extends ReferenceRetrieval {
-    override implicit val ec: ExecutionContext = executionContext
-    override val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector = mockIncomeTaxSubscriptionConnector
+    override val sessionDataService: SessionDataService = mockSessionDataService
+    override val appConfig: AppConfig = mockAppConfig
+    override implicit val ec: ExecutionContext = Implicits.global
   }
 
   implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  val utr: String = "1234567890"
   val reference: String = "test-reference"
+  val testTaskListUrl: String = "/test-task-list-url"
+  val testAgentTaskListUrl: String = "/test-agent-task-list-url"
 
-  "withReference" should {
-    "return an exception" when {
-      "the user's utr is not in session" in {
-        implicit val request: Request[AnyContent] = FakeRequest().withSession()
+  "withIndividualReference" should {
+    "return the reference requested" when {
+      "the reference was successfully returned from the session store" in {
+        mockFetchReferenceSuccess(Some(reference))
+        when(mockAppConfig.taskListUrl) thenReturn testTaskListUrl
 
-        intercept[InternalServerException](await(TestReferenceRetrieval.withReference { reference =>
+        val result = TestReferenceRetrieval.withIndividualReference { reference =>
           Future.successful(Ok(reference))
-        })).message mustBe "[ReferenceRetrieval][withReference] - Unable to retrieve users utr"
-      }
-      "reference is not already in session and the retrieval returns an InvalidJson error" in {
-        mockRetrieveReference(utr)(Left(InvalidJsonFailure))
+        }
 
-        implicit val request: Request[AnyContent] = FakeRequest().withSession(ITSASessionKeys.UTR -> utr)
-
-        intercept[InternalServerException](await(TestReferenceRetrieval.withReference { reference =>
-          Future.successful(Ok(reference))
-        })).message mustBe "[ReferenceRetrieval][withReference] - Unable to parse json returned"
-      }
-      "reference is not already in session and the retrieval returns an UnexpectedStatus error" in {
-        mockRetrieveReference(utr)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-
-        implicit val request: Request[AnyContent] = FakeRequest().withSession(ITSASessionKeys.UTR -> utr)
-
-        intercept[InternalServerException](await(TestReferenceRetrieval.withReference { reference =>
-          Future.successful(Ok(reference))
-        })).message mustBe s"[ReferenceRetrieval][withReference] - Unexpected status returned: $INTERNAL_SERVER_ERROR"
+        status(result) mustBe OK
+        contentAsString(result) mustBe reference
       }
     }
-    "pass the reference through to the provided function" when {
-      "the reference is already in session" in {
-        implicit val request: Request[AnyContent] = FakeRequest().withSession(ITSASessionKeys.UTR -> utr, ITSASessionKeys.REFERENCE -> reference)
+    "redirect to the individual task list page" when {
+      "no reference was found in the session store" in {
+        mockFetchReferenceSuccess(None)
+        when(mockAppConfig.taskListUrl) thenReturn testTaskListUrl
 
-        val result = TestReferenceRetrieval.withReference { reference =>
-          Future.successful(Ok(reference))
+        val result = TestReferenceRetrieval.withIndividualReference { _ =>
+          Future.successful(Redirect(testTaskListUrl))
         }
 
-        status(result) mustBe OK
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(testTaskListUrl)
       }
-      "the reference is not in session and we call out to retrieve the reference successfully and add the reference to the session" in {
-        mockRetrieveReference(utr)(Right(reference))
+    }
+    "throw an InternalServerException" when {
+      "an error was returned from the session store" in {
+        mockFetchReferenceFailure(INTERNAL_SERVER_ERROR)
+        when(mockAppConfig.taskListUrl) thenReturn testTaskListUrl
 
-        implicit val request: Request[AnyContent] = FakeRequest().withSession(ITSASessionKeys.UTR -> utr)
-
-        val result = TestReferenceRetrieval.withReference { reference =>
-          Future.successful(Ok(reference))
-        }
-
-        status(result) mustBe OK
+        intercept[InternalServerException](await(TestReferenceRetrieval.withIndividualReference { _ =>
+          Future.successful(Ok("test-failure"))
+        })).message mustBe s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session. Status: $INTERNAL_SERVER_ERROR"
       }
     }
   }
+
+  "withAgentReference" should {
+    "return the reference requested" when {
+      "the reference was successfully returned from the session store" in {
+        mockFetchReferenceSuccess(Some(reference))
+        when(mockAppConfig.clientTaskListUrl) thenReturn testAgentTaskListUrl
+
+        val result = TestReferenceRetrieval.withAgentReference { reference =>
+          Future.successful(Ok(reference))
+        }
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe reference
+      }
+    }
+    "redirect to the individual task list page" when {
+      "no reference was found in the session store" in {
+        mockFetchReferenceSuccess(None)
+        when(mockAppConfig.clientTaskListUrl) thenReturn testAgentTaskListUrl
+
+        val result = TestReferenceRetrieval.withAgentReference { _ =>
+          Future.successful(Ok("test-redirect"))
+        }
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(testAgentTaskListUrl)
+      }
+    }
+    "throw an InternalServerException" when {
+      "an error was returned from the session store" in {
+        mockFetchReferenceFailure(INTERNAL_SERVER_ERROR)
+        when(mockAppConfig.clientTaskListUrl) thenReturn testAgentTaskListUrl
+
+        intercept[InternalServerException](await(TestReferenceRetrieval.withAgentReference { _ =>
+          Future.successful(Ok("test-failure"))
+        })).message mustBe s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session. Status: $INTERNAL_SERVER_ERROR"
+      }
+    }
+  }
+
 }

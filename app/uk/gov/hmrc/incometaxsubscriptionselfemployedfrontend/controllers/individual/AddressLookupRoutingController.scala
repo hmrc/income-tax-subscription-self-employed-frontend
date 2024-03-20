@@ -21,13 +21,13 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.{AddressLookupConnector, IncomeTaxSubscriptionConnector}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Address}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -37,9 +37,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents,
                                                authService: AuthService,
                                                addressLookupConnector: AddressLookupConnector,
-                                               val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService)
-                                              (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+                                              (val sessionDataService: SessionDataService,
+                                               val appConfig: AppConfig)
+                                              (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
   private def addressLookupContinueUrl(businessId: String, id: Option[String], isEditMode: Boolean): String =
@@ -47,7 +48,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
       routes.AddressLookupRoutingController.addressLookupRedirect(businessId, id, isEditMode)
 
   def checkAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    withReference { reference =>
+    withIndividualReference { reference =>
       multipleSelfEmploymentsService.fetchFirstAddress(reference) map {
         case Right(Some(_)) if isEnabled(EnableTaskListRedesign) =>
           Redirect(routes.BusinessAddressConfirmationController.show(businessId))
@@ -77,7 +78,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
 
   def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withIndividualReference { reference =>
         for {
           addressDetails <- fetchAddress(addressId)
           accountingMethod <- fetchAccountMethod(reference)

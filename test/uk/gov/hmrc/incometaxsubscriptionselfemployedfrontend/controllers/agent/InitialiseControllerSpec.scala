@@ -42,7 +42,7 @@ class InitialiseControllerSpec extends ControllerBaseSpec with FeatureSwitching 
     mockMessagesControllerComponents,
     mockAuthService,
     mockUuid
-  )
+  )(appConfig)
 
   "initialise" when {
     "the task list redesign feature switch is enabled" should {

@@ -27,12 +27,11 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.{ControllerBaseSpec, agent}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
@@ -40,7 +39,7 @@ import uk.gov.hmrc.play.language.LanguageUtils
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService
-  with MockIncomeTaxSubscriptionConnector
+  with MockSessionDataService
   with ImplicitDateFormatter
   with FeatureSwitchingTestUtils {
 
@@ -84,10 +83,12 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
-    mockIncomeTaxSubscriptionConnector,
     mockAuthService,
-    mockLanguageUtils,
     businessStartDate
+  )(
+    mockSessionDataService,
+    mockLanguageUtils,
+    appConfig
   )
 
   def modelToFormData(model: DateModel): Seq[(String, String)] = {

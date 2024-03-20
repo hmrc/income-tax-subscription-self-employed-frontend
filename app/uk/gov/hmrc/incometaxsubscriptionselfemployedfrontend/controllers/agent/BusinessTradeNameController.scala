@@ -23,12 +23,11 @@ import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -39,9 +38,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
                                             businessTradeName: BusinessTradeName,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                            val incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector,
                                             authService: AuthService)
-                                           (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+                                           (val sessionDataService: SessionDataService,
+                                            val appConfig: AppConfig)
+                                           (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
   def view(tradeForm: Form[String], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
@@ -55,7 +55,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withAgentReference { reference =>
         getCurrentTradeAndExcludedTrades(reference, id) flatMap { case (currentTrade, excludedTrades) =>
           Future.successful(Ok(
             view(tradeValidationForm(excludedTrades).fill(currentTrade), id, isEditMode)
@@ -67,7 +67,7 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
 
   def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      withReference { reference =>
+      withAgentReference { reference =>
         getCurrentTradeAndExcludedTrades(reference, id) flatMap { case (_, excludedTrades) =>
           tradeValidationForm(excludedTrades).bindFromRequest().fold(
             formWithErrors =>
