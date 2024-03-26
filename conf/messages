@@ -84,7 +84,7 @@ individual.business-address-confirmation.heading.caption        = Sole trader
 individual.business-address-confirmation.para                   = Does this business have the same address as the first one you added?
 individual.business-address-confirmation.summary.address        = Address
 individual.business-address-confirmation.form.heading           = Is this address correct?
-error.individual.business-address-confirmation.empty            = Select ‘Yes’ if this is is your business’s address.
+error.individual.business-address-confirmation.empty            = Select ‘Yes’ if this is your business’s address.
 
 # Business Address page
 address-lookup.select-page.title                                = Select business address
@@ -198,7 +198,7 @@ agent.business-address-confirmation.heading.caption             = {0} | {1}
 agent.business-address-confirmation.para                        = Does this business have the same address as the first one you added?
 agent.business-address-confirmation.summary.address             = Address
 agent.business-address-confirmation.form.heading                = Is this address correct?
-error.agent.business-address-confirmation.empty                 = Select ’Yes’ if this is your client’s business address.
+error.agent.business-address-confirmation.empty                 = Select ‘Yes’ if this is your client’s business address.
 
 #Agent Business Address page
 agent.address-lookup.select-page.title                            = Select client’s business address
