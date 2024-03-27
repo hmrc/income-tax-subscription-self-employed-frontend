@@ -75,7 +75,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
       val legend: String = "Is this address correct?"
       val yes: String = "Yes"
       val no: String = "No"
-      val emptyError: String = "Select ’Yes’ if this is your client’s business address."
+      val emptyError: String = "Select ‘Yes’ if this is your client’s business address."
       val saveAndContinue: String = "Save and continue"
       val saveAndComeBackLater: String = "Save and come back later"
     }
