@@ -38,7 +38,8 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val heading: String = title
     val captionHidden = "This section is"
     val captionVisual = "Sole trader"
-    val line_1: String = "This is the date we’ll use to calculate Class 2 National Insurance charge, if appropriate."
+    val line_1: String = "The date your business started trading can be today, in the past or up to 7 days in the future"
+    val line_2: String = "This is the date we’ll use to calculate Class 2 National Insurance charge, if appropriate."
     val hint = "For example, 17 4 2018."
     val backLink = "Back"
     val update = "Update"
@@ -88,8 +89,9 @@ class BusinessStartDateViewSpec extends ViewSpec {
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessStartDateMessages.heading
     }
-    "have a paragraph" in new Setup {
-      document.select("p[class=govuk-body]").text mustBe BusinessStartDateMessages.line_1
+    "have paragraphs" in new Setup {
+      document.getElementById("business-start-date.line-1").text mustBe BusinessStartDateMessages.line_1
+      document.getElementById("business-start-date.line-2").text mustBe BusinessStartDateMessages.line_2
     }
     "have a Form" in new Setup {
       document.getForm.attr("method") mustBe testCall.method
