@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, DetailsHelper, RadioHelper, SaveAndContinueButtonHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Accruals, Cash}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
 @this(
         mainTemplate: PrincipalMainTemplate,
@@ -44,8 +45,8 @@
 
 @handleBackUrl = @{
     backUrl match {
-        case None => Some("javascript:history.back()")
-        case Some(url) => Some(url)
+        case Some(url) => Some(BackLink(href = url))
+        case None => Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
     }
 }
 

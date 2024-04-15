@@ -33,7 +33,7 @@
 
 @(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, address: Address, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("agent.business-address-confirmation.heading"), optForm = Some(confirmationForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("agent.business-address-confirmation.heading"), optForm = Some(confirmationForm), backLink = Some(BackLink(href = backUrl))) {
 
     @hmrcPageHeading(PageHeading(
         text = messages("agent.business-address-confirmation.heading"),

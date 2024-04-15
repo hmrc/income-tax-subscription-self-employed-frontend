@@ -124,7 +124,7 @@
 
 @mainTemplate(
     title = messages("agent.self-employed-cya.title"),
-    backLink = backUrl
+    backLink = backUrl.map(url => BackLink(href = url))
 ) {
 
     <span class="govuk-caption-l">

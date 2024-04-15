@@ -30,7 +30,7 @@
 )
 @(businessStartDateForm: Form[DateModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.start-date.title"), optForm = Some(businessStartDateForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("business.start-date.title"), optForm = Some(businessStartDateForm), backLink = Some(BackLink(href = backUrl))) {
 
     @form(action = postAction) {
 

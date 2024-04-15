@@ -30,9 +30,9 @@
         hmrcPageHeading:HmrcPageHeading,
 )
 
-@(businessNameForm: Form[String], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
+@(businessNameForm: Form[String], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("agent.business.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("agent.business.name.title"), optForm = Some(businessNameForm), backLink = Some(BackLink(href = backUrl))) {
 
     <span class="govuk-caption-l">
         @messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)

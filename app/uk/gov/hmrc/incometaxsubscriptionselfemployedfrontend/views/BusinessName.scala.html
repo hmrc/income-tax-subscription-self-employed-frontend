@@ -30,7 +30,7 @@
 
 @(businessNameForm: Form[String], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.name.title"), optForm = Some(businessNameForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("business.name.title"), optForm = Some(businessNameForm), backLink = Some(BackLink(href = backUrl))) {
 
     @form(action = postAction) {
 

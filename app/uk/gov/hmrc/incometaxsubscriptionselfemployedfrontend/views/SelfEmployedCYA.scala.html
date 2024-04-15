@@ -126,7 +126,7 @@
 
 @mainTemplate(
     title = messages("self-employed-cya.title"),
-    backLink = backUrl
+    backLink = backUrl.map(url => BackLink(href = url))
 ) {
 
     @hmrcPageHeading(PageHeading(

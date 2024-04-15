@@ -22,7 +22,7 @@
         govukWrapper: GovUkWrapper
 )
 
-@(title: String, optForm: Option[Form[_]] = None, backLink: Option[String]= None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(title: String, optForm: Option[Form[_]] = None, backLink: Option[BackLink] = None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @prefixedTitle = @{
     optForm match {

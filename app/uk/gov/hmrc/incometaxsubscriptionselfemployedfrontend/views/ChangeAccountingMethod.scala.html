@@ -27,7 +27,7 @@
 
 @(postAction: Call, backUrl: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.change-accounting-method.heading"), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("business.change-accounting-method.heading"), backLink = Some(BackLink(href = backUrl))) {
 
     <h1 class="govuk-heading-l">@messages("business.change-accounting-method.heading")</h1>
 

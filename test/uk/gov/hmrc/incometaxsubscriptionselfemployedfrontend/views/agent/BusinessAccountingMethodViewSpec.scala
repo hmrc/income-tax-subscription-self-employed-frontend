@@ -82,7 +82,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
     "have a javascript backlink" in new Setup(backLink = None) {
       document.getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
-      document.getBackLinkByClass.attr("href") mustBe "javascript:history.back()"
+      document.getBackLinkByClass.attr("href") mustBe "#"
+      document.getBackLinkByClass.attr("data-module") mustBe "hmrc-back-link"
     }
 
     "have a heading" in new Setup {
