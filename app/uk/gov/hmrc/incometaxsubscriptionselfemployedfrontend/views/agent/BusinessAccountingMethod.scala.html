@@ -34,8 +34,8 @@
 
 @handleBackUrl = @{
     backUrl match {
-        case None => Some("javascript:history.back()")
-        case Some(url) => Some(url)
+        case None => Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+        case Some(url) => Some(BackLink(href = url))
     }
 }
 

@@ -36,7 +36,7 @@
         hmrcStandardPage: HmrcStandardPage
 )
 
-@(title: String, serviceName: String, serviceUrl: String, optForm: Option[Form[_]] = None, backLink: Option[String] = None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(title: String, serviceName: String, serviceUrl: String, optForm: Option[Form[_]] = None, backLink: Option[BackLink] = None, showSignOutLink: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @additionalHeadBlock = {
     <link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css" />
@@ -67,8 +67,7 @@
 
 }
 
-@hmrcStandardPage(HmrcStandardPageParams
-  (
+@hmrcStandardPage(HmrcStandardPageParams(
     serviceURLs = ServiceURLs(
       serviceUrl = Some(serviceUrl),
       signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
@@ -83,6 +82,5 @@
     serviceName = Some(serviceName),
     isWelshTranslationAvailable = true,
     pageTitle = Some(title),
-    backLink = backLink.map(url => BackLink(href = url))
-  )
-)(content)
+    backLink = backLink
+))(content)

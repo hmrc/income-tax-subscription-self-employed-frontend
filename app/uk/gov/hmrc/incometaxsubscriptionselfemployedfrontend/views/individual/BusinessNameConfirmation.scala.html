@@ -34,7 +34,7 @@
 
 @(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, name: String, isBusinessName:Boolean)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages(headingKey), optForm = Some(confirmationForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages(headingKey), optForm = Some(confirmationForm), backLink = Some(BackLink(href = backUrl))) {
 
             @hmrcPageHeading(PageHeading(
                     text = messages(headingKey),

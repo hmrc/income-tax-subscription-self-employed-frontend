@@ -88,7 +88,9 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
       Some(routes.ChangeAccountingMethodController.show(id).url)
     } else if (isEditMode) {
       Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
-    } else None
+    } else {
+      None
+    }
   }
 
   private def withAccountingMethod(reference: String)(f: Option[AccountingMethod] => Future[Result])

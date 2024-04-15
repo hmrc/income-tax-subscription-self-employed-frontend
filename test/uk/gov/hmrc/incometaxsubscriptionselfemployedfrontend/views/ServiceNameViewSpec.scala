@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.test.FakeRequest
 import play.twirl.api.{Html, HtmlFormat}
+import uk.gov.hmrc.govukfrontend.views.Aliases.BackLink
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.GovUkWrapper
 
@@ -34,7 +35,7 @@ class ServiceNameViewSpec extends ViewSpec {
       serviceName = serviceName,
       serviceUrl = serviceUrl,
       optForm = None,
-      backLink = Some("backUrl"),
+      backLink = Some(BackLink("backUrl")),
       showSignOutLink = false
     )(Html(""))(FakeRequest(), implicitly)
 

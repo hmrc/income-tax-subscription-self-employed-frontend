@@ -31,7 +31,7 @@
 
 @(businessTradeNameForm: Form[String], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.trade-name.title"), optForm = Some(businessTradeNameForm), backLink = Some(backUrl)) {
+@mainTemplate(title = messages("business.trade-name.title"), optForm = Some(businessTradeNameForm), backLink = Some(BackLink(href = backUrl))) {
 
     @hmrcPageHeading(PageHeading(
         text = messages("business.trade-name.heading"),
