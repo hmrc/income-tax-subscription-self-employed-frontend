@@ -32,14 +32,9 @@
 @(businessTradeNameForm: Form[String], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.trade-name.title"), optForm = Some(businessTradeNameForm), backLink = Some(BackLink(href = backUrl))) {
-
-    @hmrcPageHeading(PageHeading(
-        text = messages("business.trade-name.heading"),
-        section = Some(messages("business.trade-name.caption")),
-        headingClasses = Some("govuk-heading-l"),
-        captionClasses = Some("govuk-caption-l")
-    ))
-
+    <span class="govuk-caption-l">
+        @messages("business.trade-name.caption")
+    </span>
     @form(action = postAction) {
 
         @textInputHelper(
@@ -47,8 +42,6 @@
             label = messages("business.trade-name.heading"),
             hint = Some(inputTextHint),
             classes = Some("govuk-!-width-one-half"),
-            isPageHeading = false,
-            isLabelHidden = true
         )
 
         @saveAndContinueButtonHelper(individual = true, saveAndReturnReference = Some("sole-trader-business-trade"))
