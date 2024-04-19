@@ -66,7 +66,7 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
       val legend: String = "Is this name correct?"
       val yes: String = "Yes"
       val no: String = "No"
-      val emptyError: String = "Select ‘Yes’ if this is correct"
+      val emptyError: String = "Select ‘Yes’ if your business trading name is the same as your own name"
       val saveAndContinue: String = "Save and continue"
       val saveAndComeBackLater: String = "Save and come back later"
     }

@@ -31,7 +31,7 @@ individual.business-name-confirmation.heading.second            = A yw’r enw m
 individual.business-name-confirmation.heading.caption           = Unig fasnachwr
 individual.business-name-confirmation.summary.business-name     = Enw’r busnes
 individual.business-name-confirmation.form.heading              = A yw’r enw hwn yn gywir?
-error.individual.business-name-confirmation.empty               = Dewiswch ‘Iawn’ os yw hyn yn gywir.
+error.individual.business-name-confirmation.empty               = Dewiswch ‘Iawn’ os yw enw masnachu eich busnes yr un fath â’ch enw chi
 
 # Business Name
 business.name.title                                             = Beth yw enw’ch busnes?
@@ -85,7 +85,7 @@ individual.business-address-confirmation.heading.caption        = Unig fasnachwr
 individual.business-address-confirmation.para                   = A oes gan y busnes hwn yr un cyfeiriad â’r un cyntaf i chi ei ychwanegu?
 individual.business-address-confirmation.summary.address        = Cyfeiriad
 individual.business-address-confirmation.form.heading           = A yw’r cyfeiriad hwn yn gywir?
-error.individual.business-address-confirmation.empty            = Dewiswch ‘Iawn’ os mai dyma gyfeiriad eich busnes.
+error.individual.business-address-confirmation.empty            = Dewiswch ‘Iawn’ os mai dyma gyfeiriad eich busnes
 
 # Business Address page
 address-lookup.select-page.title                                = Dewiswch gyfeiriad busnes
@@ -150,7 +150,7 @@ agent.business-name-confirmation.heading-secondary         = A yw enw masnachu b
 agent.business-name-confirmation.heading.caption           = {0} | {1}
 agent.business-name-confirmation.summary.business-name     = Enw’r busnes
 agent.business-name-confirmation.form.heading              = A yw’r enw hwn yn gywir?
-error.agent.business-name-confirmation.empty               = Dewiswch ‘Iawn’ os yw hyn yn gywir.
+error.agent.business-name-confirmation.empty               = Dewiswch ‘Iawn’ os yw enw busnes eich cleient yr un fath â’i enw ei hun
 
 
 # Agent Business Name
@@ -200,7 +200,7 @@ agent.business-address-confirmation.heading.caption             = {0} | {1}
 agent.business-address-confirmation.para                        = A yw enw masnachu busnes eich cleient yr un peth â’r enw cyntaf i chi ei ychwanegu?
 agent.business-address-confirmation.summary.address             = Cyfeiriad
 agent.business-address-confirmation.form.heading                = A yw’r cyfeiriad hwn yn gywir?
-error.agent.business-address-confirmation.empty                 = Dewiswch ‘Iawn’ os mai dyma gyfeiriad busnes eich cleient.
+error.agent.business-address-confirmation.empty                 = Dewiswch ‘Iawn’ os mai dyma gyfeiriad busnes eich cleient
 
 # Agent Business Address page
 agent.address-lookup.select-page.title                          = dewis cyfeiriad busnes y cleient
