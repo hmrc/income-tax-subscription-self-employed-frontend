@@ -36,6 +36,7 @@
 @(businessAccountingMethodForm: Form[AccountingMethod], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
 
 @detailsContent = {
+    <p class="govuk-body govuk-!-font-weight-bold">@Messages("business.accounting-method.accordion.subheading")</p>
     <p>@Messages("business.accounting-method.accordion.line-1")</p>
     <ul class="bullets">
         <li>@Messages("business.accounting-method.accordion.bullet-1")</li>
