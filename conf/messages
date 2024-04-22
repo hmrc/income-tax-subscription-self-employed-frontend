@@ -31,7 +31,7 @@ individual.business-name-confirmation.heading.second            = Is your busine
 individual.business-name-confirmation.heading.caption           = Sole trader
 individual.business-name-confirmation.summary.business-name     = Business name
 individual.business-name-confirmation.form.heading              = Is this name correct?
-error.individual.business-name-confirmation.empty               = Select ‘Yes’ if this is correct
+error.individual.business-name-confirmation.empty               = Select ‘Yes’ if your business trading name is the same as your own name
 
 # Business Name
 business.name.caption                                           = Sole trader
@@ -77,7 +77,7 @@ error.business-trade-name.empty                                 = Enter the trad
 error.business-trade-name.max-length                            = Business trade must be 35 characters or fewer.
 error.business-trade-name.min-length                            = Your business trade name must include at least two letters (upper or lower case)
 error.business-trade-name.duplicate                             = You cannot enter the same trade and same business name.
-error.business-trade-name.invalid                               = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, ', \, /, -
+error.business-trade-name.invalid                               = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
 
 # Business address confirmation
 individual.business-address-confirmation.heading                = Confirm business address
@@ -85,7 +85,7 @@ individual.business-address-confirmation.heading.caption        = Sole trader
 individual.business-address-confirmation.para                   = Does this business have the same address as the first one you added?
 individual.business-address-confirmation.summary.address        = Address
 individual.business-address-confirmation.form.heading           = Is this address correct?
-error.individual.business-address-confirmation.empty            = Select ‘Yes’ if this is your business’s address.
+error.individual.business-address-confirmation.empty            = Select ‘Yes’ if this is your business address
 
 # Business Address page
 address-lookup.select-page.title                                = Select business address
@@ -151,7 +151,7 @@ agent.business-name-confirmation.heading-secondary         = Is your client’s 
 agent.business-name-confirmation.heading.caption           = {0} | {1}
 agent.business-name-confirmation.summary.business-name     = Business name
 agent.business-name-confirmation.form.heading              = Is this name correct?
-error.agent.business-name-confirmation.empty               = Select ‘Yes’ if this is correct
+error.agent.business-name-confirmation.empty               = Select ‘Yes’ if your client’s business name is the same as their own name
 
 # Agent Business Name
 agent.business.name.title                                       = What is the name of your client’s business?
@@ -191,7 +191,7 @@ business.agent.trade-name.hint                                  = For example: p
 error.agent.business-trade-name.empty                           = Enter the trade of your client’s business.
 error.agent.business-trade-name.max-length                      = Business trade must be 35 characters or fewer.
 error.agent.business-trade-name.min-length                      = Your business trade name must include at least two letters (upper or lower case)
-error.agent.business-trade-name.invalid                         = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, ', \, /, -
+error.agent.business-trade-name.invalid                         = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
 error.agent.business-trade-name.duplicate                       = You cannot enter the same trade and same business name.
 
 #Agent Business Address Confirmation
@@ -200,7 +200,7 @@ agent.business-address-confirmation.heading.caption             = {0} | {1}
 agent.business-address-confirmation.para                        = Does this business have the same address as the first one you added?
 agent.business-address-confirmation.summary.address             = Address
 agent.business-address-confirmation.form.heading                = Is this address correct?
-error.agent.business-address-confirmation.empty                 = Select ‘Yes’ if this is your client’s business address.
+error.agent.business-address-confirmation.empty                 = Select ‘Yes’ if this is your client’s business address
 
 #Agent Business Address page
 agent.address-lookup.select-page.title                            = Select client’s business address
