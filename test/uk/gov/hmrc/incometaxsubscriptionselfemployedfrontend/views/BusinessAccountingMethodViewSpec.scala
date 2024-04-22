@@ -41,7 +41,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val captionHidden = "This section is"
     val captionVisual = "Sole trader"
     val line_1: String = "If you have more than one sole trader business, all your businesses need to have the same accounting method."
-    val accordion = "Show me an example"
+    val accordion = "Help with accounting methods"
+    val accordion_subheading = "Example"
     val accordionLine_1 = "You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:"
     val accordionBullet_1 = "May 2017, you use ‘cash basis accounting’"
     val accordionBullet_2 = "March 2017, you use ‘traditional accounting’"
@@ -93,8 +94,12 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document().select(".govuk-details__summary-text").text() mustBe BusinessAccountingMethodMessages.accordion
     }
 
+    "have an accordion sub heading" in {
+      document().getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordion_subheading
+    }
+
     "have an accordion heading" in {
-      document().getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
+      document().getParagraphNth(4) mustBe BusinessAccountingMethodMessages.accordionLine_1
     }
 
     "have an accordion bullets list 1" in {
