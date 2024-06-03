@@ -22,8 +22,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
@@ -33,12 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockSessionDataService with FeatureSwitchingTestUtils {
-
-  override def beforeEach(): Unit = {
-    disable(featureSwitch = EnableTaskListRedesign)
-    super.beforeEach()
-  }
+  with MockMultipleSelfEmploymentsService with MockSessionDataService {
 
   val id: String = "testId"
 
@@ -195,16 +188,10 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         TestBusinessNameController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
-  }
-  "not in edit mode with feature switch enabled" should {
-    s"redirect to business name confirmation page" in {
-      enable(featureSwitch = EnableTaskListRedesign)
-      TestBusinessNameController.backUrl(id, isEditMode = false) contains appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/details/confirm-business-name"
-    }
-  }
-  "not in edit mode with feature switch disabled" should {
-    s"redirect to income source page" in {
-      TestBusinessNameController.backUrl(id, isEditMode = false) mustBe appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/income-source"
+    "not in edit mode" should {
+      s"redirect to business name confirmation page" in {
+        TestBusinessNameController.backUrl(id, isEditMode = false) contains appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/client/details/confirm-business-name"
+      }
     }
   }
 

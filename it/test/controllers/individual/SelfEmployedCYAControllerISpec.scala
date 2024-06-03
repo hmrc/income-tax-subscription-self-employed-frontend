@@ -18,22 +18,15 @@ package controllers.individual
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants.{id, soleTraderBusinesses, taskListURI, yourIncomeSources}
+import helpers.IntegrationTestConstants.{id, soleTraderBusinesses, yourIncomeSources}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
 
-class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(EnableTaskListRedesign)
-  }
+class SelfEmployedCYAControllerISpec extends ComponentSpecBase {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -79,10 +72,8 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-check-your-answers" should {
-    "redirect to the your income source page if the task list redesign feature switch is enabled" when {
+    "redirect to the your income source page" when {
       "the user submits valid full data" in {
-        enable(EnableTaskListRedesign)
-
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
@@ -100,8 +91,6 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       }
 
       "the user submits valid incomplete data" in {
-        enable(EnableTaskListRedesign)
-
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
@@ -113,39 +102,6 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(yourIncomeSources)
-        )
-      }
-    }
-    "redirect to the task list page if the task list redesign feature switch is disabled" when {
-      "the user submits valid full data" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When("GET /details/business-check-your-answers is called")
-        val res = submitBusinessCheckYourAnswers(id)
-
-        Then("Should return a SEE_OTHER with a redirect location of task list page")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(taskListURI)
-        )
-      }
-
-      "the user submits valid incomplete data" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
-
-        When("GET /details/business-check-your-answers is called")
-        val res = submitBusinessCheckYourAnswers(id)
-
-        Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(taskListURI)
         )
       }
     }

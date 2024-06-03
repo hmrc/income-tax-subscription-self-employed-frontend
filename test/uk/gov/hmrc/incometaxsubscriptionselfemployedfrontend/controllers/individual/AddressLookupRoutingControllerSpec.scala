@@ -19,8 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks.MockAddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -33,13 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
   with MockSessionDataService
-  with MockMultipleSelfEmploymentsService
-  with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(EnableTaskListRedesign)
-  }
+  with MockMultipleSelfEmploymentsService {
 
   val isAgent = false
 
@@ -70,11 +62,11 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   )
 
   "checkAddressLookupJourney" when {
-    "the task list redesign feature switch is disabled" should {
+    "the user has no already added business addresses" should {
       "redirect to the address lookup initialise route" when {
         "edit mode is false" in {
           mockAuthSuccess()
-          mockFetchFirstAddress(Right(Some(testAddress)))
+          mockFetchFirstAddress(Right(None))
 
           val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)
 
@@ -83,7 +75,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         }
         "edit mode is true" in {
           mockAuthSuccess()
-          mockFetchFirstAddress(Right(Some(testAddress)))
+          mockFetchFirstAddress(Right(None))
 
           val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = true)(fakeRequest)
 
@@ -92,51 +84,19 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         }
       }
     }
-    "the task list redesign feature switch is enabled" when {
-      "the user has no already added business addresses" should {
-        "redirect to the address lookup initialise route" when {
-          "edit mode is false" in {
-            enable(EnableTaskListRedesign)
+    "the user has an already added business address" should {
+      "redirect to the business address confirmation page" in {
+        mockAuthSuccess()
+        mockFetchFirstAddress(Right(Some(testAddress)))
 
-            mockAuthSuccess()
-            mockFetchFirstAddress(Right(None))
+        val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)
 
-            val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)
-
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId).url)
-          }
-          "edit mode is true" in {
-            enable(EnableTaskListRedesign)
-
-            mockAuthSuccess()
-            mockFetchFirstAddress(Right(None))
-
-            val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = true)(fakeRequest)
-
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url)
-          }
-        }
-      }
-      "the user has an already added business address" should {
-        "redirect to the business address confirmation page" in {
-          enable(EnableTaskListRedesign)
-
-          mockAuthSuccess()
-          mockFetchFirstAddress(Right(Some(testAddress)))
-
-          val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessAddressConfirmationController.show(businessId).url)
-        }
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessAddressConfirmationController.show(businessId).url)
       }
     }
     "there was an error returned when fetching the first added address" should {
       "throw an internal server exception" in {
-        enable(EnableTaskListRedesign)
-
         mockFetchFirstAddress(Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)

@@ -24,7 +24,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.{ControllerBaseSpec, agent}
@@ -40,8 +39,7 @@ import uk.gov.hmrc.play.language.LanguageUtils
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService
   with MockSessionDataService
-  with ImplicitDateFormatter
-  with FeatureSwitchingTestUtils {
+  with ImplicitDateFormatter {
 
   val businessStartDate: BusinessStartDate = mock[BusinessStartDate]
   val id: String = "testId"

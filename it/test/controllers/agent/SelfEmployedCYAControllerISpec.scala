@@ -24,16 +24,10 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(EnableTaskListRedesign)
-  }
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -79,10 +73,8 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {
-    "redirect to the your income sources page if the task list redesign feature switch is enabled" when {
+    "redirect to the your income sources page" when {
       "the user submits valid full data" in {
-        enable(EnableTaskListRedesign)
-
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
@@ -100,8 +92,6 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       }
 
       "the user submits valid incomplete data" in {
-        enable(EnableTaskListRedesign)
-
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
@@ -113,39 +103,6 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(clientYourIncomeSources)
-        )
-      }
-    }
-    "redirect to the task list page if the task list redesign feature switch is disabled" when {
-      "the user submits valid full data" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(id)
-
-        Then("Should return a SEE_OTHER with a redirect location of task list page")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(clientTaskListURI)
-        )
-      }
-
-      "the user submits valid incomplete data" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
-
-        When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(id)
-
-        Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(clientTaskListURI)
         )
       }
     }

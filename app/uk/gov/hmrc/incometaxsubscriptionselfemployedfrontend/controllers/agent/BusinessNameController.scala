@@ -22,7 +22,6 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
@@ -34,7 +33,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
 
 @Singleton
 class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
@@ -118,10 +116,8 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
 
   def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
     routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
-  } else if (isEnabled(EnableTaskListRedesign)) {
-    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameConfirmationController.show(id).url
   } else {
-    appConfig.clientWhatIncomeSourceToSignUpUrl
+    routes.BusinessNameConfirmationController.show(id).url
   }
 
 

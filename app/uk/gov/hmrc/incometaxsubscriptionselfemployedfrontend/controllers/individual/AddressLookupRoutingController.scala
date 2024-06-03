@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
@@ -50,7 +49,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
   def checkAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     withIndividualReference { reference =>
       multipleSelfEmploymentsService.fetchFirstAddress(reference) map {
-        case Right(Some(_)) if isEnabled(EnableTaskListRedesign) =>
+        case Right(Some(_)) =>
           Redirect(routes.BusinessAddressConfirmationController.show(businessId))
         case Right(_) =>
           Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode))

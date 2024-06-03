@@ -22,8 +22,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
@@ -33,17 +31,12 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessTradeName
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with FeatureSwitching with MockSessionDataService {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService {
 
   val id: String = "testId"
 
   override val controllerName: String = "BusinessTradeNameController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
-
-  override def beforeEach(): Unit = {
-    disable(EnableTaskListRedesign)
-    super.beforeEach()
-  }
 
   private def withController(testCode: BusinessTradeNameController => Any): Unit = {
     val businessTradeNameView = mock[BusinessTradeName]

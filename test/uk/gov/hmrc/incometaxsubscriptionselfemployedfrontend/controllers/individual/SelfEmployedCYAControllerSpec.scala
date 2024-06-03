@@ -19,8 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingTestUtils
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
@@ -31,12 +29,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.individ
 import scala.concurrent.Future
 
 class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockSessionDataService with FeatureSwitchingTestUtils with MockSelfEmployedCYA {
-
-  override def beforeEach(): Unit = {
-    disable(EnableTaskListRedesign)
-    super.beforeEach()
-  }
+  with MockMultipleSelfEmploymentsService with MockSessionDataService with MockSelfEmployedCYA {
 
   val id: String = "testId"
 
@@ -103,28 +96,8 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
           .message mustBe "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
       }
 
-      "return 303, (SEE_OTHER) and redirect to the task list page if the task list redesign feature switch is disabled" when {
+      "return 303, (SEE_OTHER) and redirect to the your income sources page" when {
         "the user submits valid full data" in {
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
-          mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
-
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.taskListUrl)
-        }
-        "the user submits valid incomplete data" in {
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
-
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.taskListUrl)
-        }
-      }
-
-      "return 303, (SEE_OTHER) and redirect to the your income sources page if the task list redesign feature switch is enabled" when {
-        "the user submits valid full data" in {
-          enable(EnableTaskListRedesign)
-
           mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
           mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
@@ -134,8 +107,6 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         }
 
         "the user submits valid incomplete data" in {
-          enable(EnableTaskListRedesign)
-
           mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
 
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
@@ -146,22 +117,14 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     }
   }
 
-  "backUrl" should {
-    "in edit mode" when {
-      "TaskList is not Enabled " should {
-        "return the task list page" in {
-          TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.taskListUrl)
-        }
-      }
-      " TaskList is Enabled" should {
-        "return the your income source page" in {
-          enable(EnableTaskListRedesign)
-          TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.yourIncomeSourcesUrl)
-        }
+  "backUrl" when {
+    "in edit mode" should {
+      "return the your income source page" in {
+        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.yourIncomeSourcesUrl)
       }
     }
-    "return nothing" when {
-      "not in edit mode" in {
+    "not in edit mode" should {
+      "return no back url" in {
         TestSelfEmployedCYAController.backUrl(false) mustBe None
       }
     }

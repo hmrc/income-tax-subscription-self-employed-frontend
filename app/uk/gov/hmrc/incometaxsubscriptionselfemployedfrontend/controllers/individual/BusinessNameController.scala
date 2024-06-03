@@ -22,7 +22,6 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm._
@@ -115,18 +114,14 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): String = if (isEditMode) {
-    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
-  } else if (isEnabled(EnableTaskListRedesign)) {
-    if (doesUserNameExists) {
+  def backUrl(id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): String = {
+    if (isEditMode) {
+      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
+    } else if (doesUserNameExists) {
       routes.BusinessNameConfirmationController.show(id).url
-    }
-    else {
+    } else {
       appConfig.yourIncomeSourcesUrl
     }
-  }
-  else {
-    appConfig.whatIncomeSourceToSignUpUrl
   }
 
   private val FullNameSessionKey: String = "FULLNAME"

@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
@@ -73,11 +72,7 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   }
 
   private def continueUrl: String = {
-    if (isEnabled(EnableTaskListRedesign)) {
-      appConfig.clientYourIncomeSourcesUrl
-    } else {
-      appConfig.clientTaskListUrl
-    }
+    appConfig.clientYourIncomeSourcesUrl
   }
 
   private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])

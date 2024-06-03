@@ -22,8 +22,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
@@ -34,7 +32,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessName
 
 class BusinessNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with FeatureSwitching with MockSessionDataService {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService {
 
   val id: String = "testId"
 
@@ -53,11 +51,6 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
     mockSessionDataService,
     appConfig
   )
-
-  override def beforeEach(): Unit = {
-    disable(featureSwitch = EnableTaskListRedesign)
-    super.beforeEach()
-  }
 
   def modelToFormData(businessNameModel: String): Seq[(String, String)] = {
     BusinessNameForm.businessNameValidationForm(Nil).fill(businessNameModel).data.toSeq
@@ -194,18 +187,17 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         TestBusinessNameController.backUrl(id, isEditMode = true)(fakeRequest) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
-    "not in edit mode with feature switch is enabled" should {
+    "not in edit mode" should {
       "redirect to business name confirmation page if user name exists" in {
-        enable(featureSwitch = EnableTaskListRedesign)
-        TestBusinessNameController.backUrl(id, isEditMode = false)(fakeRequest.withSession(ITSASessionKeys.FullNameSessionKey -> "Selena Kyle")) contains appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/confirm-business-name"
+        TestBusinessNameController.backUrl(id, isEditMode = false)(
+          fakeRequest.withSession(ITSASessionKeys.FullNameSessionKey -> "Selena Kyle")
+        ) contains appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/confirm-business-name"
       }
-      "redirect to new income source page if user name doesn't exists feature is enabled" in {
-        enable(featureSwitch = EnableTaskListRedesign)
-        TestBusinessNameController.backUrl(id, isEditMode = false)(fakeRequest) mustBe appConfig.yourIncomeSourcesUrl
+      "redirect to new income source page if user name doesn't exists" in {
+        TestBusinessNameController.backUrl(id, isEditMode = false)(
+          fakeRequest
+        ) mustBe appConfig.yourIncomeSourcesUrl
       }
-    }
-    "not in edit mode with feature switch disabled" in {
-      TestBusinessNameController.backUrl(id, isEditMode = false)(fakeRequest) mustBe appConfig.whatIncomeSourceToSignUpUrl
     }
   }
   authorisationTests()
