@@ -19,20 +19,13 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 
-class InitialiseControllerSpec extends ControllerBaseSpec with FeatureSwitching {
+class InitialiseControllerSpec extends ControllerBaseSpec {
 
   override val controllerName: String = "InitialiseController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
-
-  override def beforeEach(): Unit = {
-    disable(EnableTaskListRedesign)
-    super.beforeEach()
-  }
 
   val mockUuid: UUIDGenerator = mock[UUIDGenerator]
 
@@ -45,27 +38,14 @@ class InitialiseControllerSpec extends ControllerBaseSpec with FeatureSwitching 
   )(appConfig)
 
   "initialise" when {
-    "the task list redesign feature switch is enabled" should {
-      s"return $SEE_OTHER and redirect to Business Name Confirmation page" in {
-        enable(EnableTaskListRedesign)
+    s"return $SEE_OTHER and redirect to Business Name Confirmation page" in {
+      mockAuthSuccess()
 
-        mockAuthSuccess()
+      val result = TestInitialiseController.initialise(fakeRequest)
 
-        val result = TestInitialiseController.initialise(fakeRequest)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessNameConfirmationController.show("testId").url)
-      }
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.BusinessNameConfirmationController.show("testId").url)
     }
-    "the task list redesign feature switch is disabled" should {
-      s"return $SEE_OTHER and redirect to Business Name page" in {
-        mockAuthSuccess()
-
-        val result = TestInitialiseController.initialise(fakeRequest)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessNameController.show("testId").url)
-      }
-    }
-
   }
 
   authorisationTests()

@@ -1,9 +1,0 @@
-body:not(.js-enabled) {
-  a.govuk-back-link[href*="javascript"] {
-    display: none;
-  }
-}
-
-.govuk-nowrap {
-white-space: nowrap;
-}

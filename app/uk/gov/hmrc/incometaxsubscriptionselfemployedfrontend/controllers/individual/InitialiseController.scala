@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import _root_.uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -43,9 +42,5 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def redirectLocation(id: String): Call = if (isEnabled(EnableTaskListRedesign)) {
-    routes.BusinessNameConfirmationController.show(id)
-  } else {
-    routes.BusinessNameController.show(id)
-  }
+  def redirectLocation(id: String): Call = routes.BusinessNameConfirmationController.show(id)
 }

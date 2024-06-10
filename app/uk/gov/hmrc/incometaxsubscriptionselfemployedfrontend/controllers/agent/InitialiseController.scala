@@ -18,7 +18,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableTaskListRedesign
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
@@ -38,11 +37,7 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
   val initialise: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       val id = uuidGen.generateId
-      if (isEnabled(EnableTaskListRedesign)) {
-        Future.successful(Redirect(routes.BusinessNameConfirmationController.show(id)))
-      } else {
-        Future.successful(Redirect(routes.BusinessNameController.show(id)))
-      }
+      Future.successful(Redirect(routes.BusinessNameConfirmationController.show(id)))
     }
   }
 
