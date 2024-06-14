@@ -28,7 +28,7 @@
         hmrcPageHeading: HmrcPageHeadingHelper
 )
 
-@(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
+@(answers: SoleTraderBusiness, postAction: Call, backUrl: String)(implicit request: Request[_], messages: Messages)
 
 @summaryRow(question: String, answer: Option[String], changeUrl: Option[ChangeLink]) = {
     <div class="govuk-summary-list__row">
@@ -94,17 +94,13 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@accountingMethod(accountingMethod: Option[AccountingMethod], businessCount: Int, businessId: String) = @{
+@accountingMethod(accountingMethod: Option[AccountingMethod], businessId: String) = @{
     val question: String = messages("self-employed-cya.accounting-method")
     val answer: Option[String] = accountingMethod map {
         case Cash => messages("self-employed-cya.accounting-method.cash")
         case Accruals => messages("self-employed-cya.accounting-method.accruals")
     }
-    val changeUrl: String = if(businessCount > 1) {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.ChangeAccountingMethodController.show(businessId).url
-    } else {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
-    }
+    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
         hiddenContent = if(answer.isDefined) messages("self-employed-cya.accounting-method.change") else messages("self-employed-cya.accounting-method.add")
@@ -112,21 +108,21 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@contentTable(business: SelfEmploymentsCYAModel) = {
+@contentTable(business: SoleTraderBusiness) = {
 
     <dl class="govuk-summary-list">
-        @businessName(business.businessName, business.id)
-        @tradingStartDate(business.businessStartDate, business.id)
-        @businessTrade(business.businessTradeName, business.id)
-        @businessAddress(business.businessAddress, business.id)
-        @accountingMethod(business.accountingMethod, business.totalSelfEmployments, business.id)
+        @businessName(business.name, business.id)
+        @tradingStartDate(business.startDate, business.id)
+        @businessTrade(business.trade, business.id)
+        @businessAddress(business.address, business.id)
+        @accountingMethod(business.accountingMethod, business.id)
     </dl>
 
 }
 
 @mainTemplate(
     title = messages("self-employed-cya.title"),
-    backLink = backUrl.map(url => BackLink(href = url))
+    backLink = Some(BackLink(href = backUrl))
 ) {
 
     @hmrcPageHeading(PageHeading(

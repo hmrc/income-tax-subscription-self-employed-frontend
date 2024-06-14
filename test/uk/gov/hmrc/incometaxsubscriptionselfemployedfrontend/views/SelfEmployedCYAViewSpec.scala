@@ -57,56 +57,51 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val addBusinessAddress = "Add address"
   }
 
-  def testSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+  def testSoleTraderBusiness: SoleTraderBusiness = SoleTraderBusiness(
     id = testId,
-    businessStartDate = Some(DateModel("1", "1", "2018")),
-    businessName = Some(s"ABC Limited"),
-    businessTradeName = Some(s"Plumbing"),
-    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
-    accountingMethod = Some(Cash),
-    totalSelfEmployments = 1
+    startDate = Some(DateModel("1", "1", "2018")),
+    name = Some(s"ABC Limited"),
+    trade = Some(s"Plumbing"),
+    address = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
+    accountingMethod = Some(Cash)
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
 
   val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
 
-  val backUrl: Option[String] = Some(testBackUrl)
-
   val testId: String = "testId"
 
-  class SetupIncomplete(answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+  class SetupIncomplete(answers: SoleTraderBusiness = SoleTraderBusiness(
     id = testId,
-    businessStartDate = Some(DateModel("1", "1", "2018")),
-    businessName = Some(s"ABC Limited"),
-    businessTradeName = Some(s"Plumbing"),
-    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
-    totalSelfEmployments = 1
+    startDate = Some(DateModel("1", "1", "2018")),
+    name = Some(s"ABC Limited"),
+    trade = Some(s"Plumbing"),
+    address = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
   )) {
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
       testCall,
-      backUrl
+      testBackUrl
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
   }
 
-  class SetupComplete(confirmed: Boolean = false, totalSelfEmployments: Int = 1) {
-    val answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+  class SetupComplete(confirmed: Boolean = false) {
+    val answers: SoleTraderBusiness = SoleTraderBusiness(
       id = testId,
-      businessStartDate = Some(DateModel("1", "1", "2018")),
-      businessName = Some(s"ABC Limited"),
-      businessTradeName = Some(s"Plumbing"),
-      businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
+      startDate = Some(DateModel("1", "1", "2018")),
+      name = Some(s"ABC Limited"),
+      trade = Some(s"Plumbing"),
+      address = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
       confirmed = confirmed,
-      accountingMethod = Some(Cash),
-      totalSelfEmployments = totalSelfEmployments
+      accountingMethod = Some(Cash)
     )
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
       testCall,
-      backUrl = None
+      testBackUrl
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
@@ -117,13 +112,13 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     "have the correct template details" when {
       "there is no error" in new TemplateViewTest(
         view = checkYourAnswers(
-          answers = testSelfEmploymentsCYAModel,
+          answers = testSoleTraderBusiness,
           postAction = testCall,
-          backUrl
+          testBackUrl
         )(FakeRequest(), implicitly),
         title = CheckYourAnswersMessages.title,
         hasSignOutLink = true,
-        backLink = backUrl
+        backLink = Some(testBackUrl)
       )
     }
 
@@ -150,7 +145,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
               changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "testId", isEditMode = true).url
             }
-            "has an add link with correct content" in new SetupIncomplete(SelfEmploymentsCYAModel(testId, totalSelfEmployments = 1)) {
+            "has an add link with correct content" in new SetupIncomplete(SoleTraderBusiness(testId)) {
               val addLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
               addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
               addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addTradingStartDate
@@ -201,7 +196,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
             }
 
-            "has an add link with correct content" in new SetupIncomplete(SelfEmploymentsCYAModel(testId, totalSelfEmployments = 1)) {
+            "has an add link with correct content" in new SetupIncomplete(SoleTraderBusiness(testId)) {
               val addLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
               addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
               addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addBusinessAddress
@@ -216,16 +211,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               document.getSummaryList().getSummaryListRow(5).getSummaryListValue.text mustBe "Cash basis accounting"
             }
             "has a change link" which {
-              "points to the change accounting method page" when {
-                "the number of self employments is more than 1" in new SetupComplete(totalSelfEmployments = 2) {
-                  val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
-                  changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                  changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
-                  changeLink.attr("href") mustBe routes.ChangeAccountingMethodController.show(id = "testId").url
-                }
-              }
               "points to the accounting method page" when {
-                "the number of self employments is 1" in new SetupComplete(totalSelfEmployments = 1) {
+                "the number of self employments is 1" in new SetupComplete() {
                   val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
                   changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
                   changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
@@ -256,8 +243,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
           buttonLink mustBe None
         }
 
-        "have no back button" in new SetupComplete {
-          document.getBackLinkByClass mustBe empty
+        "have a back button" in new SetupIncomplete {
+          document.getBackLinkByClass.text mustBe CheckYourAnswersMessages.back
         }
 
       }

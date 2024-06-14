@@ -22,7 +22,6 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
@@ -42,7 +41,7 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                       (val sessionDataService: SessionDataService,
                                        val appConfig: AppConfig)
                                       (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   def view(businessNameForm: Form[String], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
     businessName(

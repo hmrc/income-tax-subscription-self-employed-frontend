@@ -50,32 +50,33 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
     startDate = Some(date),
     name = Some(name),
     trade = Some(trade),
-    address = Some(address)
+    address = Some(address),
+    accountingMethod = Some(accountingMethod)
   )
 
   def soleTraderBusinessTwo(
                              startDate: Option[DateModel] = None,
                              name: Option[String] = None,
                              trade: Option[String] = None,
-                             address: Option[Address] = None
+                             address: Option[Address] = None,
+                             accountingMethod: Option[AccountingMethod] = None
                            ): SoleTraderBusiness = SoleTraderBusiness(
     id = s"$id-2",
     startDate = startDate,
     name = name,
     trade = trade,
-    address = address
+    address = address,
+    accountingMethod = accountingMethod
   )
 
   val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
-    businesses = Seq(soleTraderBusiness),
-    accountingMethod = Some(accountingMethod)
+    businesses = Seq(soleTraderBusiness)
   )
 
   def multipleSoleTraderBusinesses(
                                     otherBusiness: SoleTraderBusiness = soleTraderBusinessTwo()
                                   ): SoleTraderBusinesses = SoleTraderBusinesses(
-    businesses = Seq(soleTraderBusiness, otherBusiness),
-    accountingMethod = Some(accountingMethod)
+    businesses = Seq(soleTraderBusiness, otherBusiness)
   )
 
   "fetchSoleTraderBusinesses" must {
@@ -823,23 +824,23 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(Some(soleTraderBusinesses))
         )
 
-        await(service.fetchAccountingMethod(testReference)) mustBe Right(Some(accountingMethod))
+        await(service.fetchAccountingMethod(testReference, id)) mustBe Right(Some(accountingMethod))
       }
     }
     "return no accounting method" when {
       "there are sole trader businesses but no accounting method set" in new Setup {
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses.copy(accountingMethod = None)))
+          Right(Some(soleTraderBusinesses.copy(businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = None)))))
         )
 
-        await(service.fetchAccountingMethod(testReference)) mustBe Right(None)
+        await(service.fetchAccountingMethod(testReference, id)) mustBe Right(None)
       }
       "there are no sole trader businesses" in new Setup {
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
           Right(None)
         )
 
-        await(service.fetchAccountingMethod(testReference)) mustBe Right(None)
+        await(service.fetchAccountingMethod(testReference, id)) mustBe Right(None)
       }
     }
     "return an error" when {
@@ -848,7 +849,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
-        await(service.fetchAccountingMethod(testReference)) mustBe
+        await(service.fetchAccountingMethod(testReference, id)) mustBe
           Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
       }
     }
@@ -859,7 +860,9 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
       "there are already existing sole trader businesses with an accounting method" in new Setup {
         val saveData: AccountingMethod = Accruals
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
+          businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = Some(saveData)))
+        )
 
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
           Right(Some(oldBusinesses))
@@ -871,13 +874,17 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
-        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "there are already existing sole trader businesses without an accounting method" in new Setup {
         val saveData: AccountingMethod = Accruals
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
+          businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = None))
+        )
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
+          businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = Some(saveData)))
+        )
 
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
           Right(Some(oldBusinesses))
@@ -889,12 +896,12 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
-        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "no sole trader businesses were returned" in new Setup {
         val saveData: AccountingMethod = Accruals
-        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq.empty[SoleTraderBusiness], accountingMethod = Some(saveData))
+        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id = id, accountingMethod = Some(saveData))))
 
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
           Right(None)
@@ -906,7 +913,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
         )
 
-        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
     }
@@ -918,13 +925,15 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
-        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
       "there was an error saving the sole trader businesses" in new Setup {
         val saveData: AccountingMethod = Accruals
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
+          businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = Some(saveData)))
+        )
 
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
           Right(Some(oldBusinesses))
@@ -933,13 +942,15 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
-        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
       "there was an error deleting the income source completed field" in new Setup {
         val saveData: AccountingMethod = Accruals
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
+        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
+          businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = Some(saveData)))
+        )
 
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
           Right(Some(oldBusinesses))
@@ -951,7 +962,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
 
-        await(service.saveAccountingMethod(testReference, saveData)) mustBe
+        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
     }

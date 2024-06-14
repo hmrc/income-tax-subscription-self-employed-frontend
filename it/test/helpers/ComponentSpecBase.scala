@@ -301,10 +301,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getChangeAccountingMethod(id: String): WSResponse = get(s"/details/change-accounting-method?id=$id")
-
-  def submitChangeAccountingMethod(id: String): WSResponse = post(s"/details/change-accounting-method?id=$id")(Map.empty)
-
   def getClientBusinessAccountingMethod(id: String): WSResponse = get(s"/client/details/business-accounting-method?id=$id")
 
   def submitClientBusinessAccountingMethod(request: Option[AccountingMethod],
@@ -341,7 +337,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientAddressLookupInitialise(itsaId: String): WSResponse = get(s"/client/address-lookup-initialise/$itsaId")
 
-  def getClientAddressLookup(itsaId: String, id: String, isEditMode: Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
+  def getClientAddressLookup(itsaId: String, id: String, isEditMode: Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id&isEditMode=$isEditMode")
 
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim

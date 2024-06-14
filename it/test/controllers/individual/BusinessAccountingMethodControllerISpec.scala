@@ -31,7 +31,9 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
-  val soleTraderBusinessesWithoutAccountingMethod: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = None)
+  val soleTraderBusinessesWithoutAccountingMethod: SoleTraderBusinesses = soleTraderBusinesses.copy(
+    businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = None))
+  )
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
 

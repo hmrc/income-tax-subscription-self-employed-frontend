@@ -37,8 +37,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   with FeatureSwitching {
 
   override val controllerName: String = "BusinessAccountingMethodController"
-  private val testId = "testId"
-  private val id: String = testId
+  private val id: String = "testId"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
     "show" -> TestBusinessAccountingMethodController.show(id = id, isEditMode = false),
     "submit" -> TestBusinessAccountingMethodController.submit(id = id, isEditMode = false)
@@ -58,17 +57,11 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     BusinessAccountingMethodForm.businessAccountingMethodForm.fill(accountingMethodModel).data.toSeq
   }
 
-  val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
-    businesses = Seq(SoleTraderBusiness(id)),
-    accountingMethod = Some(Cash)
-  )
-
   "Show" should {
     "return ok (200)" when {
       "the connector returns data" in withController { controller =>
         mockAuthSuccess()
-        mockFetchAccountingMethod(Right(Some(testAccountingMethodModel)))
-        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
+        mockFetchAccountingMethod(id)(Right(Some(testAccountingMethodModel)))
 
         val result = controller.show(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
@@ -76,8 +69,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       }
       "the connector returns no data" in withController { controller =>
         mockAuthSuccess()
-        mockFetchAccountingMethod(Right(None))
-        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
+        mockFetchAccountingMethod(id)(Right(None))
 
         val result = controller.show(id = id, isEditMode = false)(fakeRequest)
         status(result) mustBe OK
@@ -87,19 +79,10 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "Throw an internal exception" when {
       "there is an unexpected status failure from the accounting method retrieval" in withController { controller =>
         mockAuthSuccess()
-        mockFetchAccountingMethod(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchAccountingMethod(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
         response.message mustBe "[BusinessAccountingMethodController][withAccountingMethod] - Failed to retrieve accounting method"
-      }
-
-      "there is an unexpected status failure from the get all businesses call" in withController { controller =>
-        mockAuthSuccess()
-        mockFetchAccountingMethod(Right(None))
-        mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-
-        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
-        response.message mustBe "[BusinessAccountingMethodController][withSelfEmploymentsCount] - Failed to retrieve all self employments"
       }
     }
 
@@ -112,14 +95,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
           "an ID is provided" should {
             "redirect to the self employed CYA page" in withController { controller =>
               mockAuthSuccess()
-              mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+              mockSaveAccountingMethod(id, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
               val result = controller.submit(id = id, isEditMode = false)(
                 fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
               )
 
               status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(testId).url)
+              redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id).url)
             }
           }
 
@@ -129,14 +112,14 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
           "an ID is provided" should {
             "redirect to the self employed CYA page" in withController { controller =>
               mockAuthSuccess()
-              mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+              mockSaveAccountingMethod(id, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
               val result = controller.submit(id = id, isEditMode = true)(
                 fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
               )
 
               status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
+              redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
             }
           }
 
@@ -146,7 +129,6 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER)" when {
       "the user submits invalid data" in withController { controller =>
         mockAuthSuccess()
-        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
 
         val result = controller.submit(id = id, isEditMode = false)(fakeRequest)
 
@@ -156,36 +138,12 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     }
   }
 
-  "The back url" when {
-    "not in edit mode" should {
-      "return None " in withController { controller =>
-        mockAuthSuccess()
-        controller.backUrl(id = id, isEditMode = false, selfEmploymentCount = 0) mustBe None
-      }
-    }
-
-    "in edit mode" when {
-      "the number of self employment businesses is more than 1" should {
-        "return a url for the change accounting method page" in withController { controller =>
-          mockAuthSuccess()
-          controller.backUrl(id = id, isEditMode = true, selfEmploymentCount = 2) mustBe
-            Some(routes.ChangeAccountingMethodController.show(testId).url)
-        }
-      }
-      "return a url for the self employed CYA page" in withController { controller =>
-        mockAuthSuccess()
-        controller.backUrl(id = id, isEditMode = true, selfEmploymentCount = 1) mustBe
-          Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
-      }
-    }
-  }
-
   authorisationTests()
 
   private def withController(testCode: BusinessAccountingMethodController => Any): Unit = {
     val businessAccountingMethodView = mock[BusinessAccountingMethod]
 
-    when(businessAccountingMethodView(any(), any(), any(), any())(any(), any()))
+    when(businessAccountingMethodView(any(), any(), any())(any(), any()))
       .thenReturn(HtmlFormat.empty)
 
     val controller = new BusinessAccountingMethodController(

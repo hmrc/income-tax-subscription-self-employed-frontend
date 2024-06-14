@@ -23,7 +23,7 @@ import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
@@ -64,7 +64,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return ok (200)" when {
       "the connector returns data" in withController { controller =>
         mockAuthSuccess()
-        mockFetchAccountingMethod(Right(Some(testAccountingMethodModel)))
+        mockFetchAccountingMethod(id)(Right(Some(testAccountingMethodModel)))
 
         val result = controller.show(id = id, isEditMode = false)(fakeRequest)
 
@@ -73,7 +73,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
       }
       "the connector returns no data" in withController { controller =>
         mockAuthSuccess()
-        mockFetchAccountingMethod(Right(None))
+        mockFetchAccountingMethod(id)(Right(None))
 
         val result = controller.show(id = id, isEditMode = false)(fakeRequest)
 
@@ -84,20 +84,11 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "Throw an internal exception" when {
       "there is an unexpected status failure" in withController { controller =>
         mockAuthSuccess()
-        mockFetchAccountingMethod(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchAccountingMethod(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
 
-        response.message mustBe "[BusinessAccountingMethodController][show] - Unexpected status: 500"
-      }
-
-      "there is an invalid Json" in withController { controller =>
-        mockAuthSuccess()
-        mockFetchAccountingMethod(Left(InvalidJson))
-
-        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
-
-        response.message mustBe "[BusinessAccountingMethodController][show] - Invalid Json"
+        response.message mustBe s"[BusinessAccountingMethodController][show] - Unexpected error: ${UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)}"
       }
     }
   }
@@ -106,7 +97,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER not in edit mode" when {
       "the user submits valid data" in withController { controller =>
         mockAuthSuccess()
-        mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+        mockSaveAccountingMethod(id, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
         val result = controller.submit(id = id, isEditMode = false)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
@@ -119,7 +110,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER in edit mode" when {
       "the user submits valid data" in withController { controller =>
         mockAuthSuccess()
-        mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+        mockSaveAccountingMethod(id, testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
         val result = controller.submit(id = id, isEditMode = true)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)

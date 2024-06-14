@@ -49,16 +49,12 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     appConfig
   )
 
-  val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
-    businesses = Seq(
-      SoleTraderBusiness(
-        id = id,
-        startDate = Some(DateModel("1", "1", "1980")),
-        name = Some("testBusinessName"),
-        trade = Some("testBusinessTrade"),
-        address = Some(Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))
-      )
-    ),
+  val soleTraderBusiness: SoleTraderBusiness = SoleTraderBusiness(
+    id = id,
+    startDate = Some(DateModel("1", "1", "1980")),
+    name = Some("testBusinessName"),
+    trade = Some("testBusinessTrade"),
+    address = Some(Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"))),
     accountingMethod = Some(Cash)
   )
 
@@ -66,16 +62,16 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     "throw an internal server exception" when {
       "there was a problem retrieving the users sole trader businesses" in {
         mockAuthSuccess()
-        mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
+          .message mustBe "[SelfEmployedCYAController][withSoleTraderBusiness] - Failed to retrieve sole trader business"
       }
     }
     "return OK" when {
       "all data is retrieved successfully" in {
         mockAuthSuccess()
-        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
+        mockFetchBusiness(id)(Right(Some(soleTraderBusiness)))
         mockSelfEmployedCYA()
 
         val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)
@@ -90,15 +86,15 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     "throw an internal server exception" when {
       "there was a problem retrieving the users sole trader businesses" in {
         mockAuthSuccess()
-        mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+        mockFetchBusiness(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
+          .message mustBe "[SelfEmployedCYAController][withSoleTraderBusiness] - Failed to retrieve sole trader business"
       }
     }
     "return 303 (SEE_OTHER) to the your income sources page" when {
       "the user submits valid full data" in {
-        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
+        mockFetchBusiness(id)(Right(Some(soleTraderBusiness)))
         mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
         val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
@@ -106,7 +102,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
       }
       "the user submits valid incomplete data" in {
-        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
+        mockFetchBusiness(id)(Right(Some(soleTraderBusiness.copy(accountingMethod = None))))
 
         val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
         status(result) mustBe SEE_OTHER
@@ -118,12 +114,12 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   "backUrl" when {
     "in edit mode" should {
       "return the your income source page" in {
-        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
+        TestSelfEmployedCYAController.backUrl(id, isEditMode = true) mustBe appConfig.clientYourIncomeSourcesUrl
       }
     }
     "not in edit mode" should {
       "return no back url" in {
-        TestSelfEmployedCYAController.backUrl(false) mustBe None
+        TestSelfEmployedCYAController.backUrl(id, isEditMode = false) mustBe routes.BusinessAccountingMethodController.show(id).url
       }
     }
   }

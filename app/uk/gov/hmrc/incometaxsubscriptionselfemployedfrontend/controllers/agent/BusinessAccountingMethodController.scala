@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.{InvalidJson, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
@@ -58,13 +57,11 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
-        multipleSelfEmploymentsService.fetchAccountingMethod(reference) map {
+        multipleSelfEmploymentsService.fetchAccountingMethod(reference, id) map {
           case Right(accountingMethod) =>
             Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, isEditMode))
-          case Left(UnexpectedStatusFailure(_@status)) =>
-            throw new InternalServerException(s"[BusinessAccountingMethodController][show] - Unexpected status: $status")
-          case Left(InvalidJson) =>
-            throw new InternalServerException("[BusinessAccountingMethodController][show] - Invalid Json")
+          case Left(error) =>
+            throw new InternalServerException(s"[BusinessAccountingMethodController][show] - Unexpected error: $error")
         }
       }
     }
@@ -77,7 +74,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessAccountingMethod =>
-            multipleSelfEmploymentsService.saveAccountingMethod(reference, businessAccountingMethod) map {
+            multipleSelfEmploymentsService.saveAccountingMethod(reference, id, businessAccountingMethod) map {
               case Right(_) =>
                 Redirect(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode))
               case Left(_) =>

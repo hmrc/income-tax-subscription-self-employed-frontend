@@ -66,13 +66,8 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document().title mustBe BusinessAccountingMethodMessages.title + BusinessAccountingMethodMessages.titleSuffix
     }
 
-    "have a backlink" in {
-      document().getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
-      document().getBackLinkByClass.attr("href") mustBe testBackUrl
-    }
-
     "have a javascript backlink" in {
-      val testDoc = document(backLink = None)
+      val testDoc = document()
       testDoc.getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
       testDoc.getBackLinkByClass.attr("href") mustBe "#"
       testDoc.getBackLinkByClass.attr("data-module") mustBe "hmrc-back-link"
@@ -184,20 +179,18 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     ).mustHaveGovUkErrorNotificationMessage(BusinessAccountingMethodMessages.emptyError)
   }
 
-  private def page(businessAccountingMethodForm: Form[AccountingMethod], isEditMode: Boolean, backLink: Option[String]) = {
+  private def page(businessAccountingMethodForm: Form[AccountingMethod], isEditMode: Boolean) = {
     businessAccountingMethodView(
       businessAccountingMethodForm,
       testCall,
-      isEditMode,
-      backLink
+      isEditMode
     )(FakeRequest(), implicitly)
   }
 
   private def document(
                         businessAccountingMethodForm: Form[AccountingMethod] = BusinessAccountingMethodForm.businessAccountingMethodForm,
-                        isEditMode: Boolean = false,
-                        backLink: Option[String] = Some(testBackUrl)
+                        isEditMode: Boolean = false
                       ): Document = {
-    Jsoup.parse(page(businessAccountingMethodForm, isEditMode, backLink).body)
+    Jsoup.parse(page(businessAccountingMethodForm, isEditMode).body)
   }
 }

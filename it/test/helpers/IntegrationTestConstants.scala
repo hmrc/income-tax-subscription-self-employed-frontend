@@ -50,7 +50,9 @@ object IntegrationTestConstants {
   val ggSignOutURI = s"/bas-gateway/sign-out-without-state"
 
   def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
+
   def businessAddressCheckUri(itsaId: String): String = s"$baseURI/address-lookup-check/$itsaId"
+
   def businessAddressLookupRedirectUri(itsaId: String): String = s"$baseURI/details/address-lookup/$itsaId"
 
   object Auth {
@@ -78,10 +80,10 @@ object IntegrationTestConstants {
         startDate = Some(DateModel("1", "1", "1980")),
         name = Some("test name"),
         trade = Some("test trade"),
-        address = Some(address)
+        address = Some(address),
+        accountingMethod = Some(testAccountingMethodModel)
       )
-    ),
-    accountingMethod = Some(Cash)
+    )
   )
 
   def testAddressLookupConfig(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {

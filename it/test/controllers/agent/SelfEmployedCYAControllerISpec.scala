@@ -32,7 +32,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val incompleteSoleTraderBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
-    accountingMethod = None
+    businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = None))
   )
 
   val completeSoleTraderBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(

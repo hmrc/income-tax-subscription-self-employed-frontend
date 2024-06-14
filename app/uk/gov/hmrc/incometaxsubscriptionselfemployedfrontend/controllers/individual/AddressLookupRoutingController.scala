@@ -25,7 +25,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Address}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -80,27 +80,17 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
       withIndividualReference { reference =>
         for {
           addressDetails <- fetchAddress(addressId)
-          accountingMethod <- fetchAccountMethod(reference)
           saveResult <- multipleSelfEmploymentsService.saveAddress(reference, businessId, addressDetails)
         } yield {
           saveResult match {
             case Right(_) =>
               if (isEditMode) Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode))
-              else if (accountingMethod.isDefined) Redirect(routes.SelfEmployedCYAController.show(businessId))
               else Redirect(routes.BusinessAccountingMethodController.show(businessId))
             case Left(_) =>
               throw new InternalServerException("[AddressLookupResultController][addressLookupRedirect] - Could not save business address")
           }
         }
       }
-    }
-  }
-
-  private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier): Future[Option[AccountingMethod]] = {
-    multipleSelfEmploymentsService.fetchAccountingMethod(reference) map {
-      case Left(_) =>
-        throw new InternalServerException("[AddressLookupRoutingController][fetchAccountMethod] - Failure retrieving accounting method")
-      case Right(accountingMethod) => accountingMethod
     }
   }
 

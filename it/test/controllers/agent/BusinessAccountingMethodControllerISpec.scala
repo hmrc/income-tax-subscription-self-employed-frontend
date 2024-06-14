@@ -28,7 +28,9 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBu
 
 class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
 
-  val soleTraderBusinessesWithoutAccountingMethod: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = None)
+  val soleTraderBusinessesWithoutAccountingMethod: SoleTraderBusinesses = soleTraderBusinesses.copy(
+    businesses = soleTraderBusinesses.businesses.map(_.copy(accountingMethod = None))
+  )
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-accounting-method" when {
 

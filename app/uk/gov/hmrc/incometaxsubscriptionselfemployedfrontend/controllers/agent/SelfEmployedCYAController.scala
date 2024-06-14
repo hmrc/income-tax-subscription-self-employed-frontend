@@ -22,7 +22,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SelfEmploymentsCYAModel, SoleTraderBusiness}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusiness
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -42,11 +42,11 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
-        withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
+        withSoleTraderBusiness(reference, id) { soleTraderBusiness =>
           Future.successful(Ok(checkYourAnswersView(
-            answers = selfEmploymentCYAModel,
+            answers = soleTraderBusiness,
             postAction = routes.SelfEmployedCYAController.submit(id),
-            backUrl = backUrl(isEditMode),
+            backUrl = backUrl(id, isEditMode),
             clientDetails = request.getClientDetails
           )))
         }
@@ -56,8 +56,8 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
 
   def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
     withAgentReference { reference =>
-      withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-        if (selfEmploymentCYAModel.isComplete) {
+      withSoleTraderBusiness(reference, id) { soleTraderBusiness =>
+        if (soleTraderBusiness.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
             case Right(_) =>
               Redirect(continueUrl)
@@ -75,33 +75,29 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
     appConfig.clientYourIncomeSourcesUrl
   }
 
-  private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])
-                                        (implicit hc: HeaderCarrier): Future[Result] =
-    for {
-      (businesses, accountingMethod) <- fetchBusinessListAndAccountingMethod(reference)
-      business = businesses.find(_.id == id)
-      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, businesses.length))
-    } yield result
-
-  private def fetchBusinessListAndAccountingMethod(reference: String)(implicit hc: HeaderCarrier) = {
-    multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference)
-      .map(_.getOrElse(throw new FetchSoleTraderBusinessesException))
-      .map {
-        case Some(soleTraderBusinesses) => (soleTraderBusinesses.businesses, soleTraderBusinesses.accountingMethod)
-        case None => (Seq.empty[SoleTraderBusiness], None)
-      }
-  }
-
-  private class FetchSoleTraderBusinessesException extends InternalServerException(
-    "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
-  )
-
-  def backUrl(isEditMode: Boolean): Option[String] = {
-    if (isEditMode) {
-      Some(continueUrl)
-    } else {
-      None
+  private def withSoleTraderBusiness(reference: String, id: String)(f: SoleTraderBusiness => Future[Result])
+                                    (implicit hc: HeaderCarrier): Future[Result] = {
+    multipleSelfEmploymentsService.fetchSoleTraderBusiness(reference, id) flatMap {
+      case Right(optBusiness) =>
+        val soleTraderBusiness = optBusiness match {
+          case Some(business) => business // return the real business
+          case None => SoleTraderBusiness(id) // return an empty business
+        }
+        f(soleTraderBusiness)
+      case Left(_) => throw new FetchSoleTraderBusinessException
     }
   }
+
+  def backUrl(id: String, isEditMode: Boolean): String = {
+    if (isEditMode) {
+      continueUrl
+    } else {
+      routes.BusinessAccountingMethodController.show(id, isEditMode).url
+    }
+  }
+
+  private class FetchSoleTraderBusinessException extends InternalServerException(
+    "[SelfEmployedCYAController][withSoleTraderBusiness] - Failed to retrieve sole trader business"
+  )
 
 }

@@ -44,22 +44,19 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
 
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
-  def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, businessCount: Int, isEditMode: Boolean)
+  def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, isEditMode: Boolean)
           (implicit request: Request[AnyContent]): Html =
     businessAccountingMethod(
       businessAccountingMethodForm = businessAccountingMethodForm,
       postAction = routes.BusinessAccountingMethodController.submit(id, isEditMode),
-      isEditMode: Boolean,
-      backUrl = backUrl(id, isEditMode, businessCount)
+      isEditMode: Boolean
     )
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
-        withAccountingMethod(reference) { accountingMethod =>
-          withSelfEmploymentsCount(reference) { businessCount =>
-            Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, businessCount, isEditMode))
-          }
+        withAccountingMethod(reference, id) { accountingMethod =>
+          Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, isEditMode))
         }
       }
     }
@@ -69,12 +66,9 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     authService.authorised() {
       withIndividualReference { reference =>
         businessAccountingMethodForm.bindFromRequest().fold(
-          formWithErrors =>
-            withSelfEmploymentsCount(reference) { businessCount =>
-              BadRequest(view(formWithErrors, id, businessCount, isEditMode))
-            },
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
           businessAccountingMethod =>
-            multipleSelfEmploymentsService.saveAccountingMethod(reference, businessAccountingMethod) map {
+            multipleSelfEmploymentsService.saveAccountingMethod(reference, id, businessAccountingMethod) map {
               case Right(_) => Redirect(routes.SelfEmployedCYAController.show(id, isEditMode))
               case Left(_) => throw new InternalServerException("[BusinessAccountingMethodController][submit] - Could not save business accounting method")
             }
@@ -83,35 +77,15 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean, selfEmploymentCount: Int): Option[String] = {
-    if (isEditMode && selfEmploymentCount > 1) {
-      Some(routes.ChangeAccountingMethodController.show(id).url)
-    } else if (isEditMode) {
-      Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
-    } else {
-      None
-    }
-  }
-
-  private def withAccountingMethod(reference: String)(f: Option[AccountingMethod] => Future[Result])
+  private def withAccountingMethod(reference: String, id: String)(f: Option[AccountingMethod] => Result)
                                   (implicit hc: HeaderCarrier): Future[Result] = {
-    multipleSelfEmploymentsService.fetchAccountingMethod(reference)
+    multipleSelfEmploymentsService.fetchAccountingMethod(reference, id)
       .map(_.getOrElse(throw new FetchAccountingMethodException))
-      .flatMap(f)
+      .map(f)
   }
 
   private class FetchAccountingMethodException extends InternalServerException(
     "[BusinessAccountingMethodController][withAccountingMethod] - Failed to retrieve accounting method"
-  )
-
-  private def withSelfEmploymentsCount(reference: String)(f: Int => Result)(implicit hc: HeaderCarrier): Future[Result] = {
-    multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference)
-      .map(_.getOrElse(throw new FetchAllBusinessesException).map(_.businesses.length).getOrElse(0))
-      .map(f)
-  }
-
-  private class FetchAllBusinessesException extends InternalServerException(
-    "[BusinessAccountingMethodController][withSelfEmploymentsCount] - Failed to retrieve all self employments"
   )
 
 }

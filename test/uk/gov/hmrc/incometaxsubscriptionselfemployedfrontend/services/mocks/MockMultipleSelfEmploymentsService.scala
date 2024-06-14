@@ -24,7 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccess
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Address, DateModel, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 
@@ -41,6 +41,11 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
 
   def mockFetchSoleTraderBusinesses(response: Either[GetSelfEmploymentsFailure, Option[SoleTraderBusinesses]]): Unit = {
     when(mockMultipleSelfEmploymentsService.fetchSoleTraderBusinesses(any())(any()))
+      .thenReturn(Future.successful(response))
+  }
+
+  def mockFetchBusiness(businessId: String)(response: Either[GetSelfEmploymentsFailure, Option[SoleTraderBusiness]]): Unit = {
+    when(mockMultipleSelfEmploymentsService.fetchSoleTraderBusiness(any(), ArgumentMatchers.eq(businessId))(ArgumentMatchers.any()))
       .thenReturn(Future.successful(response))
   }
 
@@ -113,14 +118,14 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
       .thenReturn(Future.successful(response))
   }
 
-  def mockFetchAccountingMethod(response: Either[GetSelfEmploymentsFailure, Option[AccountingMethod]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchAccountingMethod(any())(any()))
+  def mockFetchAccountingMethod(businessId: String)(response: Either[GetSelfEmploymentsFailure, Option[AccountingMethod]]): Unit = {
+    when(mockMultipleSelfEmploymentsService.fetchAccountingMethod(any(), ArgumentMatchers.eq(businessId))(any()))
       .thenReturn(Future.successful(response))
   }
 
-  def mockSaveAccountingMethod(accountingMethod: AccountingMethod)
+  def mockSaveAccountingMethod(businessId: String, accountingMethod: AccountingMethod)
                               (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
-    when(mockMultipleSelfEmploymentsService.saveAccountingMethod(any(), ArgumentMatchers.eq(accountingMethod))(any()))
+    when(mockMultipleSelfEmploymentsService.saveAccountingMethod(any(), ArgumentMatchers.eq(businessId), ArgumentMatchers.eq(accountingMethod))(any()))
       .thenReturn(Future.successful(response))
   }
 

@@ -63,16 +63,21 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     }
   }
 
-  private def findData[T](reference: String, id: String, modelToData: SoleTraderBusiness => Option[T])
-                         (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[T]]] = {
+  def fetchSoleTraderBusiness(reference: String, id: String)
+                             (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[SoleTraderBusiness]]] = {
     fetchSoleTraderBusinesses(reference) map { result =>
       result map {
         case Some(soleTraderBusinesses) => soleTraderBusinesses.businesses
         case None => Seq.empty[SoleTraderBusiness]
       } map { businesses =>
-        businesses.find(_.id == id).flatMap(modelToData)
+        businesses.find(_.id == id)
       }
     }
+  }
+
+  private def findData[T](reference: String, id: String, modelToData: SoleTraderBusiness => Option[T])
+                         (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[T]]] = {
+    fetchSoleTraderBusiness(reference, id).map(_.map(_.flatMap(modelToData)))
   }
 
   private def saveData(reference: String, id: String, businessUpdate: SoleTraderBusiness => SoleTraderBusiness)
@@ -134,24 +139,14 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     saveData(reference, businessId, _.copy(confirmed = true))
   }
 
-  def fetchAccountingMethod(reference: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[AccountingMethod]]] = {
-    fetchSoleTraderBusinesses(reference) map {
-      case Right(soleTraderBusinesses) => Right(soleTraderBusinesses.flatMap(_.accountingMethod))
-      case Left(value) => Left(value)
-    }
+  def fetchAccountingMethod(reference: String, businessId: String)
+                           (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[AccountingMethod]]] = {
+    findData[AccountingMethod](reference, businessId, _.accountingMethod)
   }
 
-  def saveAccountingMethod(reference: String, accountingMethod: AccountingMethod)
+  def saveAccountingMethod(reference: String, businessId: String, accountingMethod: AccountingMethod)
                           (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    fetchSoleTraderBusinesses(reference) map { result =>
-      result.map {
-        case Some(soleTraderBusinesses) => soleTraderBusinesses.copy(accountingMethod = Some(accountingMethod))
-        case None => SoleTraderBusinesses(Seq.empty[SoleTraderBusiness], accountingMethod = Some(accountingMethod))
-      }
-    } flatMap {
-      case Right(businesses) => saveSoleTraderBusinesses(reference, businesses)
-      case Left(_) => Future.successful(Left(SaveSelfEmploymentDataFailure))
-    }
+    saveData(reference, businessId, _.copy(accountingMethod = Some(accountingMethod)))
   }
 
   def fetchFirstAddress(reference: String)

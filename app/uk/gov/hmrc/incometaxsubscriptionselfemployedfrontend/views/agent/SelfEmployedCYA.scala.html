@@ -29,7 +29,7 @@
         hmrcPageHeading: HmrcPageHeadingHelper
 )
 
-@(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
+@(answers: SoleTraderBusiness, postAction: Call, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @summaryRow(question: String, answer: Option[String], changeUrl: Option[ChangeLink]) = {
 
@@ -110,13 +110,13 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@contentTable(business: SelfEmploymentsCYAModel) = {
+@contentTable(business: SoleTraderBusiness) = {
 
     <dl class="govuk-summary-list">
-        @businessName(business.businessName, business.id)
-        @tradingStartDate(business.businessStartDate, business.id)
-        @businessTrade(business.businessTradeName, business.id)
-        @businessAddress(business.businessAddress, business.id)
+        @businessName(business.name, business.id)
+        @tradingStartDate(business.startDate, business.id)
+        @businessTrade(business.trade, business.id)
+        @businessAddress(business.address, business.id)
         @accountingMethod(business.accountingMethod, business.id)
     </dl>
 
@@ -124,7 +124,7 @@
 
 @mainTemplate(
     title = messages("agent.self-employed-cya.title"),
-    backLink = backUrl.map(url => BackLink(href = url))
+    backLink = Some(BackLink(href = backUrl))
 ) {
 
     <span class="govuk-caption-l">

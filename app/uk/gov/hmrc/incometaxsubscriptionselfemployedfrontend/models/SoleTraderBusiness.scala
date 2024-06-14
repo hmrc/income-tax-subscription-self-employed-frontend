@@ -27,7 +27,18 @@ case class SoleTraderBusiness(id: String,
                               startDate: Option[DateModel] = None,
                               name: Option[String] = None,
                               trade: Option[String] = None,
-                              address: Option[Address] = None)
+                              address: Option[Address] = None,
+                              accountingMethod: Option[AccountingMethod] = None) {
+
+  val isComplete: Boolean = {
+    startDate.isDefined &&
+      name.isDefined &&
+      trade.isDefined &&
+      address.isDefined &&
+      accountingMethod.isDefined
+  }
+
+}
 
 object SoleTraderBusiness {
 
@@ -43,10 +54,19 @@ object SoleTraderBusiness {
         (__ \ "startDate").readNullable[DateModel] and
         (__ \ "name").readNullable[SensitiveString] and
         (__ \ "trade").readNullable[String] and
-        (__ \ "address").readNullable[Address]
+        (__ \ "address").readNullable[Address] and
+        (__ \ "accountingMethod").readNullable[AccountingMethod]
       )(
-      (id, confirmed, startDate, name, trade, address) =>
-        SoleTraderBusiness.apply(id, confirmed, startDate, name.map(_.decryptedValue), trade, address)
+      (id, confirmed, startDate, name, trade, address, accountingMethod) =>
+        SoleTraderBusiness.apply(
+          id,
+          confirmed,
+          startDate,
+          name.map(_.decryptedValue),
+          trade,
+          address,
+          accountingMethod
+        )
     )
 
     val writes: OWrites[SoleTraderBusiness] = (
@@ -55,7 +75,8 @@ object SoleTraderBusiness {
         (__ \ "startDate").writeNullable[DateModel] and
         (__ \ "name").writeNullable[SensitiveString] and
         (__ \ "trade").writeNullable[String] and
-        (__ \ "address").writeNullable[Address]
+        (__ \ "address").writeNullable[Address] and
+        (__ \ "accountingMethod").writeNullable[AccountingMethod]
       )(
       soleTraderBusiness =>
         (
@@ -64,7 +85,8 @@ object SoleTraderBusiness {
           soleTraderBusiness.startDate,
           soleTraderBusiness.name.map(SensitiveString.apply),
           soleTraderBusiness.trade,
-          soleTraderBusiness.address
+          soleTraderBusiness.address,
+          soleTraderBusiness.accountingMethod
         )
     )
 
