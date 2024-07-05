@@ -24,9 +24,8 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameConfirmationForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails.ClientInfoRequestUtil
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessNameConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -35,6 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerComponents,
+                                                   clientDetailsRetrieval: ClientDetailsRetrieval,
                                                    authService: AuthService,
                                                    multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                    businessNameConfirmation: BusinessNameConfirmation)
@@ -51,13 +51,15 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
     authService.authorised() {
       withAgentReference { reference =>
         withBusinessOrClientsName(reference) { (name, isBusinessName) =>
-          Future.successful(Ok(view(
-            form = confirmationForm,
-            id = id,
-            clientDetails = request.getClientDetails,
-            displayName = name,
-            isBusinessName = isBusinessName
-          )))
+          clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            Ok(view(
+              form = confirmationForm,
+              id = id,
+              clientDetails = clientDetails,
+              displayName = name,
+              isBusinessName = isBusinessName
+            ))
+          }
         }
       }
     }
@@ -91,16 +93,16 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
                         (implicit request: Request[AnyContent]): Future[Result] = {
     withAgentReference { reference =>
       withBusinessOrClientsName(reference) { (name, isBusinessName) =>
-        val clientDetails: ClientDetails = request.getClientDetails
         confirmationForm.bindFromRequest().fold(
-          hasError =>
-            Future.successful(BadRequest(view(
+          hasError => clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            BadRequest(view(
               form = hasError,
               id = id,
               clientDetails = clientDetails,
               displayName = name,
               isBusinessName = isBusinessName
-            ))),
+            ))
+          },
           {
             case Yes =>
               saveBusinessName(reference, id, name) {
@@ -127,11 +129,13 @@ class BusinessNameConfirmationController @Inject()(mcc: MessagesControllerCompon
                                        (f: (String, Boolean) => Future[Result])
                                        (implicit request: Request[AnyContent]): Future[Result] = {
     multipleSelfEmploymentsService.fetchFirstBusinessName(reference).flatMap { result =>
-      result.getOrElse(
-        throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrClientsName] - Unable to retrieve businesses")
-      ) match {
-        case Some(name) => f(name, true)
-        case None => f(request.getClientDetails.name, false)
+      clientDetailsRetrieval.getClientDetails flatMap { clientDetails =>
+        result.getOrElse(
+          throw new InternalServerException("[BusinessNameConfirmationController][withBusinessOrClientsName] - Unable to retrieve businesses")
+        ) match {
+          case Some(name) => f(name, true)
+          case None => f(clientDetails.name, false)
+        }
       }
     }
   }

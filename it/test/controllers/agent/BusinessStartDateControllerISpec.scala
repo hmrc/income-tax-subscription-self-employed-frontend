@@ -17,14 +17,17 @@
 package controllers.agent
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
+import connectors.stubs.SessionDataConnectorStub
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.{id, soleTraderBusinesses}
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 
 class BusinessStartDateControllerISpec extends ComponentSpecBase {
@@ -33,6 +36,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
     businesses = soleTraderBusinesses.businesses.map(_.copy(startDate = None))
   )
 
+  val testNino: String = "test-nino"
   val date: DateModel = DateModel("1", "1", "1980")
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-start-date" when {
@@ -41,6 +45,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(id)
@@ -59,6 +64,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(id)
@@ -97,6 +103,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When("POST /client/details/business-start-date is called")
         val res = submitClientBusinessStartDate(id, None)

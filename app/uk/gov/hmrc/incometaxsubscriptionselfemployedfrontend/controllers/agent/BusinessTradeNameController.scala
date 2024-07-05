@@ -26,8 +26,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -36,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
+                                            clientDetailsRetrieval: ClientDetailsRetrieval,
                                             businessTradeName: BusinessTradeName,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                             authService: AuthService)
@@ -44,22 +45,23 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
                                            (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
-  def view(tradeForm: Form[String], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(tradeForm: Form[String], id: String, isEditMode: Boolean, clientDetails: ClientDetails)
+          (implicit request: Request[AnyContent]): Html =
     businessTradeName(
       businessTradeNameForm = tradeForm,
       postAction = routes.BusinessTradeNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
       backUrl = backUrl(id, isEditMode),
-      clientDetails = request.getClientDetails
+      clientDetails = clientDetails
     )
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
         getCurrentTradeAndExcludedTrades(reference, id) flatMap { case (currentTrade, excludedTrades) =>
-          Future.successful(Ok(
-            view(tradeValidationForm(excludedTrades).fill(currentTrade), id, isEditMode)
-          ))
+          clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            Ok(view(tradeValidationForm(excludedTrades).fill(currentTrade), id, isEditMode, clientDetails))
+          }
         }
       }
     }
@@ -70,8 +72,9 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
       withAgentReference { reference =>
         getCurrentTradeAndExcludedTrades(reference, id) flatMap { case (_, excludedTrades) =>
           tradeValidationForm(excludedTrades).bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
+            formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
+              BadRequest(view(formWithErrors, id, isEditMode = isEditMode, clientDetails))
+            },
             trade =>
               multipleSelfEmploymentsService.saveTrade(reference, id, trade) map {
                 case Right(_) =>

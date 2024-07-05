@@ -26,17 +26,17 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, ClientDetails}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class BusinessAccountingMethodController @Inject()(businessAccountingMethod: BusinessAccountingMethod,
+                                                   clientDetailsRetrieval: ClientDetailsRetrieval,
                                                    mcc: MessagesControllerComponents,
                                                    multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                    authService: AuthService)
@@ -45,22 +45,24 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
                                                   (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
-  def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, isEditMode: Boolean)
+  def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, isEditMode: Boolean, clientDetails: ClientDetails)
           (implicit request: Request[AnyContent]): Html =
     businessAccountingMethod(
       businessAccountingMethodForm = businessAccountingMethodForm,
       postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.submit(id, isEditMode),
       backUrl = backUrl(id, isEditMode),
       isEditMode = isEditMode,
-      clientDetails = request.getClientDetails
+      clientDetails = clientDetails
     )
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
-        multipleSelfEmploymentsService.fetchAccountingMethod(reference) map {
+        multipleSelfEmploymentsService.fetchAccountingMethod(reference) flatMap {
           case Right(accountingMethod) =>
-            Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, isEditMode))
+            clientDetailsRetrieval.getClientDetails map { clientDetails =>
+              Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, isEditMode, clientDetails))
+            }
           case Left(UnexpectedStatusFailure(_@status)) =>
             throw new InternalServerException(s"[BusinessAccountingMethodController][show] - Unexpected status: $status")
           case Left(InvalidJson) =>
@@ -75,7 +77,9 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
       withAgentReference { reference =>
         businessAccountingMethodForm.bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
+            clientDetailsRetrieval.getClientDetails map { clientDetails =>
+              BadRequest(view(formWithErrors, id, isEditMode, clientDetails))
+            },
           businessAccountingMethod =>
             multipleSelfEmploymentsService.saveAccountingMethod(reference, businessAccountingMethod) map {
               case Right(_) =>

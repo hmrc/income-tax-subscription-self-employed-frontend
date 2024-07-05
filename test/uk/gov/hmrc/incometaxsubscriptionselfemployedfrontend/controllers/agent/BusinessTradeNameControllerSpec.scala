@@ -26,12 +26,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessTradeNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.{testBusinessNameModel, testValidBusinessTradeName, testValidBusinessTradeNameModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessTradeName
 
 class BusinessTradeNameControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockSessionDataService {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService
+  with MockClientDetailsRetrieval {
 
   val id: String = "testId"
 
@@ -46,6 +47,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
 
     val controller = new BusinessTradeNameController(
       mockMessagesControllerComponents,
+      mockClientDetailsRetrieval,
       businessTradeNameView,
       mockMultipleSelfEmploymentsService,
       mockAuthService

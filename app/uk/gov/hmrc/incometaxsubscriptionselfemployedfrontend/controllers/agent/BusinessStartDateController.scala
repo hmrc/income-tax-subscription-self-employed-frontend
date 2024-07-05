@@ -26,19 +26,19 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.R
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
+                                            clientDetailsRetrieval: ClientDetailsRetrieval,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                             authService: AuthService,
                                             businessStartDate: BusinessStartDateView)
@@ -48,23 +48,25 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                            (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
-  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean)
+  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, clientDetails: ClientDetails)
           (implicit request: Request[AnyContent]): Html = {
     businessStartDate(
       businessStartDateForm = businessStartDateForm,
       postAction = routes.BusinessStartDateController.submit(id, isEditMode),
       isEditMode,
       backUrl = backUrl(id, isEditMode),
-      clientDetails = request.getClientDetails
+      clientDetails = clientDetails
     )
   }
 
   def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
-        multipleSelfEmploymentsService.fetchStartDate(reference, id).map {
+        multipleSelfEmploymentsService.fetchStartDate(reference, id) flatMap {
           case Right(businessStartDateData) =>
-            Ok(view(form.fill(businessStartDateData), id, isEditMode))
+            clientDetailsRetrieval.getClientDetails map { clientDetails =>
+              Ok(view(form.fill(businessStartDateData), id, isEditMode, clientDetails))
+            }
           case Left(error) => throw new InternalServerException(error.toString)
         }
       }
@@ -75,8 +77,9 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     authService.authorised() {
       withAgentReference { reference =>
         form.bindFromRequest().fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, id, isEditMode))),
+          formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            BadRequest(view(formWithErrors, id, isEditMode, clientDetails))
+          },
           businessStartDateData =>
             multipleSelfEmploymentsService.saveStartDate(reference, id, businessStartDateData) map {
               case Right(_) =>

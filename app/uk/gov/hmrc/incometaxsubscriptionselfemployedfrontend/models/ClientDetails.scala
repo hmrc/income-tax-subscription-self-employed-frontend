@@ -16,31 +16,17 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import play.api.mvc._
-
 import scala.util.matching.Regex
 
-object ClientDetails{
-  implicit class ClientInfoRequestUtil(request: Request[AnyContent]) {
-    def getClientDetails: ClientDetails = {
-      val clientName: String = Seq(request.session.get("FirstName"), request.session.get("LastName")).flatten.mkString(" ")
-      val clientNino: String = request.session.get("NINO").mkString("")
+case class ClientDetails(name: String, nino: String) {
+  private val ninoRegex: Regex = """^([a-zA-Z]{2})\s*(\d{2})\s*(\d{2})\s*(\d{2})\s*([a-zA-Z])$""".r
 
-      ClientDetails(clientName, clientNino)
-    }
+  val formattedNino: String = nino match {
+    case ninoRegex(startLetters, firstDigits, secondDigits, thirdDigits, finalLetter) =>
+      s"$startLetters $firstDigits $secondDigits $thirdDigits $finalLetter"
+    case other => other
   }
-
 }
-
-  case class ClientDetails(name: String, nino: String){
-    private val ninoRegex: Regex = """^([a-zA-Z]{2})\s*(\d{2})\s*(\d{2})\s*(\d{2})\s*([a-zA-Z])$""".r
-
-    val formattedNino: String = nino match {
-      case ninoRegex(startLetters, firstDigits, secondDigits, thirdDigits, finalLetter) =>
-        s"$startLetters $firstDigits $secondDigits $thirdDigits $finalLetter"
-      case other => other
-    }
-  }
 
 
 

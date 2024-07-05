@@ -17,14 +17,16 @@
 package controllers.agent
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.{id, soleTraderBusinesses}
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 
 class BusinessNameControllerISpec extends ComponentSpecBase {
@@ -33,6 +35,8 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
     businesses = soleTraderBusinesses.businesses.map(_.copy(name = None))
   )
 
+  val testNino: String = "test-nino"
+
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-name" when {
 
     "the Connector receives no content" should {
@@ -40,6 +44,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When("GET /client/details/business-name is called")
         val res = getClientBusinessName(id)
@@ -56,6 +61,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When("GET /client/business/start-date is called")
         val res = getClientBusinessName(id)
@@ -92,6 +98,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(id, inEditMode = false, None)
@@ -124,6 +131,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When("POST /client/details/business-name is called")
         val res = submitClientBusinessName(id, inEditMode = true, None)

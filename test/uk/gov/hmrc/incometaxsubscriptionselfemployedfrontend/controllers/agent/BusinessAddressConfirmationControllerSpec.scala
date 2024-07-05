@@ -31,14 +31,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAddressConfirmation
 
 import scala.concurrent.Future
 
 class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService with MockMultipleSelfEmploymentsService {
+  with MockSessionDataService with MockMultipleSelfEmploymentsService
+  with MockClientDetailsRetrieval {
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -53,6 +54,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
 
   object TestBusinessAddressConfirmationController extends BusinessAddressConfirmationController(
     mockMessagesControllerComponents,
+    mockClientDetailsRetrieval,
     mockAuthService,
     mockMultipleSelfEmploymentsService,
     mock[BusinessAddressConfirmation]
@@ -72,6 +74,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
 
     val controller: BusinessAddressConfirmationController = new BusinessAddressConfirmationController(
       mockMessagesControllerComponents,
+      mockClientDetailsRetrieval,
       mockAuthService,
       mockMultipleSelfEmploymentsService,
       mockBusinessAddressConfirmation

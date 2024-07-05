@@ -25,9 +25,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails.ClientInfoRequestUtil
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAddressConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -36,6 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerComponents,
+                                                      clientDetailsRetrieval: ClientDetailsRetrieval,
                                                       authService: AuthService,
                                                       multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                       businessAddressConfirmation: BusinessAddressConfirmation)
@@ -52,7 +52,9 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
     authService.authorised() {
       withAgentReference { reference =>
         withFirstAddress(reference, id) { address =>
-          Future.successful(Ok(view(confirmationForm, id, address, clientDetails = request.getClientDetails)))
+          clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            Ok(view(confirmationForm, id, address, clientDetails = clientDetails))
+          }
         }
       }
     }
@@ -82,7 +84,9 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
     withAgentReference { reference =>
       withFirstAddress(reference, id) { address =>
         confirmationForm.bindFromRequest().fold(
-          hasError => Future.successful(BadRequest(view(hasError, id, address, clientDetails = request.getClientDetails))),
+          hasError => clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            BadRequest(view(hasError, id, address, clientDetails = clientDetails))
+          },
           {
             case Yes =>
               saveBusinessAddress(reference, id, address) {

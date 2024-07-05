@@ -23,13 +23,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.agent.MockSelfEmployedCYA
 
 import scala.concurrent.Future
 
 class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockSessionDataService with MockSelfEmployedCYA {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService with MockSelfEmployedCYA with MockClientDetailsRetrieval {
 
   val id: String = "testId"
 
@@ -41,6 +41,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
   object TestSelfEmployedCYAController extends SelfEmployedCYAController(
     selfEmployedCYA,
+    mockClientDetailsRetrieval,
     mockAuthService,
     mockMultipleSelfEmploymentsService,
     mockMessagesControllerComponents

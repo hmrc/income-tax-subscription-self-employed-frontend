@@ -26,8 +26,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -36,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
+                                       clientDetailsRetrieval: ClientDetailsRetrieval,
                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                        authService: AuthService,
                                        businessName: BusinessName)
@@ -44,13 +45,13 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                       (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
-  def view(businessNameForm: Form[String], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessNameForm: Form[String], id: String, isEditMode: Boolean, clientDetails: ClientDetails)(implicit request: Request[AnyContent]): Html =
     businessName(
       businessNameForm = businessNameForm,
       postAction = routes.BusinessNameController.submit(id, isEditMode = isEditMode),
       isEditMode,
       backUrl = backUrl(id, isEditMode),
-      clientDetails = request.getClientDetails
+      clientDetails = clientDetails
     )
 
 
@@ -58,9 +59,9 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     authService.authorised() {
       withAgentReference { reference =>
         getCurrentNameAndExcludedNames(reference, id) flatMap { case (currentName, excludedBusinessNames) =>
-          Future.successful(Ok(
-            view(businessNameValidationForm(excludedBusinessNames).fill(currentName), id, isEditMode = isEditMode)
-          ))
+          clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            Ok(view(businessNameValidationForm(excludedBusinessNames).fill(currentName), id, isEditMode = isEditMode, clientDetails))
+          }
         }
       }
     }
@@ -71,8 +72,9 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
       withAgentReference { reference =>
         getCurrentNameAndExcludedNames(reference, id) flatMap { case (_, excludedBusinessNames) =>
           businessNameValidationForm(excludedBusinessNames).bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
+            formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
+              BadRequest(view(formWithErrors, id, isEditMode = isEditMode, clientDetails))
+            },
             name =>
               multipleSelfEmploymentsService.saveName(reference, id, name) map {
                 case Right(_) =>
