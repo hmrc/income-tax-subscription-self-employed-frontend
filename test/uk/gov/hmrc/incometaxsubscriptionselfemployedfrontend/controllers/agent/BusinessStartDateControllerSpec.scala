@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.{Contro
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
@@ -39,6 +39,7 @@ import uk.gov.hmrc.play.language.LanguageUtils
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService
   with MockSessionDataService
+  with MockClientDetailsRetrieval
   with ImplicitDateFormatter {
 
   val businessStartDate: BusinessStartDate = mock[BusinessStartDate]
@@ -80,6 +81,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
+    mockClientDetailsRetrieval,
     mockMultipleSelfEmploymentsService,
     mockAuthService,
     businessStartDate

@@ -17,11 +17,12 @@
 package controllers.agent
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -36,6 +37,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
   val soleTraderBusinessesWithoutName: SoleTraderBusinesses = soleTraderBusinesses.copy(
     businesses = soleTraderBusinesses.businesses.map(_.copy(name = None))
   )
+  val testNino: String = "test-nino"
 
   s"GET ${routes.BusinessNameConfirmationController.show(id).url}" should {
     "return the page" when {
@@ -43,6 +45,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
         val res = getClientBusinessNameConfirmation(id)(Map(
@@ -60,6 +63,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.BusinessNameConfirmationController.show(id).url} is called")
         val res = getClientBusinessNameConfirmation(id)(Map(
@@ -83,6 +87,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitClientBusinessNameConfirmation(id, None)(Map(
@@ -104,6 +109,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
           stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitClientBusinessNameConfirmation(id, Some(Yes))(Map(
@@ -123,6 +129,7 @@ class BusinessNameConfirmationControllerISpec extends ComponentSpecBase with Fea
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
           When(s"POST ${routes.BusinessNameConfirmationController.show(id).url} is called")
           val res = submitClientBusinessNameConfirmation(id, Some(No))(Map(

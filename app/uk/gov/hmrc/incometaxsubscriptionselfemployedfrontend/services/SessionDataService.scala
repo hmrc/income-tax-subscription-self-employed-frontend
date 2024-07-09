@@ -31,4 +31,8 @@ class SessionDataService @Inject()(sessionDataConnector: SessionDataConnector) {
     sessionDataConnector.getSessionData[String](ITSASessionKeys.REFERENCE)
   }
 
+  def fetchNino(implicit hc: HeaderCarrier): Future[Either[GetSessionDataFailure, Option[String]]] = {
+    sessionDataConnector.getSessionData[String](ITSASessionKeys.NINO)
+  }
+
 }

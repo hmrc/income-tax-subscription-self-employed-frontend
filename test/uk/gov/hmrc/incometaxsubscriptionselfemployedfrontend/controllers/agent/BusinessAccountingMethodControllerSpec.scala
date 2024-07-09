@@ -28,13 +28,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testAccountingMethodModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAccountingMethod
 
 class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   with MockSessionDataService
   with MockMultipleSelfEmploymentsService
+  with MockClientDetailsRetrieval
   with FeatureSwitching {
 
   override val controllerName: String = "BusinessAccountingMethodController"
@@ -47,6 +48,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   private object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
     mock[BusinessAccountingMethod],
+    mockClientDetailsRetrieval,
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
     mockAuthService
@@ -168,6 +170,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
     val controller = new BusinessAccountingMethodController(
       businessAccountingMethodView,
+      mockClientDetailsRetrieval,
       mockMessagesControllerComponents,
       mockMultipleSelfEmploymentsService,
       mockAuthService

@@ -21,9 +21,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SelfEmploymentsCYAModel, SoleTraderBusiness}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -31,6 +30,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
+                                          clientDetailsRetrieval: ClientDetailsRetrieval,
                                           authService: AuthService,
                                           multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                           mcc: MessagesControllerComponents)
@@ -43,12 +43,14 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
     authService.authorised() {
       withAgentReference { reference =>
         withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-          Future.successful(Ok(checkYourAnswersView(
-            answers = selfEmploymentCYAModel,
-            postAction = routes.SelfEmployedCYAController.submit(id),
-            backUrl = backUrl(isEditMode),
-            clientDetails = request.getClientDetails
-          )))
+          clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            Ok(checkYourAnswersView(
+              answers = selfEmploymentCYAModel,
+              postAction = routes.SelfEmployedCYAController.submit(id),
+              backUrl = backUrl(isEditMode),
+              clientDetails = clientDetails
+            ))
+          }
         }
       }
     }

@@ -17,11 +17,12 @@
 package controllers.agent
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -40,6 +41,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
     ),
     Some("ZZ1 1ZZ")
   )
+  val testNino: String = "test-nino"
 
   s"GET ${routes.BusinessAddressConfirmationController.show(id).url}" should {
     "return the page" when {
@@ -47,6 +49,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = getClientBusinessAddressConfirmation(id)(Map(
@@ -87,6 +90,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
           When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
           val res = submitClientBusinessAddressConfirmation(id, None)(Map(

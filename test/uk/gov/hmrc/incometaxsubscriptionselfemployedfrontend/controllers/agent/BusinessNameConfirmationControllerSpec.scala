@@ -31,26 +31,26 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessNameConfirmation
 
 import scala.concurrent.Future
 
 class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService with MockMultipleSelfEmploymentsService {
+  with MockSessionDataService with MockMultipleSelfEmploymentsService
+  with MockClientDetailsRetrieval {
 
   val id: String = "testId"
   val clientDetails: ClientDetails = ClientDetails(
     name = "FirstName LastName",
-    nino = "ZZ111111Z"
+    nino = testNino
   )
 
   val fakeRequestWithClientDetails: FakeRequest[AnyContentAsEmpty.type] = fakeRequest
     .withSession(
       ITSASessionKeys.FirstName -> "FirstName",
       ITSASessionKeys.LastName -> "LastName",
-      ITSASessionKeys.NINO -> "ZZ111111Z",
       ITSASessionKeys.REFERENCE -> "test-reference"
     )
 
@@ -58,6 +58,7 @@ class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
 
   object TestBusinessNameConfirmationController extends BusinessNameConfirmationController(
     mockMessagesControllerComponents,
+    mockClientDetailsRetrieval,
     mockAuthService,
     mockMultipleSelfEmploymentsService,
     mock[BusinessNameConfirmation]
@@ -77,6 +78,7 @@ class BusinessNameConfirmationControllerSpec extends ControllerBaseSpec
 
     val controller: BusinessNameConfirmationController = new BusinessNameConfirmationController(
       mockMessagesControllerComponents,
+      mockClientDetailsRetrieval,
       mockAuthService,
       mockMultipleSelfEmploymentsService,
       mockBusinessNameConfirmation

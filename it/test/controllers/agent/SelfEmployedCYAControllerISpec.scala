@@ -17,15 +17,17 @@
 package controllers.agent
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
@@ -39,12 +41,15 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
     businesses = soleTraderBusinesses.businesses.map(_.copy(confirmed = true))
   )
 
+  val testNino: String = "test-nino"
+
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {
     "return OK" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
       stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-
+      stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+      
       When("GET /client/details/business-check-your-answers is called")
       val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
 
