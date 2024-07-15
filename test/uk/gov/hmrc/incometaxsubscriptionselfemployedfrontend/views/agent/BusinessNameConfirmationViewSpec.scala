@@ -91,7 +91,7 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
           isAgent = true,
           backLink = Some(testBackUrl),
           hasSignOutLink = true,
-          error = Some(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError)
+          errors = Some(Seq(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError))
         )
       }
       "the page is for a secondary business" when {
@@ -108,7 +108,7 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
           isAgent = true,
           backLink = Some(testBackUrl),
           hasSignOutLink = true,
-          error = Some(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError)
+          errors = Some(Seq(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError))
         )
       }
     }

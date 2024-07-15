@@ -86,7 +86,7 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
           title = BusinessNameConfirmationMessages.heading,
           backLink = Some(testBackUrl),
           hasSignOutLink = true,
-          error = Some(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError)
+          errors = Some(Seq(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError))
         )
       }
 
@@ -102,7 +102,7 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
           title = BusinessNameConfirmationMessages.headingSecond,
           backLink = Some(testBackUrl),
           hasSignOutLink = true,
-          error = Some(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError)
+          errors = Some(Seq(testFormError.key -> BusinessNameConfirmationMessages.Form.emptyError))
         )
       }
     }

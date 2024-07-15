@@ -80,7 +80,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         isAgent = true,
         backLink = Some(testBackUrl),
         hasSignOutLink = true,
-        error = Some(emptyFormError.key -> BusinessStartDateMessages.emptyError)
+        errors = Some(Seq(emptyFormError.key -> BusinessStartDateMessages.emptyError))
       )
     }
 

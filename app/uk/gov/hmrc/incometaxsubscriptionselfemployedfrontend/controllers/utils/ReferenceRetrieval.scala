@@ -49,8 +49,8 @@ trait ReferenceRetrieval extends Logging {
     sessionDataService.fetchReference flatMap {
       case Right(Some(value)) => f(value)
       case Right(None) => Future.successful(redirectIfNotPresent)
-      case Left(GetSessionDataHttpParser.UnexpectedStatusFailure(status)) =>
-        throw new InternalServerException(s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session. Status: $status")
+      case Left(_) =>
+        throw new InternalServerException(s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session")
     }
   }
 

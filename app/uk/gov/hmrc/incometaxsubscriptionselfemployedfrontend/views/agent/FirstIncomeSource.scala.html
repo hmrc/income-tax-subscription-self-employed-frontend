@@ -1,0 +1,120 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.FirstIncomeSourceForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ AccountingMethod, Accruals, Cash, ClientDetails, DateModel }
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ DateHelper, DetailsHelper, RadioHelper, SaveAndContinueButtonHelper }
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ ContinueButton, TextInputHelper }
+
+@this(
+    mainTemplate: AgentMainTemplate,
+    form: FormWithCSRF,
+    textInputHelper: TextInputHelper,
+    dateHelper: DateHelper,
+    radioHelper: RadioHelper,
+    detailsHelper: DetailsHelper,
+    continueButton: ContinueButton,
+    saveAndContinueButtonHelper: SaveAndContinueButtonHelper
+)
+
+@(firstIncomeSourceForm: Form[(String, String, DateModel, AccountingMethod)], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
+
+@mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(firstIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
+
+    @heading
+
+    @form(action = postAction) {
+
+        @textInputHelper(
+            field = firstIncomeSourceForm(FirstIncomeSourceForm.businessTradeName),
+            label = messages("agent.full-income-source.trade.label"),
+            hint = Some(Html(messages("agent.full-income-source.trade.hint"))),
+            isPageHeading = false,
+            classes = Some("govuk-!-width-one-half")
+        )
+
+        @textInputHelper(
+            field = firstIncomeSourceForm(FirstIncomeSourceForm.businessName),
+            label = messages("agent.full-income-source.name.label"),
+            hint = Some(Html(messages("agent.full-income-source.name.hint"))),
+            isPageHeading = false,
+            classes = Some("govuk-!-width-one-half")
+        )
+
+        @dateHelper(
+            field = firstIncomeSourceForm(FirstIncomeSourceForm.startDate),
+            legendContent = messages("agent.full-income-source.start-date.legend"),
+            isLegendVisible = true,
+            parentForm = firstIncomeSourceForm,
+            hintText = Some(messages("agent.full-income-source.start-date.hint")),
+            isPageHeading = false
+        )
+
+        <p class="govuk-body govuk-!-font-weight-bold">
+            @messages("agent.full-income-source.accounting-method.legend")
+        </p>
+
+        @detailsHelper(
+            summary = messages("agent.full-income-source.accounting-method.details.summary"),
+            content = helpWithAccountingMethodContent
+        )
+
+        @radioHelper(
+            field = firstIncomeSourceForm(FirstIncomeSourceForm.accountingMethodBusiness),
+            legend = messages("agent.full-income-source.accounting-method.legend"),
+            hint = Some(messages("agent.full-income-source.accounting-method.hint")),
+            isPageHeading = false,
+            radioItems = Seq(
+                RadioItem(
+                    content = Text(messages("agent.full-income-source.accounting-method.cash")),
+                    value = Some(Cash.CASH)
+                ),
+                RadioItem(
+                    content = Text(messages("agent.full-income-source.accounting-method.accruals")),
+                    value = Some(Accruals.ACCRUALS)
+                )
+            )
+        )
+
+        @saveAndContinueButtonHelper(
+            individual = false,
+            saveAndReturnReference = Some("sole-trader-income-source")
+        )
+
+    }
+
+}
+
+@heading = {
+    <span class="govuk-caption-l">@messages("agent.full-income-source.caption", clientDetails.name, clientDetails.formattedNino)</span>
+    <h1 class="govuk-heading-l">@messages("agent.full-income-source.heading")</h1>
+}
+
+@helpWithAccountingMethodContent = {
+    <p class="govuk-body govuk-!-font-weight-bold">
+        @messages("agent.full-income-source.accounting-method.details.para-one")
+    </p>
+
+    <p class="govuk-body">
+        @messages("agent.full-income-source.accounting-method.details.para-two")
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("agent.full-income-source.accounting-method.details.bullet-one")</li>
+        <li>@messages("agent.full-income-source.accounting-method.details.bullet-two")</li>
+    </ul>
+}
