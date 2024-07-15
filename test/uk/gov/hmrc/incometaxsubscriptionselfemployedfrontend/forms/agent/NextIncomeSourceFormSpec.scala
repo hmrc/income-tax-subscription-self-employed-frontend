@@ -28,6 +28,10 @@ class NextIncomeSourceFormSpec extends PlaySpec {
   val form: Form[(String, String, DateModel)] = nextIncomeSourceForm(_.toString)
 
   lazy val testNameEmpty = ""
+  lazy val testNameNotTooLong = "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-12345"
+  lazy val testTradeNameNotTooLong = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  lazy val testTradeNameMinLength = "AA"
+  lazy val testNameMinLength = "AA"
   lazy val testNameTooLong = "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456"
   lazy val testNameInvalidChar = "!@£$%^*():;"
 
@@ -93,6 +97,36 @@ class NextIncomeSourceFormSpec extends PlaySpec {
       result.errors must contain(FormError(businessTradeName, "error.agent.business-trade-name.max-length"))
     }
 
+    "bind successfully when business trade name is has minimum 2 characters" in {
+      val date = DateModel("10", "6", "2023")
+      val testInput = Map(
+        businessTradeName -> testTradeNameMinLength,
+        businessName -> "Test Business Name",
+        s"$startDate-dateDay" -> date.day,
+        s"$startDate-dateMonth" -> date.month,
+        s"$startDate-dateYear" -> date.year
+      )
+      val expected = (testTradeNameMinLength, "Test Business Name", date)
+      val actual = form.bind(testInput).value
+
+      actual mustBe Some(expected)
+    }
+
+    "bind successfully when business trade name is exactly 35 characters" in {
+      val date = DateModel("10", "6", "2023")
+      val testInput = Map(
+        businessTradeName -> testTradeNameNotTooLong,
+        businessName -> "Test Business Name",
+        s"$startDate-dateDay" -> date.day,
+        s"$startDate-dateMonth" -> date.month,
+        s"$startDate-dateYear" -> date.year
+      )
+      val expected = (testTradeNameNotTooLong, "Test Business Name", date)
+      val actual = form.bind(testInput).value
+
+      actual mustBe Some(expected)
+    }
+
     "fail to bind when business trade name has invalid characters" in {
       val date = DateModel("10", "6", "2023")
       val testInput = Map(
@@ -151,6 +185,36 @@ class NextIncomeSourceFormSpec extends PlaySpec {
       result.value mustBe None
 
       result.errors must contain(FormError(businessName, "error.agent.business-name.max-length"))
+    }
+
+    "bind successfully when business name has minimum 2 characters" in {
+      val date = DateModel("10", "6", "2023")
+      val testInput = Map(
+        businessTradeName -> "Test Trade Name",
+        businessName -> testNameMinLength,
+        s"$startDate-dateDay" -> date.day,
+        s"$startDate-dateMonth" -> date.month,
+        s"$startDate-dateYear" -> date.year
+      )
+      val expected = ("Test Trade Name", testNameMinLength, date)
+      val actual = form.bind(testInput).value
+
+      actual mustBe Some(expected)
+    }
+
+    "bind successfully when business name is exactly 105 characters" in {
+      val date = DateModel("10", "6", "2023")
+      val testInput = Map(
+        businessTradeName -> "Test Trade Name",
+        businessName -> testNameNotTooLong,
+        s"$startDate-dateDay" -> date.day,
+        s"$startDate-dateMonth" -> date.month,
+        s"$startDate-dateYear" -> date.year
+      )
+      val expected = ("Test Trade Name", testNameNotTooLong, date)
+      val actual = form.bind(testInput).value
+
+      actual mustBe Some(expected)
     }
 
     "fail to bind when business name has invalid characters" in {
