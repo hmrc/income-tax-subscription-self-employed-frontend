@@ -29,11 +29,10 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
   val form: Form[(String, String, DateModel, AccountingMethod)] = firstIncomeSourceForm(_.toString)
 
   lazy val testNameEmpty = ""
-  lazy val testNameNotTooLong = "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-12345"
-  lazy val testTradeNameNotTooLong = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  lazy val testTradeNameMaxLength = "A" * 35
   lazy val testTradeNameMinLength = "AA"
   lazy val testNameMinLength = "AA"
-  lazy val testNameTooLong = "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456"
+  lazy val testNameMaxLength = "A" * 105
   lazy val testNameInvalidChar = "!@£$%^*():;"
 
   "FirstIncomeSourceForm" should {
@@ -89,7 +88,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
     "fail to bind when business trade name is too long" in {
       val date = DateModel("10", "6", "2023")
       val testInput = Map(
-        businessTradeName -> ("A" * 36),
+        businessTradeName -> (testTradeNameMaxLength + 1),
         businessName -> "Test Business Name",
         s"$startDate-dateDay" -> date.day,
         s"$startDate-dateMonth" -> date.month,
@@ -153,14 +152,14 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
     "bind successfully when business trade name is exactly 35 characters" in {
       val date = DateModel("10", "6", "2023")
       val testInput = Map(
-        businessTradeName -> testTradeNameNotTooLong,
+        businessTradeName -> testTradeNameMaxLength,
         businessName -> "Test Business Name",
         s"$startDate-dateDay" -> date.day,
         s"$startDate-dateMonth" -> date.month,
         s"$startDate-dateYear" -> date.year,
         accountingMethodBusiness -> CASH
       )
-      val expected = (testTradeNameNotTooLong, "Test Business Name", date, Cash)
+      val expected = (testTradeNameMaxLength, "Test Business Name", date, Cash)
       val actual = form.bind(testInput).value
 
       actual mustBe Some(expected)
@@ -186,7 +185,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val date = DateModel("10", "6", "2023")
       val testInput = Map(
         businessTradeName -> "Test Trade Name",
-        businessName -> testNameTooLong,
+        businessName -> (testNameMaxLength + 1),
         s"$startDate-dateDay" -> date.day,
         s"$startDate-dateMonth" -> date.month,
         s"$startDate-dateYear" -> date.year,
@@ -218,13 +217,13 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val date = DateModel("10", "6", "2023")
       val testInput = Map(
         businessTradeName -> "Test Trade Name",
-        businessName -> testNameNotTooLong,
+        businessName -> testNameMaxLength,
         s"$startDate-dateDay" -> date.day,
         s"$startDate-dateMonth" -> date.month,
         s"$startDate-dateYear" -> date.year,
         accountingMethodBusiness -> CASH
       )
-      val expected = ("Test Trade Name", testNameNotTooLong, date, Cash)
+      val expected = ("Test Trade Name", testNameMaxLength, date, Cash)
       val actual = form.bind(testInput).value
 
       actual mustBe Some(expected)
