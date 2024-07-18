@@ -19,6 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
@@ -85,9 +86,15 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         } yield {
           saveResult match {
             case Right(_) =>
-              if (isEditMode) Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
-              else if (accountingMethod.isDefined) Redirect(routes.SelfEmployedCYAController.show(businessId))
-              else Redirect(routes.BusinessAccountingMethodController.show(businessId))
+              if (isEditMode) {
+                Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
+              } else {
+                if(isEnabled(EnableAgentStreamline) || accountingMethod.isDefined) {
+                  Redirect(routes.SelfEmployedCYAController.show(businessId))
+                } else {
+                  Redirect(routes.BusinessAccountingMethodController.show(businessId))
+                }
+              }
             case Left(_) =>
               throw new InternalServerException("[AddressLookupRoutingController][addressLookupRedirect] - Could not save business address")
           }

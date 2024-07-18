@@ -26,12 +26,18 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, SoleTraderBusinesses}
 
 import java.net.URLEncoder
 
 class AddressLookupRoutingControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(EnableAgentStreamline)
+  }
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -94,24 +100,50 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
   s"GET $baseUrl$clientOrIndividual/details/address-lookup/$id" when {
     "it is not in edit mode" when {
       "business accounting method is not defined" when {
-        "the address lookup service return successful JSON details" should {
-          "redirect to sole trader accounting method page" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
+        "the streamline agent feature switch is enabled" when {
+          "the address lookup service return successful JSON details" should {
+            "redirect to sole trader check your answers page" in {
+              enable(EnableAgentStreamline)
 
-            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
-            stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
-            stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
-            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+              Given("I setup the Wiremock stubs")
+              stubAuthSuccess()
 
-            When("GET /details/address-lookup/" + id + " is called")
-            val res = getAddressLookupResponse(id, addressId, isEditMode = false)
+              stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
+              stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
+              stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
+              stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
-            Then("Should return a SEE_OTHER with a redirect location of business accounting method")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(ClientBusinessAccountingMethodUri)
-            )
+              When("GET /details/address-lookup/" + id + " is called")
+              val res = getAddressLookupResponse(id, addressId, isEditMode = false)
+
+              Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers")
+              res must have(
+                httpStatus(SEE_OTHER),
+                redirectURI(ClientBusinessCYAUri)
+              )
+            }
+          }
+        }
+        "the streamline agent feature switch is disabled" when {
+          "the address lookup service return successful JSON details" should {
+            "redirect to sole trader accounting method page" in {
+              Given("I setup the Wiremock stubs")
+              stubAuthSuccess()
+
+              stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
+              stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
+              stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
+              stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+
+              When("GET /details/address-lookup/" + id + " is called")
+              val res = getAddressLookupResponse(id, addressId, isEditMode = false)
+
+              Then("Should return a SEE_OTHER with a redirect location of business accounting method")
+              res must have(
+                httpStatus(SEE_OTHER),
+                redirectURI(ClientBusinessAccountingMethodUri)
+              )
+            }
           }
         }
       }
