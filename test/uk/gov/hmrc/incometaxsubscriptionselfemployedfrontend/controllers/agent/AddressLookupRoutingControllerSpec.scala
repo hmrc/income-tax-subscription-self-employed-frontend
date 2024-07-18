@@ -19,6 +19,8 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks.MockAddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -31,7 +33,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
   with MockSessionDataService
-  with MockMultipleSelfEmploymentsService {
+  with MockMultipleSelfEmploymentsService
+  with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(EnableAgentStreamline)
+  }
 
   val isAgent = true
 
@@ -152,6 +160,25 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
             Some(routes.SelfEmployedCYAController.show(businessId, isEditMode = true).url)
+        }
+      }
+    }
+
+    "is not in edit mode" when {
+      "the streamline agent journey is enabled" should {
+        "redirect to the sole trader check your answers page" when {
+          "the address lookup service returns valid data" in {
+            enable(EnableAgentStreamline)
+
+            mockAuthSuccess()
+            mockFetchAccountingMethod(Right(None))
+            mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
+            mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false)(fakeRequest)
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(businessId).url)
+          }
         }
       }
     }
