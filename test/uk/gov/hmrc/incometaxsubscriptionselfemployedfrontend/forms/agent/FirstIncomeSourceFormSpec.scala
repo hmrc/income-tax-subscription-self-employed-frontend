@@ -18,21 +18,23 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import org.scalatestplus.play.PlaySpec
 import play.api.data.{Form, FormError}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.FirstIncomeSourceForm.{accountingMethodBusiness, businessName, businessTradeName, firstIncomeSourceForm, startDate}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.FirstIncomeSourceForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Cash.CASH
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Cash, DateModel}
 
 import java.time.LocalDate
 
 class FirstIncomeSourceFormSpec extends PlaySpec {
+
   def dateFormatter(date: LocalDate): String = date.toString
+
   val form: Form[(String, String, DateModel, AccountingMethod)] = firstIncomeSourceForm(_.toString)
 
   lazy val testNameEmpty = ""
-  lazy val testTradeNameMaxLength = "A" * 35
+  lazy val testTradeNameMaxLength: String = "A" * 35
   lazy val testTradeNameMinLength = "AA"
   lazy val testNameMinLength = "AA"
-  lazy val testNameMaxLength = "A" * 105
+  lazy val testNameMaxLength: String = "A" * 105
   lazy val testNameInvalidChar = "!@£$%^*():;"
 
   "FirstIncomeSourceForm" should {
@@ -66,7 +68,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, "error.agent.business-trade-name.empty"))
+      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
     }
 
     "fail to bind when business trade name is too short" in {
@@ -82,7 +84,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, "error.agent.business-trade-name.min-length"))
+      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.min-length"))
     }
 
     "fail to bind when business trade name is too long" in {
@@ -98,7 +100,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, "error.agent.business-trade-name.max-length"))
+      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.max-length"))
     }
 
     "fail to bind when business trade name has invalid characters" in {
@@ -114,7 +116,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, "error.agent.business-trade-name.invalid"))
+      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.invalid"))
     }
 
     "fail to bind when business trade name has just a space" in {
@@ -130,7 +132,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, "error.agent.business-trade-name.empty"))
+      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
     }
 
     "bind successfully when business trade name is has minimum 2 characters" in {
@@ -178,7 +180,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessName, "error.agent.business-name.empty"))
+      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
     }
 
     "fail to bind when business name is too long (over 105 characters)" in {
@@ -194,7 +196,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessName, "error.agent.business-name.max-length"))
+      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.max-length"))
     }
 
     "bind successfully when business name has minimum 2 characters" in {
@@ -242,7 +244,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessName, "error.agent.business-name.invalid-character"))
+      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.invalid-character"))
     }
 
     "fail to bind when business name has just a space" in {
@@ -258,7 +260,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(businessName, "error.agent.business-name.empty"))
+      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
     }
 
     "fail to bind when date is missing" in {
@@ -273,7 +275,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day-month-year.empty"))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.empty"))
     }
 
     "fail to bind when date is out of bounds (too early)" in {
@@ -288,7 +290,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day-month-year.min-date", Seq("1900-01-01")))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.min-date", Seq("1900-01-01")))
     }
 
     "fail to bind when date is out of bounds (too late)" in {
@@ -304,13 +306,13 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day-month-year.max-date", Seq(maxDate.minusDays(1).toString)))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.max-date", Seq(maxDate.minusDays(1).toString)))
     }
 
     "unbind data correctly" in {
       val filledForm = form.fill(("Test Trade Name", "Test Business Name", DateModel("10", "6", "2023"), Cash))
 
-      filledForm.data must contain allOf (
+      filledForm.data must contain allOf(
         businessTradeName -> "Test Trade Name",
         businessName -> "Test Business Name",
         s"$startDate-dateDay" -> "10",
@@ -322,7 +324,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
 
     "show an error when date is not supplied" in {
       val result = form.bind(Map.empty[String, String])
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day-month-year.empty"))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.empty"))
     }
 
     "show an error when date is invalid" in {
@@ -334,7 +336,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "1899",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateMonth", "agent.error.business.month.invalid"))
+      result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.invalid"))
     }
 
     "show an error when day is missing" in {
@@ -346,7 +348,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "2017",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day.empty"))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day.empty"))
     }
 
     "show an error when month is missing" in {
@@ -358,7 +360,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "2017",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateMonth", "agent.error.business.month.empty"))
+      result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.empty"))
     }
 
     "show an error when year is missing" in {
@@ -370,7 +372,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateYear", "agent.error.business.year.empty"))
+      result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.empty"))
     }
 
     "show an error when multiple fields are missing" in {
@@ -382,7 +384,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "2017",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day-month.empty"))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month.empty"))
     }
 
     "show an error when day is invalid" in {
@@ -394,7 +396,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "2017",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day.invalid"))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day.invalid"))
     }
 
     "show an error when month is invalid" in {
@@ -406,7 +408,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "2017",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateMonth", "agent.error.business.month.invalid"))
+      result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.invalid"))
     }
 
     "show an error when year is invalid" in {
@@ -418,7 +420,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "invalid",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateYear", "agent.error.business.year.invalid"))
+      result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.invalid"))
     }
 
     "show an error when multiple fields are invalid" in {
@@ -430,7 +432,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "2017",
         accountingMethodBusiness -> CASH
       ))
-      result.errors must contain(FormError(s"$startDate-dateDay", "agent.error.business.day-month.invalid"))
+      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month.invalid"))
     }
 
     "show an error when year length is incorrect" when {
@@ -443,7 +445,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
           s"$startDate-dateYear" -> "123",
           accountingMethodBusiness -> CASH
         ))
-        result.errors must contain(FormError(s"$startDate-dateYear", "agent.error.business.year.length"))
+        result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.length"))
       }
 
       "year has 5 digits" in {
@@ -455,7 +457,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
           s"$startDate-dateYear" -> "12345",
           accountingMethodBusiness -> CASH
         ))
-        result.errors must contain(FormError(s"$startDate-dateYear", "agent.error.business.year.length"))
+        result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.length"))
       }
     }
 
@@ -471,7 +473,7 @@ class FirstIncomeSourceFormSpec extends PlaySpec {
       val result = form.bind(testInput)
       result.value mustBe None
 
-      result.errors must contain(FormError(accountingMethodBusiness, "agent.error.accounting-method-property.invalid"))
+      result.errors must contain(FormError(accountingMethodBusiness, s"agent.error.$pageIdentifier.$accountingMethodBusiness.invalid"))
     }
 
 

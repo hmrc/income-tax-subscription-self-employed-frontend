@@ -52,11 +52,11 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
                          isAgent: Boolean = false,
                          backLink: Option[String] = None,
                          hasSignOutLink: Boolean = false,
-                         error: Option[(String, String)] = None) {
+                         errors: Option[Seq[(String, String)]] = None) {
 
     val document: Document = Jsoup.parse(view.body)
 
-    private val titlePrefix: String = if (error.isDefined) "Error: " else ""
+    private val titlePrefix: String = if (errors.isDefined) "Error: " else ""
     private val titleSuffix: String = if (isAgent) {
       " - Use software to report your client’s Income Tax - GOV.UK"
     } else {
@@ -79,12 +79,15 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       document.selectOptionally(".hmrc-sign-out-nav__link") mustBe None
     }
 
-    error.map { case (errorKey, errorMessage) =>
+    errors.map { errorList =>
       val errorSummary: Element = document.selectHead(".govuk-error-summary")
       errorSummary.selectHead("h2").text mustBe "There is a problem"
-      val errorLink: Element = errorSummary.selectHead("div > ul > li > a")
-      errorLink.text mustBe errorMessage
-      errorLink.attr("href") mustBe s"#$errorKey"
+
+      errorList.zip(1 to errorList.length).map { case ((errorKey, errorMessage), index) =>
+        val errorLink: Element = errorSummary.selectNth("a", index)
+        errorLink.text mustBe errorMessage
+        errorLink.attr("href") mustBe s"#$errorKey"
+      }
     }
 
   }

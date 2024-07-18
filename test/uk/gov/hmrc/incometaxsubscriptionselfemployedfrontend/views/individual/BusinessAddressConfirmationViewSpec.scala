@@ -89,7 +89,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
         isAgent = false,
         backLink = Some(testBackUrl),
         hasSignOutLink = true,
-        error = Some(testFormError.key -> BusinessAddressConfirmationMessages.Form.emptyError)
+        errors = Some(Seq(testFormError.key -> BusinessAddressConfirmationMessages.Form.emptyError))
       )
     }
 

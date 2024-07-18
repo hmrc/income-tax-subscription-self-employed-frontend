@@ -86,7 +86,7 @@
       value = parentForm(s"${field.name}-dateYear").value
     )
   ),
-  hint = hintText.map(t => Hint(content = Text(t))),
+  hint = hintText.map(t => Hint(content = HtmlContent(t))),
   errorMessage = errorMessage,
   fieldset = Some(Fieldset(
     legend = Some(Legend(

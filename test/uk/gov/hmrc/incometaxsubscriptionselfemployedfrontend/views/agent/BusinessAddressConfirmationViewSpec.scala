@@ -64,7 +64,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
     val heading: String = "Confirm business address"
     val captionHidden = "This section is"
     val captionVisible: String = "FirstName LastName | ZZ 11 11 11 Z"
-    val caption = captionHidden + ' ' + captionVisible
+    val caption: String = captionHidden + ' ' + captionVisible
     val para: String = "Does this business have the same address as the first one you added?"
 
     object Summary {
@@ -96,7 +96,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
         isAgent = true,
         backLink = Some(testBackUrl),
         hasSignOutLink = true,
-        error = Some(testFormError.key -> BusinessAddressConfirmationMessages.Form.emptyError)
+        errors = Some(Seq(testFormError.key -> BusinessAddressConfirmationMessages.Form.emptyError))
       )
     }
 

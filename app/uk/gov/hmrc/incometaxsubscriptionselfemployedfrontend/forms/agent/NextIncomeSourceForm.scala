@@ -17,11 +17,11 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import play.api.data.Forms.tuple
+import play.api.data.validation.Constraint
 import play.api.data.{Form, Mapping}
-import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{businessNameValidateChar, maxLength, minLettersLength, nonEmpty, validateCharAgainst}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping.dateModelMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.{ConstraintUtil, constraint}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.trimmedText
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 
@@ -29,41 +29,32 @@ import java.time.LocalDate
 
 object NextIncomeSourceForm {
 
-  val businessTradeName: String = "businessTradeName"
+  val pageIdentifier: String = "full-income-source"
 
+  val businessTradeName: String = "business-trade"
   val businessTradeNameMaxLength = 35
   val businessTradeNameMinLength = 2
-  val tradeNameEmpty: Constraint[String] = nonEmpty("error.agent.business-trade-name.empty")
-  val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, "error.agent.business-trade-name.max-length")
-  val nameTooShort: Constraint[String] = minLettersLength(businessTradeNameMinLength, "error.agent.business-trade-name.min-length")
-  val nameCharsValid: Constraint[String] = businessNameValidateChar("error.agent.business-trade-name.invalid")
-  val businessName = "businessName"
+  val tradeNameEmpty: Constraint[String] = nonEmpty(s"agent.error.$pageIdentifier.$businessTradeName.empty")
+  val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, s"agent.error.$pageIdentifier.$businessTradeName.max-length")
+  val nameTooShort: Constraint[String] = minLettersLength(businessTradeNameMinLength, s"agent.error.$pageIdentifier.$businessTradeName.min-length")
+  val nameCharsValid: Constraint[String] = businessNameValidateChar(s"agent.error.$pageIdentifier.$businessTradeName.invalid")
 
+  val businessName = "business-name"
   private val businessNameMaxLength: Int = 105
-
-  val nameNotEmpty: Constraint[String] = nonEmpty("error.agent.business-name.empty")
-  val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, "error.agent.business-name.max-length")
+  val nameNotEmpty: Constraint[String] = nonEmpty(s"agent.error.$pageIdentifier.$businessName.empty")
+  val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, s"agent.error.$pageIdentifier.$businessName.max-length")
   val businessTradeNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
-  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, "error.agent.business-name.invalid-character")
+  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, s"agent.error.$pageIdentifier.$businessName.invalid-character")
 
-  val startDate: String = "startDate"
-  val errorContext: String = "business"
+  val startDate: String = "start-date"
 
-  def hasDuplicateTradeNames(excludedNames: Seq[String]): Constraint[String] = constraint[String] { trade =>
-    if (excludedNames.contains(trade)) Invalid("error.agent.business-trade-name.duplicate")
-    else Valid
-  }
-
-  def nameIsNotExcluded(excludedNames: Seq[String]): Constraint[String] = constraint[String] { name =>
-    if (excludedNames.contains(name)) Invalid("error.agent.business-trade-name.duplicate")
-    else Valid
-  }
   def maxStartDate: LocalDate = LocalDate.now().plusDays(6)
+
   def minStartDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   def businessStartDate(f: LocalDate => String): Mapping[DateModel] = dateModelMapping(
     isAgent = true,
-    errorContext = errorContext,
+    errorContext = s"$pageIdentifier.$startDate",
     minDate = Some(minStartDate),
     maxDate = Some(maxStartDate),
     Some(f)
@@ -76,7 +67,10 @@ object NextIncomeSourceForm {
       startDate -> businessStartDate(f)
     )
   )
-  def createNextIncomeSourceData(maybeTradeName: Option[String], maybeBusinessName: Option[String], maybeStartDate: Option[DateModel]): Map[String, String] = {
+
+  def createNextIncomeSourceData(maybeTradeName: Option[String],
+                                 maybeBusinessName: Option[String],
+                                 maybeStartDate: Option[DateModel]): Map[String, String] = {
 
     val tradeNameMap: Map[String, String] = maybeTradeName.map(name => Map(businessTradeName -> name)).getOrElse(Map.empty)
     val businessNameMap: Map[String, String] = maybeBusinessName.map(name => Map(businessName -> name)).getOrElse(Map.empty)

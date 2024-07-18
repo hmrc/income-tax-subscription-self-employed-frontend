@@ -78,7 +78,7 @@ class ReferenceRetrievalSpec extends PlaySpec with MockSessionDataService with M
 
         intercept[InternalServerException](await(TestReferenceRetrieval.withIndividualReference { _ =>
           Future.successful(Ok("test-failure"))
-        })).message mustBe s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session. Status: $INTERNAL_SERVER_ERROR"
+        })).message mustBe s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session"
       }
     }
   }
@@ -117,7 +117,7 @@ class ReferenceRetrievalSpec extends PlaySpec with MockSessionDataService with M
 
         intercept[InternalServerException](await(TestReferenceRetrieval.withAgentReference { _ =>
           Future.successful(Ok("test-failure"))
-        })).message mustBe s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session. Status: $INTERNAL_SERVER_ERROR"
+        })).message mustBe s"[ReferenceRetrieval][withReference] - Error occurred when fetching reference from session"
       }
     }
   }
