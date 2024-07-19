@@ -2,8 +2,6 @@
 
 import uk.gov.hmrc.DefaultBuildSettings
 
-import scala.sys.process._
-
 val appName = "income-tax-subscription-self-employed-frontend"
 
 ThisBuild / majorVersion := 1
@@ -15,6 +13,7 @@ lazy val microservice = Project(AppDependencies.appName, file("."))
     scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
     scalacOptions ++= Seq("-deprecation", "-feature"),
   )
+  .settings(CodeCoverageSettings.settings *)
   .settings(PlayKeys.playDefaultPort := 9563)
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)

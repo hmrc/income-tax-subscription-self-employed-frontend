@@ -24,6 +24,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataK
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{DeleteSubscriptionDetailsHttpParser, GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent.StreamlineBusiness
 
 class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubscriptionConnector {
 
@@ -1104,6 +1105,57 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
         await(service.fetchAllNameTradeCombos(testReference)) mustBe
           Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+  }
+
+  "fetchStreamlineBusiness" should {
+    "return a GetSelfEmploymentsFailure" when {
+      "there was a problem retrieving businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        await(service.fetchStreamlineBusiness(testReference, id)) mustBe
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+    "return a streamline business" when {
+      "there are no businesses currently" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(None))
+
+        await(service.fetchStreamlineBusiness(testReference, id)) mustBe
+          Right(StreamlineBusiness(None, None, None, None, isFirstBusiness = true))
+      }
+      "the requested business does not exist in the list of existing businesses" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
+
+        await(service.fetchStreamlineBusiness(testReference, s"$id-2")) mustBe
+          Right(StreamlineBusiness(None, None, None, Some(accountingMethod), isFirstBusiness = false))
+      }
+      "the requested business exists in the list and it's the first business" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
+
+        await(service.fetchStreamlineBusiness(testReference, id)) mustBe
+          Right(StreamlineBusiness(
+            trade = Some(trade),
+            name = Some(name),
+            startDate = Some(date),
+            accountingMethod = Some(accountingMethod),
+            isFirstBusiness = true
+          ))
+      }
+      "the requested business exists in the list and it's not the first business" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(multipleSoleTraderBusinesses())))
+
+        await(service.fetchStreamlineBusiness(testReference, s"$id-2")) mustBe
+          Right(StreamlineBusiness(
+            trade = None,
+            name = None,
+            startDate = None,
+            accountingMethod = Some(accountingMethod),
+            isFirstBusiness = false
+          ))
       }
     }
   }
