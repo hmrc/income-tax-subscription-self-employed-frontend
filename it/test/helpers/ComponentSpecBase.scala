@@ -197,6 +197,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getInitialise: WSResponse = get(s"/details")
 
+  def getClientInitialise: WSResponse = get(s"/client/details")
+
   def getBusinessNameConfirmation(id: String)(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
     get(s"/details/confirm-business-name?id=$id", session)
   }
