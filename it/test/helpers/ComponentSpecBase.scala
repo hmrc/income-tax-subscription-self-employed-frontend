@@ -30,6 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.{FirstIncomeSourceForm, NextIncomeSourceForm}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
@@ -342,6 +343,37 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getClientAddressLookupInitialise(itsaId: String): WSResponse = get(s"/client/address-lookup-initialise/$itsaId")
 
   def getClientAddressLookup(itsaId: String, id: String, isEditMode: Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
+
+  def getFirstIncomeSource(id: String, isEditMode: Boolean): WSResponse = {
+    get(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode")
+  }
+
+  def submitFirstIncomeSource(trade: Option[String],
+                              name: Option[String],
+                              startDate: Option[DateModel],
+                              accountingMethod: Option[AccountingMethod],
+                              id: String,
+                              isEditMode: Boolean): WSResponse = {
+    post(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode")(
+      FirstIncomeSourceForm.createFirstIncomeSourceData(trade, name, startDate, accountingMethod)
+        .map { case (k, v) => (k, Seq(v)) }
+    )
+  }
+
+  def getNextIncomeSource(id: String, isEditMode: Boolean): WSResponse = {
+    get(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode")
+  }
+
+  def submitNextIncomeSource(trade: Option[String],
+                               name: Option[String],
+                               startDate: Option[DateModel],
+                               id: String,
+                               isEditMode: Boolean): WSResponse = {
+    post(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode")(
+      NextIncomeSourceForm.createNextIncomeSourceData(trade, name, startDate)
+        .map { case (k, v) => (k, Seq(v)) }
+    )
+  }
 
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim

@@ -16,6 +16,14 @@ POST       /details/confirm-business-name              uk.gov.hmrc.incometaxsubs
 GET         /details/business-name                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/business-name                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false)
 
+# First Income Source
+GET         /details/initial-sole-trader-business      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FirstIncomeSourceController.show(id: String, isEditMode: Boolean ?= false)
+POST        /details/initial-sole-trader-business      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FirstIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false)
+
+# First Income Source
+GET         /details/subsequent-sole-trader-business   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.NextIncomeSourceController.show(id: String, isEditMode: Boolean ?= false)
+POST        /details/subsequent-sole-trader-business   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.NextIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false)
+
 # Business Trade Name Page
 GET         /details/business-trade                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/business-trade                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false)

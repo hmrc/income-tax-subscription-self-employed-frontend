@@ -23,6 +23,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTa
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccess
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent.StreamlineBusiness
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 
 import javax.inject.{Inject, Singleton}
@@ -75,7 +76,28 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     }
   }
 
-  private def saveData(reference: String, id: String, businessUpdate: SoleTraderBusiness => SoleTraderBusiness)
+  def fetchStreamlineBusiness(reference: String, id: String)
+                             (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, StreamlineBusiness]] = {
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result map {
+        case Some(SoleTraderBusinesses(businesses, maybeAccountingMethod)) =>
+          val maybeFirstBusiness: Option[SoleTraderBusiness] = businesses.find(_.id == id)
+          StreamlineBusiness(
+            trade = maybeFirstBusiness.flatMap(_.trade),
+            name = maybeFirstBusiness.flatMap(_.name),
+            startDate = maybeFirstBusiness.flatMap(_.startDate),
+            accountingMethod = maybeAccountingMethod,
+            isFirstBusiness = businesses.headOption.exists(_.id == id)
+          )
+        case None => StreamlineBusiness(None, None, None, None, isFirstBusiness = true)
+      }
+    }
+  }
+
+  private def saveData(reference: String,
+                       id: String,
+                       businessUpdate: SoleTraderBusiness => SoleTraderBusiness,
+                       accountingMethod: Option[AccountingMethod] = None)
                       (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
 
     def updateSoleTraderBusinesses(soleTraderBusinesses: SoleTraderBusinesses): SoleTraderBusinesses = {
@@ -97,6 +119,8 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
         case None => SoleTraderBusinesses(businesses = Seq.empty[SoleTraderBusiness])
       } map updateSoleTraderBusinesses
     } flatMap {
+      case Right(soleTraderBusinesses) if accountingMethod.isDefined =>
+        saveSoleTraderBusinesses(reference, soleTraderBusinesses.copy(accountingMethod = accountingMethod))
       case Right(soleTraderBusinesses) =>
         saveSoleTraderBusinesses(reference, soleTraderBusinesses)
       case Left(_) => Future.successful(Left(SaveSelfEmploymentDataFailure))
@@ -132,6 +156,25 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
   def confirmBusiness(reference: String, businessId: String)
                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     saveData(reference, businessId, _.copy(confirmed = true))
+  }
+
+  def saveFirstIncomeSource(reference: String, businessId: String, trade: String, name: String, startDate: DateModel, accountingMethod: AccountingMethod)
+                           (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    saveData(
+      reference,
+      businessId,
+      _.copy(name = Some(name), trade = Some(trade), startDate = Some(startDate), confirmed = false),
+      accountingMethod = Some(accountingMethod)
+    )
+  }
+
+  def saveNextIncomeSource(reference: String, businessId: String, trade: String, name: String, startDate: DateModel)
+                          (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    saveData(
+      reference,
+      businessId,
+      _.copy(name = Some(name), trade = Some(trade), startDate = Some(startDate), confirmed = false)
+    )
   }
 
   def fetchAccountingMethod(reference: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[AccountingMethod]]] = {
