@@ -19,10 +19,17 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SoleTraderBusiness, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 
-class InitialiseControllerSpec extends ControllerBaseSpec {
+class InitialiseControllerSpec extends ControllerBaseSpec
+  with MockSessionDataService
+  with MockMultipleSelfEmploymentsService
+  with FeatureSwitching {
 
   override val controllerName: String = "InitialiseController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
@@ -31,20 +38,67 @@ class InitialiseControllerSpec extends ControllerBaseSpec {
 
   when(mockUuid.generateId).thenReturn("testId")
 
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(EnableAgentStreamline)
+  }
+
   object TestInitialiseController extends InitialiseController(
     mockMessagesControllerComponents,
+    mockMultipleSelfEmploymentsService,
     mockAuthService,
     mockUuid
-  )(appConfig)
+  )(appConfig, mockSessionDataService)
 
   "initialise" when {
-    s"return $SEE_OTHER and redirect to Business Name Confirmation page" in {
-      mockAuthSuccess()
+    "the agent streamline feature switch is disabled" should {
+      s"return $SEE_OTHER and redirect to Business Name Confirmation page" in {
+        mockAuthSuccess()
 
-      val result = TestInitialiseController.initialise(fakeRequest)
+        val result = TestInitialiseController.initialise(fakeRequest)
 
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessNameConfirmationController.show("testId").url)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessNameConfirmationController.show("testId").url)
+      }
+    }
+    "the agent streamline feature switch is enabled" should {
+      s"return $SEE_OTHER and redirect to the first sole trader income source page" when {
+        "there are no businesses in the sole trader businesses" in {
+          enable(EnableAgentStreamline)
+
+          mockAuthSuccess()
+          mockFetchSoleTraderBusinesses(Right(Some(SoleTraderBusinesses(Seq.empty))))
+
+          val result = TestInitialiseController.initialise(fakeRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.FirstIncomeSourceController.show("testId").url)
+        }
+        "there is no sole trader businesses stored" in {
+          enable(EnableAgentStreamline)
+
+          mockAuthSuccess()
+          mockFetchSoleTraderBusinesses(Right(None))
+
+          val result = TestInitialiseController.initialise(fakeRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.FirstIncomeSourceController.show("testId").url)
+        }
+      }
+      s"return $SEE_OTHER and redirect to the next sole trader income source page" when {
+        "there are businesses already" in {
+          enable(EnableAgentStreamline)
+
+          mockAuthSuccess()
+          mockFetchSoleTraderBusinesses(Right(Some(SoleTraderBusinesses(Seq(SoleTraderBusiness(id = "previousId"))))))
+
+          val result = TestInitialiseController.initialise(fakeRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.NextIncomeSourceController.show("testId").url)
+        }
+      }
     }
   }
 

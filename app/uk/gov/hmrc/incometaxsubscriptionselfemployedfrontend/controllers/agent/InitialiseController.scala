@@ -17,9 +17,13 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.AuthService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -28,16 +32,31 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
+                                     multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                      authService: AuthService,
                                      uuidGen: UUIDGenerator)
-                                    (val appConfig: AppConfig)
+                                    (val appConfig: AppConfig,
+                                     val sessionDataService: SessionDataService)
                                     (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with FeatureSwitching {
+  extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
 
   val initialise: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       val id = uuidGen.generateId
-      Future.successful(Redirect(routes.BusinessNameConfirmationController.show(id)))
+      if (isEnabled(EnableAgentStreamline)) {
+        withAgentReference { reference =>
+          multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
+            case Right(Some(SoleTraderBusinesses(businesses, _))) if businesses.nonEmpty =>
+              Redirect(routes.NextIncomeSourceController.show(id))
+            case Right(_) =>
+              Redirect(routes.FirstIncomeSourceController.show(id))
+            case Left(_) =>
+              throw new InternalServerException("[InitialiseController][initialise] - Failure fetching sole trader businesses")
+          }
+        }
+      } else {
+        Future.successful(Redirect(routes.BusinessNameConfirmationController.show(id)))
+      }
     }
   }
 
