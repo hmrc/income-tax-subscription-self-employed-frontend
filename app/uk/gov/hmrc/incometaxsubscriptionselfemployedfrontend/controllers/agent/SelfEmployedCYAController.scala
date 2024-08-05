@@ -82,7 +82,8 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
     for {
       (businesses, accountingMethod) <- fetchBusinessListAndAccountingMethod(reference)
       business = businesses.find(_.id == id)
-      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, businesses.length))
+      isFirstBusiness = businesses.headOption.exists(_.id == id)
+      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, businesses.length, isFirstBusiness))
     } yield result
 
   private def fetchBusinessListAndAccountingMethod(reference: String)(implicit hc: HeaderCarrier) = {

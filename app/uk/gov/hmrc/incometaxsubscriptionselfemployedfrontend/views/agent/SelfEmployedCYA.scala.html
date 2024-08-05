@@ -20,13 +20,16 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
 
 @this(
         mainTemplate: AgentMainTemplate,
         form: FormWithCSRF,
         saveAndContinueButton: SaveAndContinueButtonHelper,
         implicitDateFormatter: ImplicitDateFormatterImpl,
-        hmrcPageHeading: HmrcPageHeadingHelper
+        hmrcPageHeading: HmrcPageHeadingHelper,
+        featureSwitching: FeatureSwitchingImpl
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
@@ -35,7 +38,7 @@
 
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">@question</dt>
-        <dd class="govuk-summary-list__value">@answer.getOrElse("")</dd>
+        <dd class="govuk-summary-list__value">@Html(answer.getOrElse(""))</dd>
         <dd class="govuk-summary-list__actions">
         @changeUrl.map { link =>
             <a class="govuk-link" href="@link.url">
@@ -51,10 +54,18 @@
     </div>
 }
 
-@businessName(businessName: Option[String], businessId: String) = @{
+@businessName(businessName: Option[String], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
     val question: String = messages("agent.self-employed-cya.business-name")
     val answer: Option[String] = businessName
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(businessId, isEditMode = true).url
+    val changeUrl: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+        if (isFirstIncomeSourceCompleted) {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.FirstIncomeSourceController.show(businessId, isEditMode = true).url
+        } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.NextIncomeSourceController.show(businessId, isEditMode = true).url
+        }
+    } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessNameController.show(businessId, isEditMode = true).url
+    }
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
         hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.business-name.change") else messages("agent.self-employed-cya.business-name.add")
@@ -62,31 +73,67 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@tradingStartDate(businessStartDate: Option[DateModel], businessId: String) = @{
+@tradingStartDate(businessStartDate: Option[DateModel], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
     import implicitDateFormatter.LongDate
-    val question: String = messages("agent.self-employed-cya.trading-start-date")
+    val question: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+        messages("agent.self-employed-cya.trading-start-date.streamline")
+    } else {
+        messages("agent.self-employed-cya.trading-start-date")
+    }
     val answer: Option[String] = businessStartDate.map(_.toLocalDate.toLongDate())
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
+    val changeUrl: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+        if (isFirstIncomeSourceCompleted) {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.FirstIncomeSourceController.show(businessId, isEditMode = true).url
+        } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.NextIncomeSourceController.show(businessId, isEditMode = true).url
+    }
+        } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
+    }
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.trading-start-date.change") else messages("agent.self-employed-cya.trading-start-date.add")
-    )
+        hiddenContent = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+            if(answer.isDefined) messages("agent.self-employed-cya.trading-start-date.change.streamline") else messages("agent.self-employed-cya.business-trade.add")
+    } else {
+            if(answer.isDefined) messages("agent.self-employed-cya.trading-start-date.change") else messages("agent.self-employed-cya.business-trade.add")
+    }
+)
     summaryRow(question, answer, Some(changeLink))
 }
 
-@businessTrade(businessTrade: Option[String], businessId: String) = @{
-    val question: String = messages("agent.self-employed-cya.business-trade")
+@businessTrade(businessTrade: Option[String], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
+    val question: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+        messages("agent.self-employed-cya.business-trade.streamline")
+    } else {
+        messages("agent.self-employed-cya.business-trade")
+    }
     val answer: Option[String] = businessTrade
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
+    val changeUrl: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+        if (isFirstIncomeSourceCompleted) {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.FirstIncomeSourceController.show(businessId, isEditMode = true).url
+        } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.NextIncomeSourceController.show(businessId, isEditMode = true).url
+    }
+        } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
+    }
     val changeLink: ChangeLink = ChangeLink(
         url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.business-trade.change") else messages("agent.self-employed-cya.business-trade.add")
-    )
+        hiddenContent = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+            if(answer.isDefined) messages("agent.self-employed-cya.business-trade.change.streamline") else messages("agent.self-employed-cya.business-trade.add")
+        } else {
+            if(answer.isDefined) messages("agent.self-employed-cya.business-trade.change") else messages("agent.self-employed-cya.business-trade.add")
+    }
+)
     summaryRow(question, answer, Some(changeLink))
 }
 
 @businessAddress(businessAddress: Option[Address], businessId: String) = @{
-    val question: String = messages("agent.self-employed-cya.business-address")
+    val question: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+        messages("agent.self-employed-cya.business-address.streamline")
+    } else {
+        messages("agent.self-employed-cya.business-address")
+    }
     val answer: Option[String] = businessAddress.map(_.toString)
     val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url
     val changeLink: ChangeLink = ChangeLink(
@@ -96,30 +143,52 @@
     summaryRow(question, answer, Some(changeLink))
 }
 
-@accountingMethod(accountingMethod: Option[AccountingMethod], businessId: String) = @{
-    val question: String = messages("agent.self-employed-cya.accounting-method")
-    val answer: Option[String] = accountingMethod map {
-        case Cash => messages("agent.self-employed-cya.accounting-method.cash")
-        case Accruals => messages("agent.self-employed-cya.accounting-method.accruals")
+@accountingMethod(accountingMethod: Option[AccountingMethod], businessId: String, isFirstIncomeSource: Boolean) = @{
+    if (isFirstIncomeSource) {
+        val question: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+            messages("agent.self-employed-cya.accounting-method.streamline")
+        } else {
+            messages("agent.self-employed-cya.accounting-method")
     }
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
-    val changeLink: ChangeLink = ChangeLink(
-        url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("agent.self-employed-cya.accounting-method.change") else messages("agent.self-employed-cya.accounting-method.add")
-    )
-    summaryRow(question, answer, Some(changeLink))
+        val answer: Option[String] = accountingMethod.map {
+            case Cash => messages("agent.self-employed-cya.accounting-method.cash")
+            case Accruals => messages("agent.self-employed-cya.accounting-method.accruals")
+    }
+        val changeUrl: String = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.FirstIncomeSourceController.show(businessId, isEditMode = true).url
+        } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
+    }
+        val changeLink: ChangeLink = ChangeLink(
+            url = changeUrl,
+            hiddenContent = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+            if(answer.isDefined) messages("agent.self-employed-cya.accounting-method.change.streamline") else messages("agent.self-employed-cya.accounting-method.add.streamline")
+        } else {
+            if(answer.isDefined) messages("agent.self-employed-cya.accounting-method.change") else messages("agent.self-employed-cya.accounting-method.add")
+    }
+)
+        summaryRow(question, answer, Some(changeLink))
+    }
 }
 
 @contentTable(business: SelfEmploymentsCYAModel) = {
-
     <dl class="govuk-summary-list">
-        @businessName(business.businessName, business.id)
-        @tradingStartDate(business.businessStartDate, business.id)
-        @businessTrade(business.businessTradeName, business.id)
+        @if(featureSwitching.isEnabled(EnableAgentStreamline)) {
+        @businessTrade(business.businessTradeName, business.id, business.isFirstBusiness)
+        @businessName(business.businessName, business.id, business.isFirstBusiness)
+        @tradingStartDate(business.businessStartDate, business.id, business.isFirstBusiness)
+        @if(business.isFirstBusiness) {
+            @accountingMethod(business.accountingMethod, business.id, true)
+        }
         @businessAddress(business.businessAddress, business.id)
-        @accountingMethod(business.accountingMethod, business.id)
+        } else {
+        @businessName(business.businessName, business.id, business.isFirstBusiness)
+        @tradingStartDate(business.businessStartDate, business.id, business.isFirstBusiness)
+        @businessTrade(business.businessTradeName, business.id, business.isFirstBusiness)
+        @businessAddress(business.businessAddress, business.id)
+        @accountingMethod(business.accountingMethod, business.id, business.isFirstBusiness)
+        }
     </dl>
-
 }
 
 @mainTemplate(

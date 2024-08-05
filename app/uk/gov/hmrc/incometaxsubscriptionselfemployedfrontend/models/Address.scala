@@ -23,7 +23,7 @@ import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 case class Address(lines: Seq[String], postcode: Option[String]) {
-  override def toString: String = s"${lines.mkString(", ")}${postcode.map(t => s", $t").getOrElse("")}"
+  override def toString: String = s"${lines.mkString("<br>")}${postcode.map(t => s"<br>$t").getOrElse("")}"
 }
 
 object Address {

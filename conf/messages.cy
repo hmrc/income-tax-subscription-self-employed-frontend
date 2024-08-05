@@ -245,6 +245,16 @@ agent.self-employed-cya.title                                   = Gwirio’ch at
 agent.self-employed-cya.heading                                 = Gwirio’ch atebion
 agent.self-employed-cya.caption                                 = Y busnes unig fasnachwr a nodwyd gennych
 
+#Enable AgentStreamline Self Employed CYA
+agent.self-employed-cya.business-trade.streamline               = Fasnach
+agent.self-employed-cya.business-trade.change.streamline        = Newid y fasnach
+agent.self-employed-cya.trading-start-date.streamline           = Dyddiad dechrau
+agent.self-employed-cya.trading-start-date.change.streamline    = Newid y dyddiad dechrau
+agent.self-employed-cya.accounting-method.streamline            = Dull cyfrifyddu
+agent.self-employed-cya.accounting-method.change.streamline     = Newid y dull cyfrifyddu
+agent.self-employed-cya.business-address.streamline             = Cyfeiriad
+agent.self-employed-cya.accounting-method.add.streamline        = Add accounting method (WELSH REQUIRED)
+
 agent.full-income-source.heading                                     = Busnes unig fasnachwr eich cleient
 agent.full-income-source.caption                                     = {0} | {1}
 agent.full-income-source.trade.label                                 = Beth yw masnach busnes eich cleient?
