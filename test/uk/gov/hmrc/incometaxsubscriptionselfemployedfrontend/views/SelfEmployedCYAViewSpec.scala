@@ -195,7 +195,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
             }
             "has a answer the user gave" in new SetupComplete {
-              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line<br>line9<br>line99<br>TF3 4NT"
+              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line line9 line99 TF3 4NT"
             }
             "has a change link" in new SetupComplete {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
@@ -320,7 +320,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
             }
             "has a answer the user gave" in new SetupIncomplete {
-              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line<br>line9<br>line99<br>TF3 4NT"
+              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line line9 line99 TF3 4NT"
             }
             "has a change link" in new SetupIncomplete {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")

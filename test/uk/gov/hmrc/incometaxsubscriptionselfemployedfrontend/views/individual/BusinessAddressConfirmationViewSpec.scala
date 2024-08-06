@@ -106,7 +106,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
     "have a summary list detailing the previous address" in {
       val businessAddressRow: Element = document().mainContent.selectHead("dl").selectHead("div")
       businessAddressRow.selectHead("dt").text mustBe BusinessAddressConfirmationMessages.Summary.businessAddress
-      businessAddressRow.selectHead("dd").text mustBe testAddress.toString
+      businessAddressRow.selectHead("dd").text mustBe testAddress.toString.replace("<br>", " ")
     }
 
     "have a form" which {

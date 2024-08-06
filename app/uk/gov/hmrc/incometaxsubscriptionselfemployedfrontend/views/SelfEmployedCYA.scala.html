@@ -33,7 +33,7 @@
 @summaryRow(question: String, answer: Option[String], changeUrl: Option[ChangeLink]) = {
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">@question</dt>
-        <dd class="govuk-summary-list__value">@answer.getOrElse("")</dd>
+        <dd class="govuk-summary-list__value">@Html(answer.getOrElse(""))</dd>
         <dd class="govuk-summary-list__actions">
         @changeUrl.map { link =>
             <a class="govuk-link" href="@link.url">
