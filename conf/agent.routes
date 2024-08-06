@@ -20,7 +20,7 @@ POST        /details/business-name                     uk.gov.hmrc.incometaxsubs
 GET         /details/initial-sole-trader-business      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FirstIncomeSourceController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/initial-sole-trader-business      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FirstIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false)
 
-# First Income Source
+# Next Income Source
 GET         /details/subsequent-sole-trader-business   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.NextIncomeSourceController.show(id: String, isEditMode: Boolean ?= false)
 POST        /details/subsequent-sole-trader-business   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.NextIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false)
 

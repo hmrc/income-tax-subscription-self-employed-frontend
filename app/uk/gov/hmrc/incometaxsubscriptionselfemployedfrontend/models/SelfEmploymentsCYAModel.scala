@@ -23,7 +23,8 @@ case class SelfEmploymentsCYAModel(id: String,
                                    businessTradeName: Option[String] = None,
                                    businessAddress: Option[Address] = None,
                                    accountingMethod: Option[AccountingMethod] = None,
-                                   totalSelfEmployments: Int) {
+                                   totalSelfEmployments: Int,
+                                   isFirstBusiness: Boolean) {
 
   private val businessStartDateComplete: Boolean = businessStartDate.isDefined
   private val businessNameComplete: Boolean = businessName.isDefined
@@ -42,7 +43,7 @@ case class SelfEmploymentsCYAModel(id: String,
 }
 
 object SelfEmploymentsCYAModel {
-  def apply(id: String, soleTraderBusiness: Option[SoleTraderBusiness], accountingMethod: Option[AccountingMethod], totalSelfEmployments: Int): SelfEmploymentsCYAModel = {
+  def apply(id: String, soleTraderBusiness: Option[SoleTraderBusiness], accountingMethod: Option[AccountingMethod], totalSelfEmployments: Int, isFirstBusiness: Boolean): SelfEmploymentsCYAModel = {
     SelfEmploymentsCYAModel(
       id = id,
       confirmed = soleTraderBusiness.exists(_.confirmed),
@@ -51,7 +52,8 @@ object SelfEmploymentsCYAModel {
       businessTradeName = soleTraderBusiness.flatMap(_.trade),
       businessAddress = soleTraderBusiness.flatMap(_.address),
       accountingMethod = accountingMethod,
-      totalSelfEmployments = totalSelfEmployments
+      totalSelfEmployments = totalSelfEmployments,
+      isFirstBusiness = isFirstBusiness
     )
   }
 }

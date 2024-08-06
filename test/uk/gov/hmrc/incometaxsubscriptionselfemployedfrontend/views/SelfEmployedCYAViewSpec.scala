@@ -64,7 +64,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessTradeName = Some(s"Plumbing"),
     businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
     accountingMethod = Some(Cash),
-    totalSelfEmployments = 1
+    totalSelfEmployments = 1,
+    isFirstBusiness = true
   )
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -81,7 +82,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     businessName = Some(s"ABC Limited"),
     businessTradeName = Some(s"Plumbing"),
     businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
-    totalSelfEmployments = 1
+    totalSelfEmployments = 1,
+    isFirstBusiness = true
   )) {
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
@@ -101,7 +103,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
       businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
       confirmed = confirmed,
       accountingMethod = Some(Cash),
-      totalSelfEmployments = totalSelfEmployments
+      totalSelfEmployments = totalSelfEmployments,
+      isFirstBusiness = true
     )
     val page: HtmlFormat.Appendable = checkYourAnswers(
       answers,
@@ -150,10 +153,10 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
               changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "testId", isEditMode = true).url
             }
-            "has an add link with correct content" in new SetupIncomplete(SelfEmploymentsCYAModel(testId, totalSelfEmployments = 1)) {
+            "has an add link with correct content" in new SetupIncomplete() {
               val addLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
-              addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
-              addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addTradingStartDate
+              addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
+              addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
             }
           }
 
@@ -192,7 +195,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
             }
             "has a answer the user gave" in new SetupComplete {
-              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line, line9, line99, TF3 4NT"
+              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line<br>line9<br>line99<br>TF3 4NT"
             }
             "has a change link" in new SetupComplete {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
@@ -201,10 +204,10 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
             }
 
-            "has an add link with correct content" in new SetupIncomplete(SelfEmploymentsCYAModel(testId, totalSelfEmployments = 1)) {
+            "has an add link with correct content" in new SetupIncomplete {
               val addLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
-              addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
-              addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addBusinessAddress
+              addLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
+              addLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
             }
           }
 
@@ -317,7 +320,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
             }
             "has a answer the user gave" in new SetupIncomplete {
-              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line, line9, line99, TF3 4NT"
+              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line<br>line9<br>line99<br>TF3 4NT"
             }
             "has a change link" in new SetupIncomplete {
               val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
