@@ -21,108 +21,15 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
 
 @this(
-        mainTemplate: PrincipalMainTemplate,
-        form: FormWithCSRF,
-        saveAndContinueButton: SaveAndContinueButtonHelper,
-        implicitDateFormatter: ImplicitDateFormatterImpl,
-        hmrcPageHeading: HmrcPageHeadingHelper
+    mainTemplate: PrincipalMainTemplate,
+    form: FormWithCSRF,
+    govukSummaryList: GovukSummaryList,
+    hmrcPageHeading: HmrcPageHeading,
+    saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+    implicitDateFormatter: ImplicitDateFormatterImpl
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
-
-@summaryRow(question: String, answer: Option[String], changeUrl: Option[ChangeLink]) = {
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">@question</dt>
-        <dd class="govuk-summary-list__value">@Html(answer.getOrElse(""))</dd>
-        <dd class="govuk-summary-list__actions">
-        @changeUrl.map { link =>
-            <a class="govuk-link" href="@link.url">
-                <span aria-hidden="true">@if(answer.isDefined) {
-                    @messages("base.change")
-                } else {
-                    @messages("base.add")
-                }</span>
-                <span class="govuk-visually-hidden">@link.hiddenContent</span>
-            </a>
-        }
-        </dd>
-    </div>
-}
-
-@businessName(businessName: Option[String], businessId: String) = @{
-    val question: String = messages("self-employed-cya.business-name")
-    val answer: Option[String] = businessName
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessNameController.show(businessId, isEditMode = true).url
-    val changeLink: ChangeLink = ChangeLink(
-        url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("self-employed-cya.business-name.change") else messages("self-employed-cya.business-name.add")
-    )
-    summaryRow(question, answer, Some(changeLink))
-}
-
-@tradingStartDate(businessStartDate: Option[DateModel], businessId: String) = @{
-    import implicitDateFormatter.LongDate
-    val question: String = messages("self-employed-cya.trading-start-date")
-    val answer: Option[String] = businessStartDate.map(_.toLocalDate.toLongDate())
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessStartDateController.show(businessId, isEditMode = true).url
-    val changeLink: ChangeLink = ChangeLink(
-        url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("self-employed-cya.trading-start-date.change") else messages("self-employed-cya.trading-start-date.add")
-    )
-    summaryRow(question, answer, Some(changeLink))
-}
-
-@businessTrade(businessTrade: Option[String], businessId: String) = @{
-    val question: String = messages("self-employed-cya.business-trade")
-    val answer: Option[String] = businessTrade
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
-    val changeLink: ChangeLink = ChangeLink(
-        url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("self-employed-cya.business-trade.change") else messages("self-employed-cya.business-trade.add")
-    )
-    summaryRow(question, answer, Some(changeLink))
-}
-
-@businessAddress(businessAddress: Option[Address], businessId: String) = @{
-    val question: String = messages("self-employed-cya.business-address")
-    val answer: Option[String] = businessAddress.map(_.toString)
-    val changeUrl: String = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url
-    val changeLink: ChangeLink = ChangeLink(
-        url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("self-employed-cya.business-address.change") else messages("self-employed-cya.business-address.add")
-    )
-    summaryRow(question, answer, Some(changeLink))
-}
-
-@accountingMethod(accountingMethod: Option[AccountingMethod], businessCount: Int, businessId: String) = @{
-    val question: String = messages("self-employed-cya.accounting-method")
-    val answer: Option[String] = accountingMethod map {
-        case Cash => messages("self-employed-cya.accounting-method.cash")
-        case Accruals => messages("self-employed-cya.accounting-method.accruals")
-    }
-    val changeUrl: String = if(businessCount > 1) {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.ChangeAccountingMethodController.show(businessId).url
-    } else {
-        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
-    }
-    val changeLink: ChangeLink = ChangeLink(
-        url = changeUrl,
-        hiddenContent = if(answer.isDefined) messages("self-employed-cya.accounting-method.change") else messages("self-employed-cya.accounting-method.add")
-    )
-    summaryRow(question, answer, Some(changeLink))
-}
-
-@contentTable(business: SelfEmploymentsCYAModel) = {
-
-    <dl class="govuk-summary-list">
-        @businessName(business.businessName, business.id)
-        @tradingStartDate(business.businessStartDate, business.id)
-        @businessTrade(business.businessTradeName, business.id)
-        @businessAddress(business.businessAddress, business.id)
-        @accountingMethod(business.accountingMethod, business.totalSelfEmployments, business.id)
-    </dl>
-
-}
 
 @mainTemplate(
     title = messages("self-employed-cya.title"),
@@ -131,16 +38,98 @@
 
     @hmrcPageHeading(PageHeading(
         text = messages("self-employed-cya.heading"),
-        section = Some(messages("self-employed-cya.caption"))
+        section = Some(messages("self-employed-cya.caption")),
+        headingClasses = Some("govuk-heading-l"),
+        captionClasses = Some("govuk-caption-l")
     ))
 
-    @contentTable(answers)
+    @govukSummaryList(SummaryList(
+        rows = Seq(
+            businessName(answers.businessName, answers.id),
+            tradingStartDate(answers.businessStartDate, answers.id),
+            businessTrade(answers.businessTradeName, answers.id),
+            businessAddress(answers.businessAddress, answers.id),
+            accountingMethod(answers.accountingMethod, answers.totalSelfEmployments, answers.id)
+        )
+    ))
 
     @form(action = postAction) {
-        @saveAndContinueButton(
+        @saveAndContinueButtonHelper(
             individual = true,
-            saveAndContinueText = if(!answers.confirmed) Some(messages("confirm-and-continue")) else Some(messages("base.continue")),
-            saveAndReturnReference = if(!answers.confirmed) Some("sole-trader-check-your-answers") else None
+            saveAndContinueText = Some(messages("confirm-and-continue")),
+            saveAndReturnReference = Some("sole-trader-check-your-answers")
         )
     }
+
+}
+
+@simpleSummaryListRow(key: String, value: Option[String], changeHref: String, id: String, htmlValue: Boolean = false) = @{
+    SummaryListRow(
+        key = Key(content = Text(key)),
+        value = Value(content = if(htmlValue) HtmlContent(value.getOrElse("")) else Text(value.getOrElse(""))),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = changeHref,
+                    content = Text(messages(if(value.isDefined) "base.change" else "base.add")),
+                    visuallyHiddenText = Some(key)
+                )
+            )
+        ))
+    )
+}
+
+@businessName(businessName: Option[String], businessId: String) = @{
+    simpleSummaryListRow(
+        key = messages("self-employed-cya.business-name"),
+        value = businessName,
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessNameController.show(businessId, isEditMode = true).url,
+        id = businessId
+    )
+}
+
+@tradingStartDate(businessStartDate: Option[DateModel], businessId: String) = @{
+    import implicitDateFormatter.LongDate
+
+    simpleSummaryListRow(
+        key = messages("self-employed-cya.trading-start-date"),
+        value = businessStartDate.map(_.toLocalDate.toLongDate()),
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessStartDateController.show(businessId, isEditMode = true).url,
+        id = businessId
+    )
+}
+
+@businessTrade(businessTrade: Option[String], businessId: String) = @{
+    simpleSummaryListRow(
+        key = messages("self-employed-cya.business-trade"),
+        value = businessTrade,
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessTradeNameController.show(businessId, isEditMode = true).url,
+        id = businessId
+    )
+}
+
+@businessAddress(businessAddress: Option[Address], businessId: String) = @{
+    simpleSummaryListRow(
+        key = messages("self-employed-cya.business-address"),
+        value = businessAddress.map(_.toString),
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url,
+        id = businessId,
+        htmlValue = true
+    )
+}
+
+@accountingMethod(accountingMethod: Option[AccountingMethod], businessCount: Int, businessId: String) = @{
+    simpleSummaryListRow(
+        key = messages("self-employed-cya.accounting-method"),
+        value = accountingMethod map {
+            case Cash => messages("self-employed-cya.accounting-method.cash")
+            case Accruals => messages("self-employed-cya.accounting-method.accruals")
+        },
+        changeHref = if(businessCount > 1) {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.ChangeAccountingMethodController.show(businessId).url
+        } else {
+            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
+        },
+        id = businessId
+    )
 }

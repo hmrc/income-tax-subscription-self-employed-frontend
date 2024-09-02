@@ -19,9 +19,10 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
+import org.scalatest.Checkpoints.Checkpoint
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatest.{Assertion, BeforeAndAfterEach}
+import org.scalatest.{Assertion, BeforeAndAfterEach, Succeeded}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
 import play.api.i18n.{Lang, Messages, MessagesApi}
@@ -189,7 +190,64 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
   }
 
+  case class SummaryListActionValues(href: String, text: String, visuallyHidden: String)
+
+  case class SummaryListRowValues(key: String, value: Option[String], actions: Seq[SummaryListActionValues])
+
   implicit class ElementTests(element: Element) {
+
+    def mustHaveSummaryList(selector: String)(rows: Seq[SummaryListRowValues]): Assertion = {
+      val checkpoint: Checkpoint = new Checkpoint()
+
+      val summaryList = element.selectHead(selector)
+
+      rows.zip(1 to rows.length) foreach { case (rowData, rowIndex) =>
+        val row = summaryList.selectHead(s".govuk-summary-list__row:nth-of-type($rowIndex)")
+
+        checkpoint {
+          row.selectHead("dt.govuk-summary-list__key").text mustBe rowData.key
+        }
+
+        checkpoint {
+          row.selectHead("dd.govuk-summary-list__value").text mustBe rowData.value.getOrElse("")
+        }
+
+        rowData.actions match {
+          case Nil =>
+            checkpoint {
+              row.selectOptionally("dd.govuk-summary-list__actions") mustBe None
+            }
+          case actionValues :: Nil =>
+            val link = row.selectHead("dd.govuk-summary-list__actions").selectHead("a")
+
+            checkpoint {
+              link.attr("href") mustBe actionValues.href
+            }
+            checkpoint {
+              link.text mustBe actionValues.text
+            }
+            checkpoint {
+              link.selectHead("span.govuk-visually-hidden").text mustBe actionValues.visuallyHidden
+            }
+          case actionsValues =>
+            actionsValues.zip(1 to actionsValues.length) foreach { case (actionValues, actionIndex) =>
+              val link = row.selectHead("dd.govuk-summary-list__actions").selectHead(s"a:nth-of-type($actionIndex)")
+              checkpoint {
+                link.attr("href") mustBe actionValues.href
+              }
+              checkpoint {
+                link.text mustBe actionValues.text
+              }
+              checkpoint {
+                link.selectHead("span.govuk-visually-hidden").text mustBe actionValues.visuallyHidden
+              }
+            }
+        }
+      }
+
+      checkpoint.reportAll()
+      Succeeded
+    }
 
     def mustHaveRadioInput(name: String, radioItems: Seq[RadioItem]): Assertion = {
       radioItems.zip(1 to radioItems.length) map { case (radioItem, index) =>
