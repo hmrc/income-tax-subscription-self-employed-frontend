@@ -20,479 +20,458 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.{FeatureSwitch, FeatureSwitchingImpl}
 
-class SelfEmployedCYAViewSpec extends ViewSpec {
+class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
 
-  object CheckYourAnswersMessages {
-    val captionHidden = "This section is"
-    val caption = "FirstName LastName | ZZ 11 11 11 Z"
-    val heading = "Check your answers"
-    val title = "Check your answers - sole trader business"
-    val confirmAndContinue = "Confirm and continue"
-    val continue = "Continue"
-    val saveAndBack = "Save and come back later"
-    val change = "Change"
-    val back = "Back"
-    val add = "Add"
-    val tradingStartDate = "Trading start date"
-    val changeTradingStartDate = "Change trading start date"
-    val addTradingStartDate = "Add trading start date"
-    val businessName = "Business name"
-    val changeBusinessName = "Change business name"
-    val addBusinessName = "Add business name"
-    val businessAddress = "Address"
-    val changeBusinessAddress = "Change address"
-    val addBusinessAddress = "Add address"
-    val businessTrade = "Type of trade"
-    val changeBusinessTrade = "Change type of trade"
-    val addTypeOfTrade = "Add type of trade"
-    val accountingMethod = "Accounting method for sole trader income"
-    val changeAccountingMethod = "Change accounting method for sole trader income"
-    val addAccountingMethod = "Add accounting method for sole trader income"
-    val yes = "Yes"
-    val no = "No"
-    val businessTradeStreamline = "Trade"
-    val changeBusinessTradeStreamline = "Change trade"
-    val tradingStartDateStreamline = "Start date"
-    val changeTradingStartDateStreamline = "Change start date"
-    val accountingMethodStreamline = "Accounting method"
-    val changeAccountingMethodStreamline = "Change accounting method"
-    val businessAddressStreamline = "Address"
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(EnableAgentStreamline)
   }
 
-  def testSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+  val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
+  val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
+
+  val testId: String = "testId"
+
+  val fullSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
     id = testId,
     businessStartDate = Some(DateModel("1", "1", "2018")),
     businessName = Some(s"ABC Limited"),
     businessTradeName = Some(s"Plumbing"),
-    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
+    businessAddress = Some(Address(Seq(s"line 1"), Some("TF3 4NT"))),
     accountingMethod = Some(Cash),
     totalSelfEmployments = 1,
     isFirstBusiness = true
   )
 
-  val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
-
-  val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
-
-  val backUrl: Option[String] = Some(testBackUrl)
-
-  val testId: String = "testId"
-
-  val featureSwitching: FeatureSwitchingImpl = app.injector.instanceOf[FeatureSwitchingImpl]
-
-  val EnableAgentStreamline: Boolean = true
-
-
-  class SetupIncomplete(answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+  val emptySelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
     id = testId,
-    businessStartDate = Some(DateModel("1", "1", "2018")),
-    businessName = Some(s"ABC Limited"),
-    businessTradeName = Some(s"Plumbing"),
-    businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
     totalSelfEmployments = 1,
     isFirstBusiness = true
-  )) {
-    def page: HtmlFormat.Appendable = checkYourAnswers(
-      answers,
-      testCall,
-      backUrl,
-      ClientDetails("FirstName LastName", "ZZ111111Z")
-    )(FakeRequest(), implicitly)
+  )
 
-    def document: Document = Jsoup.parse(page.body)
-  }
+  def page(answers: SelfEmploymentsCYAModel): HtmlFormat.Appendable = checkYourAnswers(
+    answers,
+    testCall,
+    backUrl = Some(testBackUrl),
+    ClientDetails("FirstName LastName", "ZZ111111Z")
+  )(FakeRequest(), implicitly)
 
-  class SetupComplete(confirmed: Boolean = false) {
-    val answers: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
-      id = testId,
-      businessStartDate = Some(DateModel("1", "1", "2018")),
-      businessName = Some(s"ABC Limited"),
-      businessTradeName = Some(s"Plumbing"),
-      businessAddress = Some(Address(Seq(s"line", "line9", "line99"), Some("TF3 4NT"))),
-      confirmed = confirmed,
-      accountingMethod = Some(Cash),
-      totalSelfEmployments = 1,
-      isFirstBusiness = true
-    )
-    def page: HtmlFormat.Appendable = checkYourAnswers(
-      answers,
-      testCall,
-      backUrl = None,
-      ClientDetails("FirstName LastName", "ZZ111111Z")
-    )(FakeRequest(), implicitly)
-
-    def document: Document = Jsoup.parse(page.body)
-  }
+  def document(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel): Document = Jsoup.parse(page(answers).body)
 
   "Check Your Answers" must {
 
     "have the correct template details" when {
       "there is no error" in new TemplateViewTest(
-        view = checkYourAnswers(
-          answers = testSelfEmploymentsCYAModel,
-          postAction = testCall,
-          backUrl,
-          ClientDetails("FirstName LastName", "ZZ111111Z")
-        )(FakeRequest(), implicitly),
+        view = page(fullSelfEmploymentsCYAModel),
         title = CheckYourAnswersMessages.title,
         isAgent = true,
         hasSignOutLink = true,
-        backLink = backUrl
+        backLink = Some(testBackUrl)
       )
     }
 
-    "have a heading" in new SetupComplete {
-      val header: Element = document.mainContent.getHeader
-      header.getH1Element.text mustBe CheckYourAnswersMessages.heading
+    "have a heading" in {
+      document().mainContent.getH1Element.text mustBe CheckYourAnswersMessages.heading
     }
 
-    "have a caption" in new SetupComplete() {
-      document.selectHead(".govuk-caption-l")
-        .text() mustBe CheckYourAnswersMessages.caption
+    "have a caption" in {
+      document().mainContent.selectHead(".govuk-caption-l").text mustBe CheckYourAnswersMessages.caption
     }
 
+    "have a summary of the users answers" when {
+      "in a streamline state as the initial business" when {
+        "all data is complete" in {
+          enable(EnableAgentStreamline)
 
-    "display a business check your answers" when {
-      "all the answers have been completed" should {
-        "has a check your answers table" which {
-          "EnableAgentStreamline is disabled" should {
-            "have a row for the business name" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(1).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessName
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(1).getSummaryListValue.text mustBe "ABC Limited"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
-                changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the trading start date" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(2).getSummaryListKey.text mustBe CheckYourAnswersMessages.tradingStartDate
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(2).getSummaryListValue.text mustBe "1 January 2018"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
-                changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the business trade" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(3).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessTrade
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(3).getSummaryListValue.text mustBe "Plumbing"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
-                changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the business address" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line line9 line99 TF3 4NT"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-                changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the accounting method" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(5).getSummaryListKey.text mustBe CheckYourAnswersMessages.accountingMethod
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(5).getSummaryListValue.text mustBe "Cash basis accounting"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethod
-                changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = "testId", isEditMode = true).url
-              }
-            }
-          }
+          document().mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessTradeStreamline,
+              value = Some("Plumbing"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTradeStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessName,
+              value = Some("ABC Limited"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
+                  visuallyHidden = CheckYourAnswersMessages.businessName
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.tradingStartDateStreamline,
+              value = Some("1 January 2018"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.accountingMethodStreamline,
+              value = Some("Cash basis accounting"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethodStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.accountingMethodStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessAddressStreamline,
+              value = Some("line 1 TF3 4NT"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddressStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
+                )
+              )
+            )
+          ))
         }
+        "all data is missing" in {
+          enable(EnableAgentStreamline)
 
-        "have a confirm and continue button" in new SetupComplete {
-          document.select("button").last.text mustBe CheckYourAnswersMessages.confirmAndContinue
+          document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessTradeStreamline,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTradeStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessName,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
+                  visuallyHidden = CheckYourAnswersMessages.businessName
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.tradingStartDateStreamline,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.accountingMethodStreamline,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.accountingMethodStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.accountingMethodStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessAddressStreamline,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddressStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
+                )
+              )
+            )
+          ))
         }
+      }
+      "in a streamline state as a subsequent business" when {
+        "all data is complete" in {
+          enable(EnableAgentStreamline)
 
-        "have a continue button if confirmed" in new SetupComplete(true) {
-          document.select("button").last.text mustBe CheckYourAnswersMessages.continue
+          document(fullSelfEmploymentsCYAModel.copy(isFirstBusiness = false)).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessTradeStreamline,
+              value = Some("Plumbing"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTradeStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessName,
+              value = Some("ABC Limited"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
+                  visuallyHidden = CheckYourAnswersMessages.businessName
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.tradingStartDateStreamline,
+              value = Some("1 January 2018"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessAddressStreamline,
+              value = Some("line 1 TF3 4NT"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddressStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
+                )
+              )
+            )
+          ))
         }
+        "all data is missing" in {
+          enable(EnableAgentStreamline)
 
-        "have a save and come back later button" in new SetupComplete {
-          val buttonLink: Element = document.mainContent.selectHead(".govuk-button--secondary")
-          buttonLink.text mustBe CheckYourAnswersMessages.saveAndBack
-          buttonLink.attr("href") mustBe
-            appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-check-your-answers"
+          document(emptySelfEmploymentsCYAModel.copy(isFirstBusiness = false)).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessTradeStreamline,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTradeStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessName,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
+                  visuallyHidden = CheckYourAnswersMessages.businessName
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.tradingStartDateStreamline,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessAddressStreamline,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddressStreamline}",
+                  visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
+                )
+              )
+            )
+          ))
         }
-
-        "not have a save and come back later button if confirmed" in new SetupComplete(true) {
-          val buttonLink: Option[Element] = document.mainContent.selectOptionally(".govuk-button--secondary")
-          buttonLink mustBe None
+      }
+      "in a non streamline state" when {
+        "all data is complete" in {
+          document().mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessName,
+              value = Some("ABC Limited"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
+                  visuallyHidden = CheckYourAnswersMessages.businessName
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.tradingStartDate,
+              value = Some("1 January 2018"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
+                  visuallyHidden = CheckYourAnswersMessages.tradingStartDate
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessTrade,
+              value = Some("Plumbing"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
+                  visuallyHidden = CheckYourAnswersMessages.businessTrade
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessAddress,
+              value = Some("line 1 TF3 4NT"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
+                  visuallyHidden = CheckYourAnswersMessages.businessAddress
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.accountingMethod,
+              value = Some("Cash basis accounting"),
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
+                  visuallyHidden = CheckYourAnswersMessages.accountingMethod
+                )
+              )
+            ),
+          ))
         }
-
-        "have no back button" in new SetupComplete {
-          document.getBackLinkByClass mustBe empty
+        "all data is missing" in {
+          document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessName,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
+                  visuallyHidden = CheckYourAnswersMessages.businessName
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.tradingStartDate,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDate}",
+                  visuallyHidden = CheckYourAnswersMessages.tradingStartDate
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessTrade,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTrade}",
+                  visuallyHidden = CheckYourAnswersMessages.businessTrade
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.businessAddress,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddress}",
+                  visuallyHidden = CheckYourAnswersMessages.businessAddress
+                )
+              )
+            ),
+            SummaryListRowValues(
+              key = CheckYourAnswersMessages.accountingMethod,
+              value = None,
+              actions = Seq(
+                SummaryListActionValues(
+                  href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
+                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.accountingMethod}",
+                  visuallyHidden = CheckYourAnswersMessages.accountingMethod
+                )
+              )
+            ),
+          ))
         }
-
       }
     }
 
-    "display a business check your answers" when {
-      "some of the answers have not been completed" should {
+    "have a form" which {
+      def form: Element = document().mainContent.getForm
 
-        "has a check your answers table" which {
-          "has a row for the trading start date" which {
-            "has a label to identify it" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(2).getSummaryListKey.text mustBe CheckYourAnswersMessages.tradingStartDate
-            }
-            "has a answer the user gave" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(2).getSummaryListValue.text mustBe "1 January 2018"
-            }
-            "has a change link with correct content" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
-              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDate
-              changeLink.attr("href") mustBe routes.BusinessStartDateController.show(id = "testId", isEditMode = true).url
-            }
-          }
-
-          "has a row for the business name" which {
-            "has a label to identify it" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(1).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessName
-            }
-            "has a answer the user gave" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(1).getSummaryListValue.text mustBe "ABC Limited"
-            }
-            "has a change link" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectHead("a")
-              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
-              changeLink.attr("href") mustBe routes.BusinessNameController.show(id = "testId", isEditMode = true).url
-            }
-          }
-
-          "has a row for the business trade" which {
-            "has a label to identify it" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(3).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessTrade
-            }
-            "has a answer the user gave" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(3).getSummaryListValue.text mustBe "Plumbing"
-            }
-            "has a change link" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectHead("a")
-              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessTrade
-              changeLink.attr("href") mustBe routes.BusinessTradeNameController.show(id = "testId", isEditMode = true).url
-            }
-          }
-
-          "has a row for the business address" which {
-            "has a label to identify it" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddress
-            }
-            "has a answer the user gave" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "line line9 line99 TF3 4NT"
-            }
-            "has a change link" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
-              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-              changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
-            }
-          }
-
-          "has a row for the business accounting method" which {
-            "has a label to identify it" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(5).getSummaryListKey.text mustBe CheckYourAnswersMessages.accountingMethod
-            }
-            "has a answer the user gave" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              document.getSummaryList().getSummaryListRow(5).getSummaryListValue.text mustBe ""
-            }
-            "has a incomplete link" in new SetupIncomplete {
-              featureSwitching.disable(FeatureSwitch.EnableAgentStreamline)
-              val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
-              changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.add
-              changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.addAccountingMethod
-              changeLink.attr("href") mustBe routes.BusinessAccountingMethodController.show(id = "testId", isEditMode = true).url
-            }
-          }
-
-          "the confirm and continue button is not disabled" in new SetupIncomplete {
-            val buttonLink: Element = document.selectHead(".govuk-button")
-            buttonLink.hasAttr("disabled") mustBe false
-          }
-
-          "have a save and come back later button" in new SetupIncomplete {
-            val buttonLink: Element = document.mainContent.selectHead(".govuk-button--secondary")
-            buttonLink.text mustBe CheckYourAnswersMessages.saveAndBack
-            buttonLink.attr("href") mustBe
-              appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-check-your-answers"
-          }
-
-          "have a back button" in new SetupIncomplete {
-            document.getBackLinkByClass.text mustBe CheckYourAnswersMessages.back
-          }
-
-        }
-
+      "has the correct attributes" in {
+        form.attr("method") mustBe testCall.method
+        form.attr("action") mustBe testCall.url
       }
-    }
-
-
-    "display a business check your answers" when {
-      "all the answers have been completed" should {
-        "has a check your answers table" which {
-          "EnableAgentStreamline is enabled" should {
-            "has a row for the business trade" which {
-              "has a label to identify it" in new SetupIncomplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(1).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessTradeStreamline
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(1).getSummaryListValue.text mustBe "Plumbing"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(1).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessTradeStreamline
-                changeLink.attr("href") mustBe routes.FirstIncomeSourceController.show(id = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the business name" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(2).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessName
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(2).getSummaryListValue.text mustBe "ABC Limited"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(2).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessName
-                changeLink.attr("href") mustBe routes.FirstIncomeSourceController.show(id = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the trading start date" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(3).getSummaryListKey.text mustBe CheckYourAnswersMessages.tradingStartDateStreamline
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(3).getSummaryListValue.text mustBe "1 January 2018"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(3).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeTradingStartDateStreamline
-                changeLink.attr("href") mustBe routes.FirstIncomeSourceController.show(id = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the accounting method" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(4).getSummaryListKey.text mustBe CheckYourAnswersMessages.accountingMethodStreamline
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(4).getSummaryListValue.text mustBe "Cash basis accounting"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(4).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeAccountingMethodStreamline
-                changeLink.attr("href") mustBe routes.FirstIncomeSourceController.show(id = "testId", isEditMode = true).url
-              }
-            }
-
-            "have a row for the business address" which {
-              "has a label to identify it" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(5).getSummaryListKey.text mustBe CheckYourAnswersMessages.businessAddressStreamline
-              }
-              "has an answer the user gave" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                document.getSummaryList().getSummaryListRow(5).getSummaryListValue.text mustBe "line line9 line99 TF3 4NT"
-              }
-              "has a change link with correct content" in new SetupComplete {
-                featureSwitching.enable(FeatureSwitch.EnableAgentStreamline)
-                val changeLink: Element = document.getSummaryList().getSummaryListRow(5).getSummaryListActions.selectHead("a")
-                changeLink.selectHead("span[aria-hidden=true]").text mustBe CheckYourAnswersMessages.change
-                changeLink.selectHead("span[class=govuk-visually-hidden]").text mustBe CheckYourAnswersMessages.changeBusinessAddress
-                changeLink.attr("href") mustBe routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId = "testId", isEditMode = true).url
-              }
-            }
-          }
-        }
+      "has a confirm and continue button" in {
+        form.selectNth(".govuk-button", 1).text mustBe CheckYourAnswersMessages.confirmAndContinue
+      }
+      "has a save and come back later button" in {
+        val saveAndComeBackLater = form.selectNth(".govuk-button", 2)
+        saveAndComeBackLater.text mustBe CheckYourAnswersMessages.saveAndBack
+        saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-check-your-answers"
       }
     }
   }
+}
+
+object CheckYourAnswersMessages {
+  val captionHidden = "This section is"
+  val caption = "FirstName LastName | ZZ 11 11 11 Z"
+  val heading = "Check your answers"
+  val title = "Check your answers - sole trader business"
+  val confirmAndContinue = "Confirm and continue"
+  val continue = "Continue"
+  val saveAndBack = "Save and come back later"
+  val change = "Change"
+  val add = "Add"
+  val tradingStartDate = "Trading start date"
+  val businessName = "Business name"
+  val businessAddress = "Address"
+  val businessTrade = "Type of trade"
+  val accountingMethod = "Accounting method for sole trader income"
+  val yes = "Yes"
+  val no = "No"
+  val businessTradeStreamline = "Trade"
+  val tradingStartDateStreamline = "Start date"
+  val accountingMethodStreamline = "Accounting method"
+  val businessAddressStreamline = "Address"
 }
