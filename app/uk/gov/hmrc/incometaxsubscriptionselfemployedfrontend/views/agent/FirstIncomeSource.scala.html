@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ DateHelper, DetailsHelper, RadioHelper, SaveAndContinueButtonHelper }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ ContinueButton, TextInputHelper }
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.PageHeadingHelper
 
 @this(
     mainTemplate: AgentMainTemplate,
@@ -28,14 +29,19 @@
     radioHelper: RadioHelper,
     detailsHelper: DetailsHelper,
     continueButton: ContinueButton,
-    saveAndContinueButtonHelper: SaveAndContinueButtonHelper
+    saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+    pageHeadingHelper: PageHeadingHelper,
 )
 
 @(firstIncomeSourceForm: Form[(String, String, DateModel, AccountingMethod)], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(firstIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
 
-    @heading
+    @pageHeadingHelper(
+        heading = messages("agent.full-income-source.heading"),
+        caption = messages("agent.full-income-source.caption", clientDetails.name, clientDetails.formattedNino),
+        isSection = false
+    )
 
     @form(action = postAction) {
 
@@ -97,11 +103,6 @@
 
     }
 
-}
-
-@heading = {
-    <span class="govuk-caption-l">@messages("agent.full-income-source.caption", clientDetails.name, clientDetails.formattedNino)</span>
-    <h1 class="govuk-heading-l">@messages("agent.full-income-source.heading")</h1>
 }
 
 @helpWithAccountingMethodContent = {

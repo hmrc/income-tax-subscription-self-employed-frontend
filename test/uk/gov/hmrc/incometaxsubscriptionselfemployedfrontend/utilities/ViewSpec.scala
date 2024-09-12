@@ -385,6 +385,30 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       element.selectHead(s".govuk-error-message").text mustBe s"Error: $error"
     }
 
+    def mustHaveHeadingAndCaption(heading: String, caption: String, isSection: Boolean): Assertion = {
+      val checkpoint: Checkpoint = new Checkpoint()
+
+      checkpoint {
+        element.selectHead("h1.govuk-heading-l").text mustBe heading
+      }
+
+      if (isSection) {
+        checkpoint {
+          element.selectHead(".govuk-caption-l").text mustBe s"This section is $caption"
+        }
+        checkpoint {
+          element.selectHead(".govuk-caption-l").selectHead("span.govuk-visually-hidden").text mustBe "This section is"
+        }
+      } else {
+        checkpoint {
+          element.selectHead("span.govuk-caption-l").text mustBe caption
+        }
+      }
+
+      checkpoint.reportAll()
+      Succeeded
+    }
+
 
   }
 

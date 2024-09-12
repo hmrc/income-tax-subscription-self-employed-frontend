@@ -39,7 +39,8 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     val title = "What is the trade of your business?"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
     val heading: String = title
-    val caption = "Sole trader"
+    val captionHidden = "This section is"
+    val captionVisible = "Sole trader"
     val hintText = "For example: plumbing, electrical work, consulting."
     val update = "Update"
     val backLink = "Back"
@@ -74,7 +75,7 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     }
     "have a caption" in new Setup {
       document.selectHead(".govuk-caption-l")
-        .text() mustBe BusinessTradeNameMessages.caption
+        .text() mustBe BusinessTradeNameMessages.captionVisible
     }
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessTradeNameMessages.heading

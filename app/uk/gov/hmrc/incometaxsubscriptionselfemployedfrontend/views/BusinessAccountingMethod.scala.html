@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, DetailsHelper, RadioHelper, SaveAndContinueButtonHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Accruals, Cash}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
@@ -29,7 +29,7 @@
         continueButton: ContinueButton,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         detailsHelper: DetailsHelper,
-        hmrcPageHeading: HmrcPageHeading,
+        pageHeadingHelper: PageHeadingHelper,
         radioHelper: RadioHelper
 )
 
@@ -53,12 +53,11 @@
 
 @mainTemplate(title = messages("business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
 
-    @hmrcPageHeading(PageHeading(
-        text = messages("business.accounting-method.heading"),
-        section = Some(messages("business.accounting-method.caption")),
-        headingClasses = Some("govuk-heading-l"),
-        captionClasses = Some("govuk-caption-l")
-    ))
+    @pageHeadingHelper(
+        heading = messages("business.accounting-method.heading"),
+        caption = messages("business.accounting-method.caption"),
+        isSection = true
+    )
 
     <p class="govuk-body">@messages("business.accounting-method.line-1")</p>
 

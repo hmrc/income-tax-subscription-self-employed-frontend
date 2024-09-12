@@ -78,12 +78,12 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       testDoc.getBackLinkByClass.attr("data-module") mustBe "hmrc-back-link"
     }
 
-    "have a caption" in {
-      document().selectHead(".hmrc-caption").text mustBe s"${BusinessAccountingMethodMessages.captionHidden} ${BusinessAccountingMethodMessages.captionVisual}"
-    }
-
-    "have a heading" in {
-      document().selectHead(".govuk-heading-l").text mustBe BusinessAccountingMethodMessages.heading
+    "have the correct heading and caption" in {
+      document().mainContent.mustHaveHeadingAndCaption(
+        heading = BusinessAccountingMethodMessages.heading,
+        caption = BusinessAccountingMethodMessages.captionVisual,
+        isSection = true
+      )
     }
 
     "have a paragraph" in {

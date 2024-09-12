@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.NextIncomeSourceForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ AccountingMethod, Accruals, Cash, ClientDetails, DateModel }
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ DateHelper, RadioHelper, SaveAndContinueButtonHelper }
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ DateHelper, RadioHelper, SaveAndContinueButtonHelper, PageHeadingHelper }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ ContinueButton, TextInputHelper }
 
@@ -27,14 +27,20 @@
     dateHelper: DateHelper,
     radioHelper: RadioHelper,
     continueButton: ContinueButton,
-    saveAndContinueButtonHelper: SaveAndContinueButtonHelper
+    saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+    pageHeadingHelper: PageHeadingHelper
 )
 
 @(nextIncomeSourceForm: Form[(String, String, DateModel)], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(nextIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
 
-    @heading
+
+    @pageHeadingHelper(
+        heading = messages("agent.full-income-source.heading"),
+        caption = messages("agent.full-income-source.caption", clientDetails.name, clientDetails.formattedNino),
+        isSection = false
+    )
 
     @form(action = postAction) {
 
@@ -72,7 +78,3 @@
 
 }
 
-@heading = {
-    <span class="govuk-caption-l">@messages("agent.full-income-source.caption", clientDetails.name, clientDetails.formattedNino)</span>
-    <h1 class="govuk-heading-l">@messages("agent.full-income-source.heading")</h1>
-}

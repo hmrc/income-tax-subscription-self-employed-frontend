@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{SaveAndContinueButtonHelper, PageHeadingHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
 
@@ -24,9 +24,9 @@
     mainTemplate: PrincipalMainTemplate,
     form: FormWithCSRF,
     govukSummaryList: GovukSummaryList,
-    hmrcPageHeading: HmrcPageHeading,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-    implicitDateFormatter: ImplicitDateFormatterImpl
+    implicitDateFormatter: ImplicitDateFormatterImpl,
+    pageHeadingHelper: PageHeadingHelper
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
@@ -36,12 +36,11 @@
     backLink = backUrl.map(url => BackLink(href = url))
 ) {
 
-    @hmrcPageHeading(PageHeading(
-        text = messages("self-employed-cya.heading"),
-        section = Some(messages("self-employed-cya.caption")),
-        headingClasses = Some("govuk-heading-l"),
-        captionClasses = Some("govuk-caption-l")
-    ))
+    @pageHeadingHelper(
+        heading = messages("self-employed-cya.heading"),
+        caption = messages("self-employed-cya.caption"),
+        isSection = true
+    )
 
     @govukSummaryList(SummaryList(
         rows = Seq(

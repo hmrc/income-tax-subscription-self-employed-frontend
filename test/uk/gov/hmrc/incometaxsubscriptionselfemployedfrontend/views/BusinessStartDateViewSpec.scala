@@ -83,12 +83,15 @@ class BusinessStartDateViewSpec extends ViewSpec {
     "have a title" in new Setup {
       document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
     }
-    "have a caption" in new Setup {
-      document.selectHead(".hmrc-caption").text mustBe s"${BusinessStartDateMessages.captionHidden} ${BusinessStartDateMessages.captionVisual}"
+
+    "have the correct heading and caption" in new Setup{
+      document.mainContent.mustHaveHeadingAndCaption(
+        heading = BusinessStartDateMessages.heading,
+        caption = BusinessStartDateMessages.captionVisual,
+        isSection = true
+      )
     }
-    "have a heading" in new Setup {
-      document.getH1Element.text mustBe BusinessStartDateMessages.heading
-    }
+
     "have paragraphs" in new Setup {
       document.getElementById("business-start-date.line-1").text mustBe BusinessStartDateMessages.line_1
       document.getElementById("business-start-date.line-2").text mustBe BusinessStartDateMessages.line_2

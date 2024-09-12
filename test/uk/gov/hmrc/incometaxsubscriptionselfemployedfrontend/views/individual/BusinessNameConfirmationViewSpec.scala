@@ -56,7 +56,8 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
   object BusinessNameConfirmationMessages {
     val heading: String = "Is your business trading name the same as your own name?"
     val headingSecond: String = "Is your business trading name the same as the first one you added?"
-    val caption: String = "This section is Sole trader"
+    val captionHidden:String = "This section is"
+    val captionVisible: String = "Sole trader"
 
     object Summary {
       val businessName: String = "Business name"
@@ -107,16 +108,20 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
       }
     }
 
-    "have a page heading with caption" when {
+    "have the correct heading and caption" when {
       "the page is for a personal name" in {
-        val heading: Element = document().mainContent.selectHead(".hmrc-page-heading")
-        heading.selectHead("h1.govuk-heading-l").text() mustBe BusinessNameConfirmationMessages.heading
-        heading.selectHead("p.govuk-caption-l").text() mustBe BusinessNameConfirmationMessages.caption
+        document().mainContent.mustHaveHeadingAndCaption(
+          heading = BusinessNameConfirmationMessages.heading,
+          caption = BusinessNameConfirmationMessages.captionVisible,
+          isSection = true
+        )
       }
       "the page is for a secondary business" in {
-        val heading: Element = document(isBusinessName = true).mainContent.selectHead(".hmrc-page-heading")
-        heading.selectHead("h1.govuk-heading-l").text() mustBe BusinessNameConfirmationMessages.headingSecond
-        heading.selectHead("p.govuk-caption-l").text() mustBe BusinessNameConfirmationMessages.caption
+       document(isBusinessName = true).mainContent.mustHaveHeadingAndCaption(
+          heading = BusinessNameConfirmationMessages.headingSecond,
+          caption = BusinessNameConfirmationMessages.captionVisible,
+          isSection = true
+        )
       }
     }
 
