@@ -100,58 +100,106 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.getForm.attr("method") mustBe testCall.method
       document.getForm.attr("action") mustBe testCall.url
     }
-    "have a fieldset with dateInputs" in new Setup {
-      private val fieldset = document.selectFirst("fieldset")
-      fieldset.select("div[id=startDate]").attr("class") mustBe "govuk-date-input"
-      fieldset.attr("aria-describedby") mustBe s"startDate-hint"
-      fieldset.selectHead("legend").text mustBe BusinessStartDateMessages.heading
-      fieldset.selectHead("div[id=startDate-hint]").text mustBe BusinessStartDateMessages.hint
-      fieldset.select("div label[for=startDate-dateDay]").text() mustBe "Day"
-      fieldset.select("div label[for=startDate-dateMonth]").text() mustBe "Month"
-      fieldset.select("div label[for=startDate-dateYear]").text() mustBe "Year"
-    }
 
-    "has buttons" which {
-      "include the save and continue button" in new Setup() {
-        document.getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
+    "has a correct date input field with the legend as the page heading" when {
+      "there is no error on the page" in new Setup {
+        document.getForm.mustHaveDateInput(
+          id = "startDate",
+          legend = BusinessStartDateMessages.heading,
+          exampleDate = BusinessStartDateMessages.hint,
+          isHeading = false,
+          isLegendHidden = true,
+          dateInputsValues = Seq(
+            DateInputFieldValues("Day", None),
+            DateInputFieldValues("Month", None),
+            DateInputFieldValues("Year", None)
+          )
+        )
       }
-      "include the save and come back later link" in new Setup() {
-        val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
-        saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBack
-        saveAndComeBackLink.attr("href") mustBe
-          appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-trading-start-date"
+
+      "has a form empty error on page" in new Setup(
+        isEditMode = false,
+        form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+          BusinessStartDateForm.maxStartDate, d => d.toString).withError(testError)
+      ) {
+        document.mustHaveDateInput(
+          id = "startDate",
+          legend = BusinessStartDateMessages.heading,
+          exampleDate = BusinessStartDateMessages.hint,
+          errorMessage = Some(BusinessStartDateMessages.empty),
+          isHeading = false,
+          isLegendHidden = true,
+          dateInputsValues = Seq(
+            DateInputFieldValues("Day", None),
+            DateInputFieldValues("Month", None),
+            DateInputFieldValues("Year", None)
+          )
+        )
       }
+
+      "has a max date error on page" in new Setup(
+        isEditMode = false,
+        form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+          BusinessStartDateForm.maxStartDate, d => d.toString).withError(dateTooLateError)
+      ) {
+
+        document.mustHaveDateInput(
+          id = "startDate",
+          legend = BusinessStartDateMessages.heading,
+          exampleDate = BusinessStartDateMessages.hint,
+          errorMessage = Some(BusinessStartDateMessages.maxDate),
+          isHeading = false,
+          isLegendHidden = true,
+          dateInputsValues = Seq(
+            DateInputFieldValues("Day", None),
+            DateInputFieldValues("Month", None),
+            DateInputFieldValues("Year", None)
+          )
+        )
+      }
+
     }
 
-    "have a backlink " in new Setup {
-      private val backLink: Elements = document.select(".govuk-back-link")
-      backLink.text mustBe BusinessStartDateMessages.backLink
-      backLink.attr("href") mustBe testBackUrl
-    }
+      "has a min date error on page" in new Setup(
+        isEditMode = false,
+        form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+          BusinessStartDateForm.maxStartDate, d => d.toString).withError(dateTooEarlyError)
+      ) {
+        {
 
-    "must display form error on page" in new Setup(
-      isEditMode = false,
-      form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString).withError(testError)
-    ) {
-      document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
-      document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-      document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.empty}"
-    }
+          document.mustHaveDateInput(
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            errorMessage = Some(BusinessStartDateMessages.minDate),
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
+          )
+        }
+      }
 
-    "must display max date error on page" in new Setup(
-      form = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooLateError)
-    ) {
-      document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
-      document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-      document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.maxDate}"
-    }
+      "has buttons" which {
+        "include the save and continue button" in new Setup() {
+          document.getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
+        }
+        "include the save and come back later link" in new Setup() {
+          val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
+          saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBack
+          saveAndComeBackLink.attr("href") mustBe
+            appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-trading-start-date"
+        }
+      }
 
-    "must display min date error on page" in new Setup(
-      form = BusinessStartDateForm.businessStartDateForm(LocalDate.now(), LocalDate.now(), d => d.toString).withError(dateTooEarlyError)
-    ) {
-      document.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
-      document.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-      document.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.minDate}"
+      "have a backlink " in new Setup {
+        private val backLink: Elements = document.select(".govuk-back-link")
+        backLink.text mustBe BusinessStartDateMessages.backLink
+        backLink.attr("href") mustBe testBackUrl
+      }
+
     }
   }
-}

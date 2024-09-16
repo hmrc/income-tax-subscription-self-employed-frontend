@@ -103,33 +103,72 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
       "has a correct date input field with the legend as the page heading" when {
         "there is no error on the page" in {
           document().getForm.mustHaveDateInput(
-            name = BusinessStartDateForm.startDate,
-            label = BusinessStartDateMessages.heading,
-            hint = Some(BusinessStartDateMessages.hint),
-            isPageHeading = false
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
           )
         }
-      }
 
-      "display form error on page" in {
-        val doc = document(error = Some(emptyFormError))
-        doc.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
-        doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.emptyError}"
-      }
+        "has a form empty error on page" in {
+          val doc = document(error = Some(emptyFormError))
 
-      "display max date error on page" in {
-        val doc = document(error = Some(dateTooLateFormError))
-        doc.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
-        doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.dateTooLateError}"
-      }
+          doc.mustHaveDateInput(
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            errorMessage = Some(BusinessStartDateMessages.emptyError),
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
+          )
+        }
 
-      "display min date error on page" in {
-        val doc = document(error = Some(dateTooEarlyFormError))
-        doc.select("div[class=govuk-error-summary]").select("div").attr("role") mustBe "alert"
-        doc.select("div[class=govuk-error-summary]").select("h2").text mustBe "There is a problem"
-        doc.select("p[id=startDate-Error]").text() mustBe s"Error: ${BusinessStartDateMessages.dateTooEarlyError}"
+        "has a max date error on page" in {
+          val doc = document(error = Some(dateTooLateFormError))
+
+          doc.mustHaveDateInput(
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            errorMessage = Some(BusinessStartDateMessages.dateTooLateError),
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
+          )
+        }
+
+        "has a min date error on page" in {
+          val doc = document(error = Some(dateTooEarlyFormError))
+
+          doc.mustHaveDateInput(
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            errorMessage = Some(BusinessStartDateMessages.dateTooEarlyError),
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
+          )
+        }
       }
 
       "has buttons" which {

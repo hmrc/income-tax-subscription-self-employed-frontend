@@ -24,7 +24,6 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{Assertion, BeforeAndAfterEach, Succeeded}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.FormError
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.{AnyContentAsEmpty, Call}
 import play.api.test.FakeRequest
@@ -151,6 +150,8 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
     def getHintTextByClass: String = element.select(s"""[class=govuk-hint]""").text()
 
+    def getFieldset: Element = element.selectHead("fieldset")
+
     def getForm: Element = element.selectHead("form")
 
     def getBackLink: Elements = element.select(s"a[class=link-back]")
@@ -193,6 +194,8 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
   case class SummaryListActionValues(href: String, text: String, visuallyHidden: String)
 
   case class SummaryListRowValues(key: String, value: Option[String], actions: Seq[SummaryListActionValues])
+
+  case class DateInputFieldValues(label: String, value: Option[String])
 
   implicit class ElementTests(element: Element) {
 
@@ -304,56 +307,83 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       } forall (_ == succeed) mustBe true
     }
 
-    def mustHaveDateInput(name: String,
-                          label: String,
-                          isPageHeading: Boolean = true,
-                          hint: Option[String] = None,
-                          error: Option[FormError] = None,
-                          isDateOfBirth: Boolean = false): Assertion = {
+    def mustHaveDateInput(id: String,
+                          legend: String,
+                          exampleDate: String,
+                          isHeading: Boolean,
+                          isLegendHidden: Boolean,
+                          errorMessage: Option[String] = None,
+                          dateInputsValues: Seq[DateInputFieldValues]): Assertion = {
 
-      val fieldset: Element = element.selectHead("fieldset")
-      val legend: Element = element.selectHead("legend")
+      val checkpoint: Checkpoint = new Checkpoint()
 
-      if (isPageHeading) legend.selectHead("h1").text mustBe label
-      else legend.text mustBe label
+      val dateInputField: Element = element.selectHead(s"#$id")
 
-      hint.foreach { value =>
-        element.selectHead(s"#$name-hint").text mustBe value
-        fieldset.attr("aria-describedby").contains(s"$name-hint") mustBe true
+      val dateLegend: Element = element.selectHead(".govuk-fieldset__legend")
+      if (isHeading) {
+        checkpoint {
+          dateLegend.getH1Element.text mustBe legend
+        }
+      } else {
+        checkpoint {
+          dateLegend.text mustBe legend
+        }
+        if (isLegendHidden) {
+          checkpoint {
+            dateLegend.attr("class") must include ("govuk-visually-hidden")
+          }
+        }
       }
 
-      error.foreach { value =>
-        element.selectHead(s"#${value.key}-error").text mustBe s"Error: ${value.message}"
-        fieldset.attr("aria-describedby").contains(s"${value.key}-error") mustBe true
+      val hintText: Element = element.selectHead(".govuk-hint")
+      checkpoint {
+        hintText.text mustBe exampleDate
       }
 
-      val dayInput: Element = fieldset.selectNth(".govuk-date-input__item", 1).selectHead("input")
-      val dayLabel: Element = fieldset.selectNth(".govuk-date-input__item", 1).selectHead("label")
-      val monthInput: Element = fieldset.selectNth(".govuk-date-input__item", 2).selectHead("input")
-      val monthLabel: Element = fieldset.selectNth(".govuk-date-input__item", 2).selectHead("label")
-      val yearInput: Element = fieldset.selectNth(".govuk-date-input__item", 3).selectHead("input")
-      val yearLabel: Element = fieldset.selectNth(".govuk-date-input__item", 3).selectHead("label")
+      dateInputsValues zip(1 to dateInputsValues.length) foreach { case (dateInputValues, index) =>
+        val item: Element = dateInputField.selectNth(".govuk-date-input__item", index)
+        val label = item.selectHead("label")
+        val input = item.selectHead("input")
 
-      dayInput.attr("name") mustBe s"$name-dateDay"
-      dayInput.attr("type") mustBe "text"
-      dayInput.attr("inputmode") mustBe "numeric"
-      if (isDateOfBirth) dayInput.attr("autocomplete") mustBe "bday-day"
-      dayLabel.text mustBe "Day"
-      dayLabel.attr("for") mustBe s"$name-dateDay"
+        checkpoint {
+          label.text mustBe dateInputValues.label
+        }
+        checkpoint {
+          label.attr("for") mustBe input.id
+        }
+        checkpoint {
+          input.id mustBe input.attr("name")
+        }
+        checkpoint {
+          input.attr("type") mustBe "text"
+        }
+        checkpoint {
+          input.attr("inputmode") mustBe "numeric"
+        }
 
-      monthInput.attr("name") mustBe s"$name-dateMonth"
-      monthInput.attr("type") mustBe "text"
-      monthInput.attr("inputmode") mustBe "numeric"
-      if (isDateOfBirth) monthInput.attr("autocomplete") mustBe "bday-month"
-      monthLabel.text mustBe "Month"
-      monthLabel.attr("for") mustBe s"$name-dateMonth"
+        dateInputValues.value foreach { value =>
+          input.attr("value") mustBe value
+        }
 
-      yearInput.attr("name") mustBe s"$name-dateYear"
-      yearInput.attr("type") mustBe "text"
-      yearInput.attr("inputmode") mustBe "numeric"
-      if (isDateOfBirth) yearInput.attr("autocomplete") mustBe "bday-year"
-      yearLabel.text mustBe "Year"
-      yearLabel.attr("for") mustBe s"$name-dateYear"
+      }
+
+      errorMessage foreach { message =>
+
+        val fieldset: Element = element.getFieldset
+        val errorMessage: Element = element.selectHead(".govuk-error-message")
+        checkpoint {
+          fieldset.attr("aria-describedby") must include ("startDate-error")
+        }
+        checkpoint {
+          errorMessage.selectHead("p").attr("id") mustBe "startDate-error"
+        }
+        checkpoint {
+          errorMessage.text mustBe s"Error: $message"
+        }
+      }
+
+      checkpoint.reportAll()
+      Succeeded
 
     }
 
