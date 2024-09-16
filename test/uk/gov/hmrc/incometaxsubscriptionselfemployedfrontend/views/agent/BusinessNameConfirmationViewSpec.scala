@@ -113,16 +113,20 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
       }
     }
 
-    "have a page heading with caption" when {
+    "have the correct heading and caption" when {
       "the page is for a personal name" in {
-        val mainContent: Element = document().mainContent
-        mainContent.selectHead("h1.govuk-heading-l").text() mustBe BusinessNameConfirmationMessages.headingPersonal
-        mainContent.selectHead("span.govuk-caption-l").text() mustBe BusinessNameConfirmationMessages.caption
+        document().mainContent.mustHaveHeadingAndCaption(
+          heading = BusinessNameConfirmationMessages.headingPersonal,
+          caption = BusinessNameConfirmationMessages.caption,
+          isSection = false
+        )
       }
       "the page is for a secondary business" in {
-        val mainContent: Element = document(isBusinessName = true).mainContent
-        mainContent.selectHead("h1.govuk-heading-l").text() mustBe BusinessNameConfirmationMessages.headingSecondary
-        mainContent.selectHead("span.govuk-caption-l").text() mustBe BusinessNameConfirmationMessages.caption
+        document(isBusinessName = true).mainContent.mustHaveHeadingAndCaption(
+          heading = BusinessNameConfirmationMessages.headingSecondary,
+          caption = BusinessNameConfirmationMessages.caption,
+          isSection = false
+        )
       }
     }
 

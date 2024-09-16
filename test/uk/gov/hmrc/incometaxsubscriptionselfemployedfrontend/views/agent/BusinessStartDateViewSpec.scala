@@ -84,6 +84,14 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
+    "have the correct heading and caption" in {
+      document().mainContent.mustHaveHeadingAndCaption(
+        heading = BusinessStartDateMessages.heading,
+        caption = BusinessStartDateMessages.caption,
+        isSection = false
+      )
+    }
+
     "have a form" which {
       "has the correct action and method assigned" in {
         val form: Element = document().getForm

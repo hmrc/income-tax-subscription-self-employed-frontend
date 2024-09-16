@@ -18,13 +18,14 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ButtonHelper, ContinueButton, TextInputHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.PageHeadingHelper
 
 @this(
         mainTemplate: PrincipalMainTemplate,
         form: FormWithCSRF,
         textInputHelper: TextInputHelper,
         continueButton: ContinueButton,
-        hmrcPageHeading: HmrcPageHeading,
+        pageHeadingHelper: PageHeadingHelper,
         buttonHelper: ButtonHelper
 )
 
@@ -34,12 +35,11 @@
 
     @form(action = postAction) {
 
-        @hmrcPageHeading(PageHeading(
-            text = messages("business.name.heading"),
-            section = Some(messages("business.name.caption")),
-            headingClasses = Some("govuk-heading-l"),
-            captionClasses = Some("govuk-caption-l")
-        ))
+        @pageHeadingHelper(
+            heading = messages("business.name.heading"),
+            caption = messages("business.name.caption"),
+            isSection = true
+        )
 
         @textInputHelper(
             field = businessNameForm(businessName),

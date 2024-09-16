@@ -26,17 +26,19 @@
         buttonHelper: ButtonHelper,
         dateHelper: DateHelper,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-        form: FormWithCSRF
+        form: FormWithCSRF,
+        pageHeadingHelper: PageHeadingHelper,
 )
 @(businessStartDateForm: Form[DateModel], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.agent.start-date.heading"), optForm = Some(businessStartDateForm), backLink = Some(BackLink(href = backUrl))) {
 
     @form(action = postAction) {
-        <span class="govuk-caption-l">
-            @messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)
-        </span>
-        <h1 class="govuk-heading-l">@messages("business.agent.start-date.heading")</h1>
+        @pageHeadingHelper(
+            heading = messages("business.agent.start-date.heading"),
+            caption = messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino),
+            isSection = false
+        )
 
         @dateHelper(
             field = businessStartDateForm(startDate),

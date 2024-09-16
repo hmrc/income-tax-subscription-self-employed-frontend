@@ -23,6 +23,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.PageHeadingHelper
 
 @this(
         mainTemplate: AgentMainTemplate,
@@ -30,7 +31,8 @@
         govukSummaryList: GovukSummaryList,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         implicitDateFormatter: ImplicitDateFormatterImpl,
-        featureSwitching: FeatureSwitchingImpl
+        featureSwitching: FeatureSwitchingImpl,
+        pageHeadingHelper: PageHeadingHelper
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
@@ -40,8 +42,11 @@
     backLink = backUrl.map(url => BackLink(href = url))
 ) {
 
-    <span class="govuk-caption-l">@messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)</span>
-    <h1 class="govuk-heading-l">@messages("agent.self-employed-cya.heading")</h1>
+    @pageHeadingHelper(
+        heading = messages("agent.self-employed-cya.heading"),
+        caption = messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino),
+        isSection = false
+    )
 
     @govukSummaryList(SummaryList(
         rows = if(featureSwitching.isEnabled(EnableAgentStreamline)) {

@@ -62,9 +62,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
 
   object BusinessAddressConfirmationMessages {
     val heading: String = "Confirm business address"
-    val captionHidden = "This section is"
-    val captionVisible: String = "FirstName LastName | ZZ 11 11 11 Z"
-    val caption: String = captionHidden + ' ' + captionVisible
+    val caption: String = "FirstName LastName | ZZ 11 11 11 Z"
     val para: String = "Does this business have the same address as the first one you added?"
 
     object Summary {
@@ -100,14 +98,16 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
       )
     }
 
-    "have a page heading with caption" in {
-      val heading: Element = document().mainContent.selectHead(".hmrc-page-heading")
-      heading.selectHead("h1.govuk-heading-l").text() mustBe BusinessAddressConfirmationMessages.heading
-      heading.selectHead("p.govuk-caption-l").text() mustBe BusinessAddressConfirmationMessages.caption
+    "have a the correct heading and caption" in {
+      document().mainContent.mustHaveHeadingAndCaption(
+        heading = BusinessAddressConfirmationMessages.heading,
+        caption = BusinessAddressConfirmationMessages.caption,
+        isSection = false
+      )
     }
 
     "have a page with a paragraph" in {
-      document().mainContent.selectNth("p", 2).text mustBe BusinessAddressConfirmationMessages.para
+      document().mainContent.selectHead("p").text mustBe BusinessAddressConfirmationMessages.para
     }
 
     "have a summary list detailing the previous address" in {

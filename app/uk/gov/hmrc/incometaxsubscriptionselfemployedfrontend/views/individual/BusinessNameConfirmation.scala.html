@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameConfirmationForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.YesNo
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper, PageHeadingHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 
 
@@ -28,7 +28,7 @@
     continueButton: ContinueButton,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
     radioHelper: RadioHelper,
-    hmrcPageHeading: HmrcPageHeading,
+    pageHeadingHelper: PageHeadingHelper,
     govukSummaryList : GovukSummaryList
 )
 
@@ -36,12 +36,11 @@
 
 @mainTemplate(title = messages(headingKey), optForm = Some(confirmationForm), backLink = Some(BackLink(href = backUrl))) {
 
-            @hmrcPageHeading(PageHeading(
-                    text = messages(headingKey),
-                    section = Some(messages("individual.business-name-confirmation.heading.caption")),
-                    headingClasses = Some("govuk-heading-l"),
-                    captionClasses = Some("govuk-caption-l")
-                ))
+    @pageHeadingHelper(
+        heading = messages(headingKey),
+        caption = messages("individual.business-name-confirmation.heading.caption"),
+        isSection = true
+    )
 
     @govukSummaryList(SummaryList(
         rows = Seq(

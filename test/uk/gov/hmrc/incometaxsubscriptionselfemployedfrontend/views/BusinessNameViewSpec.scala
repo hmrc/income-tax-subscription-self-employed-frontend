@@ -63,10 +63,12 @@ class BusinessNameViewSpec extends ViewSpec {
 
   "Business Name Page" must {
 
-    "have a heading with caption" in new Setup() {
-      document.selectHead(".hmrc-caption").text mustBe s"${BusinessNameMessages.captionHidden} ${BusinessNameMessages.captionVisible}"
-      document.getH1Element.text mustBe BusinessNameMessages.heading
-
+    "have the correct heading and caption" in new Setup() {
+      document.mainContent.mustHaveHeadingAndCaption(
+        heading = BusinessNameMessages.heading,
+        caption = BusinessNameMessages.captionVisible,
+        isSection = true
+      )
     }
 
     "have a Form" in new Setup() {

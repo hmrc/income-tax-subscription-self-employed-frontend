@@ -74,12 +74,12 @@ class FirstIncomeSourceViewSpec extends ViewSpec {
       )
     }
 
-    "have a heading" in {
-      mainContent.getH1Element.text mustBe FirstIncomeSourceMessages.heading
-    }
-
-    "have a caption" in {
-      mainContent.selectHead(".govuk-caption-l").text mustBe FirstIncomeSourceMessages.caption(testClientDetails.name, testClientDetails.formattedNino)
+    "have the correct heading and caption" in {
+      mainContent.mustHaveHeadingAndCaption(
+        heading = FirstIncomeSourceMessages.heading,
+        caption = FirstIncomeSourceMessages.caption(testClientDetails.name, testClientDetails.formattedNino),
+        isSection = false
+      )
     }
 
     "have a form" which {
@@ -224,7 +224,7 @@ class FirstIncomeSourceViewSpec extends ViewSpec {
       }
 
       "has a section to capture an accounting method" which {
-        def accountingMethodLabel: Element = mainContent.selectHead("p")
+        def accountingMethodLabel: Element = mainContent.selectHead("p.govuk-body")
 
         def accountingMethodDetails: Element = mainContent.selectHead("details")
 

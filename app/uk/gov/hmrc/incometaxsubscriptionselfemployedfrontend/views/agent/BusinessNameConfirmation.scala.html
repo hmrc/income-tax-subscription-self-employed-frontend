@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameConfirmationForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.YesNo
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper, PageHeadingHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
@@ -27,7 +27,7 @@
     continueButton: ContinueButton,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
     radioHelper: RadioHelper,
-    hmrcPageHeading: HmrcPageHeading,
+    pageHeadingHelper: PageHeadingHelper,
     govukSummaryList : GovukSummaryList
 )
 
@@ -35,11 +35,11 @@
 
 @mainTemplate(title = messages(headingKey), optForm = Some(confirmationForm), backLink = Some(BackLink(href = backUrl))) {
 
-    <span class="govuk-caption-l">
-        @messages("agent.business-name-confirmation.heading.caption", clientDetails.name, clientDetails.formattedNino)
-    </span>
-
-    <h1 class="govuk-heading-l">@messages(headingKey)</h1>
+    @pageHeadingHelper(
+        heading = messages(headingKey),
+        caption = messages("agent.business-name-confirmation.heading.caption", clientDetails.name, clientDetails.formattedNino),
+        isSection = false
+    )
 
     @govukSummaryList(SummaryList(
         rows = Seq(

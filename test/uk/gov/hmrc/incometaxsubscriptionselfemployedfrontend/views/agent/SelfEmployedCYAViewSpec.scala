@@ -77,12 +77,12 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
-    "have a heading" in {
-      document().mainContent.getH1Element.text mustBe CheckYourAnswersMessages.heading
-    }
-
-    "have a caption" in {
-      document().mainContent.selectHead(".govuk-caption-l").text mustBe CheckYourAnswersMessages.caption
+    "have the correct heading and caption" in {
+      document().mainContent.mustHaveHeadingAndCaption(
+        heading = CheckYourAnswersMessages.heading,
+        caption = CheckYourAnswersMessages.caption,
+        isSection = false
+      )
     }
 
     "have a summary of the users answers" when {
@@ -454,7 +454,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
 }
 
 object CheckYourAnswersMessages {
-  val captionHidden = "This section is"
   val caption = "FirstName LastName | ZZ 11 11 11 Z"
   val heading = "Check your answers"
   val title = "Check your answers - sole trader business"

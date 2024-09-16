@@ -75,233 +75,232 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
       backLink = Some(testBackUrl)
     )
 
-    "have a heading" in {
-      document().mainContent.getH1Element.text mustBe CheckYourAnswersMessages.heading
+    "have the correct heading and caption" in {
+      document().mainContent.mustHaveHeadingAndCaption(
+        heading = CheckYourAnswersMessages.heading,
+        caption = CheckYourAnswersMessages.captionVisual,
+        isSection = true
+      )
     }
 
-    "have a caption" in {
-      document().mainContent.selectHead(".govuk-caption-l").text mustBe s"${CheckYourAnswersMessages.captionHidden} ${CheckYourAnswersMessages.captionVisual}"
-    }
-
-    "have a summary of the self employment answers" when {
-      "the answers are complete" in {
-        document().mainContent.mustHaveSummaryList(".govuk-summary-list")(
-          rows = Seq(
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessName,
-              value = Some("ABC Limited"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
-                  visuallyHidden = CheckYourAnswersMessages.businessName
+      "have a summary of the self employment answers" when {
+        "the answers are complete" in {
+          document().mainContent.mustHaveSummaryList(".govuk-summary-list")(
+            rows = Seq(
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessName,
+                value = Some("ABC Limited"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
+                    visuallyHidden = CheckYourAnswersMessages.businessName
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.tradingStartDate,
-              value = Some("1 January 2018"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
-                  visuallyHidden = CheckYourAnswersMessages.tradingStartDate
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.tradingStartDate,
+                value = Some("1 January 2018"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
+                    visuallyHidden = CheckYourAnswersMessages.tradingStartDate
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessTrade,
-              value = Some("Plumbing"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
-                  visuallyHidden = CheckYourAnswersMessages.businessTrade
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessTrade,
+                value = Some("Plumbing"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
+                    visuallyHidden = CheckYourAnswersMessages.businessTrade
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessAddress,
-              value = Some("line 1 TF3 4NT"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
-                  visuallyHidden = CheckYourAnswersMessages.businessAddress
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessAddress,
+                value = Some("line 1 TF3 4NT"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
+                    visuallyHidden = CheckYourAnswersMessages.businessAddress
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.accountingMethod,
-              value = Some("Cash basis accounting"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
-                  visuallyHidden = CheckYourAnswersMessages.accountingMethod
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.accountingMethod,
+                value = Some("Cash basis accounting"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
+                    visuallyHidden = CheckYourAnswersMessages.accountingMethod
+                  )
                 )
               )
             )
           )
-        )
-      }
-      "there exists multiple businesses" in {
-        document(multiBusinessCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-          rows = Seq(
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessName,
-              value = Some("ABC Limited"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
-                  visuallyHidden = CheckYourAnswersMessages.businessName
+        }
+        "there exists multiple businesses" in {
+          document(multiBusinessCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
+            rows = Seq(
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessName,
+                value = Some("ABC Limited"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
+                    visuallyHidden = CheckYourAnswersMessages.businessName
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.tradingStartDate,
-              value = Some("1 January 2018"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
-                  visuallyHidden = CheckYourAnswersMessages.tradingStartDate
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.tradingStartDate,
+                value = Some("1 January 2018"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
+                    visuallyHidden = CheckYourAnswersMessages.tradingStartDate
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessTrade,
-              value = Some("Plumbing"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
-                  visuallyHidden = CheckYourAnswersMessages.businessTrade
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessTrade,
+                value = Some("Plumbing"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
+                    visuallyHidden = CheckYourAnswersMessages.businessTrade
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessAddress,
-              value = Some("line 1 TF3 4NT"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
-                  visuallyHidden = CheckYourAnswersMessages.businessAddress
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessAddress,
+                value = Some("line 1 TF3 4NT"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
+                    visuallyHidden = CheckYourAnswersMessages.businessAddress
+                  )
                 )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.accountingMethod,
-              value = Some("Cash basis accounting"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.ChangeAccountingMethodController.show(testId).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
-                  visuallyHidden = CheckYourAnswersMessages.accountingMethod
-                )
-              )
-            )
-          )
-        )
-      }
-      "the answers are not complete" in {
-        document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-          rows = Seq(
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessName,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
-                  visuallyHidden = CheckYourAnswersMessages.businessName
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.tradingStartDate,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDate}",
-                  visuallyHidden = CheckYourAnswersMessages.tradingStartDate
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessTrade,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTrade}",
-                  visuallyHidden = CheckYourAnswersMessages.businessTrade
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessAddress,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddress}",
-                  visuallyHidden = CheckYourAnswersMessages.businessAddress
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.accountingMethod,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.accountingMethod}",
-                  visuallyHidden = CheckYourAnswersMessages.accountingMethod
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.accountingMethod,
+                value = Some("Cash basis accounting"),
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.ChangeAccountingMethodController.show(testId).url,
+                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
+                    visuallyHidden = CheckYourAnswersMessages.accountingMethod
+                  )
                 )
               )
             )
           )
-        )
+        }
+        "the answers are not complete" in {
+          document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
+            rows = Seq(
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessName,
+                value = None,
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
+                    visuallyHidden = CheckYourAnswersMessages.businessName
+                  )
+                )
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.tradingStartDate,
+                value = None,
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDate}",
+                    visuallyHidden = CheckYourAnswersMessages.tradingStartDate
+                  )
+                )
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessTrade,
+                value = None,
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTrade}",
+                    visuallyHidden = CheckYourAnswersMessages.businessTrade
+                  )
+                )
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.businessAddress,
+                value = None,
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddress}",
+                    visuallyHidden = CheckYourAnswersMessages.businessAddress
+                  )
+                )
+              ),
+              SummaryListRowValues(
+                key = CheckYourAnswersMessages.accountingMethod,
+                value = None,
+                actions = Seq(
+                  SummaryListActionValues(
+                    href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
+                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.accountingMethod}",
+                    visuallyHidden = CheckYourAnswersMessages.accountingMethod
+                  )
+                )
+              )
+            )
+          )
+        }
       }
+
+      "have a form" which {
+        def form: Element = document().mainContent.getForm
+
+        "has the correct attributes" in {
+          form.attr("method") mustBe testCall.method
+          form.attr("action") mustBe testCall.url
+        }
+        "has a confirm and continue button" in {
+          form.selectNth(".govuk-button", 1).text mustBe CheckYourAnswersMessages.confirmAndContinue
+        }
+        "has a save and come back later button" in {
+          val saveAndComeBackLater = form.selectNth(".govuk-button", 2)
+          saveAndComeBackLater.text mustBe CheckYourAnswersMessages.saveAndBack
+          saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendProgressSavedUrl}?location=sole-trader-check-your-answers"
+        }
+      }
+
     }
 
-    "have a form" which {
-      def form: Element = document().mainContent.getForm
-
-      "has the correct attributes" in {
-        form.attr("method") mustBe testCall.method
-        form.attr("action") mustBe testCall.url
-      }
-      "has a confirm and continue button" in {
-        form.selectNth(".govuk-button", 1).text mustBe CheckYourAnswersMessages.confirmAndContinue
-      }
-      "has a save and come back later button" in {
-        val saveAndComeBackLater = form.selectNth(".govuk-button", 2)
-        saveAndComeBackLater.text mustBe CheckYourAnswersMessages.saveAndBack
-        saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendProgressSavedUrl}?location=sole-trader-check-your-answers"
-      }
+    object CheckYourAnswersMessages {
+      val captionHidden = "This section is"
+      val captionVisual = "Sole trader"
+      val heading = "Check your answers"
+      val title = "Check your answers - sole trader business"
+      val confirmAndContinue = "Confirm and continue"
+      val saveAndBack = "Save and come back later"
+      val change = "Change"
+      val add = "Add"
+      val tradingStartDate = "Trading start date"
+      val businessName = "Business name"
+      val businessAddress = "Address"
+      val businessTrade = "Type of trade"
+      val accountingMethod = "Accounting method for sole trader income"
     }
-
-  }
-
-  object CheckYourAnswersMessages {
-    val captionHidden = "This section is"
-    val captionVisual = "Sole trader"
-    val heading = "Check your answers"
-    val title = "Check your answers - sole trader business"
-    val confirmAndContinue = "Confirm and continue"
-    val saveAndBack = "Save and come back later"
-    val change = "Change"
-    val add = "Add"
-    val tradingStartDate = "Trading start date"
-    val businessName = "Business name"
-    val businessAddress = "Address"
-    val businessTrade = "Type of trade"
-    val accountingMethod = "Accounting method for sole trader income"
-  }
-
 }

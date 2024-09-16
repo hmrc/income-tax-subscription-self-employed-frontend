@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.AccountingMethod
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, RadioHelper, SaveAndContinueButtonHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, RadioHelper, SaveAndContinueButtonHelper, PageHeadingHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Accruals, Cash}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
@@ -28,7 +28,8 @@
         form: FormWithCSRF,
         radioHelper: RadioHelper,
         continueButton: ContinueButton,
-        saveAndContinueButtonHelper: SaveAndContinueButtonHelper
+        saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+        pageHeadingHelper: PageHeadingHelper,
 )
 @(businessAccountingMethodForm: Form[AccountingMethod], postAction: Call, isEditMode: Boolean, backUrl: Option[String], clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
@@ -40,10 +41,12 @@
 }
 
 @mainTemplate(title = messages("agent.business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
-<span class="govuk-caption-l">
-    @messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino)
-  </span>
-<h1 class="govuk-heading-l">@messages("agent.business.accounting-method.heading")</h1>
+
+    @pageHeadingHelper(
+        heading = messages("agent.business.accounting-method.heading"),
+        caption = messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino),
+        isSection = false
+    )
 
     @form(action = postAction) {
         @radioHelper(

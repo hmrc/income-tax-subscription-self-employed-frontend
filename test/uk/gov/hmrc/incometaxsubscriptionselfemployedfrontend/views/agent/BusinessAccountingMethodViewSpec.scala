@@ -40,7 +40,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     val title = "What accounting method does your client use for their sole trader businesses?"
     val titleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
     val heading: String = title
-    val caption = "FirstName LastName | ZZ 11 11 11 Z"
+    val captionVisible = "FirstName LastName | ZZ 11 11 11 Z"
     val hint = "All your client’s sole trader businesses must use the same accounting method."
     val cash = "Cash basis accounting"
     val accruals = "Traditional accounting"
@@ -86,15 +86,14 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document.getBackLinkByClass.attr("data-module") mustBe "hmrc-back-link"
     }
 
-    "have a heading" in new Setup {
-      document.getH1Element.text mustBe BusinessAccountingMethodMessages.heading
-
+    "have the correct heading and caption" in new Setup {
+      document.mainContent.mustHaveHeadingAndCaption(
+        heading = BusinessAccountingMethodMessages.heading,
+        caption = BusinessAccountingMethodMessages.captionVisible,
+        isSection = false
+      )
     }
 
-    "have a caption" in new Setup() {
-      document.selectHead(".govuk-caption-l")
-        .text() mustBe BusinessAccountingMethodMessages.caption
-    }
     "have a hidden legend" in new Setup {
       document.selectHead("legend").text mustBe BusinessAccountingMethodMessages.heading
       document.selectHead("legend").attr("class") mustBe "govuk-fieldset__legend govuk-visually-hidden"

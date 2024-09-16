@@ -73,12 +73,12 @@ class NextIncomeSourceViewSpec extends ViewSpec {
       )
     }
 
-    "have a heading" in {
-      mainContent.getH1Element.text mustBe NextIncomeSourceMessages.heading
-    }
-
-    "have a caption" in {
-      mainContent.selectHead(".govuk-caption-l").text mustBe NextIncomeSourceMessages.caption(testClientDetails.name, testClientDetails.formattedNino)
+    "have the correct heading and caption" in {
+      mainContent.mustHaveHeadingAndCaption(
+        heading = NextIncomeSourceMessages.heading,
+        caption = NextIncomeSourceMessages.caption(testClientDetails.name, testClientDetails.formattedNino),
+        isSection = false
+      )
     }
 
     "have a form" which {
