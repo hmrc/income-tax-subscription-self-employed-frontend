@@ -94,32 +94,27 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
-    "have a hidden legend" in new Setup {
-      document.selectHead("legend").text mustBe BusinessAccountingMethodMessages.heading
-      document.selectHead("legend").attr("class") mustBe "govuk-fieldset__legend govuk-visually-hidden"
-    }
-
-    "has a set of radio buttons inputs" in new Setup {
+    "have the correct radio inputs" in new Setup {
       document.mainContent.mustHaveRadioInput(
+        selector = "fieldset"
+      )(
         name = BusinessAccountingMethodForm.businessAccountingMethod,
-        radioItems = Seq(
+        legend = BusinessAccountingMethodMessages.heading,
+        isHeading = false,
+        isLegendHidden = true,
+        hint = Some(BusinessAccountingMethodMessages.hint),
+        errorMessage = None,
+        radioContents = Seq(
           RadioItem(
             content = Text(BusinessAccountingMethodMessages.cash),
-
             value = Some(Cash.CASH),
-            id = Some(BusinessAccountingMethodForm.businessAccountingMethod)
           ),
           RadioItem(
             content = Text(BusinessAccountingMethodMessages.accruals),
             value = Some(Accruals.ACCRUALS),
-            id = Some(s"${BusinessAccountingMethodForm.businessAccountingMethod}-2")
           )
         )
       )
-    }
-
-    "have hint text for radio buttons" in new Setup {
-      document.select(".govuk-hint").text() mustBe BusinessAccountingMethodMessages.hint
     }
 
     "have a Form" in new Setup {

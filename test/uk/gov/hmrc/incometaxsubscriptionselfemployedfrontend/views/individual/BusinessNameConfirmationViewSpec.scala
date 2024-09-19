@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.FormError
 import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameConfirmationForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
@@ -42,21 +43,20 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
       },
       testCall,
       backUrl = testBackUrl,
-      isBusinessName =  isBusinessName,
+      isBusinessName = isBusinessName,
       name = if (isBusinessName) testBusinessName else testName,
     )(fakeTestRequest, implicitly)
   }
 
 
-
-  def document(hasFormError: Boolean = false, isBusinessName:Boolean = false): Document = {
+  def document(hasFormError: Boolean = false, isBusinessName: Boolean = false): Document = {
     Jsoup.parse(page(hasFormError, isBusinessName).body)
   }
 
   object BusinessNameConfirmationMessages {
     val heading: String = "Is your business trading name the same as your own name?"
     val headingSecond: String = "Is your business trading name the same as the first one you added?"
-    val captionHidden:String = "This section is"
+    val captionHidden: String = "This section is"
     val captionVisible: String = "Sole trader"
 
     object Summary {
@@ -117,7 +117,7 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
         )
       }
       "the page is for a secondary business" in {
-       document(isBusinessName = true).mainContent.mustHaveHeadingAndCaption(
+        document(isBusinessName = true).mainContent.mustHaveHeadingAndCaption(
           heading = BusinessNameConfirmationMessages.headingSecond,
           caption = BusinessNameConfirmationMessages.captionVisible,
           isSection = true
@@ -139,44 +139,28 @@ class BusinessNameConfirmationViewSpec extends ViewSpec {
         form.attr("action") mustBe testCall.url
       }
 
-      "has a radio button set" which {
-        "has a fieldset" which {
-          def fieldset: Element = form.selectHead("fieldset")
-
-          "has a legend" in {
-            fieldset.selectHead("legend").text mustBe BusinessNameConfirmationMessages.Form.legend
-          }
-
-          "has an inline radio button set" which {
-            def radioSet: Element = fieldset.selectHead(".govuk-radios--inline")
-
-            "has a yes radio button and label" in {
-              val yesSet = radioSet.selectNth(".govuk-radios__item", 1)
-              val radioButton = yesSet.selectHead("input")
-              radioButton.attr("id") mustBe fieldName
-              radioButton.attr("name") mustBe fieldName
-              radioButton.attr("type") mustBe "radio"
-              radioButton.attr("value") mustBe YesNoMapping.option_yes
-
-              val label = yesSet.selectHead("label")
-              label.attr("for") mustBe fieldName
-              label.text mustBe BusinessNameConfirmationMessages.Form.yes
-            }
-
-            "has a no radio button and label" in {
-              val noSet = radioSet.selectNth(".govuk-radios__item", 2)
-              val radioButton = noSet.selectHead("input")
-              radioButton.attr("id") mustBe s"$fieldName-2"
-              radioButton.attr("name") mustBe fieldName
-              radioButton.attr("type") mustBe "radio"
-              radioButton.attr("value") mustBe YesNoMapping.option_no
-
-              val label = noSet.selectHead("label")
-              label.attr("for") mustBe s"$fieldName-2"
-              label.text mustBe BusinessNameConfirmationMessages.Form.no
-            }
-          }
-        }
+      "has the correct inline radio inputs" in {
+        document().mustHaveRadioInput(
+          selector = "fieldset"
+        )(
+          name = fieldName,
+          legend = BusinessNameConfirmationMessages.Form.legend,
+          isHeading = false,
+          isLegendHidden = false,
+          hint = None,
+          errorMessage = None,
+          radioContents = Seq(
+            RadioItem(
+              content = Text(BusinessNameConfirmationMessages.Form.yes),
+              value = Some(YesNoMapping.option_yes)
+            ),
+            RadioItem(
+              content = Text(BusinessNameConfirmationMessages.Form.no),
+              value = Some(YesNoMapping.option_no)
+            )
+          ),
+          isInline = true
+        )
       }
 
       "has a save and continue button" in {
