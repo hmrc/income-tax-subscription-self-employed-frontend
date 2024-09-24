@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.FirstIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
@@ -260,60 +261,27 @@ class FirstIncomeSourceViewSpec extends ViewSpec {
           }
         }
 
-        "has a fieldset" which {
-          def fieldset: Element = accountingMethodFormGroup.selectHead("fieldset")
-
-          "has the correct attributes" in {
-            fieldset.attr("aria-describedby") mustBe s"${FirstIncomeSourceForm.accountingMethodBusiness}-hint"
-          }
-
-          "has a legend" in {
-            fieldset.selectHead("legend").text mustBe FirstIncomeSourceMessages.AccountingMethod.legend
-          }
-
-          "has a hint" in {
-            val hint = fieldset.selectHead(".govuk-hint")
-            hint.text mustBe FirstIncomeSourceMessages.AccountingMethod.hint
-            hint.id mustBe s"${FirstIncomeSourceForm.accountingMethodBusiness}-hint"
-          }
-
-          "has a group of radio buttons" which {
-            def radioGroup: Element = fieldset.selectHead(".govuk-radios")
-
-            "has a radio button for Cash" which {
-              def cashRadio: Element = radioGroup.selectNth(".govuk-radios__item", 1)
-
-              "has an input" in {
-                val input = cashRadio.selectHead("input")
-                input.id mustBe FirstIncomeSourceForm.accountingMethodBusiness
-                input.attr("name") mustBe FirstIncomeSourceForm.accountingMethodBusiness
-                input.attr("type") mustBe "radio"
-                input.attr("value") mustBe Cash.toString
-              }
-              "has a label" in {
-                val label = cashRadio.selectHead("label")
-                label.text mustBe FirstIncomeSourceMessages.AccountingMethod.Cash.label
-                label.attr("for") mustBe FirstIncomeSourceForm.accountingMethodBusiness
-              }
-            }
-
-            "has a radio button for Accruals" which {
-              def cashRadio: Element = radioGroup.selectNth(".govuk-radios__item", 2)
-
-              "has an input" in {
-                val input = cashRadio.selectHead("input")
-                input.id mustBe s"${FirstIncomeSourceForm.accountingMethodBusiness}-2"
-                input.attr("name") mustBe FirstIncomeSourceForm.accountingMethodBusiness
-                input.attr("type") mustBe "radio"
-                input.attr("value") mustBe Accruals.toString
-              }
-              "has a label" in {
-                val label = cashRadio.selectHead("label")
-                label.text mustBe FirstIncomeSourceMessages.AccountingMethod.Accruals.label
-                label.attr("for") mustBe s"${FirstIncomeSourceForm.accountingMethodBusiness}-2"
-              }
-            }
-          }
+        "has the correct radio inputs" in {
+          accountingMethodFormGroup.mustHaveRadioInput(
+            selector = "fieldset"
+          )(
+            name = FirstIncomeSourceForm.accountingMethodBusiness,
+            legend = FirstIncomeSourceMessages.AccountingMethod.legend,
+            isHeading = false,
+            isLegendHidden = true,
+            hint = Some(FirstIncomeSourceMessages.AccountingMethod.hint),
+            errorMessage = None,
+            radioContents = Seq(
+              RadioItem(
+                content = Text(FirstIncomeSourceMessages.AccountingMethod.Cash.label),
+                value = Some(Cash.toString)
+              ),
+              RadioItem(
+                content = Text(FirstIncomeSourceMessages.AccountingMethod.Accruals.label),
+                value = Some(Accruals.toString)
+              )
+            )
+          )
         }
       }
     }

@@ -252,19 +252,122 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       Succeeded
     }
 
-    def mustHaveRadioInput(name: String, radioItems: Seq[RadioItem]): Assertion = {
-      radioItems.zip(1 to radioItems.length) map { case (radioItem, index) =>
-        val radioElement: Element = element.selectNth(".govuk-radios__item", index)
-        val radioInput: Element = radioElement.selectHead("input")
-        radioItem.id mustBe Some(radioInput.attr("id"))
-        radioInput.attr("name") mustBe name
-        radioInput.attr("type") mustBe "radio"
-        Some(radioInput.attr("value")) mustBe radioItem.value
+    def mustHaveRadioInput(selector: String)(name: String,
+                                             legend: String,
+                                             isHeading: Boolean,
+                                             isLegendHidden: Boolean,
+                                             hint: Option[String],
+                                             errorMessage: Option[String],
+                                             radioContents: Seq[RadioItem],
+                                             isInline: Boolean = false): Assertion = {
 
-        val radioLabel: Element = radioElement.selectHead("label")
+      val checkpoint: Checkpoint = new Checkpoint()
+      val radioFieldSet: Element = element.selectHead(selector)
+
+
+      validateFieldSetLegend(radioFieldSet, legend, isHeading, isLegendHidden, checkpoint)
+
+      hint.foreach{ hint =>
+        val radioFieldSetHint: Element = radioFieldSet.selectHead(".govuk-hint")
+        checkpoint {
+          radioFieldSet.attr("aria-describedby") must include(radioFieldSetHint.attr("id"))
+        }
+        checkpoint {
+          radioFieldSetHint.text mustBe hint
+        }
+      }
+
+      errorMessage.foreach{ errorMessage =>
+        val radioFieldSetError: Element = radioFieldSet.selectHead(".govuk-error-message")
+        checkpoint {
+          radioFieldSet.attr("aria-describedby") must include(radioFieldSetError.attr("id"))
+        }
+        checkpoint {
+          radioFieldSetError.text must include(errorMessage)
+        }
+      }
+
+      val radioField: Element = if (isInline) element.selectHead(".govuk-radios--inline") else element.selectHead(".govuk-radios")
+
+      radioContents.zipWithIndex foreach { case (radioContent, index) =>
+        if (radioContent.divider.isDefined) {
+          validateRadioDivider(radioField, radioContent, index, checkpoint)
+        } else {
+          validateRadioItem(radioField, name, radioContent, index, checkpoint)
+        }
+      }
+      checkpoint.reportAll()
+      Succeeded
+    }
+
+    private def validateFieldSetLegend(radioFieldSet: Element,
+                                       legend: String,
+                                       isHeading: Boolean,
+                                       isLegendHidden: Boolean,
+                                       checkpoint: Checkpoint): Unit = {
+      val radioFieldSetLegend: Element = radioFieldSet.selectHead("legend")
+      if (isHeading) {
+        checkpoint {
+          radioFieldSetLegend.getH1Element.text mustBe legend
+        }
+      } else {
+        checkpoint {
+          radioFieldSetLegend.text mustBe legend
+        }
+        if (isLegendHidden) {
+          checkpoint {
+            radioFieldSetLegend.attr("class") must include("govuk-visually-hidden")
+          }
+        } else {
+          checkpoint {
+            radioFieldSetLegend.attr("class") mustNot include("govuk-visually-hidden")
+          }
+        }
+      }
+    }
+
+    private def validateRadioItem(radioField: Element, name: String, radioItem: RadioItem, index: Int, checkpoint: Checkpoint): Unit = {
+      val radioItemElement: Element = radioField.child(index)
+      val radioInput: Element = radioItemElement.selectHead("input")
+      val radioLabel: Element = radioItemElement.selectHead("label")
+      val radioInputId: String = if (index == 0) name else s"$name-${index + 1}"
+
+      checkpoint {
+        radioItemElement.className() mustBe "govuk-radios__item"
+      }
+      checkpoint {
+        radioInput.attr("id") mustBe radioInputId
+      }
+      checkpoint {
+        radioInput.attr("name") mustBe name
+      }
+      checkpoint {
+        radioInput.attr("type") mustBe "radio"
+      }
+      checkpoint {
+        radioInput.attr("value") mustBe radioItem.value.getOrElse("")
+      }
+      checkpoint {
         radioLabel.attr("for") mustBe radioInput.attr("id")
+      }
+      checkpoint {
         Text(radioLabel.text) mustBe radioItem.content
-      } forall (_ == succeed) mustBe true
+      }
+      radioItem.hint.foreach { hint =>
+        checkpoint {
+          Text(radioItemElement.selectHead(".govuk-radios__hint").text) mustBe hint.content
+        }
+      }
+    }
+
+    private def validateRadioDivider(radioField: Element, radioDivider: RadioItem, index: Int, checkpoint: Checkpoint): Unit = {
+      val dividerElement: Element = radioField.child(index)
+      checkpoint {
+        dividerElement.className() mustBe "govuk-radios__divider"
+      }
+      checkpoint {
+        dividerElement.text() mustBe radioDivider.divider.get
+      }
     }
 
     def mustHaveTextField(name: String, label: String): Assertion = {
@@ -330,7 +433,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
         }
         if (isLegendHidden) {
           checkpoint {
-            dateLegend.attr("class") must include ("govuk-visually-hidden")
+            dateLegend.attr("class") must include("govuk-visually-hidden")
           }
         }
       }
@@ -340,7 +443,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
         hintText.text mustBe exampleDate
       }
 
-      dateInputsValues zip(1 to dateInputsValues.length) foreach { case (dateInputValues, index) =>
+      dateInputsValues zip (1 to dateInputsValues.length) foreach { case (dateInputValues, index) =>
         val item: Element = dateInputField.selectNth(".govuk-date-input__item", index)
         val label = item.selectHead("label")
         val input = item.selectHead("input")
@@ -372,7 +475,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
         val fieldset: Element = element.getFieldset
         val errorMessage: Element = element.selectHead(".govuk-error-message")
         checkpoint {
-          fieldset.attr("aria-describedby") must include ("startDate-error")
+          fieldset.attr("aria-describedby") must include("startDate-error")
         }
         checkpoint {
           errorMessage.selectHead("p").attr("id") mustBe "startDate-error"

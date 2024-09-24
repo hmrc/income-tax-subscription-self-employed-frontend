@@ -21,6 +21,7 @@ import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
+import uk.gov.hmrc.govukfrontend.views.Aliases.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
@@ -110,42 +111,26 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
       document().getBulletPointNth(1) mustBe BusinessAccountingMethodMessages.accordionBullet_2
     }
 
-    "have a hidden legend" in {
-      document().selectHead("legend").text mustBe BusinessAccountingMethodMessages.heading
-      document().selectHead("legend").attr("class") mustBe "govuk-fieldset__legend govuk-visually-hidden"
-    }
-
-    //radio button test
-
-    "have a cash accounting heading for the radio button" in {
-      document().getGovukRadioButtonByIndex().select("label").text() mustBe BusinessAccountingMethodMessages.cash
-    }
-
-    "have the correct description for the cash accounting radio button" in {
-      document().getGovukRadioButtonByIndex().select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.cashDescription
-    }
-
-    "have a standard accounting heading for the radio button" in {
-      document().getGovukRadioButtonByIndex(1).select("label").text() mustBe BusinessAccountingMethodMessages.accruals
-    }
-
-    "have the correct description for the standard accounting radio button" in {
-      document().getGovukRadioButtonByIndex(1).select(".govuk-radios__hint").text() mustBe BusinessAccountingMethodMessages.accrualsDescription
-    }
-
     "has a set of radio buttons inputs" in {
       document().mainContent.mustHaveRadioInput(
+        selector = "fieldset"
+      )(
         name = BusinessAccountingMethodForm.businessAccountingMethod,
-        radioItems = Seq(
+        legend = BusinessAccountingMethodMessages.heading,
+        isHeading = false,
+        isLegendHidden = true,
+        hint = None,
+        errorMessage = None,
+        radioContents = Seq(
           RadioItem(
             content = Text(BusinessAccountingMethodMessages.cash),
             value = Some(Cash.CASH),
-            id = Some(BusinessAccountingMethodForm.businessAccountingMethod)
+            hint = Some(Hint(content = Text(BusinessAccountingMethodMessages.cashDescription))),
           ),
           RadioItem(
             content = Text(BusinessAccountingMethodMessages.accruals),
             value = Some(Accruals.ACCRUALS),
-            id = Some(s"${BusinessAccountingMethodForm.businessAccountingMethod}-2")
+            hint = Some(Hint(content = Text(BusinessAccountingMethodMessages.accrualsDescription))),
           )
         )
       )

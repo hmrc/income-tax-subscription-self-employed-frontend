@@ -20,6 +20,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.FormError
 import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, ClientDetails}
@@ -124,43 +126,31 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
         form.attr("action") mustBe testCall.url
       }
 
+
       "has a radio button set" which {
-        "has a fieldset" which {
-          def fieldset: Element = form.selectHead("fieldset")
 
-          "has a legend" in {
-            fieldset.selectHead("legend").text mustBe BusinessAddressConfirmationMessages.Form.legend
-          }
-
-          "has an inline radio button set" which {
-            def radioSet: Element = fieldset.selectHead(".govuk-radios--inline")
-
-            "has a yes radio button and label" in {
-              val yesSet = radioSet.selectNth(".govuk-radios__item", 1)
-              val radioButton = yesSet.selectHead("input")
-              radioButton.attr("id") mustBe fieldName
-              radioButton.attr("name") mustBe fieldName
-              radioButton.attr("type") mustBe "radio"
-              radioButton.attr("value") mustBe YesNoMapping.option_yes
-
-              val label = yesSet.selectHead("label")
-              label.attr("for") mustBe fieldName
-              label.text mustBe BusinessAddressConfirmationMessages.Form.yes
-            }
-
-            "has a no radio button and label" in {
-              val noSet = radioSet.selectNth(".govuk-radios__item", 2)
-              val radioButton = noSet.selectHead("input")
-              radioButton.attr("id") mustBe s"$fieldName-2"
-              radioButton.attr("name") mustBe fieldName
-              radioButton.attr("type") mustBe "radio"
-              radioButton.attr("value") mustBe YesNoMapping.option_no
-
-              val label = noSet.selectHead("label")
-              label.attr("for") mustBe s"$fieldName-2"
-              label.text mustBe BusinessAddressConfirmationMessages.Form.no
-            }
-          }
+        "has the correct radio inputs" in {
+          form.mustHaveRadioInput(
+            selector = "fieldset"
+          )(
+            name = fieldName,
+            legend = BusinessAddressConfirmationMessages.Form.legend,
+            isHeading = false,
+            isLegendHidden = false,
+            hint = None,
+            errorMessage = None,
+            radioContents = Seq(
+              RadioItem(
+                content = Text(BusinessAddressConfirmationMessages.Form.yes),
+                value = Some(YesNoMapping.option_yes)
+              ),
+              RadioItem(
+                content = Text(BusinessAddressConfirmationMessages.Form.no),
+                value = Some(YesNoMapping.option_no)
+              )
+            ),
+            isInline = true
+          )
         }
       }
 
