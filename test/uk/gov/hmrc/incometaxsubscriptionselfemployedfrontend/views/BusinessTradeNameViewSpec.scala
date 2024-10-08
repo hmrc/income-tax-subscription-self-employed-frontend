@@ -80,16 +80,37 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
     "have a heading" in new Setup {
       document.getH1Element.text mustBe BusinessTradeNameMessages.heading
     }
-    "have a Form" in new Setup {
-      document.getForm.attr("method") mustBe testCall.method
-      document.getForm.attr("action") mustBe testCall.url
+    "have a form" which {
+      "has the correct attributes" in new Setup {
+        document.getForm.attr("method") mustBe testCall.method
+        document.getForm.attr("action") mustBe testCall.url
+      }
+
+      "has a text input field with hint" when {
+        "there is no error" in new Setup {
+          document.getForm.mustHaveTextInput()(
+            name = BusinessTradeNameForm.businessTradeName,
+            label = BusinessTradeNameMessages.heading,
+            isLabelHidden = false,
+            isPageHeading = true,
+            hint = Some(BusinessTradeNameMessages.hintText)
+          )
+        }
+
+        "there is an error" in
+          new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(emptyFormError)) {
+            document.getForm.mustHaveTextInput()(
+              name = BusinessTradeNameForm.businessTradeName,
+              label = BusinessTradeNameMessages.heading,
+              isLabelHidden = false,
+              isPageHeading = true,
+              hint = Some(BusinessTradeNameMessages.hintText),
+              error = Some(BusinessTradeNameMessages.emptyError)
+            )
+          }
+      }
     }
-    "have a textInputs" in new Setup {
-      document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
-    }
-    "have a hint text for textInput" in new Setup {
-      document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
-    }
+
     "have update button when in edit mode" in new Setup(true) {
       document.getButtonByClass mustBe BusinessTradeNameMessages.saveAndContinue
     }
@@ -106,13 +127,6 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       document.getBackLinkByClass.text mustBe BusinessTradeNameMessages.backLink
       document.getBackLinkByClass.attr("href") mustBe testBackUrl
     }
-    "must display form error on page along with textInput and hintText" in
-      new Setup(false, BusinessTradeNameForm.businessTradeNameValidationForm(Nil).withError(emptyFormError)) {
-        document.mustHaveErrorSummaryByNewGovUkClass(List[String](BusinessTradeNameMessages.emptyError))
-        document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
-        document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
-      }
-
   }
 
 }

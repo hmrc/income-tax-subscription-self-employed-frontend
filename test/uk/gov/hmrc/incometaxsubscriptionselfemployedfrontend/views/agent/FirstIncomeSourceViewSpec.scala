@@ -52,6 +52,8 @@ class FirstIncomeSourceViewSpec extends ViewSpec {
   def mainContent: Element = document.mainContent
 
   "FirstIncomeSource" must {
+
+
     "use the correct template" when {
       "there are no errors" in new TemplateViewTest(
         view = view(),
@@ -91,52 +93,24 @@ class FirstIncomeSourceViewSpec extends ViewSpec {
         form.attr("action") mustBe testCall.url
       }
 
-      "has a section to capture a trade" which {
-        def tradeFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(1)")
-
-        "has a label with the correct attributes and text" in {
-          val label = tradeFormGroup.selectHead("label")
-          label.text mustBe FirstIncomeSourceMessages.Trade.label
-          label.attr("for") mustBe FirstIncomeSourceForm.businessTradeName
-        }
-
-        "has hint text with a reference id" in {
-          val hint = tradeFormGroup.selectHead(".govuk-hint")
-          hint.text mustBe FirstIncomeSourceMessages.Trade.hint
-          hint.id mustBe s"${FirstIncomeSourceForm.businessTradeName}-hint"
-        }
-
-        "has an input field with the correct attributes" in {
-          val input = tradeFormGroup.selectHead("input")
-          input.id mustBe FirstIncomeSourceForm.businessTradeName
-          input.attr("name") mustBe FirstIncomeSourceForm.businessTradeName
-          input.attr("type") mustBe "text"
-          input.attr("aria-describedby") mustBe s"${FirstIncomeSourceForm.businessTradeName}-hint"
-        }
+      "has a text input to capture a trade name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
+          FirstIncomeSourceForm.businessTradeName,
+          FirstIncomeSourceMessages.Trade.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(FirstIncomeSourceMessages.Trade.hint)
+        )
       }
 
-      "has a section to capture a name" which {
-        def nameFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(2)")
-
-        "has a label with the correct attributes and text" in {
-          val label = nameFormGroup.selectHead("label")
-          label.text mustBe FirstIncomeSourceMessages.Name.label
-          label.attr("for") mustBe FirstIncomeSourceForm.businessName
-        }
-
-        "has hint text with a reference id" in {
-          val hint = nameFormGroup.selectHead(".govuk-hint")
-          hint.text mustBe FirstIncomeSourceMessages.Name.hint
-          hint.id mustBe s"${FirstIncomeSourceForm.businessName}-hint"
-        }
-
-        "has an input field with the correct attributes" in {
-          val input = nameFormGroup.selectHead("input")
-          input.id mustBe FirstIncomeSourceForm.businessName
-          input.attr("name") mustBe FirstIncomeSourceForm.businessName
-          input.attr("type") mustBe "text"
-          input.attr("aria-describedby") mustBe s"${FirstIncomeSourceForm.businessName}-hint"
-        }
+      "has a text input to capture a business name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
+          name = FirstIncomeSourceForm.businessName,
+          label = FirstIncomeSourceMessages.Name.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(FirstIncomeSourceMessages.Name.hint)
+        )
       }
 
       "has a section to capture a start date" which {

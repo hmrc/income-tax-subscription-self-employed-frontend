@@ -71,30 +71,37 @@ class BusinessNameViewSpec extends ViewSpec {
       )
     }
 
-    "have a Form" in new Setup() {
-      document.getForm.attr("method") mustBe testCall.method
-      document.getForm.attr("action") mustBe testCall.url
-    }
+    "have a form" which {
 
-    "have a text input field with hint" when {
-      "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(formError)) {
-        document.mustHaveTextInput(
-          name = BusinessNameForm.businessName,
-          label = BusinessNameMessages.heading,
-          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
-          error = Some(BusinessNameForm.businessName -> BusinessNameMessages.emptyError)
-        )
+      "has the correct attributes" in new Setup() {
+        document.getForm.attr("method") mustBe testCall.method
+        document.getForm.attr("action") mustBe testCall.url
       }
 
-      "there is no error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil)) {
-        document.mustHaveTextInput(
-          name = BusinessNameForm.businessName,
-          label = BusinessNameMessages.heading,
-          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
-          error = None
-        )
-      }
+      "has a text input field with hint" when {
 
+        "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(formError)) {
+          document.getForm.mustHaveTextInput()(
+            name = BusinessNameForm.businessName,
+            label = BusinessNameMessages.heading,
+            isLabelHidden = true,
+            isPageHeading = false,
+            hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
+            error = Some(BusinessNameMessages.emptyError)
+          )
+        }
+
+        "there is no error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil)) {
+          document.getForm.mustHaveTextInput()(
+            name = BusinessNameForm.businessName,
+            label = BusinessNameMessages.heading,
+            isLabelHidden = true,
+            isPageHeading = false,
+            hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
+            error = None
+          )
+        }
+      }
     }
 
     "have a save and continue button when not in edit mode" in new Setup(isEditMode = false) {
@@ -104,7 +111,5 @@ class BusinessNameViewSpec extends ViewSpec {
     "have save and continue button when in edit mode" in new Setup(isEditMode = true) {
       document.select("button").last().text mustBe BusinessNameMessages.saveAndContinueButton
     }
-
   }
-
 }
