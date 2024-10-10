@@ -75,9 +75,35 @@ class BusinessNameViewSpec extends ViewSpec {
         .text() mustBe BusinessNameMessages.caption
     }
 
-    "have a Form" in new Setup() {
-      document.getForm.attr("method") mustBe testCall.method
-      document.getForm.attr("action") mustBe testCall.url
+    "have a form" which {
+      "has the correct attributes" in new Setup() {
+        document.getForm.attr("method") mustBe testCall.method
+        document.getForm.attr("action") mustBe testCall.url
+      }
+
+      "has a text input field with hint" when {
+        "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
+          document.getForm.mustHaveTextInput()(
+            name = BusinessNameForm.businessName,
+            label = BusinessNameMessages.heading,
+            isLabelHidden = false,
+            isPageHeading = true,
+            hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
+            error = Some(BusinessNameMessages.emptyError)
+          )
+        }
+
+        "there is no error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil)) {
+          document.getForm.mustHaveTextInput()(
+            name = BusinessNameForm.businessName,
+            label = BusinessNameMessages.heading,
+            isLabelHidden = false,
+            isPageHeading = true,
+            hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
+            error = None
+          )
+        }
+      }
     }
 
     "have a continue button when not in edit mode" in new Setup() {
@@ -86,26 +112,6 @@ class BusinessNameViewSpec extends ViewSpec {
 
     "have save and continue button when in edit mode" in new Setup(true) {
       document.getGovukButton.text mustBe BusinessNameMessages.saveAndContinue
-    }
-
-    "have a text input field with hint" when {
-      "there is an error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil).withError(testError)) {
-        document.mustHaveTextInput(
-          name = BusinessNameForm.businessName,
-          label = BusinessNameMessages.heading,
-          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
-          error = Some(BusinessNameForm.businessName -> BusinessNameMessages.emptyError)
-        )
-      }
-
-      "there is no error" in new Setup(isEditMode = false, businessNameForm = BusinessNameForm.businessNameValidationForm(Nil)) {
-        document.mustHaveTextInput(
-          name = BusinessNameForm.businessName,
-          label = BusinessNameMessages.heading,
-          hint = Some(s"${BusinessNameMessages.line1} ${BusinessNameMessages.line2}"),
-          error = None
-        )
-      }
     }
   }
 }

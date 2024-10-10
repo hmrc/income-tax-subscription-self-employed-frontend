@@ -267,7 +267,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
       validateFieldSetLegend(radioFieldSet, legend, isHeading, isLegendHidden, checkpoint)
 
-      hint.foreach{ hint =>
+      hint.foreach { hint =>
         val radioFieldSetHint: Element = radioFieldSet.selectHead(".govuk-hint")
         checkpoint {
           radioFieldSet.attr("aria-describedby") must include(radioFieldSetHint.attr("id"))
@@ -277,7 +277,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
         }
       }
 
-      errorMessage.foreach{ errorMessage =>
+      errorMessage.foreach { errorMessage =>
         val radioFieldSetError: Element = radioFieldSet.selectHead(".govuk-error-message")
         checkpoint {
           radioFieldSet.attr("aria-describedby") must include(radioFieldSetError.attr("id"))
@@ -370,39 +370,85 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       }
     }
 
-    def mustHaveTextField(name: String, label: String): Assertion = {
-      val eles = element.select(s"input[name=$name]")
-      if (eles.isEmpty) fail(s"$name does not have an input field with name=$name\ncurrent list of inputs:\n[${element.select("input")}]")
-      if (eles.size() > 1) fail(s"$name have multiple input fields with name=$name")
-      val ele = eles.asScala.head
-      ele.attr("type") mustBe "text"
-      element.select(s"label[for=$name]").text() mustBe label
-    }
-
-    def mustHaveTextInput(name: String,
+    def mustHaveTextInput(selector: String = ".govuk-form-group")(name: String,
                           label: String,
+                          isLabelHidden: Boolean,
+                          isPageHeading: Boolean,
                           hint: Option[String] = None,
-                          error: Option[(String, String)] = None,
+                          error: Option[String] = None,
                           autoComplete: Option[String] = None): Assertion = {
-      val textInput: Element = element.selectHead(s"input[name=$name]")
-      val textInputLabel: Element = element.selectHead(s"label[for=$name]")
+      val checkpoint: Checkpoint = new Checkpoint
+      val formGroup: Element = element.selectHead(selector)
+      val textInput: Element = formGroup.selectHead(s"input[name=$name]")
 
-      textInputLabel.text mustBe label
+      validateTextInputLabel(name, label, isPageHeading, isLabelHidden, checkpoint)
 
-      autoComplete.foreach(value => textInput.attr("autocomplete") mustBe value)
+      checkpoint {
+        textInput.attr("type") mustBe "text"
+      }
+      checkpoint {
+        textInput.attr("name") mustBe name
+      }
+
+      autoComplete.foreach(value =>
+        checkpoint {
+          textInput.attr("autocomplete") mustBe value
+        })
 
       hint.foreach { value =>
-        element.selectHead(s"#$name-hint").text mustBe value
-        textInput.attr("aria-describedby").contains(s"$name-hint") mustBe true
+        checkpoint {
+          element.selectHead(s"#$name-hint").text mustBe value
+        }
+        checkpoint {
+          textInput.attr("aria-describedby") must include(s"$name-hint")
+        }
       }
 
-      error.foreach { case (key, message) =>
-        element.selectHead(s"#$key-error").text mustBe s"Error: $message"
-        textInput.attr("aria-describedby").contains(s"$key-error") mustBe true
+      error.foreach { errorMessage =>
+        checkpoint {
+          element.selectHead(s"#$name-error").text mustBe s"Error: $errorMessage"
+        }
+        checkpoint {
+          textInput.attr("aria-describedby") must include(s"$name-error")
+        }
       }
 
-      textInput.attr("type") mustBe "text"
+      checkpoint.reportAll()
+      Succeeded
     }
+
+    def validateTextInputLabel(name: String,
+                               label: String,
+                               isPageHeading: Boolean,
+                               isLabelHidden: Boolean,
+                               checkpoint: Checkpoint): Unit = {
+      val textInputLabel: Element = element.selectHead(s"label[for=$name]")
+
+      checkpoint {
+        textInputLabel.text mustBe label
+      }
+      checkpoint {
+        textInputLabel.attr("for") mustBe name
+      }
+      checkpoint {
+        textInputLabel.className() must include("govuk-label")
+      }
+
+      if (isPageHeading) {
+        checkpoint {
+          textInputLabel.className() must include("govuk-label--l")
+        }
+      } else if (isLabelHidden) {
+        checkpoint {
+          textInputLabel.className() must include("govuk-visually-hidden")
+        }
+      } else {
+        checkpoint {
+          textInputLabel.className() must include("govuk-!-font-weight-bold")
+        }
+      }
+    }
+
 
     def listErrorMessages(errors: List[String]): Assertion = {
       errors.zipWithIndex.map {

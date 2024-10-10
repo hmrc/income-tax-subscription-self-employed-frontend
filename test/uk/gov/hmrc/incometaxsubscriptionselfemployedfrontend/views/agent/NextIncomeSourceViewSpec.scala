@@ -89,52 +89,24 @@ class NextIncomeSourceViewSpec extends ViewSpec {
         form.attr("action") mustBe testCall.url
       }
 
-      "has a section to capture a trade" which {
-        def tradeFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(1)")
-
-        "has a label with the correct attributes and text" in {
-          val label = tradeFormGroup.selectHead("label")
-          label.text mustBe NextIncomeSourceMessages.Trade.label
-          label.attr("for") mustBe NextIncomeSourceForm.businessTradeName
-        }
-
-        "has hint text with a reference id" in {
-          val hint = tradeFormGroup.selectHead(".govuk-hint")
-          hint.text mustBe NextIncomeSourceMessages.Trade.hint
-          hint.id mustBe s"${NextIncomeSourceForm.businessTradeName}-hint"
-        }
-
-        "has an input field with the correct attributes" in {
-          val input = tradeFormGroup.selectHead("input")
-          input.id mustBe NextIncomeSourceForm.businessTradeName
-          input.attr("name") mustBe NextIncomeSourceForm.businessTradeName
-          input.attr("type") mustBe "text"
-          input.attr("aria-describedby") mustBe s"${NextIncomeSourceForm.businessTradeName}-hint"
-        }
+      "has a text input to capture a trade name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
+          NextIncomeSourceForm.businessTradeName,
+          NextIncomeSourceMessages.Trade.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(NextIncomeSourceMessages.Trade.hint)
+        )
       }
 
-      "has a section to capture a name" which {
-        def nameFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(2)")
-
-        "has a label with the correct attributes and text" in {
-          val label = nameFormGroup.selectHead("label")
-          label.text mustBe NextIncomeSourceMessages.Name.label
-          label.attr("for") mustBe NextIncomeSourceForm.businessName
-        }
-
-        "has hint text with a reference id" in {
-          val hint = nameFormGroup.selectHead(".govuk-hint")
-          hint.text mustBe NextIncomeSourceMessages.Name.hint
-          hint.id mustBe s"${NextIncomeSourceForm.businessName}-hint"
-        }
-
-        "has an input field with the correct attributes" in {
-          val input = nameFormGroup.selectHead("input")
-          input.id mustBe NextIncomeSourceForm.businessName
-          input.attr("name") mustBe NextIncomeSourceForm.businessName
-          input.attr("type") mustBe "text"
-          input.attr("aria-describedby") mustBe s"${NextIncomeSourceForm.businessName}-hint"
-        }
+      "has a text input to capture a business name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
+          NextIncomeSourceForm.businessName,
+          NextIncomeSourceMessages.Name.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(NextIncomeSourceMessages.Name.hint)
+        )
       }
 
       "has a section to capture a start date" which {

@@ -81,39 +81,58 @@ class BusinessTradeNameViewSpec extends ViewSpec with FeatureSwitching {
       document.selectHead(".govuk-caption-l")
         .text() mustBe BusinessTradeNameMessages.caption
     }
-    "have a Form" in new Setup {
-      document.getForm.attr("method") mustBe testCall.method
-      document.getForm.attr("action") mustBe testCall.url
-    }
-    "have a textInputs" in new Setup {
-      document.mustHaveTextField("businessTradeName", BusinessTradeNameMessages.title)
-    }
-    "have a hint text for textInput" in new Setup {
-      document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
-    }
-    "have update button when in edit mode" in new Setup(true) {
-      document.getButtonByClass mustBe BusinessTradeNameMessages.saveAndContinue
-    }
-    "have a save and continue button" in new Setup() {
-      document.select("button").last().text mustBe BusinessTradeNameMessages.saveAndContinue
-    }
-    "have a save and come back later link" in new Setup(false) {
-      val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
-      saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
-      saveAndComeBackLink.attr("href") mustBe
-        appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-business-trade"
-    }
-    "have a backlink " in new Setup {
-      document.getBackLinkByClass.text mustBe BusinessTradeNameMessages.backLink
-      document.getBackLinkByClass.attr("href") mustBe testBackUrl
-    }
-    "must display form error on page along with textInput and hintText" in
-      new Setup(false, BusinessTradeNameForm.tradeValidationForm(Nil).withError(emptyFormError)) {
-        document.mustHaveErrorSummaryByNewGovUkClass(List[String](BusinessTradeNameMessages.emptyError))
-        document.mustHaveTextField(BusinessTradeNameForm.businessTradeName, BusinessTradeNameMessages.title)
-        document.getHintTextByClass mustBe BusinessTradeNameMessages.hintText
+
+    "have a form" which {
+      "has the correct attributes" in new Setup() {
+        document.getForm.attr("method") mustBe testCall.method
+        document.getForm.attr("action") mustBe testCall.url
       }
 
-  }
+      "has a text input field" when {
+        "there is no error" in new Setup {
+          document.getForm.mustHaveTextInput()(
+            name = BusinessTradeNameForm.businessTradeName,
+            label = BusinessTradeNameMessages.heading,
+            isLabelHidden = false,
+            isPageHeading = true,
+            hint = Some(BusinessTradeNameMessages.hintText),
+            error = None
+          )
+        }
 
+        "there is an error" in
+          new Setup(false, BusinessTradeNameForm.tradeValidationForm(Nil).withError(emptyFormError)) {
+            document.getForm.mustHaveTextInput()(
+              name = BusinessTradeNameForm.businessTradeName,
+              label = BusinessTradeNameMessages.heading,
+              isLabelHidden = false,
+              isPageHeading = true,
+              hint = Some(BusinessTradeNameMessages.hintText),
+              error = Some(BusinessTradeNameMessages.emptyError)
+            )
+          }
+      }
+
+      "have update button when in edit mode" in new Setup(true) {
+        document.getButtonByClass mustBe BusinessTradeNameMessages.saveAndContinue
+      }
+
+      "have a save and continue button" in new Setup() {
+        document.select("button").last().text mustBe BusinessTradeNameMessages.saveAndContinue
+      }
+      "have a save and come back later link" in new Setup(false) {
+        val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
+        saveAndComeBackLink.text mustBe BusinessTradeNameMessages.saveAndComeBackLater
+        saveAndComeBackLink.attr("href") mustBe
+          appConfig.subscriptionFrontendClientProgressSavedUrl + "?location=sole-trader-business-trade"
+      }
+      "have a backlink " in new Setup {
+        document.getBackLinkByClass.text mustBe BusinessTradeNameMessages.backLink
+        document.getBackLinkByClass.attr("href") mustBe testBackUrl
+      }
+
+
+    }
+
+  }
 }
