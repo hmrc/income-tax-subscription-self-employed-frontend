@@ -74,7 +74,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
               BadRequest(view(formWithErrors, id, businessCount, isEditMode))
             },
           businessAccountingMethod =>
-            multipleSelfEmploymentsService.saveAccountingMethod(reference, businessAccountingMethod) map {
+            multipleSelfEmploymentsService.saveAccountingMethod(reference, id, businessAccountingMethod) map {
               case Right(_) => Redirect(routes.SelfEmployedCYAController.show(id, isEditMode))
               case Left(_) => throw new InternalServerException("[BusinessAccountingMethodController][submit] - Could not save business accounting method")
             }
