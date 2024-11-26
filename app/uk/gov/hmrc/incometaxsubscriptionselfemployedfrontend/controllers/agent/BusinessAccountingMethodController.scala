@@ -81,7 +81,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
               BadRequest(view(formWithErrors, id, isEditMode, clientDetails))
             },
           businessAccountingMethod =>
-            multipleSelfEmploymentsService.saveAccountingMethod(reference, businessAccountingMethod) map {
+            multipleSelfEmploymentsService.saveAccountingMethod(reference, id, businessAccountingMethod) map {
               case Right(_) =>
                 Redirect(routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode))
               case Left(_) =>

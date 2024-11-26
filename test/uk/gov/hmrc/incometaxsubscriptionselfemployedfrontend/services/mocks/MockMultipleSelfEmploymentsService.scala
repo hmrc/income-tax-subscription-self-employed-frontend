@@ -120,7 +120,7 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
 
   def mockSaveAccountingMethod(accountingMethod: AccountingMethod)
                               (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
-    when(mockMultipleSelfEmploymentsService.saveAccountingMethod(any(), ArgumentMatchers.eq(accountingMethod))(any()))
+    when(mockMultipleSelfEmploymentsService.saveAccountingMethod(any(), any(), ArgumentMatchers.eq(accountingMethod))(any()))
       .thenReturn(Future.successful(response))
   }
 

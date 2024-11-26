@@ -184,11 +184,18 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     }
   }
 
-  def saveAccountingMethod(reference: String, accountingMethod: AccountingMethod)
+  def saveAccountingMethod(reference: String, businessId: String, accountingMethod: AccountingMethod)
                           (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+
     fetchSoleTraderBusinesses(reference) map { result =>
-      result.map {
-        case Some(soleTraderBusinesses) => soleTraderBusinesses.copy(accountingMethod = Some(accountingMethod))
+      result map {
+        case Some(soleTraderBusinesses) =>
+          soleTraderBusinesses.copy(accountingMethod = Some(accountingMethod),
+            businesses = soleTraderBusinesses.businesses.map {
+              case business if business.id == businessId => business.copy(confirmed = false)
+              case business => business
+            }
+          )
         case None => SoleTraderBusinesses(Seq.empty[SoleTraderBusiness], accountingMethod = Some(accountingMethod))
       }
     } flatMap {
