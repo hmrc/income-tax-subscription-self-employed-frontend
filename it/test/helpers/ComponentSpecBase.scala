@@ -333,8 +333,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientBusinessCheckYourAnswers(id: String, isEditMode: Boolean): WSResponse = get(s"/client/details/business-check-your-answers?id=$id,isEditMode=$isEditMode")
 
-  def submitClientBusinessCheckYourAnswers(id: String): WSResponse = {
-    post(s"/client/details/business-check-your-answers?id=$id")(Map.empty)
+  def submitClientBusinessCheckYourAnswers(id: String, isGlobalEdit: Boolean): WSResponse = {
+    post(s"/client/details/business-check-your-answers?id=$id&isGlobalEdit=$isGlobalEdit")(Map.empty)
   }
 
   def getAddressLookupInitialise(businessId: String): WSResponse = get(s"/address-lookup-initialise/$businessId")
@@ -346,8 +346,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientAddressLookup(itsaId: String, id: String, isEditMode: Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
 
-  def getFirstIncomeSource(id: String, isEditMode: Boolean): WSResponse = {
-    get(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode")
+  def getFirstIncomeSource(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
+    get(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
   }
 
   def submitFirstIncomeSource(trade: Option[String],
@@ -355,23 +355,25 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
                               startDate: Option[DateModel],
                               accountingMethod: Option[AccountingMethod],
                               id: String,
-                              isEditMode: Boolean): WSResponse = {
-    post(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode")(
+                              isEditMode: Boolean,
+                              isGlobalEdit: Boolean): WSResponse = {
+    post(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
       FirstIncomeSourceForm.createFirstIncomeSourceData(trade, name, startDate, accountingMethod)
         .map { case (k, v) => (k, Seq(v)) }
     )
   }
 
-  def getNextIncomeSource(id: String, isEditMode: Boolean): WSResponse = {
-    get(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode")
+  def getNextIncomeSource(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
+    get(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
   }
 
   def submitNextIncomeSource(trade: Option[String],
-                               name: Option[String],
-                               startDate: Option[DateModel],
-                               id: String,
-                               isEditMode: Boolean): WSResponse = {
-    post(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode")(
+                             name: Option[String],
+                             startDate: Option[DateModel],
+                             id: String,
+                             isEditMode: Boolean,
+                             isGlobalEdit: Boolean): WSResponse = {
+    post(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
       NextIncomeSourceForm.createNextIncomeSourceData(trade, name, startDate)
         .map { case (k, v) => (k, Seq(v)) }
     )

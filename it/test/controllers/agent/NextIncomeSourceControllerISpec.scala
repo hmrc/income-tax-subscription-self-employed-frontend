@@ -24,7 +24,7 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.{NextIncomeSourceController, routes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.NextIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
@@ -54,6 +54,8 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
     ))
   )
 
+  lazy val nextIncomeSourceController: NextIncomeSourceController = app.injector.instanceOf[NextIncomeSourceController]
+
   s"GET ${routes.NextIncomeSourceController.show(s"$id-2")}" when {
     "the connector returns an error from the backend" should {
       "display the technical difficulties page" in {
@@ -63,7 +65,7 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.NextIncomeSourceController.show(s"$id-2")} is called")
-        val res = getNextIncomeSource(s"$id-2", isEditMode = false)
+        val res = getNextIncomeSource(s"$id-2", isEditMode = false, isGlobalEdit = false)
 
         Then("should return an INTERNAL_SERVER_ERROR")
         res must have(
@@ -81,7 +83,7 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.NextIncomeSourceController.show(s"$id-2")} is called")
-        val res = getNextIncomeSource(s"$id-2", isEditMode = false)
+        val res = getNextIncomeSource(s"$id-2", isEditMode = false, isGlobalEdit = false)
 
         Then("should return an OK with the next sole trader business page")
         res must have(
@@ -102,7 +104,7 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.NextIncomeSourceController.show(s"$id-2")} is called")
-        val res = getNextIncomeSource(s"$id-2", isEditMode = false)
+        val res = getNextIncomeSource(s"$id-2", isEditMode = false, isGlobalEdit = false)
 
         Then("should return an OK with the next sole trader business page")
         res must have(
@@ -123,7 +125,7 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.NextIncomeSourceController.show(s"$id-2")} is called")
-        val res = getNextIncomeSource(s"$id-2", isEditMode = true)
+        val res = getNextIncomeSource(s"$id-2", isEditMode = true, isGlobalEdit = false)
 
         Then("should return an OK with the next sole trader business page")
         res must have(
@@ -144,7 +146,7 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
         When(s"GET ${routes.NextIncomeSourceController.show(id)} is called")
-        val res = getNextIncomeSource(id, isEditMode = false)
+        val res = getNextIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
         Then("should return a SEE_OTHER to the first income source page")
         res must have(
@@ -171,7 +173,8 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
           name = Some("test name"),
           startDate = Some(DateModel("1", "1", "1980")),
           id = id,
-          isEditMode = false
+          isEditMode = false,
+          isGlobalEdit = false
         )
 
         Then("should return an INTERNAL_SERVER_ERROR")
@@ -195,7 +198,8 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
           name = Some("test name"),
           startDate = Some(DateModel("1", "1", "1980")),
           id = id,
-          isEditMode = false
+          isEditMode = false,
+          isGlobalEdit = false
         )
 
         Then("Should return a SEE_OTHER with a redirect location of the check address route")
@@ -218,7 +222,8 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
           name = None,
           startDate = None,
           id = id,
-          isEditMode = false
+          isEditMode = false,
+          isGlobalEdit = false
         )
 
         Then("Should return a BAD_REQUEST")
@@ -242,7 +247,8 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
           name = Some("test name"),
           startDate = Some(DateModel("1", "1", "1980")),
           id = id,
-          isEditMode = true
+          isEditMode = true,
+          isGlobalEdit = false
         )
 
         Then("Should return a SEE_OTHER with a redirect location of the check address route")
@@ -265,13 +271,82 @@ class NextIncomeSourceControllerISpec extends ComponentSpecBase {
           name = None,
           startDate = None,
           id = id,
-          isEditMode = true
+          isEditMode = true,
+          isGlobalEdit = false
         )
 
         Then("Should return a BAD_REQUEST")
         res must have(
           httpStatus(BAD_REQUEST)
         )
+      }
+    }
+    "in global edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSingleBusiness))
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+
+        When(s"POST ${routes.NextIncomeSourceController.show(id)} is called")
+        val res = submitNextIncomeSource(
+          trade = Some("test trade"),
+          name = Some("test name"),
+          startDate = Some(DateModel("1", "1", "1980")),
+          id = id,
+          isEditMode = true,
+          isGlobalEdit = true
+        )
+
+        Then("Should return a SEE_OTHER with a redirect location of the check address route")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url)
+        )
+      }
+
+      "the form data is invalid" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSingleBusiness))
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+        When(s"POST ${routes.NextIncomeSourceController.show(id)} is called")
+        val res = submitNextIncomeSource(
+          trade = None,
+          name = None,
+          startDate = None,
+          id = id,
+          isEditMode = true,
+          isGlobalEdit = true
+        )
+
+        Then("Should return a BAD_REQUEST")
+        res must have(
+          httpStatus(BAD_REQUEST)
+        )
+      }
+    }
+  }
+
+  "backUrl" must {
+    def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean): String = nextIncomeSourceController.backUrl(id, isEditMode, isGlobalEdit)
+
+    "redirect to Self Employment CYA" when {
+      "in edit mode" in {
+        backUrl(isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+      }
+      "in global edit mode" in {
+        backUrl(isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
+
+      }
+    }
+    "redirect to Your Income Sources" when {
+      "not in edit mode or global edit mode" in {
+        backUrl(isEditMode = false, isGlobalEdit = false) must include(clientYourIncomeSources)
       }
     }
   }

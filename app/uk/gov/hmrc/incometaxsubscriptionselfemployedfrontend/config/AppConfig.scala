@@ -41,6 +41,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   lazy val clientWhatIncomeSourceToSignUpUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/income-source"
   lazy val clientYourIncomeSourcesUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/your-income-source"
   lazy val clientTaskListUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/task-list"
+  lazy val globalCYAUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/final-check-your-answers"
 
 
   private lazy val ggUrl: String = servicesConfig.getString(s"government-gateway.url")

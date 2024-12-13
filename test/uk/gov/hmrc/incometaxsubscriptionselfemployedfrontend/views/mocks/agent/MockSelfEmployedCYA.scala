@@ -34,7 +34,7 @@ trait MockSelfEmployedCYA extends PlaySpec with MockitoSugar with BeforeAndAfter
   }
 
   def mockSelfEmployedCYA(): Unit = {
-    when(selfEmployedCYA(any(), any(), any(), any())(any(), any())) thenReturn HtmlFormat.empty
+    when(selfEmployedCYA(any(), any(), any(), any(), any())(any(), any())) thenReturn HtmlFormat.empty
   }
 
 }
