@@ -87,9 +87,9 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(id)
+        val res = submitClientBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
-        Then("Should return a SEE_OTHER with a redirect location of task list page")
+        Then("Should return a SEE_OTHER with a redirect location of Your Income Sources page")
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(clientYourIncomeSources)
@@ -102,12 +102,31 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(id)
+        val res = submitClientBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
         Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(clientYourIncomeSources)
+        )
+      }
+    }
+
+    "redirect to Global CYA page" when {
+      "isGlobalEdit is true and the user submits valid full data" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+
+        When("POST /client/details/business-check-your-answers is called")
+        val res = submitClientBusinessCheckYourAnswers(id, isGlobalEdit = true)
+
+        Then("Should return a SEE_OTHER with a redirect location of Global CYA page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(globalCYAUri)
         )
       }
     }
@@ -119,7 +138,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(id)
+        val res = submitClientBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -134,7 +153,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(INTERNAL_SERVER_ERROR)
 
         When("GET /client/details/business-check-your-answers is called")
-        val res = submitClientBusinessCheckYourAnswers(id)
+        val res = submitClientBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(

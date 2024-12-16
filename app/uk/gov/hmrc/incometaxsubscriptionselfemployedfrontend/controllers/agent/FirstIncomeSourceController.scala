@@ -46,7 +46,7 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
                                            (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
         clientDetailsRetrieval.getClientDetails flatMap { clientDetails =>
@@ -62,6 +62,7 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
                   )).discardingErrors,
                   id = id,
                   isEditMode = isEditMode,
+                  isGlobalEdit = isGlobalEdit,
                   clientDetails = clientDetails
                 ))
               } else {
@@ -75,13 +76,13 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
     }
   }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
         form.bindFromRequest().fold(
           formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
             BadRequest(view(
-              formWithErrors, id, isEditMode, clientDetails
+              formWithErrors, id, isEditMode, isGlobalEdit, clientDetails
             ))
           }, {
             case (trade, name, startDate, accountingMethod) =>
@@ -94,8 +95,8 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
                 accountingMethod = accountingMethod
               ) map {
                 case Right(_) =>
-                  if (isEditMode) {
-                    Redirect(routes.SelfEmployedCYAController.show(id, isEditMode))
+                  if (isEditMode || isGlobalEdit) {
+                    Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
                   } else {
                     Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
                   }
@@ -108,17 +109,18 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
     }
   }
 
-  private def backUrl(id: String, isEditMode: Boolean): String = {
-    if (isEditMode) routes.SelfEmployedCYAController.show(id, isEditMode).url
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
+    if (isEditMode || isGlobalEdit) routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit).url
     else appConfig.clientYourIncomeSourcesUrl
   }
 
-  private def view(firstIncomeSourceForm: Form[(String, String, DateModel, AccountingMethod)], id: String, isEditMode: Boolean, clientDetails: ClientDetails)
+  private def view(firstIncomeSourceForm: Form[(String, String, DateModel, AccountingMethod)], id: String,
+                   isEditMode: Boolean, isGlobalEdit: Boolean, clientDetails: ClientDetails)
                   (implicit request: Request[AnyContent]): Html =
     firstIncomeSource(
       firstIncomeSourceForm = firstIncomeSourceForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.FirstIncomeSourceController.submit(id, isEditMode),
-      backUrl = backUrl(id, isEditMode),
+      postAction = routes.FirstIncomeSourceController.submit(id, isEditMode, isGlobalEdit),
+      backUrl = backUrl(id, isEditMode, isGlobalEdit),
       isEditMode = isEditMode,
       clientDetails = clientDetails
     )

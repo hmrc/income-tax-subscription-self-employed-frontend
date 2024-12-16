@@ -43,9 +43,9 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                               (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
-  private def addressLookupContinueUrl(businessId: String, isEditMode: Boolean): String =
+  private def addressLookupContinueUrl(businessId: String, isEditMode: Boolean, isGlobalEdit: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
-      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, isEditMode = isEditMode)
+      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
 
   def checkAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     withAgentReference { reference =>
@@ -60,10 +60,10 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       addressLookupConnector.initialiseAddressLookup(
-        continueUrl = addressLookupContinueUrl(businessId, isEditMode),
+        continueUrl = addressLookupContinueUrl(businessId, isEditMode, isGlobalEdit),
         isAgent = true
       ) map {
         case Right(PostAddressLookupSuccessResponse(Some(location))) =>
@@ -76,32 +76,33 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withAgentReference { reference =>
-        for {
-          addressDetails <- fetchAddress(addressId)
-          accountingMethod <- fetchAccountMethod(reference)
-          saveResult <- multipleSelfEmploymentsService.saveAddress(reference, businessId, addressDetails)
-        } yield {
-          saveResult match {
-            case Right(_) =>
-              if (isEditMode) {
-                Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true))
-              } else {
-                if(isEnabled(EnableAgentStreamline) || accountingMethod.isDefined) {
-                  Redirect(routes.SelfEmployedCYAController.show(businessId))
+  def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] =
+    Action.async { implicit request =>
+      authService.authorised() {
+        withAgentReference { reference =>
+          for {
+            addressDetails <- fetchAddress(addressId)
+            accountingMethod <- fetchAccountMethod(reference)
+            saveResult <- multipleSelfEmploymentsService.saveAddress(reference, businessId, addressDetails)
+          } yield {
+            saveResult match {
+              case Right(_) =>
+                if (isEditMode || isGlobalEdit) {
+                  Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = true, isGlobalEdit))
                 } else {
-                  Redirect(routes.BusinessAccountingMethodController.show(businessId))
+                  if (isEnabled(EnableAgentStreamline) || accountingMethod.isDefined) {
+                    Redirect(routes.SelfEmployedCYAController.show(businessId))
+                  } else {
+                    Redirect(routes.BusinessAccountingMethodController.show(businessId))
+                  }
                 }
-              }
-            case Left(_) =>
-              throw new InternalServerException("[AddressLookupRoutingController][addressLookupRedirect] - Could not save business address")
+              case Left(_) =>
+                throw new InternalServerException("[AddressLookupRoutingController][addressLookupRedirect] - Could not save business address")
+            }
           }
         }
       }
     }
-  }
 
   private def fetchAccountMethod(reference: String)(implicit hc: HeaderCarrier): Future[Option[AccountingMethod]] = {
     multipleSelfEmploymentsService.fetchAccountingMethod(reference) map {

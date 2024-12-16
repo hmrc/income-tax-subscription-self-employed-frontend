@@ -47,8 +47,8 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "AddressLookupRoutingController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "initialiseAddressLookupJourney" -> TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false),
-    "addressLookupRedirect" -> TestAddressLookupRoutingController.addressLookupRedirect(businessId, None, isEditMode = false)
+    "initialiseAddressLookupJourney" -> TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false),
+    "addressLookupRedirect" -> TestAddressLookupRoutingController.addressLookupRedirect(businessId, None, isEditMode = false, isGlobalEdit = false)
   )
 
   object TestAddressLookupRoutingController extends AddressLookupRoutingController(
@@ -125,7 +125,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
         )
 
-        val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)
+        val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(redirectUrl)
@@ -139,7 +139,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         )
 
         val result = intercept[InternalServerException](
-          await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false)(fakeRequest))
+          await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false)(fakeRequest))
         )
         result.message mustBe "[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: 500"
       }
@@ -156,10 +156,26 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
           mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = true)(fakeRequest)
+          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = true, isGlobalEdit = false)(fakeRequest)
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
             Some(routes.SelfEmployedCYAController.show(businessId, isEditMode = true).url)
+        }
+      }
+    }
+
+    "is in global edit mode" should {
+      "redirect to sole trader check your answer page" when {
+        "the address lookup service returns valid data" in {
+          mockAuthSuccess()
+          mockFetchAccountingMethod(Right(Some(testAccountingMethodModel)))
+          mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
+          mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = true, isGlobalEdit = true)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe
+            Some(routes.SelfEmployedCYAController.show(businessId, isEditMode = true, isGlobalEdit = true).url)
         }
       }
     }
@@ -175,7 +191,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
             mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
             mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false)(fakeRequest)
+            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(businessId).url)
           }
@@ -192,7 +208,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
             mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
             mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false)(fakeRequest)
+            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe
               Some(routes.SelfEmployedCYAController.show(businessId).url)
@@ -210,7 +226,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
             mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
             mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false)(fakeRequest)
+            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe
               Some(routes.BusinessAccountingMethodController.show(businessId).url)

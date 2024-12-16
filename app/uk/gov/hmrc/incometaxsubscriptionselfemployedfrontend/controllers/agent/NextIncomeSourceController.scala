@@ -46,14 +46,14 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
                                           (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit:Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
         clientDetailsRetrieval.getClientDetails flatMap { clientDetails =>
           multipleSelfEmploymentsService.fetchStreamlineBusiness(reference, id) map {
             case Right(streamlineBusiness) =>
               if (streamlineBusiness.isFirstBusiness) {
-                Redirect(routes.FirstIncomeSourceController.show(id, isEditMode))
+                Redirect(routes.FirstIncomeSourceController.show(id, isEditMode, isGlobalEdit))
               } else {
                 Ok(view(
                   nextIncomeSourceForm = form.bind(NextIncomeSourceForm.createNextIncomeSourceData(
@@ -63,7 +63,8 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
                   )).discardingErrors,
                   id = id,
                   isEditMode = isEditMode,
-                  clientDetails = clientDetails
+                  clientDetails = clientDetails,
+                  isGlobalEdit
                 ))
               }
             case Left(_) =>
@@ -74,13 +75,13 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
     }
   }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit:Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
         form.bindFromRequest().fold(
           formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
             BadRequest(view(
-              formWithErrors, id, isEditMode, clientDetails
+              formWithErrors, id, isEditMode, clientDetails, isGlobalEdit
             ))
           }, {
             case (trade, name, startDate) =>
@@ -92,8 +93,8 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
                 startDate = startDate
               ) map {
                 case Right(_) =>
-                  if (isEditMode) {
-                    Redirect(routes.SelfEmployedCYAController.show(id, isEditMode).url)
+                  if (isEditMode || isGlobalEdit) {
+                    Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit).url)
                   } else {
                     Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode).url)
                   }
@@ -107,17 +108,19 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
     }
   }
 
-  private def backUrl(id: String, isEditMode: Boolean): String = {
-    if (isEditMode) routes.SelfEmployedCYAController.show(id, isEditMode).url
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
+
+    if (isEditMode || isGlobalEdit) routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit = isGlobalEdit).url
     else appConfig.clientYourIncomeSourcesUrl
   }
 
-  private def view(nextIncomeSourceForm: Form[(String, String, DateModel)], id: String, isEditMode: Boolean, clientDetails: ClientDetails)
+  private def view(nextIncomeSourceForm: Form[(String, String, DateModel)], id: String,
+                   isEditMode: Boolean, clientDetails: ClientDetails, isGlobalEdit: Boolean)
                   (implicit request: Request[AnyContent]): Html =
     nextIncomeSource(
       nextIncomeSourceForm = nextIncomeSourceForm,
-      postAction = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes.NextIncomeSourceController.submit(id, isEditMode),
-      backUrl = backUrl(id, isEditMode),
+      postAction = routes.NextIncomeSourceController.submit(id, isEditMode, isGlobalEdit),
+      backUrl = backUrl(id, isEditMode, isGlobalEdit),
       isEditMode = isEditMode,
       clientDetails = clientDetails
     )

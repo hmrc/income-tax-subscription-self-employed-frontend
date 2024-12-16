@@ -44,6 +44,7 @@ object IntegrationTestConstants {
   val clientTaskListURI = s"$incomeTaxSubscriptionFrontendBaseUrl/client/business/task-list"
   val clientYourIncomeSources = s"$incomeTaxSubscriptionFrontendBaseUrl/client/your-income-source"
   val ClientBusinessListCYAUri = s"$baseURI/client/details/business-list"
+  val globalCYAUri = s"$incomeTaxSubscriptionFrontendBaseUrl/client/final-check-your-answers"
   val InitialiseUri = s"$baseURI/details"
   val ClientInitialiseUri = s"$baseURI/client/details"
   val ggSignInURI = s"/bas-gateway/sign-in"
