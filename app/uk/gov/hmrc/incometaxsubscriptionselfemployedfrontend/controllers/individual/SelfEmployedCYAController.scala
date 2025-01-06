@@ -39,39 +39,37 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
           Future.successful(Ok(checkYourAnswersView(
             answers = selfEmploymentCYAModel,
             postAction = routes.SelfEmployedCYAController.submit(id),
-            backUrl = backUrl(isEditMode)
+            backUrl = backUrl(isEditMode, isGlobalEdit, selfEmploymentCYAModel.confirmed),
+            isGlobalEdit = isGlobalEdit
           )))
         }
       }
     }
   }
 
-  def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     withIndividualReference { reference =>
       withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
         if (selfEmploymentCYAModel.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
             case Right(_) =>
-              Redirect(continueUrl)
+              if (isGlobalEdit) Redirect(appConfig.individualGlobalCYAUrl)
+              else Redirect(appConfig.yourIncomeSourcesUrl)
             case Left(_) =>
               throw new InternalServerException("[SelfEmployedCYAController][submit] - Could not confirm self employment business")
           }
         } else {
-          Future.successful(Redirect(continueUrl))
+          Future.successful(Redirect(appConfig.yourIncomeSourcesUrl))
         }
       }
     }
-  }
-
-  def continueUrl: String = {
-    appConfig.yourIncomeSourcesUrl
   }
 
   private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])
@@ -96,12 +94,13 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
     "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
   )
 
-  def backUrl(isEditMode: Boolean): Option[String] = {
-    if (isEditMode) {
-      Some(continueUrl)
-    } else {
+  def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean, isConfirmed: Boolean): Option[String] = {
+    if (isGlobalEdit && isConfirmed) {
+      Some(appConfig.individualGlobalCYAUrl)
+    } else if (isEditMode || isGlobalEdit) {
+      Some(appConfig.yourIncomeSourcesUrl)
+    } else
       None
-    }
   }
 
 }

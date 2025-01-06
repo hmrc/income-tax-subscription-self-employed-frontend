@@ -40,8 +40,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   private val testId = "testId"
   private val id: String = testId
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessAccountingMethodController.show(id = id, isEditMode = false),
-    "submit" -> TestBusinessAccountingMethodController.submit(id = id, isEditMode = false)
+    "show" -> TestBusinessAccountingMethodController.show(id = id, isEditMode = false, isGlobalEdit = false),
+    "submit" -> TestBusinessAccountingMethodController.submit(id = id, isEditMode = false, isGlobalEdit = false)
   )
 
   private object TestBusinessAccountingMethodController extends BusinessAccountingMethodController(
@@ -70,7 +70,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockFetchAccountingMethod(Right(Some(testAccountingMethodModel)))
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
 
-        val result = controller.show(id = id, isEditMode = false)(fakeRequest)
+        val result = controller.show(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -79,7 +79,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockFetchAccountingMethod(Right(None))
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
 
-        val result = controller.show(id = id, isEditMode = false)(fakeRequest)
+        val result = controller.show(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
       }
@@ -89,7 +89,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchAccountingMethod(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
+        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
         response.message mustBe "[BusinessAccountingMethodController][withAccountingMethod] - Failed to retrieve accounting method"
       }
 
@@ -98,7 +98,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockFetchAccountingMethod(Right(None))
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false)(fakeRequest)))
+        val response = intercept[InternalServerException](await(controller.show(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
         response.message mustBe "[BusinessAccountingMethodController][withSelfEmploymentsCount] - Failed to retrieve all self employments"
       }
     }
@@ -114,7 +114,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
               mockAuthSuccess()
               mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-              val result = controller.submit(id = id, isEditMode = false)(
+              val result = controller.submit(id = id, isEditMode = false, isGlobalEdit = false)(
                 fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
               )
 
@@ -131,12 +131,29 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
               mockAuthSuccess()
               mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-              val result = controller.submit(id = id, isEditMode = true)(
+              val result = controller.submit(id = id, isEditMode = true, isGlobalEdit = false)(
                 fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
               )
 
               status(result) mustBe SEE_OTHER
               redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
+            }
+          }
+
+        }
+
+        "in global edit mode" when {
+          "an ID is provided" should {
+            "redirect to the self employed CYA page" in withController { controller =>
+              mockAuthSuccess()
+              mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+              val result = controller.submit(id = id, isEditMode = true, isGlobalEdit = true)(
+                fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+              )
+
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true, isGlobalEdit = true).url)
             }
           }
 
@@ -148,7 +165,7 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
 
-        val result = controller.submit(id = id, isEditMode = false)(fakeRequest)
+        val result = controller.submit(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("text/html")
@@ -158,27 +175,47 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "not in edit mode" should {
-      "return None " in withController { controller =>
+      "return None" in withController { controller =>
         mockAuthSuccess()
-        controller.backUrl(id = id, isEditMode = false, selfEmploymentCount = 0) mustBe None
+        controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = false, selfEmploymentCount = 0) mustBe None
       }
     }
 
     "in edit mode" when {
-      "the number of self employment businesses is more than 1" should {
+      "the number of self-employment businesses is more than 1" should {
         "return a url for the change accounting method page" in withController { controller =>
           mockAuthSuccess()
-          controller.backUrl(id = id, isEditMode = true, selfEmploymentCount = 2) mustBe
-            Some(routes.ChangeAccountingMethodController.show(testId).url)
+          controller.backUrl(id = testId, isEditMode = true, isGlobalEdit = false, selfEmploymentCount = 2) mustBe
+            Some(routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = false).url)
         }
       }
-      "return a url for the self employed CYA page" in withController { controller =>
-        mockAuthSuccess()
-        controller.backUrl(id = id, isEditMode = true, selfEmploymentCount = 1) mustBe
-          Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true).url)
+      "the number of self-employment businesses is 1" should {
+        "return a url for the self-employed CYA page" in withController { controller =>
+          mockAuthSuccess()
+          controller.backUrl(id = testId, isEditMode = true, isGlobalEdit = false, selfEmploymentCount = 1) mustBe
+            Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true, isGlobalEdit = false).url)
+        }
+      }
+    }
+
+    "in global edit mode" when {
+      "the number of self-employment businesses is more than 1" should {
+        "return a url for the change accounting method page" in withController { controller =>
+          mockAuthSuccess()
+          controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = true, selfEmploymentCount = 2) mustBe
+            Some(routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = true).url)
+        }
+      }
+      "the number of self-employment businesses is 1" should {
+        "return a url for the self-employed CYA page" in withController { controller =>
+          mockAuthSuccess()
+          controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = true, selfEmploymentCount = 1) mustBe
+            Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true, isGlobalEdit = true).url)
+        }
       }
     }
   }
+
 
   authorisationTests()
 

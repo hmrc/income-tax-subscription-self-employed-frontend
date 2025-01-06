@@ -54,7 +54,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     checkYourAnswers(
       answers,
       testCall,
-      Some(testBackUrl)
+      Some(testBackUrl),
+      isGlobalEdit = true
     )(FakeRequest(), implicitly)
   }
 
@@ -68,7 +69,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
       view = checkYourAnswers(
         answers = fullSelfEmploymentsCYAModel,
         postAction = testCall,
-        Some(testBackUrl)
+        Some(testBackUrl),
+        isGlobalEdit = true
       )(FakeRequest(), implicitly),
       title = CheckYourAnswersMessages.title,
       hasSignOutLink = true,
@@ -92,7 +94,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("ABC Limited"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessNameController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
                     visuallyHidden = CheckYourAnswersMessages.businessName
                   )
@@ -103,7 +105,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("1 January 2018"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessStartDateController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
                     visuallyHidden = CheckYourAnswersMessages.tradingStartDate
                   )
@@ -114,7 +116,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("Plumbing"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
                     visuallyHidden = CheckYourAnswersMessages.businessTrade
                   )
@@ -125,7 +127,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("line 1 TF3 4NT"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
                     visuallyHidden = CheckYourAnswersMessages.businessAddress
                   )
@@ -136,7 +138,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("Cash basis accounting"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
                     visuallyHidden = CheckYourAnswersMessages.accountingMethod
                   )
@@ -153,7 +155,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("ABC Limited"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessNameController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
                     visuallyHidden = CheckYourAnswersMessages.businessName
                   )
@@ -164,7 +166,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("1 January 2018"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessStartDateController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
                     visuallyHidden = CheckYourAnswersMessages.tradingStartDate
                   )
@@ -175,7 +177,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("Plumbing"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
                     visuallyHidden = CheckYourAnswersMessages.businessTrade
                   )
@@ -186,7 +188,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("line 1 TF3 4NT"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
                     visuallyHidden = CheckYourAnswersMessages.businessAddress
                   )
@@ -197,7 +199,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = Some("Cash basis accounting"),
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.ChangeAccountingMethodController.show(testId).url,
+                    href = routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
                     visuallyHidden = CheckYourAnswersMessages.accountingMethod
                   )
@@ -214,7 +216,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = None,
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessNameController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessNameController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
                     visuallyHidden = CheckYourAnswersMessages.businessName
                   )
@@ -225,7 +227,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = None,
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessStartDateController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDate}",
                     visuallyHidden = CheckYourAnswersMessages.tradingStartDate
                   )
@@ -236,7 +238,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = None,
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessTradeNameController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTrade}",
                     visuallyHidden = CheckYourAnswersMessages.businessTrade
                   )
@@ -247,7 +249,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = None,
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
+                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddress}",
                     visuallyHidden = CheckYourAnswersMessages.businessAddress
                   )
@@ -258,7 +260,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 value = None,
                 actions = Seq(
                   SummaryListActionValues(
-                    href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
+                    href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true, isGlobalEdit = true).url,
                     text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.accountingMethod}",
                     visuallyHidden = CheckYourAnswersMessages.accountingMethod
                   )

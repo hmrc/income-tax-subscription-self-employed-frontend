@@ -42,9 +42,9 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                               (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
 
-  private def addressLookupContinueUrl(businessId: String, id: Option[String], isEditMode: Boolean): String =
+  private def addressLookupContinueUrl(businessId: String, id: Option[String], isEditMode: Boolean, isGlobalEdit: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
-      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, id, isEditMode)
+      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, id, isEditMode, isGlobalEdit)
 
   def checkAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
     withIndividualReference { reference =>
@@ -59,10 +59,10 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       addressLookupConnector.initialiseAddressLookup(
-        continueUrl = addressLookupContinueUrl(businessId, None, isEditMode),
+        continueUrl = addressLookupContinueUrl(businessId, None, isEditMode, isGlobalEdit),
         isAgent = false
       ) map {
         case Right(PostAddressLookupSuccessResponse(Some(location))) =>
@@ -75,7 +75,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         for {
@@ -85,7 +85,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         } yield {
           saveResult match {
             case Right(_) =>
-              if (isEditMode) Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode))
+              if (isEditMode) Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit))
               else if (accountingMethod.isDefined) Redirect(routes.SelfEmployedCYAController.show(businessId))
               else Redirect(routes.BusinessAccountingMethodController.show(businessId))
             case Left(_) =>

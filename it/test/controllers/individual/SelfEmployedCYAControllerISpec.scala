@@ -18,7 +18,7 @@ package controllers.individual
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants.{id, soleTraderBusinesses, yourIncomeSources}
+import helpers.IntegrationTestConstants.{id, individualGlobalCYAUri, soleTraderBusinesses, yourIncomeSources}
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.libs.json.Json
@@ -81,7 +81,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase {
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("GET /details/business-check-your-answers is called")
-        val res = submitBusinessCheckYourAnswers(id)
+        val res = submitBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
         Then("Should return a SEE_OTHER with a redirect location of task list page")
         res must have(
@@ -90,13 +90,32 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase {
         )
       }
 
+      "redirect to Global CYA page" when {
+        "isGlobalEdit is true and the user submits valid full data" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+
+          When("POST /details/business-check-your-answers is called")
+          val res =submitBusinessCheckYourAnswers(id, isGlobalEdit = true)
+
+          Then("Should return a SEE_OTHER with a redirect location of Global CYA page")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(individualGlobalCYAUri)
+          )
+        }
+      }
+
       "the user submits valid incomplete data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
 
         When("GET /details/business-check-your-answers is called")
-        val res = submitBusinessCheckYourAnswers(id)
+        val res = submitBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
         Then("Should return a SEE_OTHER with a redirect location of self-employed CYA page")
         res must have(
@@ -113,7 +132,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase {
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When("GET /details/business-check-your-answers is called")
-        val res = submitBusinessCheckYourAnswers(id)
+        val res = submitBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
@@ -128,7 +147,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase {
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(INTERNAL_SERVER_ERROR)
 
         When("GET /details/business-check-your-answers is called")
-        val res = submitBusinessCheckYourAnswers(id)
+        val res = submitBusinessCheckYourAnswers(id, isGlobalEdit = false)
 
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(

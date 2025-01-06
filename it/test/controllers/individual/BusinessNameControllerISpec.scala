@@ -84,7 +84,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("Post /details/business-name is called")
-          val res = submitBusinessName(id, inEditMode = false, Some(testBusinessName))
+          val res = submitBusinessName(id, inEditMode = false, isGlobalEdit = false, Some(testBusinessName))
 
           Then("should return a SEE_OTHER")
           res must have(
@@ -100,7 +100,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutName))
 
         When("POST /details/business-name")
-        val res = submitBusinessName(id, inEditMode = false, None)
+        val res = submitBusinessName(id, inEditMode = false, isGlobalEdit = false, None)
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
@@ -120,7 +120,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase with FeatureSwitchin
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("Post /details/business-name is called")
-          val res = submitBusinessName(id, inEditMode = true, Some(testBusinessName))
+          val res = submitBusinessName(id, inEditMode = true, isGlobalEdit = false, Some(testBusinessName))
 
           Then("should return a SEE_OTHER")
           res must have(
