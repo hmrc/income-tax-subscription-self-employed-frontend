@@ -33,26 +33,26 @@ class ChangeAccountingMethodController @Inject()(changeAccountingMethod: ChangeA
                                                 (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def view(id: String)
+  def view(id: String, isGlobalEdit: Boolean)
           (implicit request: Request[AnyContent]): Html =
     changeAccountingMethod(
-      postAction = routes.ChangeAccountingMethodController.submit(id),
-      backUrl = backUrl(id)
+      postAction = routes.ChangeAccountingMethodController.submit(id, isGlobalEdit),
+      backUrl = backUrl(id, isGlobalEdit)
     )
 
-  def show(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     request.lang
     authService.authorised() {
-      Future.successful(Ok(view(id)))
+      Future.successful(Ok(view(id, isGlobalEdit)))
     }
   }
 
-  def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
-      Future.successful(Redirect(routes.BusinessAccountingMethodController.show(id, isEditMode = true)))
+      Future.successful(Redirect(routes.BusinessAccountingMethodController.show(id, isEditMode = true, isGlobalEdit)))
     }
   }
 
-  def backUrl(id: String): String = routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+  def backUrl(id: String, isGlobalEdit: Boolean): String = routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit).url
 
 }

@@ -34,8 +34,8 @@ class ChangeAccountingMethodControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "ChangeAccountingMethodController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestChangeAccountingMethodController.show(id = id),
-    "submit" -> TestChangeAccountingMethodController.submit(id = id)
+    "show" -> TestChangeAccountingMethodController.show(id = id, isGlobalEdit = true),
+    "submit" -> TestChangeAccountingMethodController.submit(id = id, isGlobalEdit = true)
   )
 
   private object TestChangeAccountingMethodController extends ChangeAccountingMethodController(
@@ -48,7 +48,7 @@ class ChangeAccountingMethodControllerSpec extends ControllerBaseSpec
     "return ok (200)" in withController { controller =>
       mockAuthSuccess()
 
-      val result = controller.show(id = id)(fakeRequest)
+      val result = controller.show(id = id, isGlobalEdit = true)(fakeRequest)
 
       status(result) mustBe OK
       contentType(result) mustBe Some("text/html")
@@ -59,17 +59,17 @@ class ChangeAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER to the business accounting method page" in withController { controller =>
       mockAuthSuccess()
 
-      val result = controller.submit(id = id)(fakeRequest)
+      val result = controller.submit(id = id, isGlobalEdit = true)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe
-        Some(routes.BusinessAccountingMethodController.show(id, isEditMode = true).url)
+        Some(routes.BusinessAccountingMethodController.show(id, isEditMode = true, isGlobalEdit = true).url)
     }
   }
 
   "The back url" should {
     "return a link to the self employment check your answer page" in {
-      TestChangeAccountingMethodController.backUrl(id) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+      TestChangeAccountingMethodController.backUrl(id, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
     }
   }
 

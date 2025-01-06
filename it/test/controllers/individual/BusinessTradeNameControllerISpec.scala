@@ -89,7 +89,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
             When("POST /details/business-trade is called")
-            val res = submitBusinessTradeName(id, inEditMode = false, Some("test trade"))
+            val res = submitBusinessTradeName(id, inEditMode = false, isGlobalEdit = false, Some("test trade"))
 
             Then("Should return a SEE_OTHER")
             res must have(
@@ -113,7 +113,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(data))
 
         When("POST /client/details/business-trade is called")
-        val res = submitBusinessTradeName("idTwo", inEditMode = false, Some("tradeOne"))
+        val res = submitBusinessTradeName("idTwo", inEditMode = false, isGlobalEdit = false, Some("tradeOne"))
 
         Then("Should return a SEE_OTHER")
         res must have(
@@ -128,7 +128,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutTrade))
 
         When("POST /details/business-trade is called")
-        val res = submitBusinessTradeName(id, inEditMode = false, Some(testInvalidBusinessTradeName))
+        val res = submitBusinessTradeName(id, inEditMode = false, isGlobalEdit = false, Some(testInvalidBusinessTradeName))
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
@@ -148,7 +148,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /details/business-trade is called")
-          val res = submitBusinessTradeName(id, inEditMode = true, Some("test trade"))
+          val res = submitBusinessTradeName(id, inEditMode = true, isGlobalEdit = false, Some("test trade"))
 
           Then(s"Should return a $SEE_OTHER with a redirect location of check your answers")
           res must have(

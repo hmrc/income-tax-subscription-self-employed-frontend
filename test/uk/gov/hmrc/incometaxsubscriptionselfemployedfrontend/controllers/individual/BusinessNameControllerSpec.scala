@@ -64,7 +64,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           (id, Some(testBusinessNameModel), None)
         )))
 
-        val result = TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)
+        val result = TestBusinessNameController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -75,7 +75,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           (id, None, None)
         )))
 
-        val result = TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)
+        val result = TestBusinessNameController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -87,7 +87,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         mockFetchAllNameTradeCombos(
           Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
         )
-        intercept[InternalServerException](await(TestBusinessNameController.show(id, isEditMode = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestBusinessNameController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
       }
 
     }
@@ -102,7 +102,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
         )))
         mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-        val result = TestBusinessNameController.submit(id, isEditMode = false)(
+        val result = TestBusinessNameController.submit(id, isEditMode = false, isGlobalEdit = false)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
         )
 
@@ -116,7 +116,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           mockFetchAllNameTradeCombos(Right(Seq(
             (id, None, None)
           )))
-          val result = TestBusinessNameController.submit(id, isEditMode = false)(fakeRequest)
+          val result = TestBusinessNameController.submit(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
           status(result) mustBe BAD_REQUEST
           contentType(result) mustBe Some(HTML)
         }
@@ -127,7 +127,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
             ("idTwo", None, Some("tradeOne"))
           )))
 
-          val result = TestBusinessNameController.submit("idTwo", isEditMode = false)(
+          val result = TestBusinessNameController.submit("idTwo", isEditMode = false, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData("nameOne"): _*)
           )
 
@@ -142,7 +142,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
             Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
           )
 
-          intercept[InternalServerException](await(TestBusinessNameController.submit(id, isEditMode = false)(fakeRequest)))
+          intercept[InternalServerException](await(TestBusinessNameController.submit(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
         }
       }
     }
@@ -155,7 +155,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           )))
           mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessNameController.submit(id, isEditMode = true)(
+          val result = TestBusinessNameController.submit(id, isEditMode = true, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
 
@@ -170,7 +170,7 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
           )))
           mockSaveBusinessName(id, mockBusinessNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessNameController.submit(id, isEditMode = true)(
+          val result = TestBusinessNameController.submit(id, isEditMode = true, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(mockBusinessNameModel): _*)
           )
 
@@ -182,19 +182,24 @@ class BusinessNameControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" when {
+    "in global edit mode" should {
+      s"redirect to Self-Employment check your answer page" in {
+        TestBusinessNameController.backUrl(id, isEditMode = true, isGlobalEdit = true)(fakeRequest) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
+      }
+    }
     "in edit mode" should {
       s"redirect to Self-Employment check your answer page" in {
-        TestBusinessNameController.backUrl(id, isEditMode = true)(fakeRequest) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+        TestBusinessNameController.backUrl(id, isEditMode = true, isGlobalEdit = false)(fakeRequest) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
     "not in edit mode" should {
       "redirect to business name confirmation page if user name exists" in {
-        TestBusinessNameController.backUrl(id, isEditMode = false)(
+        TestBusinessNameController.backUrl(id, isEditMode = false, isGlobalEdit = false)(
           fakeRequest.withSession(ITSASessionKeys.FullNameSessionKey -> "Selena Kyle")
         ) contains appConfig.incomeTaxSubscriptionFrontendBaseUrl + "/details/confirm-business-name"
       }
       "redirect to new income source page if user name doesn't exists" in {
-        TestBusinessNameController.backUrl(id, isEditMode = false)(
+        TestBusinessNameController.backUrl(id, isEditMode = false, isGlobalEdit = false)(
           fakeRequest
         ) mustBe appConfig.yourIncomeSourcesUrl
       }

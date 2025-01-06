@@ -70,7 +70,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           (id, Some(mockBusinessNameModel), Some(testValidBusinessTradeNameModel))
         )))
 
-        val result = controller.show(id, isEditMode = false)(fakeRequest)
+        val result = controller.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -82,7 +82,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           (id, Some(mockBusinessNameModel), None)
         )))
 
-        val result = controller.show(id, isEditMode = false)(fakeRequest)
+        val result = controller.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -92,7 +92,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchAllNameTradeCombos(Right(Seq()))
 
-        val result = controller.show(id, isEditMode = false)(fakeRequest)
+        val result = controller.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -104,7 +104,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchAllNameTradeCombos(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        intercept[InternalServerException](await(controller.show(id, isEditMode = false)(fakeRequest)))
+        intercept[InternalServerException](await(controller.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
       }
     }
 
@@ -120,7 +120,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           )))
           mockSaveBusinessTrade(id, testValidBusinessTradeNameModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = controller.submit(id, isEditMode = false)(
+          val result = controller.submit(id, isEditMode = false, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
           )
 
@@ -134,7 +134,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
               (id, Some(mockBusinessNameModel), None)
             )))
 
-            val result = controller.submit(id, isEditMode = false)(fakeRequest)
+            val result = controller.submit(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
             status(result) mustBe BAD_REQUEST
             contentType(result) mustBe Some(HTML)
@@ -146,7 +146,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
               ("idTwo", Some("nameOne"), None)
             )))
 
-            val result = controller.submit("idTwo", isEditMode = false)(
+            val result = controller.submit("idTwo", isEditMode = false, isGlobalEdit = false)(
               fakeRequest.withFormUrlEncodedBody(modelToFormData("tradeOne"): _*)
             )
 
@@ -167,7 +167,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
             Right(PostSubscriptionDetailsSuccessResponse)
           )
 
-          val result = controller.submit(id, isEditMode = true)(
+          val result = controller.submit(id, isEditMode = true, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
           )
 
@@ -183,7 +183,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
             Right(PostSubscriptionDetailsSuccessResponse)
           )
 
-          val result = controller.submit(id, isEditMode = true)(
+          val result = controller.submit(id, isEditMode = true, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(testValidBusinessTradeNameModel): _*)
           )
 
@@ -195,12 +195,21 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" when {
+    "in global edit mode" should {
+      s"redirect to ${
+        routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
+      }" in withController {
+        controller => {
+          controller.backUrl(id, isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
+        }
+      }
+    }
     "in edit mode" should {
       s"redirect to ${
         routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }" in withController {
         controller => {
-          controller.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+          controller.backUrl(id, isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
         }
       }
       "not in edit mode" should {
@@ -208,7 +217,7 @@ class BusinessTradeNameControllerSpec extends ControllerBaseSpec
           routes.BusinessStartDateController.show(id).url
         }" in withController {
           controller =>
-            controller.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
+            controller.backUrl(id, isEditMode = false, isGlobalEdit = false) mustBe routes.BusinessStartDateController.show(id).url
         }
       }
     }

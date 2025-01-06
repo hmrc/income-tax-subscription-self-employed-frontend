@@ -43,20 +43,20 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
                                            (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
-  def view(businessTradeNameForm: Form[String], id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): Html =
+  def view(businessTradeNameForm: Form[String], id: String, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[AnyContent]): Html =
     businessTradeName(
       businessTradeNameForm = businessTradeNameForm,
-      postAction = routes.BusinessTradeNameController.submit(id, isEditMode = isEditMode),
+      postAction = routes.BusinessTradeNameController.submit(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit),
       isEditMode,
-      backUrl = backUrl(id, isEditMode)
+      backUrl = backUrl(id, isEditMode, isGlobalEdit)
     )
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         getCurrentTradeAndExcludedTrades(reference, id) flatMap { case (currentTrade, excludedTrades) =>
           Future.successful(Ok(
-            view(businessTradeNameValidationForm(excludedTrades).fill(currentTrade), id, isEditMode)
+            view(businessTradeNameValidationForm(excludedTrades).fill(currentTrade), id, isEditMode, isGlobalEdit)
           ))
         }
       }
@@ -64,18 +64,18 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
   }
 
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async {
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async {
     implicit request =>
       authService.authorised() {
         withIndividualReference { reference =>
           getCurrentTradeAndExcludedTrades(reference, id) flatMap { case (_, excludedTrades) =>
             businessTradeNameValidationForm(excludedTrades).bindFromRequest().fold(
               formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
+                Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit))),
               trade =>
                 multipleSelfEmploymentsService.saveTrade(reference, id, trade).map {
                   case Right(_) =>
-                    Redirect(next(id, isEditMode))
+                    Redirect(next(id, isEditMode, isGlobalEdit))
                   case Left(_) =>
                     throw new InternalServerException("[BusinessTradeNameController][submit] - Could not save business trade")
                 }
@@ -85,8 +85,8 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
       }
   }
 
-  private def next(id: String, isEditMode: Boolean) = if (isEditMode) {
-    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+  private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean) = if (isEditMode || isGlobalEdit) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
   } else {
     routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode)
   }
@@ -113,8 +113,8 @@ class BusinessTradeNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
-    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = if (isEditMode || isGlobalEdit) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit).url
   } else {
     routes.BusinessStartDateController.show(id, isEditMode = isEditMode).url
   }

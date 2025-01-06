@@ -35,8 +35,8 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "SelfEmployedCYAController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestSelfEmployedCYAController.show(id, isEditMode = false),
-    "submit" -> TestSelfEmployedCYAController.submit(id)
+    "show" -> TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false),
+    "submit" -> TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)
   )
 
   object TestSelfEmployedCYAController extends SelfEmployedCYAController(
@@ -68,7 +68,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
           .message mustBe "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
       }
     }
@@ -78,7 +78,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
         mockSelfEmployedCYA()
 
-        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)
+        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -92,7 +92,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
           .message mustBe "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
       }
 
@@ -101,7 +101,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
           mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
           mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(appConfig.yourIncomeSourcesUrl)
         }
@@ -109,7 +109,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         "the user submits valid incomplete data" in {
           mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
 
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id)(fakeRequest)
+          val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(appConfig.yourIncomeSourcesUrl)
         }
@@ -118,14 +118,22 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   }
 
   "backUrl" when {
+    "in global edit mode" should {
+      "redirect to Global CYA when business is confirmed" in {
+        TestSelfEmployedCYAController.backUrl(isEditMode = true, isGlobalEdit = true, isConfirmed = true) mustBe Some(appConfig.individualGlobalCYAUrl)
+      }
+      "redirect to Your Income Sources when business is not confirmed" in {
+        TestSelfEmployedCYAController.backUrl(isEditMode = true, isGlobalEdit = true, isConfirmed = false) mustBe Some(appConfig.yourIncomeSourcesUrl)
+      }
+    }
     "in edit mode" should {
       "return the your income source page" in {
-        TestSelfEmployedCYAController.backUrl(true) mustBe Some(appConfig.yourIncomeSourcesUrl)
+        TestSelfEmployedCYAController.backUrl(isEditMode = true, isGlobalEdit = false, isConfirmed = true) mustBe Some(appConfig.yourIncomeSourcesUrl)
       }
     }
     "not in edit mode" should {
       "return no back url" in {
-        TestSelfEmployedCYAController.backUrl(false) mustBe None
+        TestSelfEmployedCYAController.backUrl(isEditMode = false, isGlobalEdit = false, isConfirmed = false) mustBe None
       }
     }
   }

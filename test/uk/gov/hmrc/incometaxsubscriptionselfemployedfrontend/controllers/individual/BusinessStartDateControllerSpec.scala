@@ -42,8 +42,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessStartDateController.show(id, isEditMode = false),
-    "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false)
+    "show" -> TestBusinessStartDateController.show(id, isEditMode = false, isGlobalEdit = false),
+    "submit" -> TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)
   )
 
   object TestBusinessStartDateController extends BusinessStartDateController(
@@ -74,7 +74,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           Right(Some(DateModel("01", "01", "2000")))
         )
 
-        val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
+        val result = TestBusinessStartDateController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -83,7 +83,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Right(None))
 
-        val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
+        val result = TestBusinessStartDateController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -93,7 +93,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "the connector returns an error fetching the business start date" in {
         mockAuthSuccess()
         mockFetchBusinessStartDate(id)(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
-        intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestBusinessStartDateController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
       }
     }
 
@@ -106,7 +106,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
+          val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
 
@@ -121,7 +121,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessStartDateController.submit(id, isEditMode = true)(
+          val result = TestBusinessStartDateController.submit(id, isEditMode = true, isGlobalEdit = false)(
             fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
           )
 
@@ -135,7 +135,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-        val result = TestBusinessStartDateController.submit(id, isEditMode = false)(
+        val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
         )
 
@@ -148,7 +148,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-        val result = TestBusinessStartDateController.submit(id, isEditMode = false)(fakeRequest)
+        val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some(HTML)
@@ -157,14 +157,19 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" when {
+    "in global edit mode" should {
+      s"redirect to Self-Employment check your answer page" in {
+        TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
+      }
+    }
     "in edit mode" should {
       s"redirect to Self-Employment check your answer page" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+        TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
     "not in edit mode" should {
       "redirect to business name page" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+        TestBusinessStartDateController.backUrl(id, isEditMode = false, isGlobalEdit = false) mustBe routes.BusinessNameController.show(id).url
       }
     }
   }

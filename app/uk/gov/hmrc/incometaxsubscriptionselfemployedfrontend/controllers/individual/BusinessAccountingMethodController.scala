@@ -44,38 +44,38 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
 
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
-  def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, businessCount: Int, isEditMode: Boolean)
+  def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, businessCount: Int, isEditMode: Boolean, isGlobalEdit: Boolean)
           (implicit request: Request[AnyContent]): Html =
     businessAccountingMethod(
       businessAccountingMethodForm = businessAccountingMethodForm,
-      postAction = routes.BusinessAccountingMethodController.submit(id, isEditMode),
+      postAction = routes.BusinessAccountingMethodController.submit(id, isEditMode, isGlobalEdit),
       isEditMode: Boolean,
-      backUrl = backUrl(id, isEditMode, businessCount)
+      backUrl = backUrl(id, isEditMode, isGlobalEdit, businessCount)
     )
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         withAccountingMethod(reference) { accountingMethod =>
           withSelfEmploymentsCount(reference) { businessCount =>
-            Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, businessCount, isEditMode))
+            Ok(view(businessAccountingMethodForm.fill(accountingMethod), id, businessCount, isEditMode, isGlobalEdit))
           }
         }
       }
     }
   }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         businessAccountingMethodForm.bindFromRequest().fold(
           formWithErrors =>
             withSelfEmploymentsCount(reference) { businessCount =>
-              BadRequest(view(formWithErrors, id, businessCount, isEditMode))
+              BadRequest(view(formWithErrors, id, businessCount, isEditMode, isGlobalEdit))
             },
           businessAccountingMethod =>
             multipleSelfEmploymentsService.saveAccountingMethod(reference, id, businessAccountingMethod) map {
-              case Right(_) => Redirect(routes.SelfEmployedCYAController.show(id, isEditMode))
+              case Right(_) => Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
               case Left(_) => throw new InternalServerException("[BusinessAccountingMethodController][submit] - Could not save business accounting method")
             }
         )
@@ -83,11 +83,11 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean, selfEmploymentCount: Int): Option[String] = {
-    if (isEditMode && selfEmploymentCount > 1) {
-      Some(routes.ChangeAccountingMethodController.show(id).url)
-    } else if (isEditMode) {
-      Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean, selfEmploymentCount: Int): Option[String] = {
+    if ((isEditMode || isGlobalEdit) && selfEmploymentCount > 1) {
+      Some(routes.ChangeAccountingMethodController.show(id, isGlobalEdit).url)
+    } else if (isEditMode || isGlobalEdit) {
+      Some(routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = isGlobalEdit).url)
     } else {
       None
     }

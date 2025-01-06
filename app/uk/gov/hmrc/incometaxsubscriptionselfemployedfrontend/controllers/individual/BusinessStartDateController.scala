@@ -48,38 +48,38 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                            (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ImplicitDateFormatter with ReferenceRetrieval with I18nSupport {
 
-  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean)
+  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, isGlobalEdit: Boolean)
           (implicit request: Request[AnyContent]): Html = {
     businessStartDate(
       businessStartDateForm = businessStartDateForm,
-      postAction = routes.BusinessStartDateController.submit(id, isEditMode),
+      postAction = routes.BusinessStartDateController.submit(id, isEditMode, isGlobalEdit),
       isEditMode,
-      backUrl = backUrl(id, isEditMode)
+      backUrl = backUrl(id, isEditMode, isGlobalEdit)
     )
   }
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         multipleSelfEmploymentsService.fetchStartDate(reference, id).map {
-          case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode))
+          case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode, isGlobalEdit))
           case Left(error) => throw new InternalServerException(error.toString)
         }
       }
     }
   }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         form.bindFromRequest().fold(
           formWithErrors => {
-            Future.successful(BadRequest(view(formWithErrors, id, isEditMode)))
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
           },
           businessStartDateData =>
             multipleSelfEmploymentsService.saveStartDate(reference, id, businessStartDateData) map {
               case Right(_) =>
-                next(id, isEditMode)
+                next(id, isEditMode, isGlobalEdit)
               case Left(_) =>
                 throw new InternalServerException("[BusinessStartDateController][submit] - Could not save business start date")
             }
@@ -90,9 +90,9 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   //save & retrieve on should have an order of: business name -> business start date (this) -> business trade
   //save & retrieve off should have an order of: business start date (this) -> business name -> business trade
-  private def next(id: String, isEditMode: Boolean) = Redirect(
-    if (isEditMode) {
-      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+  private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean) = Redirect(
+    if (isEditMode || isGlobalEdit) {
+      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
     } else {
       routes.BusinessTradeNameController.show(id)
     }
@@ -100,8 +100,8 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   //save & retrieve on should have an order of: business name -> business start date (this) -> business trade
   //save & retrieve off should have an order of: business start date (this) -> business name -> business trade
-  def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
-    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = if (isEditMode || isGlobalEdit) {
+    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit).url
   } else {
     routes.BusinessNameController.show(id, isEditMode = isEditMode).url
   }

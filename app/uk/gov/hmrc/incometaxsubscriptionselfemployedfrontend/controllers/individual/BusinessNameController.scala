@@ -43,38 +43,38 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
                                       (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
-  def view(businessNameForm: Form[String], id: String, isEditMode: Boolean)
+  def view(businessNameForm: Form[String], id: String, isEditMode: Boolean, isGlobalEdit: Boolean)
           (implicit request: Request[AnyContent]): Html =
     businessName(
       businessNameForm = businessNameForm,
-      postAction = routes.BusinessNameController.submit(id, isEditMode = isEditMode),
+      postAction = routes.BusinessNameController.submit(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit),
       isEditMode,
-      backUrl = backUrl(id, isEditMode)
+      backUrl = backUrl(id, isEditMode, isGlobalEdit)
     )
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         getCurrentNameAndExcludedNames(reference, id) flatMap { case (currentName, excludedNames) =>
           Future.successful(Ok(
-            view(businessNameValidationForm(excludedNames).fill(currentName), id, isEditMode = isEditMode)
+            view(businessNameValidationForm(excludedNames).fill(currentName), id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
           ))
         }
       }
     }
   }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
         getCurrentNameAndExcludedNames(reference, id) flatMap { case (_, excludedNames) =>
           businessNameValidationForm(excludedNames).bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode))),
+              Future.successful(BadRequest(view(formWithErrors, id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit))),
             name =>
               multipleSelfEmploymentsService.saveName(reference, id, name) map {
                 case Right(_) =>
-                  next(id, isEditMode)
+                  next(id, isEditMode, isGlobalEdit)
                 case Left(_) =>
                   throw new InternalServerException("[BusinessNameController][submit] - Could not save business name")
               }
@@ -84,9 +84,9 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  private def next(id: String, isEditMode: Boolean) = Redirect(
-    if (isEditMode) {
-      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+  private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean) = Redirect(
+    if (isEditMode || isGlobalEdit) {
+      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
     } else {
       routes.BusinessStartDateController.show(id)
     }
@@ -114,9 +114,9 @@ class BusinessNameController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean)(implicit request: Request[AnyContent]): String = {
-    if (isEditMode) {
-      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[AnyContent]): String = {
+    if (isEditMode || isGlobalEdit) {
+      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit).url
     } else if (doesUserNameExists) {
       routes.BusinessNameConfirmationController.show(id).url
     } else {

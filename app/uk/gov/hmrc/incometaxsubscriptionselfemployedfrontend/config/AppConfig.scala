@@ -35,6 +35,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   lazy val yourIncomeSourcesUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/details/your-income-source"
   lazy val taskListUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/task-list"
   lazy val subscriptionFrontendProgressSavedUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/business/progress-saved"
+  lazy val individualGlobalCYAUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/final-check-your-answers"
 
   //  Agent routes
   lazy val subscriptionFrontendClientProgressSavedUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/business/progress-saved"
