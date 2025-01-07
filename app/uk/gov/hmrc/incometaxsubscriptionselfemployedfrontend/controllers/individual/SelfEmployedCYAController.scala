@@ -45,7 +45,7 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
         withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
           Future.successful(Ok(checkYourAnswersView(
             answers = selfEmploymentCYAModel,
-            postAction = routes.SelfEmployedCYAController.submit(id),
+            postAction = routes.SelfEmployedCYAController.submit(id, isGlobalEdit),
             backUrl = backUrl(isEditMode, isGlobalEdit, selfEmploymentCYAModel.confirmed),
             isGlobalEdit = isGlobalEdit
           )))
