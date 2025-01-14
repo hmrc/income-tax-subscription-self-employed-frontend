@@ -26,7 +26,8 @@ object FeatureSwitch {
 
   val switches: Set[FeatureSwitch] = Set(
     EnableUseRealAddressLookup,
-    EnableAgentStreamline
+    EnableAgentStreamline,
+    StartDateBeforeLimit
   )
 
 
@@ -37,6 +38,11 @@ object FeatureSwitch {
     }
 
   def get(str: String): Option[FeatureSwitch] = switches find (_.name == str)
+
+  case object StartDateBeforeLimit extends FeatureSwitch {
+    override val name = s"$prefix.start-date-before-limit"
+    override val displayText: String = "Start date before limit"
+  }
 
   case object EnableUseRealAddressLookup extends FeatureSwitch {
     override val name = s"$prefix.enable-use-real-AL"
