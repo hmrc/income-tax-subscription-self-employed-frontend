@@ -23,28 +23,29 @@ import play.twirl.api.Html
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 
 class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
-    val heading: String = "When did your client’s business start trading?"
+    val title: String = "Start date for sole trader business"
     val caption = "FirstName LastName | ZZ 11 11 11 Z"
-    val hint = "For example, 17 4 2018."
+
+    def heading(trade: String): String = s"Start date for $trade"
+
+    val para: String = "We need to know the exact start date."
+    val hint: String = s"For example, 27 9 ${AccountingPeriodUtil.getCurrentTaxYearStartDate.getYear}"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
-    val update = "Update"
-    val emptyError = "Enter the date your client’s business started trading."
-    val dateTooLateError = s"The date the business started trading must be before 11 April 2021."
-    val dateTooEarlyError = "The date your client’s business started must be on or after 11 April 2021."
+    val emptyError = "Enter the date your client’s business started trading"
+    val dateTooLateError = s"The date cannot be more than 7 days in the future"
+    val dateTooEarlyError = "The date must be on or after 11 April 2021"
   }
-
-  val taxYearEnd: Int = 2020
 
   val businessStartDateView: BusinessStartDate = app.injector.instanceOf[BusinessStartDate]
 
-  def page(isEditMode: Boolean = false, error: Option[FormError] = None): Html = {
+  def page(error: Option[FormError] = None): Html = {
     val form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString)
     businessStartDateView(
       businessStartDateForm = error match {
@@ -52,14 +53,14 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         case None => form
       },
       postAction = testCall,
-      isEditMode = isEditMode,
       backUrl = testBackUrl,
-      ClientDetails("FirstName LastName", "ZZ111111Z")
+      clientDetails = ClientDetails("FirstName LastName", "ZZ111111Z"),
+      businessTrade = "test trade"
     )(fakeTestRequest, implicitly)
   }
 
-  def document(isEditMode: Boolean = false, error: Option[FormError] = None): Document =
-    Jsoup.parse(page(isEditMode, error).body)
+  def document(error: Option[FormError] = None): Document =
+    Jsoup.parse(page(error).body)
 
   private val emptyFormError = FormError(BusinessStartDateForm.startDate, "agent.error.business-start-date.day-month-year.empty")
   private val dateTooLateFormError = FormError("startDate", "agent.error.business-start-date.day-month-year.max-date", List("11 April 2021"))
@@ -69,14 +70,14 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
     "have the correct template details" when {
       "there is no error on the page" in new TemplateViewTest(
         view = page(),
-        title = BusinessStartDateMessages.heading,
+        title = BusinessStartDateMessages.title,
         isAgent = true,
         backLink = Some(testBackUrl),
         hasSignOutLink = true
       )
       "there is an error on the page" in new TemplateViewTest(
         view = page(error = Some(emptyFormError)),
-        title = BusinessStartDateMessages.heading,
+        title = BusinessStartDateMessages.title,
         isAgent = true,
         backLink = Some(testBackUrl),
         hasSignOutLink = true,
@@ -86,10 +87,14 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
     "have the correct heading and caption" in {
       document().mainContent.mustHaveHeadingAndCaption(
-        heading = BusinessStartDateMessages.heading,
+        heading = BusinessStartDateMessages.heading("test trade"),
         caption = BusinessStartDateMessages.caption,
         isSection = false
       )
+    }
+
+    "have a paragraph" in {
+      document().mainContent.selectHead("p").text mustBe BusinessStartDateMessages.para
     }
 
     "have a form" which {
@@ -104,7 +109,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         "there is no error on the page" in {
           document().getForm.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading,
+            legend = BusinessStartDateMessages.heading("test trade"),
             exampleDate = BusinessStartDateMessages.hint,
             isHeading = false,
             isLegendHidden = true,
@@ -121,7 +126,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
           doc.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading,
+            legend = BusinessStartDateMessages.heading("test trade"),
             exampleDate = BusinessStartDateMessages.hint,
             errorMessage = Some(BusinessStartDateMessages.emptyError),
             isHeading = false,
@@ -139,7 +144,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
           doc.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading,
+            legend = BusinessStartDateMessages.heading("test trade"),
             exampleDate = BusinessStartDateMessages.hint,
             errorMessage = Some(BusinessStartDateMessages.dateTooLateError),
             isHeading = false,
@@ -157,7 +162,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
           doc.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading,
+            legend = BusinessStartDateMessages.heading("test trade"),
             exampleDate = BusinessStartDateMessages.hint,
             errorMessage = Some(BusinessStartDateMessages.dateTooEarlyError),
             isHeading = false,

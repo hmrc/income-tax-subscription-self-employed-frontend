@@ -94,6 +94,17 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     }
   }
 
+  def fetchBusiness(reference: String, id: String)
+                   (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[SoleTraderBusiness]]] = {
+    fetchSoleTraderBusinesses(reference) map { result =>
+      result map {
+        case Some(SoleTraderBusinesses(businesses, _)) =>
+          businesses.find(_.id == id)
+        case None => None
+      }
+    }
+  }
+
   private def saveData(reference: String,
                        id: String,
                        businessUpdate: SoleTraderBusiness => SoleTraderBusiness,

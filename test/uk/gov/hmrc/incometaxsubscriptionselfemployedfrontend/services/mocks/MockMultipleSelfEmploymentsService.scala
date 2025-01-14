@@ -24,7 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccess
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Address, DateModel, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 
@@ -37,6 +37,13 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
   override def beforeEach(): Unit = {
     reset(mockMultipleSelfEmploymentsService)
     super.beforeEach()
+  }
+
+  def mockFetchBusiness(id: String)(response: Either[GetSelfEmploymentsFailure, Option[SoleTraderBusiness]]): Unit = {
+    when(mockMultipleSelfEmploymentsService.fetchBusiness(
+      ArgumentMatchers.any(),
+      ArgumentMatchers.eq(id)
+    )(ArgumentMatchers.any())) thenReturn Future.successful(response)
   }
 
   def mockFetchSoleTraderBusinesses(response: Either[GetSelfEmploymentsFailure, Option[SoleTraderBusinesses]]): Unit = {

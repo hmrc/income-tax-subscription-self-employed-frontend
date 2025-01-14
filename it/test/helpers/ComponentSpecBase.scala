@@ -135,8 +135,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientBusinessStartDate(id: String): WSResponse = get(s"/client/details/business-start-date?id=$id")
 
-  def submitClientBusinessStartDate(id: String, request: Option[DateModel], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-start-date?id=$id&isEditMode=$inEditMode"
+  def submitClientBusinessStartDate(id: String, request: Option[DateModel], inEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse = {
+    val uri = s"/client/details/business-start-date?id=$id&isEditMode=$inEditMode&isGlobalEdit=$isGlobalEdit"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>

@@ -21,7 +21,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.SessionDataService
 
 import scala.concurrent.{ExecutionContext, Future}

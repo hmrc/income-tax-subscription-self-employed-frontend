@@ -20,6 +20,8 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{SaveAndContinueButtonHelper, _}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+
 @this(
         mainTemplate: AgentMainTemplate,
         continueButton: ContinueButton,
@@ -29,27 +31,33 @@
         form: FormWithCSRF,
         pageHeadingHelper: PageHeadingHelper,
 )
-@(businessStartDateForm: Form[DateModel], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
+@(businessStartDateForm: Form[DateModel], postAction: Call, backUrl: String, clientDetails: ClientDetails, businessTrade: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.agent.start-date.heading"), optForm = Some(businessStartDateForm), backLink = Some(BackLink(href = backUrl))) {
+@mainTemplate(title = messages("business.agent.start-date.title"), optForm = Some(businessStartDateForm), backLink = Some(BackLink(href = backUrl))) {
 
     @form(action = postAction) {
+
         @pageHeadingHelper(
-            heading = messages("business.agent.start-date.heading"),
+            heading = messages("business.agent.start-date.heading", businessTrade),
             caption = messages("agent.business.name.caption", clientDetails.name, clientDetails.formattedNino),
             isSection = false
         )
 
+        <p class="govuk-body">
+            @messages("business.agent.start-date.para")
+        </p>
+
         @dateHelper(
             field = businessStartDateForm(startDate),
-            legendContent = messages("business.agent.start-date.heading"),
+            legendContent = messages("business.agent.start-date.heading", businessTrade),
             isLegendVisible = false,
             parentForm = businessStartDateForm,
-            hintText = Some(messages("business.agent.start-date.hint")),
+            hintText = Some(messages("business.agent.start-date.hint", AccountingPeriodUtil.getCurrentTaxYearStartDate.getYear.toString)),
             isPageHeading = false
         )
 
         @saveAndContinueButtonHelper(individual = false, saveAndReturnReference = Some("sole-trader-trading-start-date"))
+
     }
 
 }
