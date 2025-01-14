@@ -18,6 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 case class SelfEmploymentsCYAModel(id: String,
                                    confirmed: Boolean = false,
+                                   startDateBeforeLimit: Option[Boolean] = None,
                                    businessStartDate: Option[DateModel] = None,
                                    businessName: Option[String] = None,
                                    businessTradeName: Option[String] = None,
@@ -33,11 +34,19 @@ case class SelfEmploymentsCYAModel(id: String,
   private val accountingMethodComplete: Boolean = accountingMethod.isDefined
 
   val isComplete: Boolean = {
-    businessStartDateComplete &&
-      businessNameComplete &&
-      businessTradeNameComplete &&
-      businessAddressComplete &&
-      accountingMethodComplete
+    startDateBeforeLimit match {
+      case Some(true) =>
+        businessNameComplete &&
+          businessTradeNameComplete &&
+          businessAddressComplete &&
+          accountingMethodComplete
+      case _ =>
+        businessStartDateComplete &&
+          businessNameComplete &&
+          businessTradeNameComplete &&
+          businessAddressComplete &&
+          accountingMethodComplete
+    }
   }
 
 }
@@ -47,6 +56,7 @@ object SelfEmploymentsCYAModel {
     SelfEmploymentsCYAModel(
       id = id,
       confirmed = soleTraderBusiness.exists(_.confirmed),
+      startDateBeforeLimit = soleTraderBusiness.flatMap(_.startDateBeforeLimit),
       businessStartDate = soleTraderBusiness.flatMap(_.startDate),
       businessName = soleTraderBusiness.flatMap(_.name),
       businessTradeName = soleTraderBusiness.flatMap(_.trade),
