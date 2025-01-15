@@ -26,12 +26,13 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataK
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
-  val testStartDate: DateModel = DateModel("1", "1", "1980")
+  val testStartDate: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
 
   val soleTraderBusinessesWithoutStartDate: SoleTraderBusinesses = soleTraderBusinesses.copy(
     businesses = soleTraderBusinesses.businesses.map(_.copy(startDate = None))

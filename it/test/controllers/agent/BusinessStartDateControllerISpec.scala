@@ -76,7 +76,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         res must have(
           httpStatus(OK),
           pageTitle("Start date for sole trader business" + agentTitleSuffix),
-          dateField("startDate", DateModel("1", "1", "1980"))
+          dateField("startDate", date)
         )
       }
     }

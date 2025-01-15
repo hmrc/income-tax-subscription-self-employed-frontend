@@ -14,7 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.NextIncomeSourceForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ AccountingMethod, Accruals, Cash, ClientDetails, DateModel }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ DateHelper, RadioHelper, SaveAndContinueButtonHelper, PageHeadingHelper }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
@@ -28,13 +32,13 @@
     radioHelper: RadioHelper,
     continueButton: ContinueButton,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-    pageHeadingHelper: PageHeadingHelper
+    pageHeadingHelper: PageHeadingHelper,
+    featureSwitching: FeatureSwitchingImpl
 )
 
-@(nextIncomeSourceForm: Form[(String, String, DateModel)], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
+@(nextIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(nextIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
-
 
     @pageHeadingHelper(
         heading = messages("agent.full-income-source.heading"),
@@ -45,7 +49,7 @@
     @form(action = postAction) {
 
         @textInputHelper(
-            field = nextIncomeSourceForm(NextIncomeSourceForm.businessTradeName),
+            field = nextIncomeSourceForm(StreamlineIncomeSourceForm.businessTradeName),
             label = messages("agent.full-income-source.trade.label"),
             hint = Some(Html(messages("agent.full-income-source.trade.hint"))),
             isPageHeading = false,
@@ -53,21 +57,41 @@
         )
 
         @textInputHelper(
-            field = nextIncomeSourceForm(NextIncomeSourceForm.businessName),
+            field = nextIncomeSourceForm(StreamlineIncomeSourceForm.businessName),
             label = messages("agent.full-income-source.name.label"),
             hint = Some(Html(messages("agent.full-income-source.name.hint"))),
             isPageHeading = false,
             classes = Some("govuk-!-width-one-half")
         )
 
-        @dateHelper(
-            field = nextIncomeSourceForm(NextIncomeSourceForm.startDate),
-            legendContent = messages("agent.full-income-source.start-date.legend"),
-            isLegendVisible = true,
-            parentForm = nextIncomeSourceForm,
-            hintText = Some(messages("agent.full-income-source.start-date.hint")),
-            isPageHeading = false
-        )
+        @if(featureSwitching.isEnabled(StartDateBeforeLimit)) {
+            @radioHelper(
+                field = nextIncomeSourceForm(StreamlineIncomeSourceForm.startDateBeforeLimit),
+                legend = messages("agent.full-income-source.start-date-before-limit.legend", AccountingPeriodUtil.getStartDateLimit.getYear.toString),
+                isPageHeading = false,
+                customHeadingClass = Some("govuk-!-font-weight-bold"),
+                radioItems = Seq(
+                    RadioItem(
+                        content = Text(messages("base.yes")),
+                        value = Some(YesNoMapping.option_yes)
+                    ),
+                    RadioItem(
+                        content = Text(messages("base.no")),
+                        value = Some(YesNoMapping.option_no)
+                    )
+                ),
+                inline = true
+            )
+        } else {
+            @dateHelper(
+                field = nextIncomeSourceForm(StreamlineIncomeSourceForm.startDate),
+                legendContent = messages("agent.full-income-source.start-date.legend"),
+                isLegendVisible = true,
+                parentForm = nextIncomeSourceForm,
+                hintText = Some(messages("agent.full-income-source.start-date.hint")),
+                isPageHeading = false
+            )
+        }
 
         @saveAndContinueButtonHelper(
             individual = false,

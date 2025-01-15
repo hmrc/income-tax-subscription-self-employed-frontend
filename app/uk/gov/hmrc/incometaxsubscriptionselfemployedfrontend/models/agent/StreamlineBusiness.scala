@@ -22,6 +22,7 @@ case class StreamlineBusiness(
                                trade: Option[String],
                                name: Option[String],
                                startDate: Option[DateModel],
+                               startDateBeforeLimit: Option[Boolean],
                                accountingMethod: Option[AccountingMethod],
                                isFirstBusiness: Boolean
                              )

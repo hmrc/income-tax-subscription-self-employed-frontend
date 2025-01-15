@@ -20,15 +20,24 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.NextIncomeSourceForm
+import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.NextIncomeSource
 
-class NextIncomeSourceViewSpec extends ViewSpec {
+class NextIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
 
-  val form: Form[(String, String, DateModel)] = NextIncomeSourceForm.nextIncomeSourceForm(_.toString)
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(StartDateBeforeLimit)
+  }
+
+  val form: Form[(String, String, DateModel)] = StreamlineIncomeSourceForm.nextIncomeSourceForm(_.toString)
 
   val testClientDetails: ClientDetails = ClientDetails("FirstName LastName", "ZZ111111Z")
 
@@ -66,9 +75,9 @@ class NextIncomeSourceViewSpec extends ViewSpec {
         backLink = Some(testBackUrl),
         hasSignOutLink = true,
         errors = Some(Seq(
-          NextIncomeSourceForm.businessTradeName -> "Enter the trade of your client’s business",
-          NextIncomeSourceForm.businessName -> "Enter your client’s name or the name of their business",
-          s"${NextIncomeSourceForm.startDate}-${DateModelMapping.day}" -> "Enter the date your client’s business started trading"
+          StreamlineIncomeSourceForm.businessTradeName -> "Enter the trade of your client’s business",
+          StreamlineIncomeSourceForm.businessName -> "Enter your client’s name or the name of their business",
+          s"${StreamlineIncomeSourceForm.startDate}-${DateModelMapping.day}" -> "Enter the date your client’s business started trading"
         ))
       )
     }
@@ -89,108 +98,87 @@ class NextIncomeSourceViewSpec extends ViewSpec {
         form.attr("action") mustBe testCall.url
       }
 
-      "has a text input to capture a trade name" in {
-        form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
-          NextIncomeSourceForm.businessTradeName,
-          NextIncomeSourceMessages.Trade.label,
-          isLabelHidden = false,
-          isPageHeading = false,
-          hint = Some(NextIncomeSourceMessages.Trade.hint)
-        )
+      "if the start date before limit feature switch is enabled" should {
+        "have a text input to capture a trade name" in {
+          enable(StartDateBeforeLimit)
+
+          form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
+            StreamlineIncomeSourceForm.businessTradeName,
+            NextIncomeSourceMessages.Trade.label,
+            isLabelHidden = false,
+            isPageHeading = false,
+            hint = Some(NextIncomeSourceMessages.Trade.hint)
+          )
+        }
+
+        "have a text input to capture a business name" in {
+          enable(StartDateBeforeLimit)
+
+          form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
+            StreamlineIncomeSourceForm.businessName,
+            NextIncomeSourceMessages.Name.label,
+            isLabelHidden = false,
+            isPageHeading = false,
+            hint = Some(NextIncomeSourceMessages.Name.hint)
+          )
+        }
+
+        "have a section to capture if the users start date is before the limit" in {
+          enable(StartDateBeforeLimit)
+
+          form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveRadioInput("fieldset")(
+            name = StreamlineIncomeSourceForm.startDateBeforeLimit,
+            legend = NextIncomeSourceMessages.DateBeforeLimit.legend,
+            isHeading = false,
+            isLegendHidden = false,
+            hint = None,
+            errorMessage = None,
+            radioContents = Seq(
+              RadioItem(
+                content = Text("Yes"),
+                value = Some(YesNoMapping.option_yes)
+              ),
+              RadioItem(
+                content = Text("No"),
+                value = Some(YesNoMapping.option_no)
+              )
+            ),
+            isInline = true
+          )
+        }
       }
 
-      "has a text input to capture a business name" in {
-        form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
-          NextIncomeSourceForm.businessName,
-          NextIncomeSourceMessages.Name.label,
-          isLabelHidden = false,
-          isPageHeading = false,
-          hint = Some(NextIncomeSourceMessages.Name.hint)
-        )
-      }
+      "if the start date before limit feature switch is disabled" should {
+        "have a text input to capture a trade name" in {
+          form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
+            StreamlineIncomeSourceForm.businessTradeName,
+            NextIncomeSourceMessages.Trade.label,
+            isLabelHidden = false,
+            isPageHeading = false,
+            hint = Some(NextIncomeSourceMessages.Trade.hint)
+          )
+        }
 
-      "has a section to capture a start date" which {
-        def dateFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(3)")
+        "have a text input to capture a business name" in {
+          form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
+            StreamlineIncomeSourceForm.businessName,
+            NextIncomeSourceMessages.Name.label,
+            isLabelHidden = false,
+            isPageHeading = false,
+            hint = Some(NextIncomeSourceMessages.Name.hint)
+          )
+        }
 
-        "has a fieldset" which {
-          def fieldset: Element = dateFormGroup.selectHead("fieldset")
-
-          "has the correct attributes" in {
-            fieldset.attr("role") mustBe "group"
-            fieldset.attr("aria-describedby") mustBe s"${NextIncomeSourceForm.startDate}-hint"
-          }
-
-          "has a legend" in {
-            fieldset.selectHead("legend").text mustBe NextIncomeSourceMessages.Date.legend
-          }
-
-          "has a hint" in {
-            val hint = fieldset.selectHead(".govuk-hint")
-            hint.text mustBe NextIncomeSourceMessages.Date.hint
-            hint.id mustBe s"${NextIncomeSourceForm.startDate}-hint"
-          }
-
-          "has a group of inputs for the date" which {
-            def dateGroup: Element = fieldset.selectHead(".govuk-date-input")
-
-            "has the correct attributes" in {
-              dateGroup.id mustBe NextIncomeSourceForm.startDate
-            }
-
-            "has a field for the day input" which {
-              def dayField: Element = dateGroup.selectNth(".govuk-date-input__item", 1)
-
-              "has a label" in {
-                val label = dayField.selectHead("label")
-                label.text mustBe NextIncomeSourceMessages.Date.Day.label
-                label.attr("for") mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.day}"
-              }
-
-              "has an input" in {
-                val input = dayField.selectHead("input")
-                input.id mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.day}"
-                input.attr("name") mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.day}"
-                input.attr("type") mustBe "text"
-                input.attr("inputmode") mustBe "numeric"
-              }
-            }
-
-            "has a field for the month input" which {
-              def monthField: Element = dateGroup.selectNth(".govuk-date-input__item", 2)
-
-              "has a label" in {
-                val label = monthField.selectHead("label")
-                label.text mustBe NextIncomeSourceMessages.Date.Month.label
-                label.attr("for") mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.month}"
-              }
-
-              "has an input" in {
-                val input = monthField.selectHead("input")
-                input.id mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.month}"
-                input.attr("name") mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.month}"
-                input.attr("type") mustBe "text"
-                input.attr("inputmode") mustBe "numeric"
-              }
-            }
-
-            "has a field for the year input" which {
-              def yearField: Element = dateGroup.selectNth(".govuk-date-input__item", 3)
-
-              "has a label" in {
-                val label = yearField.selectHead("label")
-                label.text mustBe NextIncomeSourceMessages.Date.Year.label
-                label.attr("for") mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.year}"
-              }
-
-              "has an input" in {
-                val input = yearField.selectHead("input")
-                input.id mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.year}"
-                input.attr("name") mustBe s"${NextIncomeSourceForm.startDate}-${DateModelMapping.year}"
-                input.attr("type") mustBe "text"
-                input.attr("inputmode") mustBe "numeric"
-              }
-            }
-          }
+        "have a section to capture a start date" in {
+          form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveDateInput(
+            id = StreamlineIncomeSourceForm.startDate,
+            legend = NextIncomeSourceMessages.Date.legend,
+            exampleDate = NextIncomeSourceMessages.Date.hint,
+            isHeading = false,
+            isLegendHidden = false,
+            errorMessage = None,
+            dateInputsValues = Seq.empty
+          )
         }
       }
     }
@@ -227,6 +215,10 @@ class NextIncomeSourceViewSpec extends ViewSpec {
       object Year {
         val label = "Year"
       }
+    }
+
+    object DateBeforeLimit {
+      val legend: String = s"Did this business start before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}?"
     }
 
     object Buttons {

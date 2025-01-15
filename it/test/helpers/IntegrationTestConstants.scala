@@ -18,6 +18,9 @@ package helpers
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+
+import java.time.LocalDate
 
 
 object IntegrationTestConstants {
@@ -73,15 +76,18 @@ object IntegrationTestConstants {
     postcode = Some("ZZ1 1ZZ")
   )
 
+  val soleTraderBusiness: SoleTraderBusiness = SoleTraderBusiness(
+    id = id,
+    startDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)),
+    startDateBeforeLimit = Some(false),
+    name = Some("test name"),
+    trade = Some("test trade"),
+    address = Some(address)
+  )
+
   val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
     businesses = Seq(
-      SoleTraderBusiness(
-        id = id,
-        startDate = Some(DateModel("1", "1", "1980")),
-        name = Some("test name"),
-        trade = Some("test trade"),
-        address = Some(address)
-      )
+      soleTraderBusiness
     ),
     accountingMethod = Some(Cash)
   )
