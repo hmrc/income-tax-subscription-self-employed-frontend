@@ -18,7 +18,8 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
@@ -96,18 +97,17 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     if (isEditMode) {
       routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
     } else {
-      routes.BusinessTradeNameController.show(id)
+      routes.BusinessStartDateController.show(id)
     }
   )
 
   def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
     routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
   } else {
-    routes.BusinessNameController.show(id).url
+    routes.BusinessStartDateController.show(id).url
   }
 
   def form(implicit request: Request[_]): Form[DateModel] = {
     businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.plusDays(1).toLongDate())
   }
-
 }

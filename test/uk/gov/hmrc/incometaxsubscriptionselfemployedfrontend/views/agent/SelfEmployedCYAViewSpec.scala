@@ -20,19 +20,12 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 
-class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(EnableAgentStreamline)
-  }
+class SelfEmployedCYAViewSpec extends ViewSpec {
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
   val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
@@ -64,7 +57,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     isGlobalEdit = isGlobalEdit
   )(FakeRequest(), implicitly)
 
-  def document(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel,isGlobalEdit: Boolean = false): Document = {
+  def document(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel, isGlobalEdit: Boolean = false): Document = {
     Jsoup.parse(page(answers, isGlobalEdit).body)
   }
 
@@ -90,10 +83,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
 
     "have a summary of the users answers" when {
       "in edit mode" which {
-        "in a streamline state as the initial business" when {
+        "as the initial business" when {
           "all data is complete" in {
-            enable(EnableAgentStreamline)
-
             document().mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
               SummaryListRowValues(
                 key = CheckYourAnswersMessages.businessTradeStreamline,
@@ -153,8 +144,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             ))
           }
           "all data is missing" in {
-            enable(EnableAgentStreamline)
-
             document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
               SummaryListRowValues(
                 key = CheckYourAnswersMessages.businessTradeStreamline,
@@ -214,10 +203,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             ))
           }
         }
-        "in a streamline state as a subsequent business" when {
+        "as a subsequent business" when {
           "all data is complete" in {
-            enable(EnableAgentStreamline)
-
             document(fullSelfEmploymentsCYAModel.copy(isFirstBusiness = false)).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
               SummaryListRowValues(
                 key = CheckYourAnswersMessages.businessTradeStreamline,
@@ -266,8 +253,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             ))
           }
           "all data is missing" in {
-            enable(EnableAgentStreamline)
-
             document(emptySelfEmploymentsCYAModel.copy(isFirstBusiness = false)).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
               SummaryListRowValues(
                 key = CheckYourAnswersMessages.businessTradeStreamline,
@@ -319,10 +304,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       }
 
       "in global edit mode" which {
-        "in a streamline state as the initial business" when {
+        "as the initial business" when {
           "all data is complete" in {
-            enable(EnableAgentStreamline)
-
             document(isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
               SummaryListRowValues(
                 key = CheckYourAnswersMessages.businessTradeStreamline,
@@ -382,10 +365,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             ))
           }
         }
-        "in a streamline state as a subsequent business" when {
+        "as a subsequent business" when {
           "all data is complete" in {
-            enable(EnableAgentStreamline)
-
             document(fullSelfEmploymentsCYAModel.copy(isFirstBusiness = false), isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
               SummaryListRowValues(
                 key = CheckYourAnswersMessages.businessTradeStreamline,
@@ -436,165 +417,44 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         }
       }
 
-      "in a non streamline state" when {
-        "all data is complete" in {
-          document().mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessName,
-              value = Some("ABC Limited"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
-                  visuallyHidden = CheckYourAnswersMessages.businessName
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.tradingStartDate,
-              value = Some("1 January 2018"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDate}",
-                  visuallyHidden = CheckYourAnswersMessages.tradingStartDate
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessTrade,
-              value = Some("Plumbing"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTrade}",
-                  visuallyHidden = CheckYourAnswersMessages.businessTrade
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessAddress,
-              value = Some("line 1 TF3 4NT"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddress}",
-                  visuallyHidden = CheckYourAnswersMessages.businessAddress
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.accountingMethod,
-              value = Some("Cash basis accounting"),
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethod}",
-                  visuallyHidden = CheckYourAnswersMessages.accountingMethod
-                )
-              )
-            ),
-          ))
-        }
-        "all data is missing" in {
-          document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessName,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
-                  visuallyHidden = CheckYourAnswersMessages.businessName
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.tradingStartDate,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessStartDateController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDate}",
-                  visuallyHidden = CheckYourAnswersMessages.tradingStartDate
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessTrade,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessTradeNameController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTrade}",
-                  visuallyHidden = CheckYourAnswersMessages.businessTrade
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.businessAddress,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddress}",
-                  visuallyHidden = CheckYourAnswersMessages.businessAddress
-                )
-              )
-            ),
-            SummaryListRowValues(
-              key = CheckYourAnswersMessages.accountingMethod,
-              value = None,
-              actions = Seq(
-                SummaryListActionValues(
-                  href = routes.BusinessAccountingMethodController.show(testId, isEditMode = true).url,
-                  text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.accountingMethod}",
-                  visuallyHidden = CheckYourAnswersMessages.accountingMethod
-                )
-              )
-            ),
-          ))
-        }
-      }
-    }
+      "have a form" which {
+        def form: Element = document().mainContent.getForm
 
-    "have a form" which {
-      def form: Element = document().mainContent.getForm
-
-      "has the correct attributes" in {
-        form.attr("method") mustBe testCall.method
-        form.attr("action") mustBe testCall.url
-      }
-      "has a confirm and continue button" in {
-        form.selectNth(".govuk-button", 1).text mustBe CheckYourAnswersMessages.confirmAndContinue
-      }
-      "has a save and come back later button" in {
-        val saveAndComeBackLater = form.selectNth(".govuk-button", 2)
-        saveAndComeBackLater.text mustBe CheckYourAnswersMessages.saveAndBack
-        saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-check-your-answers"
+        "has the correct attributes" in {
+          form.attr("method") mustBe testCall.method
+          form.attr("action") mustBe testCall.url
+        }
+        "has a confirm and continue button" in {
+          form.selectNth(".govuk-button", 1).text mustBe CheckYourAnswersMessages.confirmAndContinue
+        }
+        "has a save and come back later button" in {
+          val saveAndComeBackLater = form.selectNth(".govuk-button", 2)
+          saveAndComeBackLater.text mustBe CheckYourAnswersMessages.saveAndBack
+          saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-check-your-answers"
+        }
       }
     }
   }
-}
 
-object CheckYourAnswersMessages {
-  val caption = "FirstName LastName | ZZ 11 11 11 Z"
-  val heading = "Check your answers"
-  val title = "Check your answers - sole trader business"
-  val confirmAndContinue = "Confirm and continue"
-  val continue = "Continue"
-  val saveAndBack = "Save and come back later"
-  val change = "Change"
-  val add = "Add"
-  val tradingStartDate = "Trading start date"
-  val businessName = "Business name"
-  val businessAddress = "Address"
-  val businessTrade = "Type of trade"
-  val accountingMethod = "Accounting method for sole trader income"
-  val yes = "Yes"
-  val no = "No"
-  val businessTradeStreamline = "Trade"
-  val tradingStartDateStreamline = "Start date"
-  val accountingMethodStreamline = "Accounting method"
-  val businessAddressStreamline = "Address"
+  object CheckYourAnswersMessages {
+    val caption = "FirstName LastName | ZZ 11 11 11 Z"
+    val heading = "Check your answers"
+    val title = "Check your answers - sole trader business"
+    val confirmAndContinue = "Confirm and continue"
+    val continue = "Continue"
+    val saveAndBack = "Save and come back later"
+    val change = "Change"
+    val add = "Add"
+    val tradingStartDate = "Trading start date"
+    val businessName = "Business name"
+    val businessAddress = "Address"
+    val businessTrade = "Type of trade"
+    val accountingMethod = "Accounting method for sole trader income"
+    val yes = "Yes"
+    val no = "No"
+    val businessTradeStreamline = "Trade"
+    val tradingStartDateStreamline = "Start date"
+    val accountingMethodStreamline = "Accounting method"
+    val businessAddressStreamline = "Address"
+  }
 }

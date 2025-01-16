@@ -145,14 +145,6 @@ self-employed-cya.title                                         = Check your ans
 self-employed-cya.heading                                       = Check your answers
 self-employed-cya.caption                                       = Sole trader
 
-# Agent business name confirmation
-agent.business-name-confirmation.heading-personal          = Is your client’s business name the same as their own name?
-agent.business-name-confirmation.heading-secondary         = Is your client’s business trading name the same as the first one you added?
-agent.business-name-confirmation.heading.caption           = {0} | {1}
-agent.business-name-confirmation.summary.business-name     = Business name
-agent.business-name-confirmation.form.heading              = Is this name correct?
-error.agent.business-name-confirmation.empty               = Select ‘Yes’ if your client’s business name is the same as their own name
-
 # Agent Business Name
 agent.business.name.title                                       = What is the name of your client’s business?
 agent.business.name.heading                                     = What is the name of your client’s business?
@@ -244,7 +236,7 @@ agent.self-employed-cya.title                                   = Check your ans
 agent.self-employed-cya.heading                                 = Check your answers
 agent.self-employed-cya.caption                                 = Sole trader business you entered
 
-#Enable AgentStreamline Self Employed CYA
+# Self Employed CYA
 agent.self-employed-cya.business-trade.streamline               = Trade
 agent.self-employed-cya.business-trade.change.streamline        = Change trade
 agent.self-employed-cya.trading-start-date.streamline           = Start date

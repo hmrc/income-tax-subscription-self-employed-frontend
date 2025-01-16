@@ -104,7 +104,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockFetchBusinessStartDate(id)(Right(Some(returnedModel)))
         mockBusinessStartDate(
           isEditMode = false,
-          backUrl = routes.BusinessNameController.show(id).url
+          backUrl = routes.BusinessStartDateController.show(id).url
         )
 
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
@@ -117,7 +117,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockFetchBusinessStartDate(id)(Right(None))
         mockBusinessStartDate(
           isEditMode = false,
-          backUrl = routes.BusinessNameController.show(id).url
+          backUrl = routes.BusinessStartDateController.show(id).url
         )
 
         val result = TestBusinessStartDateController.show(id, isEditMode = false)(fakeRequest)
@@ -164,7 +164,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(agent.routes.BusinessTradeNameController.show(id).url)
+            Some(agent.routes.BusinessStartDateController.show(id).url)
         }
       }
       "return 400, SEE_OTHER" when {
@@ -173,7 +173,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
           mockBusinessStartDate(
             isEditMode = false,
-            backUrl = routes.BusinessNameController.show(id).url
+            backUrl = routes.BusinessStartDateController.show(id).url
           )
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = false)(fakeRequest)
@@ -223,8 +223,8 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       }
     }
     "not in edit mode" should {
-      s"redirect to ${routes.BusinessNameController.show(id).url}" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessNameController.show(id).url
+      s"redirect to ${routes.BusinessStartDateController.show(id).url}" in {
+        TestBusinessStartDateController.backUrl(id, isEditMode = false) mustBe routes.BusinessStartDateController.show(id).url
       }
     }
   }

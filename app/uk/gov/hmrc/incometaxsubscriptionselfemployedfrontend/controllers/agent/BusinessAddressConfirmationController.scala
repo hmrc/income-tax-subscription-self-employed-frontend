@@ -46,7 +46,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
 
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 
-  def backUrl(id: String): String = controllers.agent.routes.BusinessTradeNameController.show(id).url
+  def backUrl(id: String): String = controllers.agent.routes.FirstIncomeSourceController.show(id = id).url
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {

@@ -150,36 +150,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getClientBusinessName(id: String): WSResponse = get(s"/client/details/business-name?id=$id")
-
-  def submitClientBusinessName(id: String, inEditMode: Boolean, request: Option[String]): WSResponse = {
-    val uri = s"/client/details/business-name?id=$id&isEditMode=$inEditMode"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessNameForm.businessNameValidationForm(Nil).fill(model).data.map {
-            case (k, v) =>
-              (k, Seq(v))
-          }
-      )
-    )
-  }
-
-  def getClientTradeName(id: String): WSResponse = get(s"/client/details/business-trade?id=$id")
-
-  def submitClientTradeName(id: String, request: Option[String], inEditMode: Boolean = false): WSResponse = {
-    val uri = s"/client/details/business-trade?id=$id&isEditMode=$inEditMode"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          BusinessTradeNameForm.businessTradeNameValidationForm(Nil).fill(model).data.map {
-            case (k, v) =>
-              (k, Seq(v))
-          }
-      )
-    )
-  }
-
   def submitBusinessStartDate(request: Option[DateModel], id: String, inEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse = {
     val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode&isGlobalEdit=$isGlobalEdit"
     post(uri)(
@@ -234,19 +204,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
       request.fold(Map.empty[String, Seq[String]])(
         model =>
           BusinessAddressConfirmationForm.businessAddressConfirmationForm.fill(model).data.map { case (k, v) => (k, Seq(v)) }
-      )
-    )
-  }
-
-  def getClientBusinessNameConfirmation(id: String)(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
-    get(s"/client/details/confirm-business-name?id=$id", session)
-  }
-
-  def submitClientBusinessNameConfirmation(id: String, request: Option[YesNo])(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
-    post(s"/client/details/confirm-business-name?id=$id", session)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          BusinessNameConfirmationForm.businessNameConfirmationForm.fill(model).data.map { case (k, v) => (k, Seq(v)) }
       )
     )
   }
@@ -308,23 +265,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getChangeAccountingMethod(id: String): WSResponse = get(s"/details/change-accounting-method?id=$id")
 
   def submitChangeAccountingMethod(id: String): WSResponse = post(s"/details/change-accounting-method?id=$id")(Map.empty)
-
-  def getClientBusinessAccountingMethod(id: String): WSResponse = get(s"/client/details/business-accounting-method?id=$id")
-
-  def submitClientBusinessAccountingMethod(request: Option[AccountingMethod],
-                                           inEditMode: Boolean = false,
-                                           id: String): WSResponse = {
-    val uri = s"/client/details/business-accounting-method?id=$id&isEditMode=$inEditMode"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAccountingMethodForm.businessAccountingMethodForm.fill(model).data.map {
-            case (k, v) =>
-              (k, Seq(v))
-          }
-      )
-    )
-  }
 
   def getBusinessCheckYourAnswers(id: String, isEditMode: Boolean): WSResponse = get(s"/details/business-check-your-answers?id=$id,isEditMode=$isEditMode")
 
