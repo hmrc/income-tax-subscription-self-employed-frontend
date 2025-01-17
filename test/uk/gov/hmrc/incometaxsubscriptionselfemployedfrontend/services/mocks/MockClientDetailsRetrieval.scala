@@ -29,18 +29,21 @@ trait MockClientDetailsRetrieval extends MockitoSugar with BeforeAndAfterEach {
   suite: Suite =>
 
   val mockClientDetailsRetrieval: ClientDetailsRetrieval = mock[ClientDetailsRetrieval]
-  val testNino: String = "test-nino"
+  val testName: String = "FirstName LastName"
+  val testNino: String = "AA111111A"
+
+  val clientDetails: ClientDetails = ClientDetails(testName, testNino)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockClientDetailsRetrieval)
 
-    mockGetClientDetails("FirstName LastName", testNino)
+    mockGetClientDetails()
   }
 
-  def mockGetClientDetails(name: String, nino: String): Unit = {
+  def mockGetClientDetails(): Unit = {
     when(mockClientDetailsRetrieval.getClientDetails(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(
-      Future.successful(ClientDetails(name, nino))
+      Future.successful(clientDetails)
     )
   }
 

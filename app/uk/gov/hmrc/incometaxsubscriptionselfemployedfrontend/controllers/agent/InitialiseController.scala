@@ -26,7 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGener
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
@@ -41,16 +41,16 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
   val initialise: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       val id = uuidGen.generateId
-        withAgentReference { reference =>
-          multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
-            case Right(Some(SoleTraderBusinesses(businesses, _))) if businesses.nonEmpty =>
-              Redirect(routes.NextIncomeSourceController.show(id))
-            case Right(_) =>
-              Redirect(routes.FirstIncomeSourceController.show(id))
-            case Left(_) =>
-              throw new InternalServerException("[InitialiseController][initialise] - Failure fetching sole trader businesses")
-          }
+      withAgentReference { reference =>
+        multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
+          case Right(Some(SoleTraderBusinesses(businesses, _))) if businesses.nonEmpty =>
+            Redirect(routes.NextIncomeSourceController.show(id))
+          case Right(_) =>
+            Redirect(routes.FirstIncomeSourceController.show(id))
+          case Left(_) =>
+            throw new InternalServerException("[InitialiseController][initialise] - Failure fetching sole trader businesses")
         }
       }
+    }
   }
 }

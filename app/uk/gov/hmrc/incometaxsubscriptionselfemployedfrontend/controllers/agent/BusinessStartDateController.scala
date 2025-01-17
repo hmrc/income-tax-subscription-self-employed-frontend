@@ -18,8 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc.Results.Redirect
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
@@ -27,7 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.R
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel, SoleTraderBusiness}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
@@ -35,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
@@ -49,42 +48,60 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                            (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
-  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, clientDetails: ClientDetails)
+  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, isGlobalEdit: Boolean, clientDetails: ClientDetails, businessTrade: String)
           (implicit request: Request[AnyContent]): Html = {
     businessStartDate(
       businessStartDateForm = businessStartDateForm,
-      postAction = routes.BusinessStartDateController.submit(id, isEditMode),
-      isEditMode,
-      backUrl = backUrl(id, isEditMode),
-      clientDetails = clientDetails
+      postAction = routes.BusinessStartDateController.submit(id, isEditMode, isGlobalEdit),
+      backUrl = backUrl(id, isEditMode, isGlobalEdit),
+      clientDetails = clientDetails,
+      businessTrade = businessTrade
     )
   }
 
-  def show(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
-        multipleSelfEmploymentsService.fetchStartDate(reference, id) flatMap {
-          case Right(businessStartDateData) =>
+        multipleSelfEmploymentsService.fetchBusiness(reference, id) flatMap {
+          case Right(Some(SoleTraderBusiness(_, _, _, maybeStartDate, _, Some(trade), _))) =>
             clientDetailsRetrieval.getClientDetails map { clientDetails =>
-              Ok(view(form.fill(businessStartDateData), id, isEditMode, clientDetails))
+              Ok(view(
+                businessStartDateForm = form.fill(maybeStartDate),
+                id = id,
+                isEditMode = isEditMode,
+                isGlobalEdit = isGlobalEdit,
+                clientDetails = clientDetails,
+                businessTrade = trade
+              ))
             }
-          case Left(error) => throw new InternalServerException(error.toString)
+          case Right(_) =>
+            Future.successful(Redirect(routes.FirstIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
+          case Left(error) =>
+            throw new InternalServerException(s"[BusinessStartDateController][show] - ${error.toString}")
         }
       }
     }
   }
 
-  def submit(id: String, isEditMode: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
         form.bindFromRequest().fold(
-          formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
-            BadRequest(view(formWithErrors, id, isEditMode, clientDetails))
-          },
+          formWithErrors =>
+            multipleSelfEmploymentsService.fetchBusiness(reference, id) flatMap {
+              case Right(Some(SoleTraderBusiness(_, _, _, _, _, Some(trade), _))) =>
+                clientDetailsRetrieval.getClientDetails map { clientDetails =>
+                  BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit, clientDetails, trade))
+                }
+              case Right(_) =>
+                Future.successful(Redirect(routes.FirstIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
+              case Left(error) =>
+                throw new InternalServerException(error.toString)
+            },
           businessStartDateData =>
             multipleSelfEmploymentsService.saveStartDate(reference, id, businessStartDateData) map {
               case Right(_) =>
-                next(id, isEditMode)
+                next(id, isEditMode, isGlobalEdit)
               case Left(_) =>
                 throw new InternalServerException("[BusinessStartDateController][submit] - Could not save business start date")
             }
@@ -93,21 +110,23 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  private def next(id: String, isEditMode: Boolean) = Redirect(
-    if (isEditMode) {
-      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode)
+  private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Result = Redirect(
+    if (isEditMode || isGlobalEdit) {
+      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit)
     } else {
-      routes.BusinessStartDateController.show(id)
+      routes.AddressLookupRoutingController.checkAddressLookupJourney(id)
     }
   )
 
-  def backUrl(id: String, isEditMode: Boolean): String = if (isEditMode) {
-    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode).url
-  } else {
-    routes.BusinessStartDateController.show(id).url
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
+    routes.FirstIncomeSourceController.show(id, isEditMode, isGlobalEdit).url
   }
 
   def form(implicit request: Request[_]): Form[DateModel] = {
-    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.plusDays(1).toLongDate())
+    businessStartDateForm(
+      minStartDate = BusinessStartDateForm.minStartDate,
+      maxStartDate = BusinessStartDateForm.maxStartDate,
+      d => d.plusDays(1).toLongDate()
+    )
   }
 }

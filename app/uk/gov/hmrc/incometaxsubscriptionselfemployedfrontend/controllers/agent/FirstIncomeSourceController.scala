@@ -66,7 +66,7 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
                   clientDetails = clientDetails
                 ))
               } else {
-                Redirect(routes.NextIncomeSourceController.show(id, isEditMode))
+                Redirect(routes.NextIncomeSourceController.show(id, isEditMode, isGlobalEdit))
               }
             case Left(_) =>
               throw new InternalServerException(s"[FirstIncomeSourceController][show] - Unexpected error fetching streamline business details")

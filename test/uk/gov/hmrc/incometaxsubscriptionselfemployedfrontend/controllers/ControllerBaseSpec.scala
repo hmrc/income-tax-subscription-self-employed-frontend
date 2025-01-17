@@ -38,9 +38,6 @@ trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
     .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
     .withMethod(POST)
-    .withSession(
-    ITSASessionKeys.UTR -> "1234567890"
-  )
 
   final def authorisationTests(): Unit = {
     authorisedRoutes.foreach {

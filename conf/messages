@@ -156,25 +156,27 @@ error.agent.business-name.invalid-character                     = Business name 
 agent.business.name.caption                                     = {0} | {1}
 
 # Agent Business start date
-business.agent.start-date.heading                               = When did your client’s business start trading?
-business.agent.start-date.hint                                  = For example, 17 4 2018.
-agent.error.business-start-date.day-month-year.empty            = Enter the date your client’s business started trading.
-agent.error.business-start-date.day.empty                       = The date must include a day.
-agent.error.business-start-date.month.empty                     = The date must include a month.
-agent.error.business-start-date.year.empty                      = The date must include a year.
-agent.error.business-start-date.day-month.empty                 = The date must include a day and a month.
-agent.error.business-start-date.day-year.empty                  = The date must include a day and a year.
-agent.error.business-start-date.month-year.empty                = The date must include a month and a year.
-agent.error.business-start-date.day-month-year.max-date         = The date the business started trading must be before <span class="govuk-nowrap">{0}</span>.
-agent.error.business-start-date.day-month-year.min-date         = The date your client’s business started must be on or after <span class="govuk-nowrap">{0}</span>.
-agent.error.business-start-date.day-month-year.invalid          = The date must be a real date.
-agent.error.business-start-date.day.invalid                     = The date must be a real date.
-agent.error.business-start-date.month.invalid                   = The date must be a real date.
-agent.error.business-start-date.year.invalid                    = The date must be a real date.
-agent.error.business-start-date.day-month.invalid               = The date must be a real date.
-agent.error.business-start-date.day-year.invalid                = The date must be a real date.
-agent.error.business-start-date.month-year.invalid              = The date must be a real date.
-agent.error.business-start-date.year.length                     = The year must be in four digits. For example, 2020.
+business.agent.start-date.title                                 = Start date for sole trader business
+business.agent.start-date.heading                               = Start date for {0}
+business.agent.start-date.para                                  = We need to know the exact start date.
+business.agent.start-date.hint                                  = For example, 27 9 {0}
+agent.error.business-start-date.day-month-year.empty            = Enter the date your client’s business started trading
+agent.error.business-start-date.day.empty                       = The date must include a day
+agent.error.business-start-date.month.empty                     = The date must include a month
+agent.error.business-start-date.year.empty                      = The date must include a year
+agent.error.business-start-date.day-month.empty                 = The date must include a day and a month
+agent.error.business-start-date.day-year.empty                  = The date must include a day and a year
+agent.error.business-start-date.month-year.empty                = The date must include a month and a year
+agent.error.business-start-date.day-month-year.max-date         = The date cannot be more than 7 days in the future
+agent.error.business-start-date.day-month-year.min-date         = The date must be on or after <span class="govuk-nowrap">{0}</span>
+agent.error.business-start-date.day-month-year.invalid          = The date must be a real date
+agent.error.business-start-date.day.invalid                     = The date must be a real date
+agent.error.business-start-date.month.invalid                   = The date must be a real date
+agent.error.business-start-date.year.invalid                    = The date must be a real date
+agent.error.business-start-date.day-month.invalid               = The date must be a real date
+agent.error.business-start-date.day-year.invalid                = The date must be a real date
+agent.error.business-start-date.month-year.invalid              = The date must be a real date
+agent.error.business-start-date.year.length                     = Year must include 4 numbers
 
 #Agent Trade Name
 business.agent.trade-name.title                                 = What is the trade of your client’s business?

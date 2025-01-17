@@ -20,14 +20,15 @@ import play.api.data.Form
 import play.api.data.Forms.single
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 import java.time.LocalDate
 
 object BusinessStartDateForm {
 
-  def maxStartDate: LocalDate = LocalDate.now().plusDays(6 )
+  def maxStartDate: LocalDate = LocalDate.now().plusDays(6)
 
-  def minStartDate: LocalDate = LocalDate.of(1900, 1, 1)
+  def minStartDate: LocalDate = AccountingPeriodUtil.getStartDateLimit
 
   val startDate: String = "startDate"
 

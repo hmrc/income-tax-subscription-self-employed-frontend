@@ -17,7 +17,6 @@
 package controllers.agent
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
-import connectors.stubs.SessionDataConnectorStub
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.{id, soleTraderBusinesses}
@@ -27,17 +26,21 @@ import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusinesses}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ITSASessionKeys}
 
 
 class BusinessStartDateControllerISpec extends ComponentSpecBase {
+
+  val testNino: String = "test-nino"
+  val date: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
 
   val soleTraderBusinessesWithoutStartDate: SoleTraderBusinesses = soleTraderBusinesses.copy(
     businesses = soleTraderBusinesses.businesses.map(_.copy(startDate = None))
   )
 
-  val testNino: String = "test-nino"
-  val date: DateModel = DateModel("1", "1", "1980")
+  val soleTraderBusinessesWithStartDate: SoleTraderBusinesses = soleTraderBusinessesWithoutStartDate.copy(
+    businesses = soleTraderBusinesses.businesses.map(_.copy(startDate = Some(date)))
+  )
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-start-date" when {
     "the Connector receives no content" should {
@@ -53,7 +56,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the business start date page")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your client’s business start trading?" + agentTitleSuffix),
+          pageTitle("Start date for sole trader business" + agentTitleSuffix),
           dateField("startDate", DateModel("", "", ""))
         )
       }
@@ -72,7 +75,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the business start date page")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your client’s business start trading?" + agentTitleSuffix),
+          pageTitle("Start date for sole trader business" + agentTitleSuffix),
           dateField("startDate", DateModel("1", "1", "1980"))
         )
       }
@@ -86,7 +89,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/details/business-start-date is called")
@@ -95,11 +98,11 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER with a redirect location of business name")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(routes.BusinessStartDateController.show(id).url)
+          redirectURI(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
         )
       }
 
-      "the form data is invalid and connector stores it unsuccessfully" in {
+      "the form data is invalid" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
@@ -120,7 +123,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/business/start-date is called")
@@ -130,6 +133,24 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+        )
+      }
+    }
+    "in global edit mode" when {
+      "the form data is valid and connector stores it successfully" in {
+        Given("I setup the Wiremock stubs")
+        stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
+        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+
+        When("POST /client/business/start-date is called")
+        val res = submitClientBusinessStartDate(id, Some(date), isGlobalEdit = true)
+
+        Then("Should return a SEE_OTHER with a redirect location of business name")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(routes.SelfEmployedCYAController.show(id, isGlobalEdit = true).url)
         )
       }
     }

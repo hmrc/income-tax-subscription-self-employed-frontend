@@ -24,6 +24,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 import java.time.LocalDate
 
@@ -36,15 +37,19 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
   "The Business Start Date Form" should {
     "transform a valid request to the date form case class" in {
 
-      val testDateDay = "31"
-      val testDateMonth = "5"
-      val testDateYear = "2017"
+      val validDate: LocalDate = LocalDate.now
 
       val testInput = Map(
-        s"$startDate-$day" -> testDateDay, s"$startDate-$month" -> testDateMonth, s"$startDate-$year" -> testDateYear
+        s"$startDate-$day" -> validDate.getDayOfMonth.toString,
+        s"$startDate-$month" -> validDate.getMonthValue.toString,
+        s"$startDate-$year" -> validDate.getYear.toString
       )
 
-      val expected = DateModel(testDateDay, testDateMonth, testDateYear)
+      val expected = DateModel(
+        validDate.getDayOfMonth.toString,
+        validDate.getMonthValue.toString,
+        validDate.getYear.toString
+      )
 
       val actual = form.bind(testInput).value
 
@@ -139,14 +144,17 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
       }
 
 
-      "the date is the first of january 1900" in {
-        val earliestAllowedDate: LocalDate = LocalDate.of(1900, 1, 1)
+      "the date is the earliest allowed date" in {
+        val earliestAllowedDate: LocalDate = AccountingPeriodUtil.getStartDateLimit
+
         val testData = DataMap.date(startDate)(
           day = earliestAllowedDate.getDayOfMonth.toString,
           month = earliestAllowedDate.getMonthValue.toString,
           year = earliestAllowedDate.getYear.toString
         )
+
         val validated = form.bind(testData)
+
         validated.errors mustBe List()
         validated.value mustBe Some(DateModel.dateConvert(earliestAllowedDate))
       }
