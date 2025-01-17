@@ -19,8 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
@@ -38,12 +36,11 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
                                     (val appConfig: AppConfig,
                                      val sessionDataService: SessionDataService)
                                     (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
+  extends FrontendController(mcc) with ReferenceRetrieval {
 
   val initialise: Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       val id = uuidGen.generateId
-      if (isEnabled(EnableAgentStreamline)) {
         withAgentReference { reference =>
           multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
             case Right(Some(SoleTraderBusinesses(businesses, _))) if businesses.nonEmpty =>
@@ -54,10 +51,6 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
               throw new InternalServerException("[InitialiseController][initialise] - Failure fetching sole trader businesses")
           }
         }
-      } else {
-        Future.successful(Redirect(routes.BusinessNameConfirmationController.show(id)))
       }
-    }
   }
-
 }

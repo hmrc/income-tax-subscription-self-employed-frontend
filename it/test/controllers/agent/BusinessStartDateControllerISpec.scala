@@ -95,7 +95,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER with a redirect location of business name")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(routes.BusinessTradeNameController.show(id).url)
+          redirectURI(routes.BusinessStartDateController.show(id).url)
         )
       }
 

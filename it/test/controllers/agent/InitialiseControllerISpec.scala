@@ -24,40 +24,16 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
 
-class InitialiseControllerISpec extends ComponentSpecBase with FeatureSwitching {
+class InitialiseControllerISpec extends ComponentSpecBase {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(EnableAgentStreamline)
-  }
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details" when {
-    "the agent streamline feature switch is disabled" should {
-      "redirect to self-employment business name confirmation page" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        When("GET /details is called")
-        val res = getClientInitialise
-
-        Then("should redirect to the business name page")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI("/client/details/confirm-business-name")
-        )
-      }
-    }
-  }
-  "the agent streamline feature switch is enabled" should {
     "redirect to the first sole trader income source page" when {
       "there are no sole trader businesses currently" in {
-        enable(EnableAgentStreamline)
 
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
@@ -75,8 +51,7 @@ class InitialiseControllerISpec extends ComponentSpecBase with FeatureSwitching 
     }
     "redirect to the next sole trader income source page" when {
       "sole trader businesses exist" in {
-        enable(EnableAgentStreamline)
-        
+
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
 

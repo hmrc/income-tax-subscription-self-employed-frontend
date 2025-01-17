@@ -20,8 +20,6 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableAgentStreamline
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.PageHeadingHelper
 
@@ -31,7 +29,6 @@
         govukSummaryList: GovukSummaryList,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         implicitDateFormatter: ImplicitDateFormatterImpl,
-        featureSwitching: FeatureSwitchingImpl,
         pageHeadingHelper: PageHeadingHelper
 )
 
@@ -49,8 +46,7 @@
     )
 
     @govukSummaryList(SummaryList(
-        rows = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            Seq(
+        rows =  Seq(
                 Some(businessTrade(answers.businessTradeName, answers.id, answers.isFirstBusiness)),
                 Some(businessName(answers.businessName, answers.id, answers.isFirstBusiness)),
                 Some(tradingStartDate(answers.businessStartDate, answers.id, answers.isFirstBusiness)),
@@ -61,15 +57,6 @@
                 },
                 Some(businessAddress(answers.businessAddress, answers.id, answers.isFirstBusiness))
             ).flatten
-        } else {
-            Seq(
-                businessName(answers.businessName, answers.id, answers.isFirstBusiness),
-                tradingStartDate(answers.businessStartDate, answers.id, answers.isFirstBusiness),
-                businessTrade(answers.businessTradeName, answers.id, answers.isFirstBusiness),
-                businessAddress(answers.businessAddress, answers.id, answers.isFirstBusiness),
-                accountingMethod(answers.accountingMethod, answers.id, answers.isFirstBusiness)
-            )
-        }
     ))
 
     @form(action = postAction) {
@@ -101,15 +88,11 @@
     simpleSummaryListRow(
         key = messages("agent.self-employed-cya.business-name"),
         value = businessName,
-        changeHref = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            if(isFirstIncomeSourceCompleted) {
+        changeHref = if(isFirstIncomeSourceCompleted) {
                 routes.FirstIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
             } else {
                 routes.NextIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            }
-        } else {
-            routes.BusinessNameController.show(businessId, isEditMode = true).url
-        },
+            },
         id = businessId
     )
 }
@@ -118,53 +101,33 @@
     import implicitDateFormatter._
 
     simpleSummaryListRow(
-        key = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            messages("agent.self-employed-cya.trading-start-date.streamline")
-        } else {
-            messages("agent.self-employed-cya.trading-start-date")
-        },
+        key = messages("agent.self-employed-cya.trading-start-date.streamline"),
         value = businessStartDate.map(_.toLocalDate.toLongDate()),
-        changeHref = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            if(isFirstIncomeSourceCompleted) {
+        changeHref = if(isFirstIncomeSourceCompleted) {
                 routes.FirstIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
             } else {
                 routes.NextIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            }
-        } else {
-            routes.BusinessStartDateController.show(businessId, isEditMode = true).url
-        },
+            },
         id = businessId
     )
 }
 
 @businessTrade(businessTrade: Option[String], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
     simpleSummaryListRow(
-        key = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            messages("agent.self-employed-cya.business-trade.streamline")
-        } else {
-            messages("agent.self-employed-cya.business-trade")
-        },
+        key = messages("agent.self-employed-cya.business-trade.streamline"),
         value = businessTrade,
-        changeHref = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            if(isFirstIncomeSourceCompleted) {
+        changeHref = if(isFirstIncomeSourceCompleted) {
                 routes.FirstIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
             } else {
                 routes.NextIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            }
-        } else {
-            routes.BusinessTradeNameController.show(businessId, isEditMode = true).url
-        },
+            },
         id = businessId
     )
 }
 
 @businessAddress(businessAddress: Option[Address], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
     simpleSummaryListRow(
-        key = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            messages("agent.self-employed-cya.business-address.streamline")
-        } else {
-            messages("agent.self-employed-cya.business-address")
-        },
+        key = messages("agent.self-employed-cya.business-address.streamline"),
         value = businessAddress.map(_.toString),
         changeHref = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId,
@@ -174,20 +137,12 @@
 
 @accountingMethod(accountingMethod: Option[AccountingMethod], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
     simpleSummaryListRow(
-        key = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            messages("agent.self-employed-cya.accounting-method.streamline")
-        } else {
-            messages("agent.self-employed-cya.accounting-method")
-        },
+        key = messages("agent.self-employed-cya.accounting-method.streamline"),
         value = accountingMethod map {
             case Cash => messages("agent.self-employed-cya.accounting-method.cash")
             case Accruals => messages("agent.self-employed-cya.accounting-method.accruals")
         },
-        changeHref = if(featureSwitching.isEnabled(EnableAgentStreamline)) {
-            routes.FirstIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-        } else {
-            routes.BusinessAccountingMethodController.show(businessId, isEditMode = true).url
-        },
+        changeHref = routes.FirstIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId
-    )
-}
+        )
+    }
