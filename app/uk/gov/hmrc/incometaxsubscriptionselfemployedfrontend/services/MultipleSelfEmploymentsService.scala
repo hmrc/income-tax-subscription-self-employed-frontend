@@ -30,8 +30,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
-                                              (applicationCrypto: ApplicationCrypto)
+class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCrypto,
+                                               incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
                                               (implicit ec: ExecutionContext) {
 
   implicit val jsonCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
@@ -44,8 +44,8 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     )(implicitly, SoleTraderBusinesses.encryptedFormat)
   }
 
-  private[services] def saveSoleTraderBusinesses(reference: String, soleTraderBusinesses: SoleTraderBusinesses)
-                                                (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+  def saveSoleTraderBusinesses(reference: String, soleTraderBusinesses: SoleTraderBusinesses)
+                              (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     incomeTaxSubscriptionConnector.saveSubscriptionDetails[SoleTraderBusinesses](
       reference = reference,
       id = SelfEmploymentDataKeys.soleTraderBusinessesKey,
@@ -86,10 +86,11 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
             trade = maybeFirstBusiness.flatMap(_.trade),
             name = maybeFirstBusiness.flatMap(_.name),
             startDate = maybeFirstBusiness.flatMap(_.startDate),
+            startDateBeforeLimit = maybeFirstBusiness.flatMap(_.startDateBeforeLimit),
             accountingMethod = maybeAccountingMethod,
             isFirstBusiness = businesses.headOption.exists(_.id == id)
           )
-        case None => StreamlineBusiness(None, None, None, None, isFirstBusiness = true)
+        case None => StreamlineBusiness(None, None, None, None, None, isFirstBusiness = true)
       }
     }
   }
@@ -169,22 +170,22 @@ class MultipleSelfEmploymentsService @Inject()(incomeTaxSubscriptionConnector: I
     saveData(reference, businessId, _.copy(confirmed = true))
   }
 
-  def saveFirstIncomeSource(reference: String, businessId: String, trade: String, name: String, startDate: DateModel, accountingMethod: AccountingMethod)
-                           (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+  def saveStreamlinedIncomeSource(reference: String,
+                       businessId: String,
+                       trade: String,
+                       name: String,
+                       startDate: Option[DateModel],
+                       startDateBeforeLimit: Option[Boolean],
+                       accountingMethod: Option[AccountingMethod])
+                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     saveData(
       reference,
       businessId,
-      _.copy(name = Some(name), trade = Some(trade), startDate = Some(startDate), confirmed = false),
-      accountingMethod = Some(accountingMethod)
-    )
-  }
-
-  def saveNextIncomeSource(reference: String, businessId: String, trade: String, name: String, startDate: DateModel)
-                          (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(
-      reference,
-      businessId,
-      _.copy(name = Some(name), trade = Some(trade), startDate = Some(startDate), confirmed = false)
+      startDate match {
+        case Some(_) => _.copy(name = Some(name), trade = Some(trade), startDate = startDate, confirmed = false)
+        case None => _.copy(name = Some(name), trade = Some(trade), startDateBeforeLimit = startDateBeforeLimit, confirmed = false)
+      },
+      accountingMethod = accountingMethod
     )
   }
 

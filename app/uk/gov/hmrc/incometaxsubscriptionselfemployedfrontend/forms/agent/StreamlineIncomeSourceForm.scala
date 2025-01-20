@@ -21,35 +21,39 @@ import play.api.data.validation.{Constraint, Invalid}
 import play.api.data.{Form, Mapping}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping.dateModelMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.AccountingMethodMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping.yesNoMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.{AccountingMethodMapping, YesNoMapping}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.trimmedText
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Accruals.ACCRUALS
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Cash.CASH
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, Accruals, Cash, DateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil.getStartDateLimit
 
 import java.time.LocalDate
 
-object FirstIncomeSourceForm {
-
+object StreamlineIncomeSourceForm {
   val pageIdentifier: String = "full-income-source"
+
+  val businessNameAndTradeAllowedCharacters = """^[A-Za-z0-9 ,.&'\\/-]*$"""
 
   val businessTradeName: String = "business-trade"
   val businessTradeNameMaxLength = 35
   val businessTradeNameMinLength = 2
   val tradeNameEmpty: Constraint[String] = nonEmpty(s"agent.error.$pageIdentifier.$businessTradeName.empty")
-  val nameTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, s"agent.error.$pageIdentifier.$businessTradeName.max-length")
-  val nameTooShort: Constraint[String] = minLettersLength(businessTradeNameMinLength, s"agent.error.$pageIdentifier.$businessTradeName.min-length")
-  val nameCharsValid: Constraint[String] = businessNameValidateChar(s"agent.error.$pageIdentifier.$businessTradeName.invalid")
+  val tradeTooLong: Constraint[String] = maxLength(businessTradeNameMaxLength, s"agent.error.$pageIdentifier.$businessTradeName.max-length")
+  val tradeTooShort: Constraint[String] = minLettersLength(businessTradeNameMinLength, s"agent.error.$pageIdentifier.$businessTradeName.min-length")
+  val tradeCharsValid: Constraint[String] = validateCharAgainst(businessNameAndTradeAllowedCharacters, s"agent.error.$pageIdentifier.$businessTradeName.invalid")
 
   val businessName = "business-name"
   private val businessNameMaxLength: Int = 105
   val nameNotEmpty: Constraint[String] = nonEmpty(s"agent.error.$pageIdentifier.$businessName.empty")
   val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, s"agent.error.$pageIdentifier.$businessName.max-length")
-  val businessTradeNameSpec = """^[A-Za-z0-9 ,.&'\\/-]*$"""
-  val nameValidChars: Constraint[String] = validateCharAgainst(businessTradeNameSpec, s"agent.error.$pageIdentifier.$businessName.invalid-character")
+  val nameValidChars: Constraint[String] = validateCharAgainst(businessNameAndTradeAllowedCharacters, s"agent.error.$pageIdentifier.$businessName.invalid-character")
 
   val startDate: String = "start-date"
+  val startDateBeforeLimit: String = "start-date-before-limit"
 
   def maxStartDate: LocalDate = LocalDate.now().plusDays(6)
 
@@ -71,16 +75,46 @@ object FirstIncomeSourceForm {
 
   def firstIncomeSourceForm(f: LocalDate => String): Form[(String, String, DateModel, AccountingMethod)] = Form(
     tuple(
-      businessTradeName -> trimmedText.verifying(tradeNameEmpty andThen nameCharsValid andThen nameTooLong andThen nameTooShort),
+      businessTradeName -> trimmedText.verifying(tradeNameEmpty andThen tradeCharsValid andThen tradeTooLong andThen tradeTooShort),
       businessName -> trimmedText.verifying(nameNotEmpty andThen nameMaxLength andThen nameValidChars),
       startDate -> businessStartDate(f),
       accountingMethodBusiness -> businessAccountingMethod
     )
   )
 
-  def createFirstIncomeSourceData(maybeTradeName: Option[String],
+  def nextIncomeSourceForm(f: LocalDate => String): Form[(String, String, DateModel)] = Form(
+    tuple(
+      businessTradeName -> trimmedText.verifying(tradeNameEmpty andThen tradeCharsValid andThen tradeTooLong andThen tradeTooShort),
+      businessName -> trimmedText.verifying(nameNotEmpty andThen nameMaxLength andThen nameValidChars),
+      startDate -> businessStartDate(f)
+    )
+  )
+
+  def firstIncomeSourceFormNoDate: Form[(String, String, YesNo, AccountingMethod)] = Form(
+    tuple(
+      businessTradeName -> trimmedText.verifying(tradeNameEmpty andThen tradeCharsValid andThen tradeTooLong andThen tradeTooShort),
+      businessName -> trimmedText.verifying(nameNotEmpty andThen nameMaxLength andThen nameValidChars),
+      startDateBeforeLimit -> yesNoMapping(
+        yesNoInvalid = Invalid(s"agent.error.$pageIdentifier.$startDateBeforeLimit.invalid", AccountingPeriodUtil.getStartDateLimit.getYear.toString)
+      ),
+      accountingMethodBusiness -> businessAccountingMethod
+    )
+  )
+
+  def nextIncomeSourceFormNoDate: Form[(String, String, YesNo)] = Form(
+    tuple(
+      businessTradeName -> trimmedText.verifying(tradeNameEmpty andThen tradeCharsValid andThen tradeTooLong andThen tradeTooShort),
+      businessName -> trimmedText.verifying(nameNotEmpty andThen nameMaxLength andThen nameValidChars),
+      startDateBeforeLimit -> yesNoMapping(
+        yesNoInvalid = Invalid(s"agent.error.$pageIdentifier.$startDateBeforeLimit.invalid", AccountingPeriodUtil.getStartDateLimit.getYear.toString)
+      )
+    )
+  )
+
+  def createIncomeSourceData(maybeTradeName: Option[String],
                                   maybeBusinessName: Option[String],
                                   maybeStartDate: Option[DateModel],
+                                  maybeStartDateBeforeLimit: Option[Boolean],
                                   maybeAccountingMethod: Option[AccountingMethod]): Map[String, String] = {
 
     val tradeNameMap: Map[String, String] = maybeTradeName.map(name => Map(businessTradeName -> name)).getOrElse(Map.empty)
@@ -94,12 +128,29 @@ object FirstIncomeSourceForm {
       )
     }
 
+    val startDateBeforeLimitMap: Map[String, String] = {
+      if (maybeStartDate.exists(_.toLocalDate.isBefore(getStartDateLimit))) {
+        Map(startDateBeforeLimit -> YesNoMapping.option_yes)
+      } else {
+        maybeStartDateBeforeLimit.fold(
+          if(maybeStartDate.exists(_.toLocalDate.isAfter(getStartDateLimit.minusDays(1)))) {
+            Map(startDateBeforeLimit -> YesNoMapping.option_no)
+          } else {
+            Map.empty[String, String]
+          }
+        ) {
+          case true => Map(startDateBeforeLimit -> YesNoMapping.option_yes)
+          case false => Map(startDateBeforeLimit -> YesNoMapping.option_no)
+        }
+      }
+    }
+
     val accountingMethodMap: Map[String, String] = maybeAccountingMethod.fold(Map.empty[String, String]) {
       case Cash => Map(accountingMethodBusiness -> CASH)
       case Accruals => Map(accountingMethodBusiness -> ACCRUALS)
     }
 
-    tradeNameMap ++ businessNameMap ++ dateMap ++ accountingMethodMap
+    tradeNameMap ++ businessNameMap ++ dateMap ++ startDateBeforeLimitMap ++ accountingMethodMap
 
   }
 }

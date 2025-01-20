@@ -18,8 +18,10 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import org.scalatestplus.play.PlaySpec
 import play.api.data.{Form, FormError}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.NextIncomeSourceForm._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 import java.time.LocalDate
 
@@ -28,6 +30,7 @@ class NextIncomeSourceFormSpec extends PlaySpec {
   def dateFormatter(date: LocalDate): String = date.toString
 
   val form: Form[(String, String, DateModel)] = nextIncomeSourceForm(_.toString)
+  val formNoDate: Form[(String, String, YesNo)] = nextIncomeSourceFormNoDate
 
   lazy val testNameEmpty = ""
   lazy val testTradeNameMaxLength: String = "A" * 35
@@ -36,259 +39,406 @@ class NextIncomeSourceFormSpec extends PlaySpec {
   lazy val testNameMaxLength: String = "A" * 105
   lazy val testNameInvalidChar = "!@£$%^*():;"
 
-  "NextIncomeSourceForm" should {
+  "nextIncomeSourceForm" should {
+    "bind valid data" when {
+      "business trade name is has minimum 2 characters" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> testTradeNameMinLength,
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val expected = (testTradeNameMinLength, "Test Business Name", date)
+        val actual = form.bind(testInput).value
 
-    "bind valid data" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val expected = ("Test Trade Name", "Test Business Name", date)
-      val actual = form.bind(testInput).value
+        actual mustBe Some(expected)
+      }
 
-      actual mustBe Some(expected)
+      "business trade name is exactly 35 characters" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> testTradeNameMaxLength,
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val expected = (testTradeNameMaxLength, "Test Business Name", date)
+        val actual = form.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "business name has minimum 2 characters" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> testNameMinLength,
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val expected = ("Test Trade Name", testNameMinLength, date)
+        val actual = form.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "business name is exactly 105 characters" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> testNameMaxLength,
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val expected = ("Test Trade Name", testNameMaxLength, date)
+        val actual = form.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "the date is 7 days ahead from current date" in {
+        val sevenDaysInFuture = DateModel.dateConvert(LocalDate.now().plusDays(6))
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> sevenDaysInFuture.day,
+          s"$startDate-dateMonth" -> sevenDaysInFuture.month,
+          s"$startDate-dateYear" -> sevenDaysInFuture.year
+        )
+        val expected = ("Test Trade Name", "Test Business Name", sevenDaysInFuture)
+        val actual = form.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "the date is the 1 January 1900" in {
+        val earliestAllowedDate = DateModel.dateConvert(LocalDate.of(1900, 1, 1))
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> earliestAllowedDate.day,
+          s"$startDate-dateMonth" -> earliestAllowedDate.month,
+          s"$startDate-dateYear" -> earliestAllowedDate.year
+        )
+
+        val expected = ("Test Trade Name", "Test Business Name", earliestAllowedDate)
+        val actual = form.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
     }
 
-    "fail to bind when business trade name is empty" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> testNameEmpty,
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+    "fail to bind" when {
+      "business trade name is empty" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> testNameEmpty,
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
-    }
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
+      }
 
-    "fail to bind when business trade name is too short" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "A",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "business trade name is too short" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "A",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.min-length"))
-    }
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.min-length"))
+      }
 
-    "fail to bind when business trade name is too long" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> (testTradeNameMaxLength + 1),
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "business trade name is too long" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> (testTradeNameMaxLength + 1),
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.max-length"))
-    }
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.max-length"))
+      }
 
-    "fail to bind when business trade name has invalid characters" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "!@£#$%^*()_+={}<>?~`",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "business trade name has invalid characters" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "!@£#$%^*()_+={}<>?~`",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.invalid"))
-    }
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.invalid"))
+      }
 
-    "fail to bind when business trade name has just a space" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> " ",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "business trade name has just a space" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> " ",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
-    }
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
+      }
 
-    "bind successfully when business trade name is has minimum 2 characters" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> testTradeNameMinLength,
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val expected = (testTradeNameMinLength, "Test Business Name", date)
-      val actual = form.bind(testInput).value
+      "business name is empty" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      actual mustBe Some(expected)
-    }
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
+      }
 
-    "bind successfully when business trade name is exactly 35 characters" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> testTradeNameMaxLength,
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val expected = (testTradeNameMaxLength, "Test Business Name", date)
-      val actual = form.bind(testInput).value
+      "business name is too long (over 105 characters)" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> (testNameMaxLength + 1),
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      actual mustBe Some(expected)
-    }
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.max-length"))
+      }
 
-    "fail to bind when business name is empty" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "business name has invalid characters" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> testNameInvalidChar,
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
-    }
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.invalid-character"))
+      }
 
-    "fail to bind when business name is too long (over 105 characters)" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> (testNameMaxLength + 1),
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "business name has just a space" in {
+        val date = DateModel("10", "6", "2023")
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> " ",
+          s"$startDate-dateDay" -> date.day,
+          s"$startDate-dateMonth" -> date.month,
+          s"$startDate-dateYear" -> date.year
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.max-length"))
-    }
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
+      }
 
-    "bind successfully when business name has minimum 2 characters" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> testNameMinLength,
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val expected = ("Test Trade Name", testNameMinLength, date)
-      val actual = form.bind(testInput).value
+      "date is missing" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "",
+          s"$startDate-dateMonth" -> "",
+          s"$startDate-dateYear" -> ""
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      actual mustBe Some(expected)
-    }
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.empty"))
+      }
 
-    "bind successfully when business name is exactly 105 characters" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> testNameMaxLength,
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val expected = ("Test Trade Name", testNameMaxLength, date)
-      val actual = form.bind(testInput).value
+      "date is out of bounds (too early)" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "31",
+          s"$startDate-dateMonth" -> "12",
+          s"$startDate-dateYear" -> "1899"
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      actual mustBe Some(expected)
-    }
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.min-date", Seq("1900-01-01")))
+      }
 
-    "fail to bind when business name has invalid characters" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> testNameInvalidChar,
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "date is out of bounds (too late)" in {
+        val maxDate = LocalDate.now().plusDays(7)
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> maxDate.getDayOfMonth.toString,
+          s"$startDate-dateMonth" -> maxDate.getMonthValue.toString,
+          s"$startDate-dateYear" -> maxDate.getYear.toString
+        )
+        val result = form.bind(testInput)
+        result.value mustBe None
 
-      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.invalid-character"))
-    }
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.max-date", Seq(maxDate.minusDays(1).toString)))
+      }
 
-    "fail to bind when business name has just a space" in {
-      val date = DateModel("10", "6", "2023")
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> " ",
-        s"$startDate-dateDay" -> date.day,
-        s"$startDate-dateMonth" -> date.month,
-        s"$startDate-dateYear" -> date.year
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "date is not supplied" in {
+        val result = form.bind(Map.empty[String, String])
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.empty"))
+      }
 
-      result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
-    }
+      "date is invalid" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "31",
+          s"$startDate-dateMonth" -> "13",
+          s"$startDate-dateYear" -> "1899"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.invalid"))
+      }
 
-    "fail to bind when date is missing" in {
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "",
-        s"$startDate-dateMonth" -> "",
-        s"$startDate-dateYear" -> ""
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "day is missing" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "",
+          s"$startDate-dateMonth" -> "4",
+          s"$startDate-dateYear" -> "2017"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day.empty"))
+      }
 
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.empty"))
-    }
+      "month is missing" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "1",
+          s"$startDate-dateMonth" -> "",
+          s"$startDate-dateYear" -> "2017"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.empty"))
+      }
 
-    "fail to bind when date is out of bounds (too early)" in {
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "31",
-        s"$startDate-dateMonth" -> "12",
-        s"$startDate-dateYear" -> "1899"
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "year is missing" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "1",
+          s"$startDate-dateMonth" -> "1",
+          s"$startDate-dateYear" -> ""
+        ))
+        result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.empty"))
+      }
 
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.min-date", Seq("1900-01-01")))
-    }
+      "multiple fields are missing" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "",
+          s"$startDate-dateMonth" -> "",
+          s"$startDate-dateYear" -> "2017"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month.empty"))
+      }
 
-    "fail to bind when date is out of bounds (too late)" in {
-      val maxDate = LocalDate.now().plusDays(7)
-      val testInput = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> maxDate.getDayOfMonth.toString,
-        s"$startDate-dateMonth" -> maxDate.getMonthValue.toString,
-        s"$startDate-dateYear" -> maxDate.getYear.toString
-      )
-      val result = form.bind(testInput)
-      result.value mustBe None
+      "day is invalid" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "0",
+          s"$startDate-dateMonth" -> "1",
+          s"$startDate-dateYear" -> "2017"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day.invalid"))
+      }
 
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.max-date", Seq(maxDate.minusDays(1).toString)))
+      "month is invalid" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "1",
+          s"$startDate-dateMonth" -> "13",
+          s"$startDate-dateYear" -> "2017"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.invalid"))
+      }
+
+      "year is invalid" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "1",
+          s"$startDate-dateMonth" -> "1",
+          s"$startDate-dateYear" -> "invalid"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.invalid"))
+      }
+
+      "multiple fields are invalid" in {
+        val result = form.bind(Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          s"$startDate-dateDay" -> "0",
+          s"$startDate-dateMonth" -> "0",
+          s"$startDate-dateYear" -> "2017"
+        ))
+        result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month.invalid"))
+      }
+
+      "year length is incorrect" when {
+        "year has 3 digits" in {
+          val result = form.bind(Map(
+            businessTradeName -> "Test Trade Name",
+            businessName -> "Test Business Name",
+            s"$startDate-dateDay" -> "1",
+            s"$startDate-dateMonth" -> "1",
+            s"$startDate-dateYear" -> "123"
+          ))
+          result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.length"))
+        }
+
+        "year has 5 digits" in {
+          val result = form.bind(Map(
+            businessTradeName -> "Test Trade Name",
+            businessName -> "Test Business Name",
+            s"$startDate-dateDay" -> "1",
+            s"$startDate-dateMonth" -> "1",
+            s"$startDate-dateYear" -> "12345"
+          ))
+          result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.length"))
+        }
+      }
     }
 
     "unbind data correctly" in {
@@ -302,163 +452,232 @@ class NextIncomeSourceFormSpec extends PlaySpec {
         s"$startDate-dateYear" -> "2023"
       )
     }
-
-    "show an error when date is not supplied" in {
-      val result = form.bind(Map.empty[String, String])
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month-year.empty"))
-    }
-
-    "show an error when date is invalid" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "31",
-        s"$startDate-dateMonth" -> "13",
-        s"$startDate-dateYear" -> "1899"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.invalid"))
-    }
-
-    "show an error when day is missing" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "",
-        s"$startDate-dateMonth" -> "4",
-        s"$startDate-dateYear" -> "2017"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day.empty"))
-    }
-
-    "show an error when month is missing" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "1",
-        s"$startDate-dateMonth" -> "",
-        s"$startDate-dateYear" -> "2017"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.empty"))
-    }
-
-    "show an error when year is missing" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "1",
-        s"$startDate-dateMonth" -> "1",
-        s"$startDate-dateYear" -> ""
-      ))
-      result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.empty"))
-    }
-
-    "show an error when multiple fields are missing" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "",
-        s"$startDate-dateMonth" -> "",
-        s"$startDate-dateYear" -> "2017"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month.empty"))
-    }
-
-    "show an error when day is invalid" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "0",
-        s"$startDate-dateMonth" -> "1",
-        s"$startDate-dateYear" -> "2017"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day.invalid"))
-    }
-
-    "show an error when month is invalid" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "1",
-        s"$startDate-dateMonth" -> "13",
-        s"$startDate-dateYear" -> "2017"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateMonth", s"agent.error.$pageIdentifier.$startDate.month.invalid"))
-    }
-
-    "show an error when year is invalid" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "1",
-        s"$startDate-dateMonth" -> "1",
-        s"$startDate-dateYear" -> "invalid"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.invalid"))
-    }
-
-    "show an error when multiple fields are invalid" in {
-      val result = form.bind(Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> "0",
-        s"$startDate-dateMonth" -> "0",
-        s"$startDate-dateYear" -> "2017"
-      ))
-      result.errors must contain(FormError(s"$startDate-dateDay", s"agent.error.$pageIdentifier.$startDate.day-month.invalid"))
-    }
-
-    "show an error when year length is incorrect" when {
-      "year has 3 digits" in {
-        val result = form.bind(Map(
-          businessTradeName -> "Test Trade Name",
-          businessName -> "Test Business Name",
-          s"$startDate-dateDay" -> "1",
-          s"$startDate-dateMonth" -> "1",
-          s"$startDate-dateYear" -> "123"
-        ))
-        result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.length"))
-      }
-
-      "year has 5 digits" in {
-        val result = form.bind(Map(
-          businessTradeName -> "Test Trade Name",
-          businessName -> "Test Business Name",
-          s"$startDate-dateDay" -> "1",
-          s"$startDate-dateMonth" -> "1",
-          s"$startDate-dateYear" -> "12345"
-        ))
-        result.errors must contain(FormError(s"$startDate-dateYear", s"agent.error.$pageIdentifier.$startDate.year.length"))
-      }
-    }
   }
 
-  "accept a valid date" when {
-    "the date is 7 days ahead from current date" in {
-      val sevenDaysInPast = LocalDate.now().plusDays(6)
-      val testData = Map(
-        businessTradeName -> "Test Trade Name",
-        businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> sevenDaysInPast.getDayOfMonth.toString,
-        s"$startDate-dateMonth" -> sevenDaysInPast.getMonthValue.toString,
-        s"$startDate-dateYear" -> sevenDaysInPast.getYear.toString
-      )
-      val validated = form.bind(testData)
-      validated.hasErrors mustBe false
-      validated.hasGlobalErrors mustBe false
+  "nextIncomeSourceFormNoDate" should {
+    "bind valid data" when {
+      "business trade name is has minimum 2 characters" in {
+        val testInput = Map(
+          businessTradeName -> testTradeNameMinLength,
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val expected = (testTradeNameMinLength, "Test Business Name", Yes)
+        val actual = formNoDate.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "business trade name is exactly 35 characters" in {
+        val testInput = Map(
+          businessTradeName -> testTradeNameMaxLength,
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val expected = (testTradeNameMaxLength, "Test Business Name", Yes)
+        val actual = formNoDate.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "business name has minimum 2 characters" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> testNameMinLength,
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val expected = ("Test Trade Name", testNameMinLength, Yes)
+        val actual = formNoDate.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "business name is exactly 105 characters" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> testNameMaxLength,
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val expected = ("Test Trade Name", testNameMaxLength, Yes)
+        val actual = formNoDate.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "the start date selection is Yes" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val expected = ("Test Trade Name", "Test Business Name", Yes)
+        val actual = formNoDate.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
+
+      "the start date selection is No" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_no
+        )
+        val expected = ("Test Trade Name", "Test Business Name", No)
+        val actual = formNoDate.bind(testInput).value
+
+        actual mustBe Some(expected)
+      }
     }
 
-    "the date is the 1 January 1900" in {
-      val earliestAllowedDate = LocalDate.of(1900, 1, 1)
-      val testData = Map(
+    "fail to bind" when {
+      "business trade name is empty" in {
+        val testInput = Map(
+          businessTradeName -> testNameEmpty,
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
+      }
+
+      "business trade name is too short" in {
+        val testInput = Map(
+          businessTradeName -> "A",
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.min-length"))
+      }
+
+      "business trade name is too long" in {
+        val testInput = Map(
+          businessTradeName -> (testTradeNameMaxLength + 1),
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.max-length"))
+      }
+
+      "business trade name has invalid characters" in {
+        val testInput = Map(
+          businessTradeName -> "!@£#$%^*()_+={}<>?~`",
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.invalid"))
+      }
+
+      "business trade name has just a space" in {
+        val testInput = Map(
+          businessTradeName -> " ",
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessTradeName, s"agent.error.$pageIdentifier.$businessTradeName.empty"))
+      }
+
+      "business name is empty" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
+      }
+
+      "business name is too long (over 105 characters)" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> (testNameMaxLength + 1),
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.max-length"))
+      }
+
+      "business name has invalid characters" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> testNameInvalidChar,
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.invalid-character"))
+      }
+
+      "business name has just a space" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> " ",
+          startDateBeforeLimit -> YesNoMapping.option_yes
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(businessName, s"agent.error.$pageIdentifier.$businessName.empty"))
+      }
+
+      "start date before limit has an invalid selection" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name",
+          startDateBeforeLimit -> "invalid"
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(
+          key = startDateBeforeLimit,
+          message = s"agent.error.$pageIdentifier.$startDateBeforeLimit.invalid",
+          args = Seq(AccountingPeriodUtil.getStartDateLimit.getYear.toString)
+        ))
+      }
+
+      "start date before limit has no selection" in {
+        val testInput = Map(
+          businessTradeName -> "Test Trade Name",
+          businessName -> "Test Business Name"
+        )
+        val result = formNoDate.bind(testInput)
+        result.value mustBe None
+
+        result.errors must contain(FormError(
+          key = startDateBeforeLimit,
+          message = s"agent.error.$pageIdentifier.$startDateBeforeLimit.invalid",
+          args = Seq(AccountingPeriodUtil.getStartDateLimit.getYear.toString)
+        ))
+      }
+    }
+
+    "unbind data correctly" in {
+      val filledForm = formNoDate.fill(("Test Trade Name", "Test Business Name", Yes))
+
+      filledForm.data must contain allOf(
         businessTradeName -> "Test Trade Name",
         businessName -> "Test Business Name",
-        s"$startDate-dateDay" -> earliestAllowedDate.getDayOfMonth.toString,
-        s"$startDate-dateMonth" -> earliestAllowedDate.getMonthValue.toString,
-        s"$startDate-dateYear" -> earliestAllowedDate.getYear.toString
+        startDateBeforeLimit -> YesNoMapping.option_yes
       )
-      val validated = form.bind(testData)
-      validated.hasErrors mustBe false
-      validated.hasGlobalErrors mustBe false
     }
   }
 }

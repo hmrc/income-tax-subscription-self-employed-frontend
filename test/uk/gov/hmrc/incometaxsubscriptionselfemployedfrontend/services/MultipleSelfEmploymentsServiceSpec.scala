@@ -28,10 +28,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent.Stream
 
 class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubscriptionConnector {
 
-  val crypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+  val applicationCrypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
 
   trait Setup {
-    val service: MultipleSelfEmploymentsService = new MultipleSelfEmploymentsService(mockIncomeTaxSubscriptionConnector)(crypto)
+
+    val service: MultipleSelfEmploymentsService = new MultipleSelfEmploymentsService(
+      applicationCrypto = applicationCrypto,
+      incomeTaxSubscriptionConnector = mockIncomeTaxSubscriptionConnector
+    )
+
   }
 
   val testReference: String = "test-reference"
@@ -48,6 +53,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
   val soleTraderBusiness: SoleTraderBusiness = SoleTraderBusiness(
     id = id,
+    startDateBeforeLimit = Some(false),
     startDate = Some(date),
     name = Some(name),
     trade = Some(trade),
@@ -56,12 +62,14 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
   def soleTraderBusinessTwo(
                              startDate: Option[DateModel] = None,
+                             startDateBeforeLimit: Option[Boolean] = None,
                              name: Option[String] = None,
                              trade: Option[String] = None,
                              address: Option[Address] = None
                            ): SoleTraderBusiness = SoleTraderBusiness(
     id = s"$id-2",
     startDate = startDate,
+    startDateBeforeLimit = startDateBeforeLimit,
     name = name,
     trade = trade,
     address = address
@@ -1154,13 +1162,13 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(None))
 
         await(service.fetchStreamlineBusiness(testReference, id)) mustBe
-          Right(StreamlineBusiness(None, None, None, None, isFirstBusiness = true))
+          Right(StreamlineBusiness(None, None, None, None, None, isFirstBusiness = true))
       }
       "the requested business does not exist in the list of existing businesses" in new Setup {
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
 
         await(service.fetchStreamlineBusiness(testReference, s"$id-2")) mustBe
-          Right(StreamlineBusiness(None, None, None, Some(accountingMethod), isFirstBusiness = false))
+          Right(StreamlineBusiness(None, None, None, None, Some(accountingMethod), isFirstBusiness = false))
       }
       "the requested business exists in the list and it's the first business" in new Setup {
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
@@ -1170,6 +1178,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
             trade = Some(trade),
             name = Some(name),
             startDate = Some(date),
+            startDateBeforeLimit = Some(false),
             accountingMethod = Some(accountingMethod),
             isFirstBusiness = true
           ))
@@ -1182,6 +1191,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
             trade = None,
             name = None,
             startDate = None,
+            startDateBeforeLimit = None,
             accountingMethod = Some(accountingMethod),
             isFirstBusiness = false
           ))

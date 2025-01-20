@@ -26,7 +26,6 @@ object FeatureSwitch {
 
   val switches: Set[FeatureSwitch] = Set(
     EnableUseRealAddressLookup,
-    EnableAgentStreamline,
     StartDateBeforeLimit
   )
 
@@ -47,11 +46,6 @@ object FeatureSwitch {
   case object EnableUseRealAddressLookup extends FeatureSwitch {
     override val name = s"$prefix.enable-use-real-AL"
     override val displayText = "Enable to use real Address Lookup"
-  }
-
-  case object EnableAgentStreamline extends FeatureSwitch {
-    override val name = s"$prefix.enable-agent-streamline"
-    override val displayText = "Enable the AgentStreamline feature switch"
   }
 
 }
