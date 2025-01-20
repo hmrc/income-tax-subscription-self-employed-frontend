@@ -22,44 +22,13 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 
 class SelfEmployedCYAViewSpec extends ViewSpec {
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
   val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
-
-  val testId: String = "testId"
-
-  val fullSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
-    id = testId,
-    businessStartDate = Some(DateModel("1", "1", "2018")),
-    businessName = Some(s"ABC Limited"),
-    businessTradeName = Some(s"Plumbing"),
-    businessAddress = Some(Address(Seq(s"line 1"), Some("TF3 4NT"))),
-    accountingMethod = Some(Cash),
-    totalSelfEmployments = 1,
-    isFirstBusiness = true
-  )
-
-  val emptySelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
-    id = testId,
-    totalSelfEmployments = 1,
-    isFirstBusiness = true
-  )
-
-  def page(answers: SelfEmploymentsCYAModel, isGlobalEdit: Boolean): HtmlFormat.Appendable = checkYourAnswers(
-    answers,
-    testCall,
-    backUrl = Some(testBackUrl),
-    ClientDetails("FirstName LastName", "ZZ111111Z"),
-    isGlobalEdit = isGlobalEdit
-  )(FakeRequest(), implicitly)
-
-  def document(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel, isGlobalEdit: Boolean = false): Document = {
-    Jsoup.parse(page(answers, isGlobalEdit).body)
-  }
 
   "Check Your Answers" must {
 
@@ -86,219 +55,80 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
         "as the initial business" when {
           "all data is complete" in {
             document().mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessTradeStreamline,
-                value = Some("Plumbing"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTradeStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessName,
-                value = Some("ABC Limited"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
-                    visuallyHidden = CheckYourAnswersMessages.businessName
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.tradingStartDateStreamline,
-                value = Some("1 January 2018"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.accountingMethodStreamline,
-                value = Some("Cash basis accounting"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethodStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.accountingMethodStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessAddressStreamline,
-                value = Some("line 1 TF3 4NT"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddressStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
-                  )
-                )
-              )
+              tradeRow(value = Some("Plumbing"), editMode = true),
+              nameRow(value = Some("ABC Limited"), editMode = true),
+              startDateRow(value = Some("1 January 2018"), editMode = true),
+              accountingMethodRow(value = Some("Cash basis accounting"), editMode = true),
+              addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
             ))
           }
           "all data is missing" in {
             document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessTradeStreamline,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTradeStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessName,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
-                    visuallyHidden = CheckYourAnswersMessages.businessName
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.tradingStartDateStreamline,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.accountingMethodStreamline,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.accountingMethodStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.accountingMethodStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessAddressStreamline,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddressStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
-                  )
-                )
-              )
+              tradeRow(value = None, editMode = true),
+              nameRow(value = None, editMode = true),
+              startDateRow(value = None, editMode = true),
+              accountingMethodRow(value = None, editMode = true),
+              addressRow(value = None, editMode = true)
             ))
+          }
+          "start date is before limit field is present" which {
+            "is true" in {
+              document(fullSelfEmploymentsCYAModel.copy(startDateBeforeLimit = Some(true))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+                tradeRow(value = Some("Plumbing"), editMode = true),
+                nameRow(value = Some("ABC Limited"), editMode = true),
+                startDateRow(value = Some(s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"), editMode = true),
+                accountingMethodRow(value = Some("Cash basis accounting"), editMode = true),
+                addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
+              ))
+            }
+            "is false" in {
+              document(fullSelfEmploymentsCYAModel.copy(startDateBeforeLimit = Some(false))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+                tradeRow(value = Some("Plumbing"), editMode = true),
+                nameRow(value = Some("ABC Limited"), editMode = true),
+                startDateRow(value = Some("1 January 2018"), editMode = true),
+                accountingMethodRow(value = Some("Cash basis accounting"), editMode = true),
+                addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
+              ))
+            }
           }
         }
         "as a subsequent business" when {
           "all data is complete" in {
             document(fullSelfEmploymentsCYAModel.copy(isFirstBusiness = false)).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessTradeStreamline,
-                value = Some("Plumbing"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTradeStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessName,
-                value = Some("ABC Limited"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
-                    visuallyHidden = CheckYourAnswersMessages.businessName
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.tradingStartDateStreamline,
-                value = Some("1 January 2018"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessAddressStreamline,
-                value = Some("line 1 TF3 4NT"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddressStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
-                  )
-                )
-              )
+              tradeRow(value = Some("Plumbing"), editMode = true, isFirstBusiness = false),
+              nameRow(value = Some("ABC Limited"), editMode = true, isFirstBusiness = false),
+              startDateRow(value = Some("1 January 2018"), editMode = true, isFirstBusiness = false),
+              addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
             ))
           }
           "all data is missing" in {
             document(emptySelfEmploymentsCYAModel.copy(isFirstBusiness = false)).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessTradeStreamline,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessTradeStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessName,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessName}",
-                    visuallyHidden = CheckYourAnswersMessages.businessName
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.tradingStartDateStreamline,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessAddressStreamline,
-                value = None,
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true).url,
-                    text = s"${CheckYourAnswersMessages.add} ${CheckYourAnswersMessages.businessAddressStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
-                  )
-                )
-              )
+              tradeRow(value = None, editMode = true, isFirstBusiness = false),
+              nameRow(value = None, editMode = true, isFirstBusiness = false),
+              startDateRow(value = None, editMode = true, isFirstBusiness = false),
+              addressRow(value = None, editMode = true)
             ))
+          }
+          "start date is before limit field is present" which {
+            "is true" in {
+              document(fullSelfEmploymentsCYAModel.copy(isFirstBusiness = false, startDateBeforeLimit = Some(true)))
+                .mainContent
+                .mustHaveSummaryList(".govuk-summary-list")(Seq(
+                  tradeRow(value = Some("Plumbing"), editMode = true, isFirstBusiness = false),
+                  nameRow(value = Some("ABC Limited"), editMode = true, isFirstBusiness = false),
+                  startDateRow(value = Some(s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"), editMode = true, isFirstBusiness = false),
+                  addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
+                ))
+            }
+            "is false" in {
+              document(fullSelfEmploymentsCYAModel.copy(isFirstBusiness = false, startDateBeforeLimit = Some(false)))
+                .mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+                  tradeRow(value = Some("Plumbing"), editMode = true, isFirstBusiness = false),
+                  nameRow(value = Some("ABC Limited"), editMode = true, isFirstBusiness = false),
+                  startDateRow(value = Some("1 January 2018"), editMode = true, isFirstBusiness = false),
+                  addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
+                ))
+            }
           }
         }
       }
@@ -307,111 +137,21 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
         "as the initial business" when {
           "all data is complete" in {
             document(isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessTradeStreamline,
-                value = Some("Plumbing"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTradeStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessName,
-                value = Some("ABC Limited"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
-                    visuallyHidden = CheckYourAnswersMessages.businessName
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.tradingStartDateStreamline,
-                value = Some("1 January 2018"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.accountingMethodStreamline,
-                value = Some("Cash basis accounting"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.FirstIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.accountingMethodStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.accountingMethodStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessAddressStreamline,
-                value = Some("line 1 TF3 4NT"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddressStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
-                  )
-                )
-              )
+              tradeRow(value = Some("Plumbing"), editMode = true, globalEditMode = true),
+              nameRow(value = Some("ABC Limited"), editMode = true, globalEditMode = true),
+              startDateRow(value = Some("1 January 2018"), editMode = true, globalEditMode = true),
+              accountingMethodRow(value = Some("Cash basis accounting"), editMode = true, globalEditMode = true),
+              addressRow(value = Some("line 1 TF3 4NT"), editMode = true, globalEditMode = true)
             ))
           }
         }
         "as a subsequent business" when {
           "all data is complete" in {
             document(fullSelfEmploymentsCYAModel.copy(isFirstBusiness = false), isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessTradeStreamline,
-                value = Some("Plumbing"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessTradeStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessTradeStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessName,
-                value = Some("ABC Limited"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessName}",
-                    visuallyHidden = CheckYourAnswersMessages.businessName
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.tradingStartDateStreamline,
-                value = Some("1 January 2018"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.NextIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.tradingStartDateStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.tradingStartDateStreamline
-                  )
-                )
-              ),
-              SummaryListRowValues(
-                key = CheckYourAnswersMessages.businessAddressStreamline,
-                value = Some("line 1 TF3 4NT"),
-                actions = Seq(
-                  SummaryListActionValues(
-                    href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true, isGlobalEdit = true).url,
-                    text = s"${CheckYourAnswersMessages.change} ${CheckYourAnswersMessages.businessAddressStreamline}",
-                    visuallyHidden = CheckYourAnswersMessages.businessAddressStreamline
-                  )
-                )
-              )
+              tradeRow(value = Some("Plumbing"), editMode = true, globalEditMode = true, isFirstBusiness = false),
+              nameRow(value = Some("ABC Limited"), editMode = true, globalEditMode = true, isFirstBusiness = false),
+              startDateRow(value = Some("1 January 2018"), editMode = true, globalEditMode = true, isFirstBusiness = false),
+              addressRow(value = Some("line 1 TF3 4NT"), editMode = true, globalEditMode = true)
             ))
           }
         }
@@ -441,20 +181,95 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val heading = "Check your answers"
     val title = "Check your answers - sole trader business"
     val confirmAndContinue = "Confirm and continue"
-    val continue = "Continue"
     val saveAndBack = "Save and come back later"
     val change = "Change"
     val add = "Add"
-    val tradingStartDate = "Trading start date"
-    val businessName = "Business name"
-    val businessAddress = "Address"
-    val businessTrade = "Type of trade"
-    val accountingMethod = "Accounting method for sole trader income"
+    val name = "Business name"
     val yes = "Yes"
     val no = "No"
-    val businessTradeStreamline = "Trade"
-    val tradingStartDateStreamline = "Start date"
-    val accountingMethodStreamline = "Accounting method"
-    val businessAddressStreamline = "Address"
+    val trade = "Trade"
+    val startDate = "Start date"
+    val accountingMethod = "Accounting method"
+    val address = "Address"
   }
+
+  lazy val testId: String = "testId"
+
+  lazy val fullSelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+    id = testId,
+    businessStartDate = Some(DateModel("1", "1", "2018")),
+    businessName = Some(s"ABC Limited"),
+    businessTradeName = Some(s"Plumbing"),
+    businessAddress = Some(Address(Seq(s"line 1"), Some("TF3 4NT"))),
+    accountingMethod = Some(Cash),
+    totalSelfEmployments = 1,
+    isFirstBusiness = true
+  )
+
+  lazy val emptySelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
+    id = testId,
+    totalSelfEmployments = 1,
+    isFirstBusiness = true
+  )
+
+  def page(answers: SelfEmploymentsCYAModel, isGlobalEdit: Boolean): HtmlFormat.Appendable = checkYourAnswers(
+    answers,
+    testCall,
+    backUrl = Some(testBackUrl),
+    ClientDetails("FirstName LastName", "ZZ111111Z"),
+    isGlobalEdit = isGlobalEdit
+  )(FakeRequest(), implicitly)
+
+  def document(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel, isGlobalEdit: Boolean = false): Document = {
+    Jsoup.parse(page(answers, isGlobalEdit).body)
+  }
+
+  def simpleSummaryRow(key: String): (Option[String], Boolean, Boolean, Boolean) => SummaryListRowValues = {
+    case (value, editMode, globalEditMode, isFirstBusiness) =>
+      SummaryListRowValues(
+        key = key,
+        value = value,
+        actions = Seq(
+          SummaryListActionValues(
+            href = if (isFirstBusiness) {
+              routes.FirstIncomeSourceController.show(testId, isEditMode = editMode, isGlobalEdit = globalEditMode).url
+            } else {
+              routes.NextIncomeSourceController.show(testId, isEditMode = editMode, isGlobalEdit = globalEditMode).url
+            },
+            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
+            visuallyHidden = key
+          )
+        )
+      )
+  }
+
+  private def tradeRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false, isFirstBusiness: Boolean = true) = {
+    simpleSummaryRow(CheckYourAnswersMessages.trade)(value, editMode, globalEditMode, isFirstBusiness)
+  }
+
+  private def nameRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false, isFirstBusiness: Boolean = true) = {
+    simpleSummaryRow(CheckYourAnswersMessages.name)(value, editMode, globalEditMode, isFirstBusiness)
+  }
+
+  private def startDateRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false, isFirstBusiness: Boolean = true) = {
+    simpleSummaryRow(CheckYourAnswersMessages.startDate)(value, editMode, globalEditMode, isFirstBusiness)
+  }
+
+  private def accountingMethodRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false, isFirstBusiness: Boolean = true) = {
+    simpleSummaryRow(CheckYourAnswersMessages.accountingMethod)(value, editMode, globalEditMode, isFirstBusiness)
+  }
+
+  private def addressRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false) = SummaryListRowValues(
+    key = CheckYourAnswersMessages.address,
+    value = value,
+    actions = Seq(
+      SummaryListActionValues(
+        href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = editMode, isGlobalEdit = globalEditMode).url,
+        text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + CheckYourAnswersMessages.address,
+        visuallyHidden = CheckYourAnswersMessages.address
+      )
+    )
+  )
+
+
 }

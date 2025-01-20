@@ -242,6 +242,7 @@ agent.self-employed-cya.caption                                 = Y busnes unig 
 agent.self-employed-cya.business-trade.streamline               = Fasnach
 agent.self-employed-cya.business-trade.change.streamline        = Newid y fasnach
 agent.self-employed-cya.trading-start-date.streamline           = Dyddiad dechrau
+agent.self-employed-cya.start-date-before-limit.label           = Before 6 April {0}
 agent.self-employed-cya.trading-start-date.change.streamline    = Newid y dyddiad dechrau
 agent.self-employed-cya.accounting-method.streamline            = Dull cyfrifyddu
 agent.self-employed-cya.accounting-method.change.streamline     = Newid y dull cyfrifyddu
