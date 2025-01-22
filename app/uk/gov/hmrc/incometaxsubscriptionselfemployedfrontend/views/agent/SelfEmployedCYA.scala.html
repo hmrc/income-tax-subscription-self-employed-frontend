@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.PageHeadingHelper
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 @this(
         mainTemplate: AgentMainTemplate,
@@ -46,17 +47,17 @@
     )
 
     @govukSummaryList(SummaryList(
-        rows =  Seq(
-                Some(businessTrade(answers.businessTradeName, answers.id, answers.isFirstBusiness)),
-                Some(businessName(answers.businessName, answers.id, answers.isFirstBusiness)),
-                Some(tradingStartDate(answers.businessStartDate, answers.id, answers.isFirstBusiness)),
-                if(answers.isFirstBusiness) {
-                    Some(accountingMethod(answers.accountingMethod, answers.id, true))
-                } else {
-                    None
-                },
-                Some(businessAddress(answers.businessAddress, answers.id, answers.isFirstBusiness))
-            ).flatten
+        rows = Seq(
+            Some(businessTrade(answers.businessTradeName, answers.id, answers.isFirstBusiness)),
+            Some(businessName(answers.businessName, answers.id, answers.isFirstBusiness)),
+            Some(tradingStartDate(answers.businessStartDate, answers.startDateBeforeLimit, answers.id, answers.isFirstBusiness)),
+            if(answers.isFirstBusiness) {
+                Some(accountingMethod(answers.accountingMethod, answers.id, true))
+            } else {
+                None
+            },
+            Some(businessAddress(answers.businessAddress, answers.id, answers.isFirstBusiness))
+        ).flatten
     ))
 
     @form(action = postAction) {
@@ -97,12 +98,15 @@
     )
 }
 
-@tradingStartDate(businessStartDate: Option[DateModel], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
+@tradingStartDate(businessStartDate: Option[DateModel], startDateBeforeLimit: Option[Boolean], businessId: String, isFirstIncomeSourceCompleted: Boolean) = @{
     import implicitDateFormatter._
 
     simpleSummaryListRow(
         key = messages("agent.self-employed-cya.trading-start-date.streamline"),
-        value = businessStartDate.map(_.toLocalDate.toLongDate()),
+        value = startDateBeforeLimit match {
+            case Some(true) => Some(messages("agent.self-employed-cya.start-date-before-limit.label", AccountingPeriodUtil.getStartDateLimit.getYear.toString))
+            case _ => businessStartDate.map(_.toLocalDate.toLongDate())
+        },
         changeHref = if(isFirstIncomeSourceCompleted) {
                 routes.FirstIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
             } else {

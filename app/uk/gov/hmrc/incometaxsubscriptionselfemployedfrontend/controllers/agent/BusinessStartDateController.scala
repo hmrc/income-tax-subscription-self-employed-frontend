@@ -126,7 +126,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     businessStartDateForm(
       minStartDate = BusinessStartDateForm.minStartDate,
       maxStartDate = BusinessStartDateForm.maxStartDate,
-      d => d.plusDays(1).toLongDate()
+      _.toLongDate()
     )
   }
 }
