@@ -533,42 +533,6 @@ class FirstIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwi
           )
         }
 
-        "the form data is valid they have previously provided a start date and have not changed their answer" in {
-          enable(StartDateBeforeLimit)
-
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-
-          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
-            responseStatus = OK,
-            responseBody = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDateBeforeLimit = Some(false)))))
-          )
-          stubSaveSubscriptionData(
-            reference = reference,
-            id = soleTraderBusinessesKey,
-            body = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDateBeforeLimit = Some(false)))))
-          )(OK)
-          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-          When(s"POST ${routes.FirstIncomeSourceController.submit(id)} is called")
-          val res = submitFirstIncomeSource(
-            trade = Some("test trade"),
-            name = Some("test name"),
-            startDate = None,
-            startDateBeforeLimit = Some(false),
-            accountingMethod = Some(Cash),
-            id = id,
-            isEditMode = false,
-            isGlobalEdit = false
-          )
-
-          Then("Should return a SEE_OTHER with a redirect location of the check address route")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(routes.BusinessStartDateController.show(id).url)
-          )
-        }
-
         "the form data is invalid" in {
           enable(StartDateBeforeLimit)
 
@@ -596,6 +560,7 @@ class FirstIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwi
           )
         }
       }
+      
       "in edit mode" when {
         "the form data is valid and they do not need to provide a start date" in {
           enable(StartDateBeforeLimit)
@@ -630,7 +595,7 @@ class FirstIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwi
           )
         }
 
-        "the form data is valid and they need to provide a start date having previously not provided" in {
+        "the form data is valid and their start date is not before the limit" in {
           enable(StartDateBeforeLimit)
 
           Given("I setup the Wiremock stubs")
@@ -650,7 +615,7 @@ class FirstIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwi
           val res = submitFirstIncomeSource(
             trade = Some("test trade"),
             name = Some("test name"),
-            startDate = None,
+            startDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)),
             startDateBeforeLimit = Some(false),
             accountingMethod = Some(Cash),
             id = id,

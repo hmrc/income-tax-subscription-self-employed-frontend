@@ -27,7 +27,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent.StreamlineBusiness
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.FirstIncomeSource
@@ -145,38 +144,27 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
                                   isEditMode: Boolean,
                                   isGlobalEdit: Boolean)(implicit hc: HeaderCarrier): Future[Result] = {
 
-    multipleSelfEmploymentsService.fetchStreamlineBusiness(reference, id) flatMap {
-      case Left(_) =>
-        throw new InternalServerException("[FirstIncomeSourceController][submit] - Unexpected error, fetching streamline business details")
-      case Right(StreamlineBusiness(_, _, previousStartDate, previousStartDateBeforeLimit, _, _)) =>
-        multipleSelfEmploymentsService.saveStreamlinedIncomeSource(
-          reference = reference,
-          businessId = id,
-          trade = trade,
-          name = name,
-          startDate = startDate,
-          startDateBeforeLimit = startDateBeforeLimit,
-          accountingMethod = Some(accountingMethod)
-        ) map {
-          case Right(_) =>
-            val needsToEnterMissingStartDate: Boolean = startDateBeforeLimit.contains(false) && previousStartDate.isEmpty
-            val updatedAnswerToFalse: Boolean = startDateBeforeLimit.contains(false) && (previousStartDateBeforeLimit.contains(true) || previousStartDateBeforeLimit.isEmpty)
-
-            if(needsToEnterMissingStartDate || updatedAnswerToFalse) {
-              Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
-            } else if (isEditMode || isGlobalEdit) {
-              Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
-            } else {
-              if (startDateBeforeLimit.contains(false)) {
-                Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
-              } else {
-                Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode))
-              }
-            }
-          case Left(_) =>
-            throw new InternalServerException("[FirstIncomeSourceController][submit] - Could not save first income source")
+    multipleSelfEmploymentsService.saveStreamlinedIncomeSource(
+      reference = reference,
+      businessId = id,
+      trade = trade,
+      name = name,
+      startDate = startDate,
+      startDateBeforeLimit = startDateBeforeLimit,
+      accountingMethod = Some(accountingMethod)
+    ) map {
+      case Right(_) =>
+        if (startDateBeforeLimit.contains(false)) {
+          Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
+        } else if (isEditMode || isGlobalEdit) {
+          Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
+        } else {
+          Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode))
         }
+      case Left(_) =>
+        throw new InternalServerException("[FirstIncomeSourceController][submit] - Could not save first income source")
     }
+
   }
 
   def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
