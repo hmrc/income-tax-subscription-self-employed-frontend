@@ -17,15 +17,25 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual
 
 import org.mockito.Mockito.when
+import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Cash, SoleTraderBusiness, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 
-class InitialiseControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService {
+class InitialiseControllerSpec extends ControllerBaseSpec with MockMultipleSelfEmploymentsService with MockSessionDataService with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(StartDateBeforeLimit)
+  }
 
   override val controllerName: String = "InitialiseController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
@@ -37,18 +47,69 @@ class InitialiseControllerSpec extends ControllerBaseSpec
   object TestInitialiseController extends InitialiseController(
     mockMessagesControllerComponents,
     mockAuthService,
+    mockMultipleSelfEmploymentsService,
     mockUuid
   )(
-    appConfig
+    appConfig,
+    mockSessionDataService
   )
 
   "initialise" when {
-    s"return $SEE_OTHER and redirect to Business Name Confirmation page" in {
-      mockAuthSuccess()
+    "the StartDateBeforeLimit feature switch is enabled" must {
+      s"return $SEE_OTHER and redirect to Full Income Source page when a business with accounting method already exists" in {
+        enable(StartDateBeforeLimit)
+        mockAuthSuccess()
+        mockFetchSoleTraderBusinesses(Right(Some(SoleTraderBusinesses(
+          businesses = Seq(SoleTraderBusiness(id = "firstId")),
+          accountingMethod = Some(Cash)))))
 
-      val result = TestInitialiseController.initialise(fakeRequest)
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.individual.routes.BusinessNameConfirmationController.show("testId").url)
+        val result = TestInitialiseController.initialise(fakeRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.FullIncomeSourceController.show(id = "testId").url)
+      }
+
+      s"return $SEE_OTHER and redirect to Accounting Method page when a business exists without accounting method" in {
+        enable(StartDateBeforeLimit)
+        mockAuthSuccess()
+        mockFetchSoleTraderBusinesses(Right(Some(SoleTraderBusinesses(
+          businesses = Seq(SoleTraderBusiness(id = "firstId")),
+          accountingMethod = None))))
+
+        val result = TestInitialiseController.initialise(fakeRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessAccountingMethodController.show(id = "testId").url)
+      }
+
+      s"return $SEE_OTHER and redirect to Accounting Method page when adding the first business" in {
+        enable(StartDateBeforeLimit)
+        mockAuthSuccess()
+        mockFetchSoleTraderBusinesses(Right(Some(SoleTraderBusinesses(Seq.empty))))
+
+        val result = TestInitialiseController.initialise(fakeRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.BusinessAccountingMethodController.show(id = "testId").url)
+      }
+
+      s"return $INTERNAL_SERVER_ERROR when failed to fetch sole trader businesses" in {
+        enable(StartDateBeforeLimit)
+        mockAuthSuccess()
+        mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        intercept[InternalServerException](await(TestInitialiseController.initialise(fakeRequest)))
+          .message mustBe "[InitialiseController][initialise] - Failure fetching sole trader businesses"
+      }
+    }
+    "the StartDateBeforeLimit feature switch is disabled" must {
+      s"return $SEE_OTHER and redirect to Business Name Confirmation page" in {
+        mockAuthSuccess()
+
+        val result = TestInitialiseController.initialise(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.individual.routes.BusinessNameConfirmationController.show("testId").url)
+      }
     }
   }
 

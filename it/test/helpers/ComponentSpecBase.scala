@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{StreamlineIncomeSourceForm => IndividualStreamlineIncomeSourceForm}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
@@ -322,6 +323,22 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getFullIncomeSource(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
+    get(s"/details/sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
+  }
+
+  def submitFullIncomeSource(trade: Option[String],
+                             name: Option[String],
+                             startDateBeforeLimit: Option[Boolean],
+                             id: String,
+                             isEditMode: Boolean,
+                             isGlobalEdit: Boolean): WSResponse = {
+    post(s"/details/sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
+      IndividualStreamlineIncomeSourceForm.createIncomeSourceData(trade, name, None, startDateBeforeLimit)
+        .map { case (k, v) => (k, Seq(v)) }
+    )
+
+  }
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim
 

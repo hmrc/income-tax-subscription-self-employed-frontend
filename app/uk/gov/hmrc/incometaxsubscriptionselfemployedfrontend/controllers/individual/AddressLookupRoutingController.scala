@@ -19,6 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
@@ -85,7 +86,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         } yield {
           saveResult match {
             case Right(_) =>
-              if (isEditMode) Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit))
+              if (isEditMode || isGlobalEdit || isEnabled(StartDateBeforeLimit)) Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit))
               else if (accountingMethod.isDefined) Redirect(routes.SelfEmployedCYAController.show(businessId))
               else Redirect(routes.BusinessAccountingMethodController.show(businessId))
             case Left(_) =>

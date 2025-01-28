@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -34,6 +35,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{Busines
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with FeatureSwitching with MockSessionDataService {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(StartDateBeforeLimit)
+  }
 
   val id: String = "testId"
 
@@ -99,10 +105,25 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   }
 
-  "Submit" should {
-    "when it is not in edit mode" when {
-      "return 303, SEE_OTHER and redirect to Business Trade Name page" when {
-        "the user submits valid data" in {
+  "Submit" when {
+    "not in edit mode and user submits valid data" when {
+      "the start date before limit feature switch is enabled" should {
+        "return 303, SEE_OTHER and redirect to address lookup page" in {
+          enable(StartDateBeforeLimit)
+          mockAuthSuccess()
+          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+          val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+          )
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
+        }
+      }
+
+      "the start date before limit feature switch is disabled" should {
+        "return 303, SEE_OTHER and redirect to Business Trade Name page" in {
           mockAuthSuccess()
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
@@ -114,35 +135,23 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
         }
       }
-    }
-    "when it is in edit mode" when {
-      "return 303, SEE_OTHER and redirect to Self-employment Check Your Answer page" when {
-        "the user submits valid data" in {
-          mockAuthSuccess()
-          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestBusinessStartDateController.submit(id, isEditMode = true, isGlobalEdit = false)(
-            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
-          )
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
-        }
-      }
     }
-    "return 303, SEE_OTHER" when {
-      "the user submits valid data" in {
+    "in edit mode and user submits valid data" should {
+      "return 303, SEE_OTHER and redirect to Self-employment Check Your Answer page" in {
         mockAuthSuccess()
         mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-        val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(
+        val result = TestBusinessStartDateController.submit(id, isEditMode = true, isGlobalEdit = false)(
           fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id).url)
+        redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+
       }
     }
+
     "return 400, SEE_OTHER" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
@@ -157,19 +166,39 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   }
 
   "The back url" when {
-    "in global edit mode" should {
-      s"redirect to Self-Employment check your answer page" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
+
+    "the start date before limit feature switch is enabled" should {
+      "redirect to full income source page" when {
+        "in global edit mode" in {
+          enable(StartDateBeforeLimit)
+          TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = true) mustBe routes.FullIncomeSourceController.show(id, isEditMode = true, isGlobalEdit = true).url
+        }
+        "in edit mode" in {
+          enable(StartDateBeforeLimit)
+          TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = false) mustBe routes.FullIncomeSourceController.show(id, isEditMode = true).url
+        }
+        "not in edit mode" in {
+          enable(StartDateBeforeLimit)
+          TestBusinessStartDateController.backUrl(id, isEditMode = false, isGlobalEdit = false) mustBe routes.FullIncomeSourceController.show(id).url
+        }
       }
     }
-    "in edit mode" should {
-      s"redirect to Self-Employment check your answer page" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+
+    "the start date before limit feature switch is disabled" when {
+      "in global edit mode" should {
+        s"redirect to Self-Employment check your answer page" in {
+          TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
+        }
       }
-    }
-    "not in edit mode" should {
-      "redirect to business name page" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = false, isGlobalEdit = false) mustBe routes.BusinessNameController.show(id).url
+      "in edit mode" should {
+        s"redirect to Self-Employment check your answer page" in {
+          TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+        }
+      }
+      "not in edit mode" should {
+        "redirect to business name page" in {
+          TestBusinessStartDateController.backUrl(id, isEditMode = false, isGlobalEdit = false) mustBe routes.BusinessNameController.show(id).url
+        }
       }
     }
   }

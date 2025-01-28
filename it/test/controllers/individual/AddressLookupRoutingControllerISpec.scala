@@ -26,7 +26,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.EnableUseRealAddressLookup
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.{EnableUseRealAddressLookup, StartDateBeforeLimit}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, SoleTraderBusinesses}
 
@@ -177,52 +177,29 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
             }
           }
 
-          "business accounting method is not defined" when {
-            "the address id does not return from address service" should {
-              "return InternalServerException" in {
-                Given("I setup the Wiremock stubs")
-                stubAuthSuccess()
-                enable(EnableUseRealAddressLookup)
+        }
+        "business accounting method is not defined" when {
+          "the address id does not return from address service" should {
+            "return InternalServerException" in {
+              Given("I setup the Wiremock stubs")
+              stubAuthSuccess()
+              enable(EnableUseRealAddressLookup)
 
-                stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
-                getAddressDetailsUrlNoId(OK, Json.toJson(address)(Address.format))
+              stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
+              getAddressDetailsUrlNoId(OK, Json.toJson(address)(Address.format))
 
-                When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")
-                val res = getAddressLookupResponse(id, addressId, isEditMode = false)
+              When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")
+              val res = getAddressLookupResponse(id, addressId, isEditMode = false)
 
-                Then("Should return an internal server error")
-                res must have(
-                  httpStatus(INTERNAL_SERVER_ERROR)
-                )
-              }
-            }
-          }
-
-          "business accounting method is defined" when {
-            "the address lookup service return successful JSON details" should {
-              "redirect to sole trader check your answers page" in {
-                Given("I setup the Wiremock stubs")
-                stubAuthSuccess()
-                enable(EnableUseRealAddressLookup)
-
-                stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
-                stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
-                stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
-                stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-                When("GET /details/address-lookup/" + id + " is called")
-                val res = getAddressLookupResponse(id, addressId, isEditMode = false)
-
-                Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers pagee")
-                res must have(
-                  httpStatus(SEE_OTHER),
-                  redirectURI(BusinessCYAUri)
-                )
-              }
+              Then("Should return an internal server error")
+              res must have(
+                httpStatus(INTERNAL_SERVER_ERROR)
+              )
             }
           }
         }
-        "it is in edit mode" when {
+
+        "business accounting method is defined" when {
           "the address lookup service return successful JSON details" should {
             "redirect to sole trader check your answers page" in {
               Given("I setup the Wiremock stubs")
@@ -235,9 +212,9 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
               stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
               When("GET /details/address-lookup/" + id + " is called")
-              val res = getAddressLookupResponse(id, addressId, isEditMode = true)
+              val res = getAddressLookupResponse(id, addressId, isEditMode = false)
 
-              Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers")
+              Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers pagee")
               res must have(
                 httpStatus(SEE_OTHER),
                 redirectURI(BusinessCYAUri)
@@ -248,6 +225,28 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
       }
 
       "it is in edit mode" when {
+        "the address lookup service return successful JSON details" should {
+          "redirect to sole trader check your answers page" in {
+            Given("I setup the Wiremock stubs")
+            stubAuthSuccess()
+            enable(EnableUseRealAddressLookup)
+
+            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
+            stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
+            stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+
+            When("GET /details/address-lookup/" + id + " is called")
+            val res = getAddressLookupResponse(id, addressId, isEditMode = true)
+
+            Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(BusinessCYAUri)
+            )
+          }
+        }
+
         "the address lookup service return NOT_FOUND" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
@@ -299,6 +298,30 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           )
         }
       }
+
+      "the start date before limit feature switch is enabled" should {
+        "redirect to sole trader check your answers page" in {
+          enable(StartDateBeforeLimit)
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          enable(EnableUseRealAddressLookup)
+
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
+          stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+
+          When("GET /details/address-lookup/" + id + " is called")
+          val res = getAddressLookupResponse(id, addressId, isEditMode = false)
+
+          Then("Should return a SEE_OTHER with a redirect location of sole trader check your answers")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(BusinessCYAUri)
+          )
+        }
+      }
+
     }
   }
 }

@@ -22,6 +22,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm
@@ -46,7 +48,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             val languageUtils: LanguageUtils,
                                             val appConfig: AppConfig)
                                            (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ImplicitDateFormatter with ReferenceRetrieval with I18nSupport {
+  extends FrontendController(mcc) with ImplicitDateFormatter with ReferenceRetrieval with I18nSupport with FeatureSwitching {
 
   def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, isGlobalEdit: Boolean)
           (implicit request: Request[AnyContent]): Html = {
@@ -93,6 +95,8 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean) = Redirect(
     if (isEditMode || isGlobalEdit) {
       routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
+    } else if (isEnabled(StartDateBeforeLimit)) {
+      routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode)
     } else {
       routes.BusinessTradeNameController.show(id)
     }
@@ -100,10 +104,14 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   //save & retrieve on should have an order of: business name -> business start date (this) -> business trade
   //save & retrieve off should have an order of: business start date (this) -> business name -> business trade
-  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = if (isEditMode || isGlobalEdit) {
-    routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit).url
-  } else {
-    routes.BusinessNameController.show(id, isEditMode = isEditMode).url
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
+    if (isEnabled(StartDateBeforeLimit)) {
+      routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit).url
+    } else if (isEditMode || isGlobalEdit) {
+      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit).url
+    } else {
+      routes.BusinessNameController.show(id, isEditMode = isEditMode).url
+    }
   }
 
   def form(implicit request: Request[_]): Form[DateModel] = {
