@@ -123,6 +123,25 @@ business.change-accounting-method.line-1                        = Os oes gennych
 business.change-accounting-method.warning                       = Rhybudd
 business.change-accounting-method.warning-text                  = Os byddwch yn newid y dull cyfrifyddu ar gyfer y busnes hwn, bydd gwneud hynny’n diweddaru’r dull cyfrifyddu yn awtomatig ar gyfer pob un o’ch busnesau fel unig fasnachwr.
 
+# Sole trader streamline
+individual.full-income-source.heading                                   = Eich busnes fel unig fasnachwr
+individual.full-income-source.business-trade.label                      = Masnach
+individual.full-income-source.business-trade.hint                       = Er enghraifft plymio, gwaith trydanol neu drin gwallt
+individual.full-income-source.business-name.label                       = Enw’r busnes
+individual.full-income-source.business-name.hint                        = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar eich busnes, nodwch eich enw llawn.
+individual.full-income-source.start-date-before-limit.label             = A oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}?
+
+individual.error.full-income-source.business-trade.empty                = Nodwch fasnach y busnes hwn
+individual.error.full-income-source.business-trade.max-length           = Mae’n rhaid i’r fasnach fod yn 35 o gymeriadau neu lai
+individual.error.full-income-source.business-trade.min-length           = Mae’n rhaid i’r fasnach gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
+individual.error.full-income-source.business-trade.invalid              = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, '', \, /, -
+individual.error.full-income-source.business-name.empty                 = Nodwch eich enw neu enw’ch busnes
+individual.error.full-income-source.business-name.max-length            = Mae’n rhaid i enw’r busnes fod yn 105 o gymeriadau neu lai
+individual.error.full-income-source.business-name.min-length            = Mae’n rhaid i enw’r busnes gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
+individual.error.full-income-source.business-name.invalid               = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.
+individual.error.full-income-source.start-date-before-limit.empty       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
+
+
 # Self Employed CYA
 self-employed-cya.trading-start-date                            = Dyddiad dechrau masnachu
 self-employed-cya.trading-start-date.change                     = Newid dyddiad dechrau masnachu

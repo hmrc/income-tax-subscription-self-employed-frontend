@@ -22,6 +22,8 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
@@ -40,11 +42,17 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
                                                      (val sessionDataService: SessionDataService,
                                                       val appConfig: AppConfig)
                                                      (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with SessionRetrievals with I18nSupport {
+  extends FrontendController(mcc) with ReferenceRetrieval with SessionRetrievals with I18nSupport with FeatureSwitching {
 
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 
-  def backUrl(id: String): String = routes.BusinessTradeNameController.show(id).url
+  def backUrl(id: String): String = {
+    if(isEnabled(StartDateBeforeLimit)) {
+      routes.FullIncomeSourceController.show(id).url
+    } else {
+      routes.BusinessTradeNameController.show(id).url
+    }
+  }
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {

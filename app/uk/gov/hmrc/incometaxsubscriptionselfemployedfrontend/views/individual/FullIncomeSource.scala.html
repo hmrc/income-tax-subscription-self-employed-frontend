@@ -1,0 +1,79 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.StreamlineIncomeSourceForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ RadioHelper, SaveAndContinueButtonHelper }
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
+
+@this(
+    mainTemplate: PrincipalMainTemplate,
+    form: FormWithCSRF,
+    textInputHelper: TextInputHelper,
+    radioHelper: RadioHelper,
+    saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+)
+
+@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+
+@mainTemplate(title = messages("individual.full-income-source.heading"), optForm = Some(fullIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
+
+    <h1 class="govuk-heading-l">@messages("individual.full-income-source.heading")</h1>
+
+    @form(action = postAction) {
+
+        @textInputHelper(
+            field = fullIncomeSourceForm(StreamlineIncomeSourceForm.businessTradeName),
+            label = messages("individual.full-income-source.business-trade.label"),
+            hint = Some(Html(messages("individual.full-income-source.business-trade.hint"))),
+            isPageHeading = false,
+            classes = Some("govuk-!-width-one-half")
+        )
+
+        @textInputHelper(
+            field = fullIncomeSourceForm(StreamlineIncomeSourceForm.businessName),
+            label = messages("individual.full-income-source.business-name.label"),
+            hint = Some(Html(messages("individual.full-income-source.business-name.hint"))),
+            isPageHeading = false,
+            classes = Some("govuk-!-width-one-half")
+        )
+
+        @radioHelper(
+            field = fullIncomeSourceForm(StreamlineIncomeSourceForm.startDateBeforeLimit),
+            legend = messages("individual.full-income-source.start-date-before-limit.label", AccountingPeriodUtil.getStartDateLimit.getYear.toString),
+            isPageHeading = false,
+            customHeadingClass = Some("govuk-!-font-weight-bold"),
+            radioItems = Seq(
+                RadioItem(
+                    content = Text(messages("base.yes")),
+                    value = Some(YesNoMapping.option_yes)
+                ),
+                RadioItem(
+                    content = Text(messages("base.no")),
+                    value = Some(YesNoMapping.option_no)
+                )
+            ),
+            inline = true
+        )
+
+        @saveAndContinueButtonHelper(
+            individual = true,
+            saveAndReturnReference = Some("sole-trader-income-source")
+        )
+    }
+}

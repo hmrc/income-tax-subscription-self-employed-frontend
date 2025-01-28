@@ -24,6 +24,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{HTML, await, contentType, defaultAwaitTimeout, redirectLocation, status}
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
@@ -38,7 +40,12 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individu
 import scala.concurrent.Future
 
 class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService with MockMultipleSelfEmploymentsService {
+  with MockSessionDataService with MockMultipleSelfEmploymentsService with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(StartDateBeforeLimit)
+  }
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -195,6 +202,20 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
 
         status(response) mustBe BAD_REQUEST
         contentType(response) mustBe Some(HTML)
+      }
+    }
+  }
+
+  "backUrl" when {
+    "the start date before limit feature switch is enabled" should {
+      "redirect back to the full income source page" in {
+        enable(StartDateBeforeLimit)
+        TestBusinessAddressConfirmationController.backUrl(id) mustBe routes.FullIncomeSourceController.show(id).url
+      }
+    }
+    "the start date before limit feature switch is disabled" should {
+      "redirect back to the full income source page" in {
+        TestBusinessAddressConfirmationController.backUrl(id) mustBe routes.BusinessTradeNameController.show(id).url
       }
     }
   }

@@ -123,6 +123,25 @@ business.change-accounting-method.line-1                        = If you have mo
 business.change-accounting-method.warning                       = Warning
 business.change-accounting-method.warning-text                  = If you change the accounting method for this business, it will automatically update the accounting method across all your sole trader businesses.
 
+# Sole trader streamline
+individual.full-income-source.heading                                     = Your sole trader business
+individual.full-income-source.business-trade.label                        = Trade
+individual.full-income-source.business-trade.hint                         = For example plumbing, electrical work or hairdressing
+individual.full-income-source.business-name.label                         = Business name
+individual.full-income-source.business-name.hint                          = This is the business name you used to register for Self Assessment. If your business does not have a name, enter your full name.
+individual.full-income-source.start-date-before-limit.label               = Did this business start before 6 April {0}?
+
+individual.error.full-income-source.business-trade.empty                  = Enter the trade of this business
+individual.error.full-income-source.business-trade.max-length             = Trade must be 35 characters or less
+individual.error.full-income-source.business-trade.min-length             = Trade must have at least 2 letters (upper or lower case)
+individual.error.full-income-source.business-trade.invalid                = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
+individual.error.full-income-source.business-name.empty                   = Enter your name or the name of your business
+individual.error.full-income-source.business-name.max-length              = Business name must be 105 characters or less
+individual.error.full-income-source.business-name.min-length              = Business name must have at least 2 letters (upper or lower case)
+individual.error.full-income-source.business-name.invalid                 = Business name can only include characters listed
+individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
+
+
 #Self Employed CYA
 self-employed-cya.trading-start-date                            = Trading start date
 self-employed-cya.trading-start-date.change                     = Change trading start date

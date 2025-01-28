@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -35,6 +36,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.Business
 class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
   with MockSessionDataService with MockMultipleSelfEmploymentsService
   with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(StartDateBeforeLimit)
+  }
 
   override val controllerName: String = "BusinessAccountingMethodController"
   private val testId = "testId"
@@ -109,7 +115,22 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER)" when {
       "the user submits valid data" when {
         "not in edit mode" when {
-          "an ID is provided" should {
+          "the start date before limit feature switch is enabled" should {
+            "redirect to the full income source page" in withController { controller =>
+              enable(StartDateBeforeLimit)
+              mockAuthSuccess()
+              mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+
+              val result = controller.submit(id = id, isEditMode = false, isGlobalEdit = false)(
+                fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+              )
+
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustBe Some(routes.FullIncomeSourceController.show(testId).url)
+            }
+          }
+
+          "the start date before limit feature switch is disabled" should {
             "redirect to the self employed CYA page" in withController { controller =>
               mockAuthSuccess()
               mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
@@ -122,7 +143,6 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
               redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(testId).url)
             }
           }
-
         }
 
         "in edit mode" when {
@@ -160,7 +180,8 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
         }
       }
     }
-    "return 400, SEE_OTHER)" when {
+
+    "return 400, BAD_REQUEST" when {
       "the user submits invalid data" in withController { controller =>
         mockAuthSuccess()
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
@@ -212,6 +233,16 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
           controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = true, selfEmploymentCount = 1) mustBe
             Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true, isGlobalEdit = true).url)
         }
+      }
+    }
+
+    "the start date before limit feature switch is enabled" should {
+      "redirect to your income sources" in withController { controller =>
+        enable(StartDateBeforeLimit)
+        mockAuthSuccess()
+        controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = false, selfEmploymentCount =  1) mustBe
+          Some(appConfig.yourIncomeSourcesUrl)
+
       }
     }
   }
