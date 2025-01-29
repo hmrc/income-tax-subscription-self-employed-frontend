@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.Control
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testBusinessStartDateModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.{testBusinessStartDateLimitModel, testBusinessStartDateModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
@@ -63,12 +63,12 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     appConfig
   )
 
-  def modelToFormData(businessStartDateModel: DateModel): Seq[(String, String)] = {
+  def modelToFormData(businessStartDateModel: DateModel, featureSwitchEnabled: Boolean): Seq[(String, String)] = {
     BusinessStartDateForm.businessStartDateForm(
       BusinessStartDateForm.minStartDate,
       BusinessStartDateForm.maxStartDate,
-      d => d.toString
-    ).fill(businessStartDateModel).data.toSeq
+      d => d.toString,
+      featureSwitchEnabled).fill(businessStartDateModel).data.toSeq
   }
 
   "Show" should {
@@ -111,10 +111,10 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         "return 303, SEE_OTHER and redirect to address lookup page" in {
           enable(StartDateBeforeLimit)
           mockAuthSuccess()
-          mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+          mockSaveBusinessStartDate(id, testBusinessStartDateLimitModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(
-            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateLimitModel, featureSwitchEnabled = true): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -128,7 +128,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(
-            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+            fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel, featureSwitchEnabled = false): _*)
           )
 
           status(result) mustBe SEE_OTHER
@@ -143,7 +143,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
         val result = TestBusinessStartDateController.submit(id, isEditMode = true, isGlobalEdit = false)(
-          fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel): _*)
+          fakeRequest.withFormUrlEncodedBody(modelToFormData(testBusinessStartDateModel, featureSwitchEnabled = false): _*)
         )
 
         status(result) mustBe SEE_OTHER
@@ -155,7 +155,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     "return 400, SEE_OTHER" when {
       "the user submits invalid data" in {
         mockAuthSuccess()
-        mockSaveBusinessStartDate(id, testBusinessStartDateModel)(Right(PostSubscriptionDetailsSuccessResponse))
+        mockSaveBusinessStartDate(id, testBusinessStartDateLimitModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
         val result = TestBusinessStartDateController.submit(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 

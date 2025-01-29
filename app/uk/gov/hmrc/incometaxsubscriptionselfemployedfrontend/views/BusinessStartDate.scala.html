@@ -19,10 +19,10 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 @this(
         mainTemplate: PrincipalMainTemplate,
-        continueButton: ContinueButton,
         dateHelper: DateHelper,
         form: FormWithCSRF,
         pageHeadingHelper: PageHeadingHelper,
@@ -40,15 +40,14 @@
             isSection = true
         )
 
-        <p class="govuk-body" id="business-start-date.line-1">@messages("business.start-date.line-1")</p>
-        <p class="govuk-body" id="business-start-date.line-2">@messages("business.start-date.line-2")</p>
+        <p class="govuk-body" id="business-start-date.line-1">@messages("business.start-date.paragraph")</p>
 
         @dateHelper(
             field = businessStartDateForm(startDate),
             legendContent = messages("business.start-date.heading"),
             isLegendVisible = false,
             parentForm = businessStartDateForm,
-            hintText = Some(messages("business.start-date.hint")),
+            hintText = Some(messages("business.start-date.hint", AccountingPeriodUtil.getStartDateLimit.getYear.toString)),
             isPageHeading = false
         )
 

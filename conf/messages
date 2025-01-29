@@ -44,12 +44,11 @@ error.business-name.max-length                                  = Business name 
 error.business-name.invalid-character                           = Business name can only include characters listed.
 
 # Business start date
-business.start-date.title                                       = When did your business start trading?
-business.start-date.heading                                     = When did your business start trading?
-business.start-date.caption                                     = Sole trader
-business.start-date.line-1                                      = The date your business started trading can be today, in the past or up to 7 days in the future
-business.start-date.line-2                                      = This is the date we’ll use to calculate Class 2 National Insurance charge, if appropriate.
-business.start-date.hint                                        = For example, 17 4 2018.
+business.start-date.title                                       = Start date for sole trader business
+business.start-date.heading                                     = Start date
+business.start-date.caption                                     = Your sole trader business
+business.start-date.paragraph                                   = We need to know the exact start date.
+business.start-date.hint                                        = For example, 27 9 {0}
 error.business-start-date.day-month-year.empty                  = Enter the date your business started trading.
 error.business-start-date.day.empty                             = The date must include a day.
 error.business-start-date.month.empty                           = The date must include a month.
@@ -67,6 +66,25 @@ error.business-start-date.day-month.invalid                     = The date must 
 error.business-start-date.day-year.invalid                      = The date must be a real date.
 error.business-start-date.month-year.invalid                    = The date must be a real date.
 error.business-start-date.year.length                           = The year must be in four digits. For example, 2020.
+### StartDateBeforeLimit f/s on validation:
+error.business.start-date.day-month-year.empty                  = Enter the date your business started trading
+error.business.start-date.day.empty                             = The date must include a day
+error.business.start-date.month.empty                           = The date must include a month
+error.business.start-date.year.empty                            = The date must include a year
+error.business.start-date.day-month.empty                       = The date must include a day and month
+error.business.start-date.day-year.empty                        = The date must include a day and year
+error.business.start-date.month-year.empty                      = The date must include a month and year
+error.business.start-date.day-month-year.max-date               = The date cannot be more than 7 days in the future
+error.business.start-date.day-month-year.min-date               = The date must be on or after <span class="govuk-nowrap">{0}</span>
+error.business.start-date.day-month-year.invalid                = The date must be a real date
+error.business.start-date.day.invalid                           = The date must be a real date
+error.business.start-date.month.invalid                         = The date must be a real date
+error.business.start-date.year.invalid                          = The date must be a real date
+error.business.start-date.day-month.invalid                     = The date must be a real date
+error.business.start-date.day-year.invalid                      = The date must be a real date
+error.business.start-date.month-year.invalid                    = The date must be a real date
+error.business.start-date.year.length                           = Year must include 4 numbers
+###
 
 # Business trade name
 business.trade-name.title                                       = What is the trade of your business?

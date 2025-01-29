@@ -151,13 +151,13 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def submitBusinessStartDate(request: Option[DateModel], id: String, inEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse = {
+  def submitBusinessStartDate(request: Option[DateModel], id: String, inEditMode: Boolean = false, isGlobalEdit: Boolean = false, featureSwitchEnabled: Boolean): WSResponse = {
     val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode&isGlobalEdit=$isGlobalEdit"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm(
-            BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString
+            BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString, featureSwitchEnabled
           ).fill(model).data.map {
             case (k, v) =>
               (k, Seq(v))
