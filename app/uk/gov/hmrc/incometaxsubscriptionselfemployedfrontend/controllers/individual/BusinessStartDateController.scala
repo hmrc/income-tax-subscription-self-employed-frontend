@@ -64,8 +64,10 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     authService.authorised() {
       withIndividualReference { reference =>
         multipleSelfEmploymentsService.fetchStartDate(reference, id).map {
-          case Right(businessStartDateData) => Ok(view(form.fill(businessStartDateData), id, isEditMode, isGlobalEdit))
-          case Left(error) => throw new InternalServerException(error.toString)
+          case Right(businessStartDateData) =>
+            Ok(view(form(isEnabled(StartDateBeforeLimit)).fill(businessStartDateData), id, isEditMode, isGlobalEdit))
+          case Left(error) =>
+            throw new InternalServerException(error.toString)
         }
       }
     }
@@ -74,7 +76,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
-        form.bindFromRequest().fold(
+        form(isEnabled(StartDateBeforeLimit)).bindFromRequest().fold(
           formWithErrors => {
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
           },
@@ -114,8 +116,8 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  def form(implicit request: Request[_]): Form[DateModel] = {
-    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toLongDate())
+  def form(featureSwitchEnabled: Boolean)(implicit request: Request[_]): Form[DateModel] = {
+    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toLongDate(), featureSwitchEnabled)
   }
 
 }

@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.data.Forms.single
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 import java.time.LocalDate
 
@@ -29,19 +30,36 @@ object BusinessStartDateForm {
 
   def minStartDate: LocalDate = LocalDate.of(1900, 1, 1)
 
+  val minStartDateLimit: LocalDate = AccountingPeriodUtil.getStartDateLimit
+
   val startDate: String = "startDate"
 
   val errorContext: String = "business-start-date"
+  val featureSwitchErrorContext: String = "business.start-date"
 
-  def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String): Form[DateModel] = Form(
-    single(
-      startDate -> DateModelMapping.dateModelMapping(
-        errorContext = errorContext,
-        minDate = Some(minStartDate),
-        maxDate = Some(maxStartDate),
-        dateFormatter = Some(f)
+  def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String,
+                            startDateFeatureSwitchEnabled: Boolean): Form[DateModel] = Form(
+
+    if (startDateFeatureSwitchEnabled) {
+      single(
+        startDate -> DateModelMapping.dateModelMapping(
+          errorContext = featureSwitchErrorContext,
+          minDate = Some(minStartDateLimit),
+          maxDate = Some(maxStartDate),
+          dateFormatter = Some(f)
+        )
       )
-    )
+    } else {
+      single(
+        startDate -> DateModelMapping.dateModelMapping(
+          errorContext = errorContext,
+          minDate = Some(minStartDate),
+          maxDate = Some(maxStartDate),
+          dateFormatter = Some(f)
+        )
+      )
+    }
+
   )
 
 }

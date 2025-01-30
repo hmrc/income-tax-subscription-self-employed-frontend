@@ -44,12 +44,11 @@ error.business-name.max-length                                  = Rhaid i’r en
 error.business-name.invalid-character                           = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.
 
 # Business start date
-business.start-date.title                                       = Pryd y dechreuodd eich busnes fasnachu?
-business.start-date.heading                                     = Pryd y dechreuodd eich busnes fasnachu?
-business.start-date.caption                                     = Unig fasnachwr
-business.start-date.line-1                                      = Gall y dyddiad y dechreuodd eich busnes fasnachu fod heddiw, yn y gorffennol neu hyd at 8 diwrnod yn y dyfodol
-business.start-date.line-2                                      = Byddwn yn defnyddio’r dyddiad hwn i gyfrifo’r ffi Yswiriant Gwladol Dosbarth 2, os yw’n briodol.
-business.start-date.hint                                        = Er enghraifft, 17 4 2018.
+business.start-date.title                                       = PDyddiad dechrau’r busnes fel unig fasnachwr
+business.start-date.heading                                     = Dyddiad dechrau
+business.start-date.caption                                     = Eich busnes fel unig fasnachwr
+business.start-date.paragraph                                   = Mae angen i ni wybod yr union ddyddiad dechrau.
+business.start-date.hint                                        = Er enghraifft, 27 9 {0}
 error.business-start-date.day-month-year.empty                  = Nodwch y dyddiad y gwnaeth eich busnes ddechrau masnachu.
 error.business-start-date.day.empty                             = Mae’n rhaid i’r dyddiad gynnwys diwrnod.
 error.business-start-date.month.empty                           = Mae’n rhaid i’r dyddiad gynnwys mis.
@@ -67,6 +66,25 @@ error.business-start-date.day-month.invalid                     = Rhaid i’r dy
 error.business-start-date.day-year.invalid                      = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 error.business-start-date.month-year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn.
 error.business-start-date.year.length                           = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020.
+### StartDateBeforeLimit f/s on validation:
+error.business.start-date.day-month-year.empty                  = Nodwch y dyddiad y dechreuodd eich busnes fasnachu
+error.business.start-date.day.empty                             = Mae’n rhaid i’r dyddiad gynnwys diwrnod
+error.business.start-date.month.empty                           = Mae’n rhaid i’r dyddiad gynnwys mis
+error.business.start-date.year.empty                            = Mae’n rhaid i’r dyddiad gynnwys blwyddyn
+error.business.start-date.day-month.empty                       = Mae’n rhaid i’r dyddiad gynnwys diwrnod a mis
+error.business.start-date.day-year.empty                        = Mae’n rhaid i’r dyddiad gynnwys diwrnod a blwyddyn
+error.business.start-date.month-year.empty                      = Mae’n rhaid i’r dyddiad gynnwys mis a blwyddyn
+error.business.start-date.day-month-year.max-date               = Ni all y dyddiad fod yn fwy na 7 diwrnod yn y dyfodol
+error.business.start-date.day-month-year.min-date               = Mae’n rhaid i’r dyddiad fod ar neu ar ôl <span class="govuk-nowrap">{0}</span>
+error.business.start-date.day.invalid                           = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business.start-date.month.invalid                         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business.start-date.day-month-year.invalid                = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business.start-date.year.invalid                          = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business.start-date.day-month.invalid                     = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business.start-date.day-year.invalid                      = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business.start-date.month-year.invalid                    = Rhaid i’r dyddiad fod yn ddyddiad go iawn
+error.business.start-date.year.length                           = Mae’n rhaid i flwyddyn fod yn bedwar digid. Er enghraifft, 2020
+###
 
 # Business trade name
 business.trade-name.title                                       = Beth yw masnach eich busnes?

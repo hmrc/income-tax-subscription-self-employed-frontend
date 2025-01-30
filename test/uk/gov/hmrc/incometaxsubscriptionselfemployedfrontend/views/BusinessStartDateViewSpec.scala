@@ -28,19 +28,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
 
-import java.time.LocalDate
-
 class BusinessStartDateViewSpec extends ViewSpec {
 
   object BusinessStartDateMessages {
-    val title = "When did your business start trading?"
+    val title = "Start date for sole trader business"
     val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
-    val heading: String = title
-    val captionHidden = "This section is"
-    val captionVisual = "Sole trader"
-    val line_1: String = "The date your business started trading can be today, in the past or up to 7 days in the future"
-    val line_2: String = "This is the date we’ll use to calculate Class 2 National Insurance charge, if appropriate."
-    val hint = "For example, 17 4 2018."
+    val heading: String = "Start date"
+    val captionVisual = "Your sole trader business"
+    val paragraph: String = "We need to know the exact start date."
+    val hint = "For example, 27 9 2022"
     val backLink = "Back"
     val update = "Update"
     val saveAndContinue = "Save and continue"
@@ -48,15 +44,17 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val empty = "Enter the date your business started trading."
     val maxDate = s"The date the business started trading must be on or before 11 April 2021."
     val minDate = "The date your business started must be on or after 11 April 2021."
+
+    val startDateBeforeLimitMaxDate = s"The date cannot be more than 7 days in the future"
+    val startDateBeforeLimitMinDate = "The date must be on or after 6 April 2021"
   }
 
-  val backUrl: String = testBackUrl
-  val action: Call = testCall
-  val taxYearEnd: Int = 2020
-  private val testError: FormError = FormError("startDate", "error.business-start-date.day-month-year.empty")
+  private val emptyError: FormError = FormError("startDate", "error.business-start-date.day-month-year.empty")
 
   private val dateTooLateError = FormError("startDate", "error.business-start-date.day-month-year.max-date", List("11 April 2021"))
   private val dateTooEarlyError = FormError("startDate", "error.business-start-date.day-month-year.min-date", List("11 April 2021"))
+  private val startDateBeforeLimitMaxDateError = FormError("startDate", "error.business.start-date.day-month-year.max-date", List("11 April 2021"))
+  private val startDateBeforeLimitMinDateError = FormError("startDate", "error.business.start-date.day-month-year.min-date", List("6 April 2021"))
 
   val businessStartDateView: BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
 
@@ -64,7 +62,8 @@ class BusinessStartDateViewSpec extends ViewSpec {
                isEditMode: Boolean = false,
                form: Form[DateModel] = BusinessStartDateForm.businessStartDateForm(
                  BusinessStartDateForm.minStartDate,
-                 BusinessStartDateForm.maxStartDate, d => d.toString
+                 BusinessStartDateForm.maxStartDate, d => d.toString,
+                 startDateFeatureSwitchEnabled = false
                )
              ) {
     val page: HtmlFormat.Appendable = businessStartDateView(
@@ -84,7 +83,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
     }
 
-    "have the correct heading and caption" in new Setup{
+    "have the correct heading and caption" in new Setup {
       document.mainContent.mustHaveHeadingAndCaption(
         heading = BusinessStartDateMessages.heading,
         caption = BusinessStartDateMessages.captionVisual,
@@ -92,16 +91,16 @@ class BusinessStartDateViewSpec extends ViewSpec {
       )
     }
 
-    "have paragraphs" in new Setup {
-      document.getElementById("business-start-date.line-1").text mustBe BusinessStartDateMessages.line_1
-      document.getElementById("business-start-date.line-2").text mustBe BusinessStartDateMessages.line_2
+    "have a paragraph" in new Setup {
+      document.mainContent.getParagraphNth(1) mustBe BusinessStartDateMessages.paragraph
     }
+
     "have a Form" in new Setup {
       document.getForm.attr("method") mustBe testCall.method
       document.getForm.attr("action") mustBe testCall.url
     }
 
-    "has a correct date input field with the legend as the page heading" when {
+    "has the correct date input field with the legend as the page heading" when {
       "there is no error on the page" in new Setup {
         document.getForm.mustHaveDateInput(
           id = "startDate",
@@ -117,61 +116,17 @@ class BusinessStartDateViewSpec extends ViewSpec {
         )
       }
 
-      "has a form empty error on page" in new Setup(
-        isEditMode = false,
-        form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-          BusinessStartDateForm.maxStartDate, d => d.toString).withError(testError)
-      ) {
-        document.mustHaveDateInput(
-          id = "startDate",
-          legend = BusinessStartDateMessages.heading,
-          exampleDate = BusinessStartDateMessages.hint,
-          errorMessage = Some(BusinessStartDateMessages.empty),
-          isHeading = false,
-          isLegendHidden = true,
-          dateInputsValues = Seq(
-            DateInputFieldValues("Day", None),
-            DateInputFieldValues("Month", None),
-            DateInputFieldValues("Year", None)
-          )
-        )
-      }
-
-      "has a max date error on page" in new Setup(
-        isEditMode = false,
-        form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-          BusinessStartDateForm.maxStartDate, d => d.toString).withError(dateTooLateError)
-      ) {
-
-        document.mustHaveDateInput(
-          id = "startDate",
-          legend = BusinessStartDateMessages.heading,
-          exampleDate = BusinessStartDateMessages.hint,
-          errorMessage = Some(BusinessStartDateMessages.maxDate),
-          isHeading = false,
-          isLegendHidden = true,
-          dateInputsValues = Seq(
-            DateInputFieldValues("Day", None),
-            DateInputFieldValues("Month", None),
-            DateInputFieldValues("Year", None)
-          )
-        )
-      }
-
-    }
-
-      "has a min date error on page" in new Setup(
-        isEditMode = false,
-        form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-          BusinessStartDateForm.maxStartDate, d => d.toString).withError(dateTooEarlyError)
-      ) {
-        {
-
+      "the start date before limit feature switch is enabled" which {
+        "has a form empty error on page" in new Setup(
+          isEditMode = false,
+          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = true).withError(emptyError)
+        ) {
           document.mustHaveDateInput(
             id = "startDate",
             legend = BusinessStartDateMessages.heading,
             exampleDate = BusinessStartDateMessages.hint,
-            errorMessage = Some(BusinessStartDateMessages.minDate),
+            errorMessage = Some(BusinessStartDateMessages.empty),
             isHeading = false,
             isLegendHidden = true,
             dateInputsValues = Seq(
@@ -181,25 +136,136 @@ class BusinessStartDateViewSpec extends ViewSpec {
             )
           )
         }
-      }
 
-      "has buttons" which {
-        "include the save and continue button" in new Setup() {
-          document.getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
+        "has a max date error on page" in new Setup(
+          isEditMode = false,
+          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = true).withError(startDateBeforeLimitMaxDateError)
+        ) {
+
+          document.mustHaveDateInput(
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            errorMessage = Some(BusinessStartDateMessages.startDateBeforeLimitMaxDate),
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
+          )
         }
-        "include the save and come back later link" in new Setup() {
-          val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
-          saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBack
-          saveAndComeBackLink.attr("href") mustBe
-            appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-trading-start-date"
+
+        "has a min date error on page" in new Setup(
+          isEditMode = false,
+          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = true).withError(startDateBeforeLimitMinDateError)
+        ) {
+          {
+
+            document.mustHaveDateInput(
+              id = "startDate",
+              legend = BusinessStartDateMessages.heading,
+              exampleDate = BusinessStartDateMessages.hint,
+              errorMessage = Some(BusinessStartDateMessages.startDateBeforeLimitMinDate),
+              isHeading = false,
+              isLegendHidden = true,
+              dateInputsValues = Seq(
+                DateInputFieldValues("Day", None),
+                DateInputFieldValues("Month", None),
+                DateInputFieldValues("Year", None)
+              )
+            )
+          }
         }
       }
 
-      "have a backlink " in new Setup {
-        private val backLink: Elements = document.select(".govuk-back-link")
-        backLink.text mustBe BusinessStartDateMessages.backLink
-        backLink.attr("href") mustBe testBackUrl
-      }
+      "the start date before limit feature switch is disabled" which {
+        "has a form empty error on page" in new Setup(
+          isEditMode = false,
+          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = false).withError(emptyError)
+        ) {
+          document.mustHaveDateInput(
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            errorMessage = Some(BusinessStartDateMessages.empty),
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
+          )
+        }
 
+        "has a max date error on page" in new Setup(
+          isEditMode = false,
+          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = false).withError(dateTooLateError)
+        ) {
+
+          document.mustHaveDateInput(
+            id = "startDate",
+            legend = BusinessStartDateMessages.heading,
+            exampleDate = BusinessStartDateMessages.hint,
+            errorMessage = Some(BusinessStartDateMessages.maxDate),
+            isHeading = false,
+            isLegendHidden = true,
+            dateInputsValues = Seq(
+              DateInputFieldValues("Day", None),
+              DateInputFieldValues("Month", None),
+              DateInputFieldValues("Year", None)
+            )
+          )
+        }
+
+        "has a min date error on page" in new Setup(
+          isEditMode = false,
+          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
+            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = false).withError(dateTooEarlyError)
+        ) {
+          {
+
+            document.mustHaveDateInput(
+              id = "startDate",
+              legend = BusinessStartDateMessages.heading,
+              exampleDate = BusinessStartDateMessages.hint,
+              errorMessage = Some(BusinessStartDateMessages.minDate),
+              isHeading = false,
+              isLegendHidden = true,
+              dateInputsValues = Seq(
+                DateInputFieldValues("Day", None),
+                DateInputFieldValues("Month", None),
+                DateInputFieldValues("Year", None)
+              )
+            )
+          }
+        }
+      }
     }
+
+    "has buttons" which {
+      "include the save and continue button" in new Setup() {
+        document.getForm.getGovukButton.text mustBe BusinessStartDateMessages.saveAndContinue
+      }
+      "include the save and come back later link" in new Setup() {
+        val saveAndComeBackLink: Element = document.selectHead("a[role=button]")
+        saveAndComeBackLink.text mustBe BusinessStartDateMessages.saveAndComeBack
+        saveAndComeBackLink.attr("href") mustBe
+          appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-trading-start-date"
+      }
+    }
+
+    "have a backlink " in new Setup {
+      private val backLink: Elements = document.select(".govuk-back-link")
+      backLink.text mustBe BusinessStartDateMessages.backLink
+      backLink.attr("href") mustBe testBackUrl
+    }
+
   }
+}

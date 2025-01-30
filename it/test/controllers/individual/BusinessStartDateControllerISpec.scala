@@ -32,7 +32,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
-  val testStartDate: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
+  private val testStartDate: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
+  private val pageTitle = "Start date for sole trader business"
 
   val soleTraderBusinessesWithoutStartDate: SoleTraderBusinesses = soleTraderBusinesses.copy(
     businesses = soleTraderBusinesses.businesses.map(_.copy(startDate = None))
@@ -52,7 +53,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
         Then("should return an OK with the BusinessStartDatePage")
         res must have(
           httpStatus(OK),
-          pageTitle("When did your business start trading?" + titleSuffix),
+          pageTitle(pageTitle + titleSuffix),
           dateField("startDate", DateModel("", "", ""))
         )
       }
@@ -71,7 +72,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
 
         res must have(
           httpStatus(OK),
-          pageTitle("When did your business start trading?" + titleSuffix),
+          pageTitle(pageTitle + titleSuffix),
           dateField("startDate", testStartDate)
         )
       }
@@ -90,7 +91,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /business-start-date is called")
-          val res = submitBusinessStartDate(Some(testStartDate), id)
+          val res = submitBusinessStartDate(Some(testStartDate), id, featureSwitchEnabled = false)
 
           Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
           res must have(
@@ -106,12 +107,12 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
 
         When("POST /business-start-date is called")
-        val res = submitBusinessStartDate(None, id)
+        val res = submitBusinessStartDate(None, id, featureSwitchEnabled = false)
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
           httpStatus(BAD_REQUEST),
-          pageTitle("Error: When did your business start trading?" + titleSuffix)
+          pageTitle("Error: " + pageTitle + titleSuffix)
         )
       }
     }
@@ -126,7 +127,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /business-start-date is called")
-          val res = submitBusinessStartDate(Some(testStartDate), id, inEditMode = true)
+          val res = submitBusinessStartDate(Some(testStartDate), id, inEditMode = true, featureSwitchEnabled = false)
 
 
           Then("Should return a SEE_OTHER with a redirect location of check your answers")
