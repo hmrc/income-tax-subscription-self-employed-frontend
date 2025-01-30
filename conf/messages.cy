@@ -143,21 +143,13 @@ individual.error.full-income-source.start-date-before-limit.empty       = Dewisw
 
 
 # Self Employed CYA
-self-employed-cya.trading-start-date                            = Dyddiad dechrau masnachu
-self-employed-cya.trading-start-date.change                     = Newid dyddiad dechrau masnachu
-self-employed-cya.trading-start-date.add                        = Ychwanegu dyddiad dechrau masnachu
+self-employed-cya.trading-start-date                            = Dyddiad dechrau
+self-employed-cya.start-date-before-limit.label                 = Cyn 6 Ebrill {0}
 self-employed-cya.business-name                                 = Enw’r busnes
-self-employed-cya.business-name.change                          = Newid enw’r busnes
-self-employed-cya.business-name.add                             = Ychwanegu enw’r busnes
-self-employed-cya.business-trade                                = Math o fasnach
-self-employed-cya.business-trade.change                         = Newid y math o fasnach
-self-employed-cya.business-trade.add                            = Ychwanegu’r math o fasnach
+self-employed-cya.business-trade                                = Masnach
+self-employed-cya.business-trade.change-hidden                  = y fasnach
 self-employed-cya.business-address                              = Cyfeiriad
-self-employed-cya.business-address.change                       = Newid cyfeiriad
-self-employed-cya.business-address.add                          = Ychwanegu cyfeiriad
 self-employed-cya.accounting-method                             = Dull cyfrifyddu ar gyfer incwm unig fasnachwr
-self-employed-cya.accounting-method.change                      = Newid y dull cyfrifyddu ar gyfer incwm unig fasnachwr
-self-employed-cya.accounting-method.add                         = Ychwanegu’r dull cyfrifyddu ar gyfer incwm unig fasnachwr
 self-employed-cya.accounting-method.cash                        = Cyfrifyddu ar sail arian parod
 self-employed-cya.accounting-method.accruals                    = Cyfrifyddu traddodiadol
 self-employed-cya.title                                         = Gwiriwch eich atebion - busnes unig fasnachwr
@@ -258,8 +250,8 @@ agent.self-employed-cya.heading                                 = Gwirio’ch at
 agent.self-employed-cya.caption                                 = Y busnes unig fasnachwr a nodwyd gennych
 
 #Enable AgentStreamline Self Employed CYA
-agent.self-employed-cya.business-trade.streamline               = Fasnach
-agent.self-employed-cya.business-trade.change.streamline        = Newid y fasnach
+agent.self-employed-cya.business-trade.streamline               = Masnach
+agent.self-employed-cya.business-trade.change-hidden            = y fasnach
 agent.self-employed-cya.trading-start-date.streamline           = Dyddiad dechrau
 agent.self-employed-cya.start-date-before-limit.label           = Cyn 6 Ebrill {0}
 agent.self-employed-cya.trading-start-date.change.streamline    = Newid y dyddiad dechrau

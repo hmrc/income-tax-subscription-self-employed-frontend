@@ -72,7 +72,7 @@
     }
 }
 
-@simpleSummaryListRow(key: String, value: Option[String], changeHref: String, id: String, htmlValue: Boolean = false) = @{
+@simpleSummaryListRow(key: String, value: Option[String], changeHref: String, id: String, htmlValue: Boolean = false, hiddenText: Option[String] = None) = @{
     SummaryListRow(
         key = Key(content = Text(key)),
         value = Value(content = if(htmlValue) HtmlContent(value.getOrElse("")) else Text(value.getOrElse(""))),
@@ -81,7 +81,7 @@
                 ActionItem(
                     href = changeHref,
                     content = Text(messages(if(value.isDefined) "base.change" else "base.add")),
-                    visuallyHiddenText = Some(key)
+                    visuallyHiddenText = if(hiddenText.isDefined) {hiddenText} else {Some(key)}
                 )
             )
         ))
@@ -129,7 +129,8 @@
             } else {
                 routes.NextIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
             },
-        id = businessId
+        id = businessId,
+        hiddenText = Some(messages("agent.self-employed-cya.business-trade.change-hidden"))
     )
 }
 
