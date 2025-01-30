@@ -143,21 +143,13 @@ individual.error.full-income-source.start-date-before-limit.empty         = Sele
 
 
 #Self Employed CYA
-self-employed-cya.trading-start-date                            = Trading start date
-self-employed-cya.trading-start-date.change                     = Change trading start date
-self-employed-cya.trading-start-date.add                        = Add trading start date
+self-employed-cya.trading-start-date                            = Start date
+self-employed-cya.start-date-before-limit.label         = Before 6 April {0}
 self-employed-cya.business-name                                 = Business name
-self-employed-cya.business-name.change                          = Change Business name
-self-employed-cya.business-name.add                             = Add Business name
-self-employed-cya.business-trade                                = Type of trade
-self-employed-cya.business-trade.change                         = Change type of trade
-self-employed-cya.business-trade.add                            = Add type of trade
+self-employed-cya.business-trade                                = Trade
+self-employed-cya.business-trade.change-hidden                  = Trade
 self-employed-cya.business-address                              = Address
-self-employed-cya.business-address.change                       = Change address
-self-employed-cya.business-address.add                          = Add address
 self-employed-cya.accounting-method                             = Accounting method for sole trader income
-self-employed-cya.accounting-method.change                      = Change Accounting method for sole trader income
-self-employed-cya.accounting-method.add                         = Add Accounting method for sole trader income
 self-employed-cya.accounting-method.cash                        = Cash basis accounting
 self-employed-cya.accounting-method.accruals                    = Traditional accounting
 self-employed-cya.title                                         = Check your answers - sole trader business
@@ -216,15 +208,15 @@ agent.business-address-confirmation.form.heading                = Is this addres
 error.agent.business-address-confirmation.empty                 = Select ‘Yes’ if this is your client’s business address
 
 #Agent Business Address page
-agent.address-lookup.select-page.title                            = Select client’s business address
-agent.address-lookup.select-page.heading                          = Select client’s business address
-agent.address-lookup.lookup-page.title                            = What is your client’s business address?
-agent.address-lookup.lookup-page.heading                          = What is your client’s business address?
-agent.address-lookup.edit-page.title                              = Enter client’s business address
-agent.address-lookup.edit-page.heading                            = Enter client’s business address
-agent.address-lookup.edit-page.postcode-label                      = Postcode
-agent.address-lookup.confirm-page.title                           = Confirm client’s business address
-agent.address-lookup.confirm-page.heading                         = Confirm client’s business address
+agent.address-lookup.select-page.title                          = Select client’s business address
+agent.address-lookup.select-page.heading                        = Select client’s business address
+agent.address-lookup.lookup-page.title                          = What is your client’s business address?
+agent.address-lookup.lookup-page.heading                        = What is your client’s business address?
+agent.address-lookup.edit-page.title                            = Enter client’s business address
+agent.address-lookup.edit-page.heading                          = Enter client’s business address
+agent.address-lookup.edit-page.postcode-label                   = Postcode
+agent.address-lookup.confirm-page.title                         = Confirm client’s business address
+agent.address-lookup.confirm-page.heading                       = Confirm client’s business address
 
 # Agent Business Accounting Method page
 agent.business.accounting-method.title                          = What accounting method does your client use for their sole trader businesses?
@@ -259,7 +251,7 @@ agent.self-employed-cya.caption                                 = Sole trader bu
 
 # Self Employed CYA
 agent.self-employed-cya.business-trade.streamline               = Trade
-agent.self-employed-cya.business-trade.change.streamline        = Change trade
+agent.self-employed-cya.business-trade.change-hidden            = Trade
 agent.self-employed-cya.trading-start-date.streamline           = Start date
 agent.self-employed-cya.start-date-before-limit.label           = Before 6 April {0}
 agent.self-employed-cya.trading-start-date.change.streamline    = Change start date
