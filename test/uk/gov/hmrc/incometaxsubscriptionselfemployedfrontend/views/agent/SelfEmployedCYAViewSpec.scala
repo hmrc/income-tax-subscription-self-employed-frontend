@@ -20,15 +20,27 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.SelfEmployedCYA
 
-class SelfEmployedCYAViewSpec extends ViewSpec {
+import java.time.format.DateTimeFormatter
+
+class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(StartDateBeforeLimit)
+  }
 
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
   val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
+
+  val olderThanLimitDate: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit.minusDays(1))
+  val limitDate: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
 
   "Check Your Answers" must {
 
@@ -51,6 +63,51 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     }
 
     "have a summary of the users answers" when {
+      "the start date before limit feature switch is enabled" when {
+        "start date is a date older than the limit" in {
+          enable(StartDateBeforeLimit)
+
+          document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            tradeRow(value = None, editMode = true),
+            nameRow(value = None, editMode = true),
+            startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit), editMode = true),
+            accountingMethodRow(value = None, editMode = true),
+            addressRow(value = None, editMode = true)
+          ))
+        }
+        "start date is not older than the limit" in {
+          enable(StartDateBeforeLimit)
+
+          document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            tradeRow(value = None, editMode = true),
+            nameRow(value = None, editMode = true),
+            startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))), editMode = true),
+            accountingMethodRow(value = None, editMode = true),
+            addressRow(value = None, editMode = true)
+          ))
+        }
+      }
+      "the start date before limit feature switch is disabled" when {
+        "start date is a date older than the limit" in {
+          document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            tradeRow(value = None, editMode = true),
+            nameRow(value = None, editMode = true),
+            startDateRow(value = Some(olderThanLimitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))), editMode = true),
+            accountingMethodRow(value = None, editMode = true),
+            addressRow(value = None, editMode = true)
+          ))
+        }
+        "start date is not older than the limit" in {
+          document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+            tradeRow(value = None, editMode = true),
+            nameRow(value = None, editMode = true),
+            startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))), editMode = true),
+            accountingMethodRow(value = None, editMode = true),
+            addressRow(value = None, editMode = true)
+          ))
+        }
+      }
+
       "in edit mode" which {
         "as the initial business" when {
           "all data is complete" in {
@@ -76,7 +133,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
               document(fullSelfEmploymentsCYAModel.copy(startDateBeforeLimit = Some(true))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
                 tradeRow(value = Some("Plumbing"), editMode = true),
                 nameRow(value = Some("ABC Limited"), editMode = true),
-                startDateRow(value = Some(s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"), editMode = true),
+                startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit), editMode = true),
                 accountingMethodRow(value = Some("Cash basis accounting"), editMode = true),
                 addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
               ))
@@ -116,7 +173,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
                 .mustHaveSummaryList(".govuk-summary-list")(Seq(
                   tradeRow(value = Some("Plumbing"), editMode = true, isFirstBusiness = false),
                   nameRow(value = Some("ABC Limited"), editMode = true, isFirstBusiness = false),
-                  startDateRow(value = Some(s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"), editMode = true, isFirstBusiness = false),
+                  startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit), editMode = true, isFirstBusiness = false),
                   addressRow(value = Some("line 1 TF3 4NT"), editMode = true)
                 ))
             }
@@ -191,6 +248,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec {
     val startDate = "Start date"
     val accountingMethod = "Accounting method"
     val address = "Address"
+    val beforeLimit = s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"
   }
 
   lazy val testId: String = "testId"
