@@ -20,7 +20,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 import play.api.data.{Form, FormError}
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
@@ -38,21 +37,16 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val paragraph: String = "We need to know the exact start date."
     val hint = "For example, 27 9 2022"
     val backLink = "Back"
-    val update = "Update"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
-    val empty = "Enter the date your business started trading."
-    val maxDate = s"The date the business started trading must be on or before 11 April 2021."
-    val minDate = "The date your business started must be on or after 11 April 2021."
+    val empty = "Enter the date your business started trading"
 
-    val startDateBeforeLimitMaxDate = s"The date cannot be more than 7 days in the future"
-    val startDateBeforeLimitMinDate = "The date must be on or after 6 April 2021"
+    val maxDate = s"The date cannot be more than 7 days in the future"
+    val minDate = "The date must be on or after 6 April 2021"
   }
 
-  private val emptyError: FormError = FormError("startDate", "error.business-start-date.day-month-year.empty")
+  private val emptyError: FormError = FormError("startDate", "error.business.start-date.day-month-year.empty")
 
-  private val dateTooLateError = FormError("startDate", "error.business-start-date.day-month-year.max-date", List("11 April 2021"))
-  private val dateTooEarlyError = FormError("startDate", "error.business-start-date.day-month-year.min-date", List("11 April 2021"))
   private val startDateBeforeLimitMaxDateError = FormError("startDate", "error.business.start-date.day-month-year.max-date", List("11 April 2021"))
   private val startDateBeforeLimitMinDateError = FormError("startDate", "error.business.start-date.day-month-year.min-date", List("6 April 2021"))
 
@@ -61,9 +55,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
   class Setup(
                isEditMode: Boolean = false,
                form: Form[DateModel] = BusinessStartDateForm.businessStartDateForm(
-                 BusinessStartDateForm.minStartDate,
-                 BusinessStartDateForm.maxStartDate, d => d.toString,
-                 startDateFeatureSwitchEnabled = false
+                 BusinessStartDateForm.maxStartDate, _.toString
                )
              ) {
     val page: HtmlFormat.Appendable = businessStartDateView(
@@ -116,83 +108,62 @@ class BusinessStartDateViewSpec extends ViewSpec {
         )
       }
 
-      "the start date before limit feature switch is enabled" which {
-        "has a form empty error on page" in new Setup(
-          isEditMode = false,
-          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = true).withError(emptyError)
-        ) {
-          document.mustHaveDateInput(
-            id = "startDate",
-            legend = BusinessStartDateMessages.heading,
-            exampleDate = BusinessStartDateMessages.hint,
-            errorMessage = Some(BusinessStartDateMessages.empty),
-            isHeading = false,
-            isLegendHidden = true,
-            dateInputsValues = Seq(
-              DateInputFieldValues("Day", None),
-              DateInputFieldValues("Month", None),
-              DateInputFieldValues("Year", None)
-            )
+      "has a form empty error on page" in new Setup(
+        isEditMode = false,
+        form = BusinessStartDateForm.businessStartDateForm(
+          BusinessStartDateForm.maxStartDate, _.toString
+        ).withError(emptyError)
+      ) {
+        document.mustHaveDateInput(
+          id = "startDate",
+          legend = BusinessStartDateMessages.heading,
+          exampleDate = BusinessStartDateMessages.hint,
+          errorMessage = Some(BusinessStartDateMessages.empty),
+          isHeading = false,
+          isLegendHidden = true,
+          dateInputsValues = Seq(
+            DateInputFieldValues("Day", None),
+            DateInputFieldValues("Month", None),
+            DateInputFieldValues("Year", None)
           )
-        }
-
-        "has a max date error on page" in new Setup(
-          isEditMode = false,
-          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = true).withError(startDateBeforeLimitMaxDateError)
-        ) {
-
-          document.mustHaveDateInput(
-            id = "startDate",
-            legend = BusinessStartDateMessages.heading,
-            exampleDate = BusinessStartDateMessages.hint,
-            errorMessage = Some(BusinessStartDateMessages.startDateBeforeLimitMaxDate),
-            isHeading = false,
-            isLegendHidden = true,
-            dateInputsValues = Seq(
-              DateInputFieldValues("Day", None),
-              DateInputFieldValues("Month", None),
-              DateInputFieldValues("Year", None)
-            )
-          )
-        }
-
-        "has a min date error on page" in new Setup(
-          isEditMode = false,
-          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = true).withError(startDateBeforeLimitMinDateError)
-        ) {
-          {
-
-            document.mustHaveDateInput(
-              id = "startDate",
-              legend = BusinessStartDateMessages.heading,
-              exampleDate = BusinessStartDateMessages.hint,
-              errorMessage = Some(BusinessStartDateMessages.startDateBeforeLimitMinDate),
-              isHeading = false,
-              isLegendHidden = true,
-              dateInputsValues = Seq(
-                DateInputFieldValues("Day", None),
-                DateInputFieldValues("Month", None),
-                DateInputFieldValues("Year", None)
-              )
-            )
-          }
-        }
+        )
       }
 
-      "the start date before limit feature switch is disabled" which {
-        "has a form empty error on page" in new Setup(
-          isEditMode = false,
-          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = false).withError(emptyError)
-        ) {
+      "has a max date error on page" in new Setup(
+        isEditMode = false,
+        form = BusinessStartDateForm.businessStartDateForm(
+          BusinessStartDateForm.maxStartDate, _.toString
+        ).withError(startDateBeforeLimitMaxDateError)
+      ) {
+
+        document.mustHaveDateInput(
+          id = "startDate",
+          legend = BusinessStartDateMessages.heading,
+          exampleDate = BusinessStartDateMessages.hint,
+          errorMessage = Some(BusinessStartDateMessages.maxDate),
+          isHeading = false,
+          isLegendHidden = true,
+          dateInputsValues = Seq(
+            DateInputFieldValues("Day", None),
+            DateInputFieldValues("Month", None),
+            DateInputFieldValues("Year", None)
+          )
+        )
+      }
+
+      "has a min date error on page" in new Setup(
+        isEditMode = false,
+        form = BusinessStartDateForm.businessStartDateForm(
+          BusinessStartDateForm.maxStartDate, _.toString
+        ).withError(startDateBeforeLimitMinDateError)
+      ) {
+        {
+
           document.mustHaveDateInput(
             id = "startDate",
             legend = BusinessStartDateMessages.heading,
             exampleDate = BusinessStartDateMessages.hint,
-            errorMessage = Some(BusinessStartDateMessages.empty),
+            errorMessage = Some(BusinessStartDateMessages.minDate),
             isHeading = false,
             isLegendHidden = true,
             dateInputsValues = Seq(
@@ -201,50 +172,6 @@ class BusinessStartDateViewSpec extends ViewSpec {
               DateInputFieldValues("Year", None)
             )
           )
-        }
-
-        "has a max date error on page" in new Setup(
-          isEditMode = false,
-          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = false).withError(dateTooLateError)
-        ) {
-
-          document.mustHaveDateInput(
-            id = "startDate",
-            legend = BusinessStartDateMessages.heading,
-            exampleDate = BusinessStartDateMessages.hint,
-            errorMessage = Some(BusinessStartDateMessages.maxDate),
-            isHeading = false,
-            isLegendHidden = true,
-            dateInputsValues = Seq(
-              DateInputFieldValues("Day", None),
-              DateInputFieldValues("Month", None),
-              DateInputFieldValues("Year", None)
-            )
-          )
-        }
-
-        "has a min date error on page" in new Setup(
-          isEditMode = false,
-          form = BusinessStartDateForm.businessStartDateForm(BusinessStartDateForm.minStartDate,
-            BusinessStartDateForm.maxStartDate, d => d.toString, startDateFeatureSwitchEnabled = false).withError(dateTooEarlyError)
-        ) {
-          {
-
-            document.mustHaveDateInput(
-              id = "startDate",
-              legend = BusinessStartDateMessages.heading,
-              exampleDate = BusinessStartDateMessages.hint,
-              errorMessage = Some(BusinessStartDateMessages.minDate),
-              isHeading = false,
-              isLegendHidden = true,
-              dateInputsValues = Seq(
-                DateInputFieldValues("Day", None),
-                DateInputFieldValues("Month", None),
-                DateInputFieldValues("Year", None)
-              )
-            )
-          }
         }
       }
     }

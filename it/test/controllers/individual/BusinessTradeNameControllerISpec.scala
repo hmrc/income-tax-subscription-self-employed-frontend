@@ -80,23 +80,21 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-trade" when {
     "not in edit mode" when {
       "the form data is valid and connector stores it successfully" should {
-        "redirect to Business Address check URI" when {
-          "the task list redesign feature switch is disabled" in {
-            Given("I setup the Wiremock stubs")
-            stubAuthSuccess()
-            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutTrade))
-            stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
-            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+        "redirect to Business Address check URI" in {
+          Given("I setup the Wiremock stubs")
+          stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutTrade))
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
-            When("POST /details/business-trade is called")
-            val res = submitBusinessTradeName(id, inEditMode = false, isGlobalEdit = false, Some("test trade"))
+          When("POST /details/business-trade is called")
+          val res = submitBusinessTradeName(id, inEditMode = false, isGlobalEdit = false, Some("test trade"))
 
-            Then("Should return a SEE_OTHER")
-            res must have(
-              httpStatus(SEE_OTHER),
-              redirectURI(businessAddressCheckUri(id))
-            )
-          }
+          Then("Should return a SEE_OTHER")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(businessAddressCheckUri(id))
+          )
         }
       }
 

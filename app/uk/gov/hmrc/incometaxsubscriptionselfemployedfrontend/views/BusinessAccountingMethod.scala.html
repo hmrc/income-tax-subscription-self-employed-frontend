@@ -33,7 +33,7 @@
         radioHelper: RadioHelper
 )
 
-@(businessAccountingMethodForm: Form[AccountingMethod], postAction: Call, isEditMode: Boolean, backUrl: Option[String])(implicit request: Request[_], messages: Messages)
+@(businessAccountingMethodForm: Form[AccountingMethod], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
 @detailsContent = {
     <p class="govuk-body govuk-!-font-weight-bold">@Messages("business.accounting-method.accordion.subheading")</p>
@@ -44,14 +44,7 @@
     </ul>
 }
 
-@handleBackUrl = @{
-    backUrl match {
-        case Some(url) => Some(BackLink(href = url))
-        case None => Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
-    }
-}
-
-@mainTemplate(title = messages("business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = handleBackUrl) {
+@mainTemplate(title = messages("business.accounting-method.title"), optForm = Some(businessAccountingMethodForm), backLink = Some(BackLink(backUrl))) {
 
     @pageHeadingHelper(
         heading = messages("business.accounting-method.heading"),

@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatterImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.SaveAndContinueButtonHelper
@@ -32,8 +30,7 @@
         govukSummaryList: GovukSummaryList,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         implicitDateFormatter: ImplicitDateFormatterImpl,
-        pageHeadingHelper: PageHeadingHelper,
-        featureSwitching: FeatureSwitchingImpl
+        pageHeadingHelper: PageHeadingHelper
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], clientDetails: ClientDetails, isGlobalEdit: Boolean)(implicit request: Request[_], messages: Messages)
@@ -106,7 +103,7 @@
 
     simpleSummaryListRow(
         key = messages("agent.self-employed-cya.trading-start-date.streamline"),
-        value = if(startDateBeforeLimit.contains(true) || featureSwitching.isEnabled(StartDateBeforeLimit) && businessStartDate.exists(_.toLocalDate.isBefore(AccountingPeriodUtil.getStartDateLimit))) {
+        value = if(startDateBeforeLimit.contains(true) || businessStartDate.exists(_.toLocalDate.isBefore(AccountingPeriodUtil.getStartDateLimit))) {
             Some(messages("agent.self-employed-cya.start-date-before-limit.label", AccountingPeriodUtil.getStartDateLimit.getYear.toString))
         } else {
             businessStartDate.map(_.toLocalDate.toLongDate())

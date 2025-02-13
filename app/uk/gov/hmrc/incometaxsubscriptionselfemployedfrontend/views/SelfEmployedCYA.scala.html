@@ -19,8 +19,6 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{SaveAndContinueButtonHelper, PageHeadingHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 
@@ -30,8 +28,7 @@
     govukSummaryList: GovukSummaryList,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
     implicitDateFormatter: ImplicitDateFormatterImpl,
-    pageHeadingHelper: PageHeadingHelper,
-    featureSwitching: FeatureSwitchingImpl,
+    pageHeadingHelper: PageHeadingHelper
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], isGlobalEdit: Boolean)(implicit request: Request[_], messages: Messages)
@@ -87,11 +84,7 @@
     simpleSummaryListRow(
         key = messages("self-employed-cya.business-name"),
         value = businessName,
-        changeHref = if (featureSwitching.isEnabled(StartDateBeforeLimit)) {
-                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            } else {
-                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessNameController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            },
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId
     )
 }
@@ -101,16 +94,12 @@
 
     simpleSummaryListRow(
         key = messages("self-employed-cya.trading-start-date"),
-        value = if(startDateBeforeLimit.contains(true) || featureSwitching.isEnabled(StartDateBeforeLimit) && businessStartDate.exists(_.toLocalDate.isBefore(AccountingPeriodUtil.getStartDateLimit))) {
+        value = if(startDateBeforeLimit.contains(true) || businessStartDate.exists(_.toLocalDate.isBefore(AccountingPeriodUtil.getStartDateLimit))) {
             Some(messages("self-employed-cya.start-date-before-limit.label", AccountingPeriodUtil.getStartDateLimit.getYear.toString))
         } else {
             businessStartDate.map(_.toLocalDate.toLongDate())
         },
-        changeHref = if (featureSwitching.isEnabled(StartDateBeforeLimit)) {
-                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            } else {
-                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessStartDateController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            },
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId
     )
 }
@@ -119,11 +108,7 @@
     simpleSummaryListRow(
         key = messages("self-employed-cya.business-trade"),
         value = businessTrade,
-        changeHref = if (featureSwitching.isEnabled(StartDateBeforeLimit)) {
-                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            } else {
-                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessTradeNameController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-            },
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId,
         hiddenText = Some(messages("self-employed-cya.business-trade.change-hidden"))
     )

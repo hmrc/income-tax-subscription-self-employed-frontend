@@ -20,8 +20,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
@@ -29,12 +27,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmpl
 
 import java.time.format.DateTimeFormatter
 
-class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(StartDateBeforeLimit)
-  }
+class SelfEmployedCYAViewSpec extends ViewSpec {
 
   val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -101,57 +94,33 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         "the answers are complete" in {
           document().mainContent.mustHaveSummaryList(".govuk-summary-list")(
             rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true).url)
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true).url)
-              ),
-              startDateRow(Some("1 January 2018"),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true).url)
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, editMode = true)
+              tradeRow(Some("Plumbing")),
+              nameRow(Some("ABC Limited")),
+              startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
+              addressRow(Some("line 1 TF3 4NT")),
+              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false)
             )
           )
         }
         "there exists multiple businesses" in {
           document(multiBusinessCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
             rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true).url)
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true).url)
-              ),
-              startDateRow(Some("1 January 2018"),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true).url)
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = true, editMode = true)
+              tradeRow(Some("Plumbing")),
+              nameRow(Some("ABC Limited")),
+              startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
+              addressRow(Some("line 1 TF3 4NT")),
+              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = true)
             )
           )
         }
         "the answers are not complete" in {
           document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
             rows = Seq(
-              tradeRow(None, editMode = true, changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true).url)),
-              nameRow(None, editMode = true, changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true).url)),
-              startDateRow(None,
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true).url)),
-              addressRow(None, editMode = true),
-              accountingMethodRow(None, multipleBusinesses = false, editMode = true)
+              tradeRow(None),
+              nameRow(None),
+              startDateRow(None),
+              addressRow(None),
+              accountingMethodRow(None, multipleBusinesses = false)
             )
           )
         }
@@ -160,171 +129,58 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         "the answers are complete" in {
           document(isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(
             rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true
-              ),
-              startDateRow(Some("1 January 2018"),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true,
-                globalEditMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, editMode = true, globalEditMode = true)
+              tradeRow(Some("Plumbing"), globalEditMode = true),
+              nameRow(Some("ABC Limited"), globalEditMode = true),
+              startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel), globalEditMode = true),
+              addressRow(Some("line 1 TF3 4NT"), globalEditMode = true),
+              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, globalEditMode = true)
             )
           )
         }
         "there exists multiple businesses" in {
           document(multiBusinessCYAModel, isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(
             rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true
-              ),
-              startDateRow(Some("1 January 2018"),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true,
-                globalEditMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = true, editMode = true, globalEditMode = true)
+              tradeRow(Some("Plumbing"), globalEditMode = true),
+              nameRow(Some("ABC Limited"), globalEditMode = true),
+              startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel), globalEditMode = true),
+              addressRow(Some("line 1 TF3 4NT"), globalEditMode = true),
+              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = true, globalEditMode = true)
             )
           )
         }
         "the answers are not complete" in {
           document(emptySelfEmploymentsCYAModel, isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(
             rows = Seq(
-              tradeRow(None,
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true),
-              nameRow(None,
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true),
-              startDateRow(None,
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true, isGlobalEdit = true).url),
-                globalEditMode = true),
-              addressRow(None,
-                editMode = true,
-                globalEditMode = true),
-              accountingMethodRow(None, multipleBusinesses = false, editMode = true, globalEditMode = true)
+              tradeRow(None, globalEditMode = true),
+              nameRow(None, globalEditMode = true),
+              startDateRow(None, globalEditMode = true),
+              addressRow(None, globalEditMode = true),
+              accountingMethodRow(None, multipleBusinesses = false, globalEditMode = true)
             )
           )
         }
       }
-      "the start date before limit feature switch is enabled" when {
-        "start date is before the limit" in {
-          enable(StartDateBeforeLimit)
-          document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true).url)
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true).url)
-              ),
-              startDateRow(value = Some(CheckYourAnswersMessages.startDateBeforeLimitLabel),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true).url)
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, editMode = true)
-            )
+      "start date is before the limit" in {
+        document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
+          rows = Seq(
+            tradeRow(Some("Plumbing")),
+            nameRow(Some("ABC Limited")),
+            startDateRow(value = Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
+            addressRow(Some("line 1 TF3 4NT")),
+            accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false)
           )
-        }
-        "start date is after the limit" in {
-          enable(StartDateBeforeLimit)
-          document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true).url)
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true).url)
-              ),
-              startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyy"))),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true).url)
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, editMode = true)
-            )
-          )
-        }
+        )
       }
-      "the start date before limit feature switch is disabled" when {
-        "start date is before the limit" in {
-          document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true).url)
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true).url)
-              ),
-              startDateRow(value = Some(olderThanLimitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyy"))),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true).url)
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, editMode = true)
-            )
+      "start date is after the limit" in {
+        document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
+          rows = Seq(
+            tradeRow(Some("Plumbing")),
+            nameRow(Some("ABC Limited")),
+            startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyy")))),
+            addressRow(Some("line 1 TF3 4NT")),
+            accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false)
           )
-        }
-        "start date is after the limit" in {
-          document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing"),
-                editMode = true,
-                changeHref = Some(routes.BusinessTradeNameController.show(testId, isEditMode = true).url)
-              ),
-              nameRow(Some("ABC Limited"),
-                editMode = true,
-                changeHref = Some(routes.BusinessNameController.show(testId, isEditMode = true).url)
-              ),
-              startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyy"))),
-                editMode = true,
-                changeHref = Some(routes.BusinessStartDateController.show(testId, isEditMode = true).url)
-              ),
-              addressRow(Some("line 1 TF3 4NT"),
-                editMode = true
-              ),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, editMode = true)
-            )
-          )
-        }
+        )
       }
     }
 
@@ -348,18 +204,14 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   }
 
 
-  def simpleSummaryRow(key: String, changeHref: Option[String]): (Option[String], Boolean, Boolean) => SummaryListRowValues = {
-    case (value, editMode, globalEditMode) =>
+  def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
+    case (value, globalEditMode) =>
       SummaryListRowValues(
         key = key,
         value = value,
         actions = Seq(
           SummaryListActionValues(
-            href = if (isEnabled(StartDateBeforeLimit)) {
-              routes.FullIncomeSourceController.show(testId, isEditMode = editMode, isGlobalEdit = globalEditMode).url
-            } else {
-              changeHref.getOrElse("")
-            },
+            href = routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
             text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
             visuallyHidden = key
           )
@@ -367,32 +219,31 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
   }
 
-  private def tradeRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false, changeHref: Option[String]) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessTrade, changeHref)(value, editMode, globalEditMode)
+  private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
+    simpleSummaryRow(CheckYourAnswersMessages.businessTrade)(value, globalEditMode)
   }
 
-  private def nameRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false, changeHref: Option[String]) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessName, changeHref)(value, editMode, globalEditMode)
+  private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {
+    simpleSummaryRow(CheckYourAnswersMessages.businessName)(value, globalEditMode)
   }
 
-  private def startDateRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false, changeHref: Option[String]) = {
-    simpleSummaryRow(CheckYourAnswersMessages.tradingStartDate, changeHref)(value, editMode, globalEditMode)
+  private def startDateRow(value: Option[String], globalEditMode: Boolean = false) = {
+    simpleSummaryRow(CheckYourAnswersMessages.tradingStartDate)(value, globalEditMode)
   }
 
-  private def addressRow(value: Option[String], editMode: Boolean = false, globalEditMode: Boolean = false) = SummaryListRowValues(
+  private def addressRow(value: Option[String], globalEditMode: Boolean = false) = SummaryListRowValues(
     key = CheckYourAnswersMessages.businessAddress,
     value = value,
     actions = Seq(
       SummaryListActionValues(
-        href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = editMode, isGlobalEdit = globalEditMode).url,
+        href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
         text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + CheckYourAnswersMessages.businessAddress,
         visuallyHidden = CheckYourAnswersMessages.businessAddress
       )
     )
   )
 
-  private def accountingMethodRow(value: Option[String], multipleBusinesses: Boolean,
-                                  editMode: Boolean = false, globalEditMode: Boolean = false) = SummaryListRowValues(
+  private def accountingMethodRow(value: Option[String], multipleBusinesses: Boolean, globalEditMode: Boolean = false) = SummaryListRowValues(
     key = CheckYourAnswersMessages.accountingMethod,
     value = value,
     actions = Seq(
@@ -400,7 +251,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         href = if (multipleBusinesses) {
           routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = globalEditMode).url
         } else {
-          routes.BusinessAccountingMethodController.show(testId, isEditMode = editMode, isGlobalEdit = globalEditMode).url
+          routes.BusinessAccountingMethodController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url
         },
         text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + s" ${CheckYourAnswersMessages.accountingMethod}",
         visuallyHidden = CheckYourAnswersMessages.accountingMethod

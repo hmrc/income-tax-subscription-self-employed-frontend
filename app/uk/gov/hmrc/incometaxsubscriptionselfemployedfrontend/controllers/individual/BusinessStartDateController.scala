@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
@@ -65,7 +64,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
       withIndividualReference { reference =>
         multipleSelfEmploymentsService.fetchStartDate(reference, id).map {
           case Right(businessStartDateData) =>
-            Ok(view(form(isEnabled(StartDateBeforeLimit)).fill(businessStartDateData), id, isEditMode, isGlobalEdit))
+            Ok(view(form.fill(businessStartDateData), id, isEditMode, isGlobalEdit))
           case Left(error) =>
             throw new InternalServerException(error.toString)
         }
@@ -76,7 +75,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
   def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
-        form(isEnabled(StartDateBeforeLimit)).bindFromRequest().fold(
+        form.bindFromRequest().fold(
           formWithErrors => {
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
           },
@@ -92,32 +91,20 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  //save & retrieve on should have an order of: business name -> business start date (this) -> business trade
-  //save & retrieve off should have an order of: business start date (this) -> business name -> business trade
   private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean) = Redirect(
     if (isEditMode || isGlobalEdit) {
       routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
-    } else if (isEnabled(StartDateBeforeLimit)) {
-      routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode)
     } else {
-      routes.BusinessTradeNameController.show(id)
+      routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode)
     }
   )
 
-  //save & retrieve on should have an order of: business name -> business start date (this) -> business trade
-  //save & retrieve off should have an order of: business start date (this) -> business name -> business trade
   def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
-    if (isEnabled(StartDateBeforeLimit)) {
-      routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit).url
-    } else if (isEditMode || isGlobalEdit) {
-      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit).url
-    } else {
-      routes.BusinessNameController.show(id, isEditMode = isEditMode).url
-    }
+    routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit).url
   }
 
-  def form(featureSwitchEnabled: Boolean)(implicit request: Request[_]): Form[DateModel] = {
-    businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toLongDate(), featureSwitchEnabled)
+  def form(implicit request: Request[_]): Form[DateModel] = {
+    businessStartDateForm(BusinessStartDateForm.maxStartDate, _.toLongDate())
   }
 
 }

@@ -83,7 +83,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-start-date" when {
     "not in edit mode" when {
       "the form data is valid and connector stores it successfully" should {
-        "redirect to Business Trade Name page" in {
+        "redirect to the address check route" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
@@ -91,12 +91,12 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /business-start-date is called")
-          val res = submitBusinessStartDate(Some(testStartDate), id, featureSwitchEnabled = false)
+          val res = submitBusinessStartDate(Some(testStartDate), id)
 
-          Then("Should return a SEE_OTHER with a redirect location of accounting period dates")
+          Then("Should return a SEE_OTHER with a redirect to the address check route")
           res must have(
             httpStatus(SEE_OTHER),
-            redirectURI(BusinessTradeNameUri)
+            redirectURI(businessAddressCheckUri(id))
           )
         }
       }
@@ -107,7 +107,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
 
         When("POST /business-start-date is called")
-        val res = submitBusinessStartDate(None, id, featureSwitchEnabled = false)
+        val res = submitBusinessStartDate(None, id)
 
         Then("Should return a BAD_REQUEST and THE FORM With errors")
         res must have(
@@ -127,7 +127,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /business-start-date is called")
-          val res = submitBusinessStartDate(Some(testStartDate), id, inEditMode = true, featureSwitchEnabled = false)
+          val res = submitBusinessStartDate(Some(testStartDate), id, inEditMode = true)
 
 
           Then("Should return a SEE_OTHER with a redirect location of check your answers")

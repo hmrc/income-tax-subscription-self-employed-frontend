@@ -20,7 +20,6 @@ import _root_.uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UU
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
@@ -28,7 +27,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthServi
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
@@ -43,20 +42,15 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
     val id = uuidGen.generateId
 
     authService.authorised() {
-
-      if (isEnabled(StartDateBeforeLimit)) {
-        withIndividualReference { reference =>
-          multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
-            case Right(Some(SoleTraderBusinesses(_, Some(_)))) =>
-              Redirect(routes.FullIncomeSourceController.show(id))
-            case Right(_) =>
-              Redirect(routes.BusinessAccountingMethodController.show(id))
-            case Left(_) =>
-              throw new InternalServerException("[InitialiseController][initialise] - Failure fetching sole trader businesses")
-          }
+      withIndividualReference { reference =>
+        multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
+          case Right(Some(SoleTraderBusinesses(_, Some(_)))) =>
+            Redirect(routes.FullIncomeSourceController.show(id))
+          case Right(_) =>
+            Redirect(routes.BusinessAccountingMethodController.show(id))
+          case Left(_) =>
+            throw new InternalServerException("[InitialiseController][initialise] - Failure fetching sole trader businesses")
         }
-      } else {
-        Future.successful(Redirect(routes.BusinessNameConfirmationController.show(id)))
       }
     }
   }

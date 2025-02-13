@@ -22,8 +22,6 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
@@ -34,13 +32,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.BusinessAccountingMethod
 
 class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService with MockMultipleSelfEmploymentsService
-  with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(StartDateBeforeLimit)
-  }
+  with MockSessionDataService with MockMultipleSelfEmploymentsService {
 
   override val controllerName: String = "BusinessAccountingMethodController"
   private val testId = "testId"
@@ -115,33 +107,16 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "return 303, SEE_OTHER)" when {
       "the user submits valid data" when {
         "not in edit mode" when {
-          "the start date before limit feature switch is enabled" should {
-            "redirect to the full income source page" in withController { controller =>
-              enable(StartDateBeforeLimit)
-              mockAuthSuccess()
-              mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
+          "redirect to the full income source page" in withController { controller =>
+            mockAuthSuccess()
+            mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-              val result = controller.submit(id = id, isEditMode = false, isGlobalEdit = false)(
-                fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
-              )
+            val result = controller.submit(id = id, isEditMode = false, isGlobalEdit = false)(
+              fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
+            )
 
-              status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.FullIncomeSourceController.show(testId).url)
-            }
-          }
-
-          "the start date before limit feature switch is disabled" should {
-            "redirect to the self employed CYA page" in withController { controller =>
-              mockAuthSuccess()
-              mockSaveAccountingMethod(testAccountingMethodModel)(Right(PostSubscriptionDetailsSuccessResponse))
-
-              val result = controller.submit(id = id, isEditMode = false, isGlobalEdit = false)(
-                fakeRequest.withFormUrlEncodedBody(modelToFormData(testAccountingMethodModel): _*)
-              )
-
-              status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(testId).url)
-            }
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.FullIncomeSourceController.show(testId).url)
           }
         }
 
@@ -196,25 +171,22 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
 
   "The back url" when {
     "not in edit mode" should {
-      "return None" in withController { controller =>
-        mockAuthSuccess()
-        controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = false, selfEmploymentCount = 0) mustBe None
+      "return the your income sources page url" in withController { controller =>
+        controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = false, selfEmploymentCount = 1) mustBe appConfig.yourIncomeSourcesUrl
       }
     }
 
     "in edit mode" when {
       "the number of self-employment businesses is more than 1" should {
         "return a url for the change accounting method page" in withController { controller =>
-          mockAuthSuccess()
           controller.backUrl(id = testId, isEditMode = true, isGlobalEdit = false, selfEmploymentCount = 2) mustBe
-            Some(routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = false).url)
+            routes.ChangeAccountingMethodController.show(testId).url
         }
       }
       "the number of self-employment businesses is 1" should {
         "return a url for the self-employed CYA page" in withController { controller =>
-          mockAuthSuccess()
           controller.backUrl(id = testId, isEditMode = true, isGlobalEdit = false, selfEmploymentCount = 1) mustBe
-            Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true, isGlobalEdit = false).url)
+            routes.SelfEmployedCYAController.show(testId, isEditMode = true).url
         }
       }
     }
@@ -222,27 +194,15 @@ class BusinessAccountingMethodControllerSpec extends ControllerBaseSpec
     "in global edit mode" when {
       "the number of self-employment businesses is more than 1" should {
         "return a url for the change accounting method page" in withController { controller =>
-          mockAuthSuccess()
           controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = true, selfEmploymentCount = 2) mustBe
-            Some(routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = true).url)
+            routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = true).url
         }
       }
       "the number of self-employment businesses is 1" should {
         "return a url for the self-employed CYA page" in withController { controller =>
-          mockAuthSuccess()
           controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = true, selfEmploymentCount = 1) mustBe
-            Some(routes.SelfEmployedCYAController.show(testId, isEditMode = true, isGlobalEdit = true).url)
+            routes.SelfEmployedCYAController.show(testId, isEditMode = true, isGlobalEdit = true).url
         }
-      }
-    }
-
-    "the start date before limit feature switch is enabled" should {
-      "redirect to your income sources" in withController { controller =>
-        enable(StartDateBeforeLimit)
-        mockAuthSuccess()
-        controller.backUrl(id = testId, isEditMode = false, isGlobalEdit = false, selfEmploymentCount =  1) mustBe
-          Some(appConfig.yourIncomeSourcesUrl)
-
       }
     }
   }

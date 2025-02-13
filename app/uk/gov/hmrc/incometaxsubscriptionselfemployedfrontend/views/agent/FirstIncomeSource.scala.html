@@ -17,10 +17,8 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ AccountingMethod, Accruals, Cash, ClientDetails, DateModel }
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ DateHelper, DetailsHelper, RadioHelper, SaveAndContinueButtonHelper }
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ DetailsHelper, RadioHelper, SaveAndContinueButtonHelper }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ ContinueButton, TextInputHelper }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.PageHeadingHelper
@@ -29,13 +27,11 @@
     mainTemplate: AgentMainTemplate,
     form: FormWithCSRF,
     textInputHelper: TextInputHelper,
-    dateHelper: DateHelper,
     radioHelper: RadioHelper,
     detailsHelper: DetailsHelper,
     continueButton: ContinueButton,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-    pageHeadingHelper: PageHeadingHelper,
-    featureSwitching: FeatureSwitchingImpl
+    pageHeadingHelper: PageHeadingHelper
 )
 
 @(firstIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
@@ -66,34 +62,23 @@
             classes = Some("govuk-!-width-one-half")
         )
 
-        @if(featureSwitching.isEnabled(StartDateBeforeLimit)) {
-            @radioHelper(
-                field = firstIncomeSourceForm(StreamlineIncomeSourceForm.startDateBeforeLimit),
-                legend = messages("agent.full-income-source.start-date-before-limit.legend", AccountingPeriodUtil.getStartDateLimit.getYear.toString),
-                isPageHeading = false,
-                customHeadingClass = Some("govuk-!-font-weight-bold"),
-                radioItems = Seq(
-                    RadioItem(
-                        content = Text(messages("base.yes")),
-                        value = Some(YesNoMapping.option_yes)
-                    ),
-                    RadioItem(
-                        content = Text(messages("base.no")),
-                        value = Some(YesNoMapping.option_no)
-                    )
+        @radioHelper(
+            field = firstIncomeSourceForm(StreamlineIncomeSourceForm.startDateBeforeLimit),
+            legend = messages("agent.full-income-source.start-date-before-limit.legend", AccountingPeriodUtil.getStartDateLimit.getYear.toString),
+            isPageHeading = false,
+            customHeadingClass = Some("govuk-!-font-weight-bold"),
+            radioItems = Seq(
+                RadioItem(
+                    content = Text(messages("base.yes")),
+                    value = Some(YesNoMapping.option_yes)
                 ),
-                inline = true
-            )
-        } else {
-            @dateHelper(
-                field = firstIncomeSourceForm(StreamlineIncomeSourceForm.startDate),
-                legendContent = messages("agent.full-income-source.start-date.legend"),
-                isLegendVisible = true,
-                parentForm = firstIncomeSourceForm,
-                hintText = Some(messages("agent.full-income-source.start-date.hint")),
-                isPageHeading = false
-            )
-        }
+                RadioItem(
+                    content = Text(messages("base.no")),
+                    value = Some(YesNoMapping.option_no)
+                )
+            ),
+            inline = true
+        )
 
         <p class="govuk-body govuk-!-font-weight-bold">
             @messages("agent.full-income-source.accounting-method.legend")

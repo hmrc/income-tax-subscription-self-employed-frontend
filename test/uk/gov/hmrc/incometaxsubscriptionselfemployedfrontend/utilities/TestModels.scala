@@ -22,15 +22,10 @@ import java.time.LocalDate
 
 object TestModels {
 
-  val testValidStartDate: DateModel = DateModel.dateConvert(LocalDate.now.minusYears(3))
   val testValidStartDateAfterLimit: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
-  val testBusinessStartDateModel: DateModel = testValidStartDate
-  val testBusinessStartDateLimitModel: DateModel = testValidStartDateAfterLimit
   val testBusinessNameModel: String = "Business"
   val testValidBusinessTradeName: String = "Plumbing"
-  val testInvalidBusinessTradeName: String = "!()+{}?^~"
   val testValidBusinessTradeNameModel: String = testValidBusinessTradeName
-  val testInvalidBusinessTradeNameModel: String = testInvalidBusinessTradeName
   val testAccountingMethodModel: AccountingMethod = Cash
 
   val mockBusinessNameModel: String = "ITSA me, Mario"

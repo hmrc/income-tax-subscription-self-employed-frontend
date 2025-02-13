@@ -22,11 +22,11 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel, No, Yes}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm.nextIncomeSourceForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, No, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.NextIncomeSource
@@ -57,9 +57,8 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
               if (streamlineBusiness.isFirstBusiness) {
                 Redirect(routes.FirstIncomeSourceController.show(id, isEditMode, isGlobalEdit))
               } else {
-                val form: Form[_] = nextIncomeSourceForm.fold(identity, identity)
                 Ok(view(
-                  nextIncomeSourceForm = form.bind(StreamlineIncomeSourceForm.createIncomeSourceData(
+                  nextIncomeSourceForm = nextIncomeSourceForm.bind(StreamlineIncomeSourceForm.createIncomeSourceData(
                     maybeTradeName = streamlineBusiness.trade,
                     maybeBusinessName = streamlineBusiness.name,
                     maybeStartDate = streamlineBusiness.startDate,
@@ -83,51 +82,29 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
   def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
-        nextIncomeSourceForm match {
-          case Left(form) =>
-            form.bindFromRequest().fold(
-              formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
-                BadRequest(view(
-                  formWithErrors, id, isEditMode, clientDetails, isGlobalEdit
-                ))
-              }, {
-                case (trade, name, startDate) =>
-                  saveDataAndContinue(
-                    reference = reference,
-                    id = id,
-                    trade = trade,
-                    name = name,
-                    startDate = Some(startDate),
-                    startDateBeforeLimit = None,
-                    isEditMode = isEditMode,
-                    isGlobalEdit = isGlobalEdit
-                  )
-              }
-            )
-          case Right(form) =>
-            form.bindFromRequest().fold(
-              formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
-                BadRequest(view(
-                  formWithErrors, id, isEditMode, clientDetails, isGlobalEdit
-                ))
-              }, {
-                case (trade, name, startDateBeforeLimit) =>
-                  saveDataAndContinue(
-                    reference = reference,
-                    id = id,
-                    trade = trade,
-                    name = name,
-                    startDate = None,
-                    startDateBeforeLimit = startDateBeforeLimit match {
-                      case Yes => Some(true)
-                      case No => Some(false)
-                    },
-                    isEditMode = isEditMode,
-                    isGlobalEdit = isGlobalEdit
-                  )
-              }
-            )
-        }
+        nextIncomeSourceForm.bindFromRequest().fold(
+          formWithErrors =>
+            clientDetailsRetrieval.getClientDetails map { clientDetails =>
+              BadRequest(view(
+                formWithErrors, id, isEditMode, clientDetails, isGlobalEdit
+              ))
+            },
+          {
+            case (trade, name, startDateBeforeLimit) =>
+              saveDataAndContinue(
+                reference = reference,
+                id = id,
+                trade = trade,
+                name = name,
+                startDateBeforeLimit = startDateBeforeLimit match {
+                  case Yes => true
+                  case No => false
+                },
+                isEditMode = isEditMode,
+                isGlobalEdit = isGlobalEdit
+              )
+          }
+        )
       }
     }
   }
@@ -136,8 +113,7 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
                                   id: String,
                                   trade: String,
                                   name: String,
-                                  startDate: Option[DateModel],
-                                  startDateBeforeLimit: Option[Boolean],
+                                  startDateBeforeLimit: Boolean,
                                   isEditMode: Boolean,
                                   isGlobalEdit: Boolean)(implicit hc: HeaderCarrier): Future[Result] = {
     multipleSelfEmploymentsService.saveStreamlinedIncomeSource(
@@ -145,12 +121,11 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
       businessId = id,
       trade = trade,
       name = name,
-      startDate = startDate,
       startDateBeforeLimit = startDateBeforeLimit,
       accountingMethod = None
     ) map {
       case Right(_) =>
-        if (startDateBeforeLimit.contains(false)) {
+        if (!startDateBeforeLimit) {
           Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
         } else if (isEditMode || isGlobalEdit) {
           Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
@@ -178,14 +153,6 @@ class NextIncomeSourceController @Inject()(nextIncomeSource: NextIncomeSource,
       isEditMode = isEditMode,
       clientDetails = clientDetails
     )
-
-  private def nextIncomeSourceForm(implicit request: Request[_]) = {
-    if (isEnabled(StartDateBeforeLimit)) {
-      Right(StreamlineIncomeSourceForm.nextIncomeSourceFormNoDate)
-    } else {
-      Left(StreamlineIncomeSourceForm.nextIncomeSourceForm(_.toLongDate()))
-    }
-  }
 
 }
 

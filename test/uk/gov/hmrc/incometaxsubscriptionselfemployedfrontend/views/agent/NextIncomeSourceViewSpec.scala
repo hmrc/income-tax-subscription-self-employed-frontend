@@ -21,23 +21,15 @@ import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.NextIncomeSource
 
-class NextIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
+class NextIncomeSourceViewSpec extends ViewSpec {
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(StartDateBeforeLimit)
-  }
-
-  val form: Form[(String, String, DateModel)] = StreamlineIncomeSourceForm.nextIncomeSourceForm(_.toString)
+  val form: Form[(String, String, YesNo)] = StreamlineIncomeSourceForm.nextIncomeSourceForm
 
   val testClientDetails: ClientDetails = ClientDetails("FirstName LastName", "ZZ111111Z")
 
@@ -77,7 +69,7 @@ class NextIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
         errors = Some(Seq(
           StreamlineIncomeSourceForm.businessTradeName -> "Enter the trade of your client’s business",
           StreamlineIncomeSourceForm.businessName -> "Enter your client’s name or the name of their business",
-          s"${StreamlineIncomeSourceForm.startDate}-${DateModelMapping.day}" -> "Enter the date your client’s business started trading"
+          StreamlineIncomeSourceForm.startDateBeforeLimit -> s"Select ‘Yes’ if this business started before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"
         ))
       )
     }
@@ -98,87 +90,60 @@ class NextIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
         form.attr("action") mustBe testCall.url
       }
 
-      "if the start date before limit feature switch is enabled" should {
-        "have a text input to capture a trade name" in {
-          enable(StartDateBeforeLimit)
-
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
-            StreamlineIncomeSourceForm.businessTradeName,
-            NextIncomeSourceMessages.Trade.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(NextIncomeSourceMessages.Trade.hint)
-          )
-        }
-
-        "have a text input to capture a business name" in {
-          enable(StartDateBeforeLimit)
-
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
-            StreamlineIncomeSourceForm.businessName,
-            NextIncomeSourceMessages.Name.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(NextIncomeSourceMessages.Name.hint)
-          )
-        }
-
-        "have a section to capture if the users start date is before the limit" in {
-          enable(StartDateBeforeLimit)
-
-          form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveRadioInput("fieldset")(
-            name = StreamlineIncomeSourceForm.startDateBeforeLimit,
-            legend = NextIncomeSourceMessages.DateBeforeLimit.legend,
-            isHeading = false,
-            isLegendHidden = false,
-            hint = None,
-            errorMessage = None,
-            radioContents = Seq(
-              RadioItem(
-                content = Text("Yes"),
-                value = Some(YesNoMapping.option_yes)
-              ),
-              RadioItem(
-                content = Text("No"),
-                value = Some(YesNoMapping.option_no)
-              )
-            ),
-            isInline = true
-          )
-        }
+      "have a text input to capture a trade name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
+          StreamlineIncomeSourceForm.businessTradeName,
+          NextIncomeSourceMessages.Trade.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(NextIncomeSourceMessages.Trade.hint)
+        )
       }
 
-      "if the start date before limit feature switch is disabled" should {
-        "have a text input to capture a trade name" in {
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
-            StreamlineIncomeSourceForm.businessTradeName,
-            NextIncomeSourceMessages.Trade.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(NextIncomeSourceMessages.Trade.hint)
-          )
+      "have a text input to capture a business name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
+          StreamlineIncomeSourceForm.businessName,
+          NextIncomeSourceMessages.Name.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(NextIncomeSourceMessages.Name.hint)
+        )
+      }
+
+      "have a section to capture if the users start date is before the limit" in {
+        form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveRadioInput("fieldset")(
+          name = StreamlineIncomeSourceForm.startDateBeforeLimit,
+          legend = NextIncomeSourceMessages.DateBeforeLimit.legend,
+          isHeading = false,
+          isLegendHidden = false,
+          hint = None,
+          errorMessage = None,
+          radioContents = Seq(
+            RadioItem(
+              content = Text("Yes"),
+              value = Some(YesNoMapping.option_yes)
+            ),
+            RadioItem(
+              content = Text("No"),
+              value = Some(YesNoMapping.option_no)
+            )
+          ),
+          isInline = true
+        )
+      }
+
+      "have a button group" which {
+        def buttonGroup: Element = form.selectHead(".govuk-button-group")
+
+        "has a save and continue button" in {
+          buttonGroup.selectHead(".govuk-button").text mustBe NextIncomeSourceMessages.Buttons.saveAndContinue
         }
 
-        "have a text input to capture a business name" in {
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
-            StreamlineIncomeSourceForm.businessName,
-            NextIncomeSourceMessages.Name.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(NextIncomeSourceMessages.Name.hint)
-          )
-        }
+        "has a save and come back later button" in {
+          val saveAndComeBackLater: Element = buttonGroup.selectHead(".govuk-button--secondary")
 
-        "have a section to capture a start date" in {
-          form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveDateInput(
-            id = StreamlineIncomeSourceForm.startDate,
-            legend = NextIncomeSourceMessages.Date.legend,
-            exampleDate = NextIncomeSourceMessages.Date.hint,
-            isHeading = false,
-            isLegendHidden = false,
-            errorMessage = None,
-            dateInputsValues = Seq.empty
-          )
+          saveAndComeBackLater.text mustBe NextIncomeSourceMessages.Buttons.saveAndComeBackLater
+          saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-income-source"
         }
       }
     }
@@ -198,23 +163,6 @@ class NextIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
     object Name {
       val label = "What is the name of your client’s business?"
       val hint = "This is the business name your client used to register for Self Assessment. If their business does not have a name, enter your client’s full name."
-    }
-
-    object Date {
-      val legend = "When did your client’s business start trading?"
-      val hint = "We’ll use this date to calculate any Class 2 National Insurance charge. For example, 17 8 2014"
-
-      object Day {
-        val label = "Day"
-      }
-
-      object Month {
-        val label = "Month"
-      }
-
-      object Year {
-        val label = "Year"
-      }
     }
 
     object DateBeforeLimit {
