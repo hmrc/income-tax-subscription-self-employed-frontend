@@ -82,10 +82,9 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
                 businessId = id,
                 trade = trade,
                 name = name,
-                startDate = None,
                 startDateBeforeLimit = startDateBeforeLimit match {
-                  case Yes => Some(true)
-                  case No => Some(false)
+                  case Yes => true
+                  case No => false
                 },
                 accountingMethod = None
               ) map {

@@ -63,21 +63,17 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
 
   "Business Accounting Method Page" must {
 
-    "have a title" in {
-      document().title mustBe BusinessAccountingMethodMessages.title + BusinessAccountingMethodMessages.titleSuffix
-    }
-
-    "have a backlink" in {
-      document().getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
-      document().getBackLinkByClass.attr("href") mustBe testBackUrl
-    }
-
-    "have a javascript backlink" in {
-      val testDoc = document(backLink = None)
-      testDoc.getBackLinkByClass.text mustBe BusinessAccountingMethodMessages.backLink
-      testDoc.getBackLinkByClass.attr("href") mustBe "#"
-      testDoc.getBackLinkByClass.attr("data-module") mustBe "hmrc-back-link"
-    }
+    "have the correct template" in new TemplateViewTest(
+      view = page(
+        businessAccountingMethodForm = BusinessAccountingMethodForm.businessAccountingMethodForm,
+        isEditMode = false,
+        backLink = testBackUrl
+      ),
+      title = BusinessAccountingMethodMessages.title,
+      isAgent = false,
+      backLink = Some(testBackUrl),
+      hasSignOutLink = true
+    )
 
     "have the correct heading and caption" in {
       document().mainContent.mustHaveHeadingAndCaption(
@@ -169,7 +165,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     ).mustHaveGovUkErrorNotificationMessage(BusinessAccountingMethodMessages.emptyError)
   }
 
-  private def page(businessAccountingMethodForm: Form[AccountingMethod], isEditMode: Boolean, backLink: Option[String]) = {
+  private def page(businessAccountingMethodForm: Form[AccountingMethod], isEditMode: Boolean, backLink: String) = {
     businessAccountingMethodView(
       businessAccountingMethodForm,
       testCall,
@@ -181,7 +177,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
   private def document(
                         businessAccountingMethodForm: Form[AccountingMethod] = BusinessAccountingMethodForm.businessAccountingMethodForm,
                         isEditMode: Boolean = false,
-                        backLink: Option[String] = Some(testBackUrl)
+                        backLink: String = testBackUrl
                       ): Document = {
     Jsoup.parse(page(businessAccountingMethodForm, isEditMode, backLink).body)
   }

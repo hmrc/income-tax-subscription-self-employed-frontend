@@ -22,8 +22,6 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAccountingMethodForm._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
@@ -44,7 +42,7 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
                                                    val appConfig: AppConfig)
                                                   (implicit val ec: ExecutionContext)
 
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with FeatureSwitching {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
   def view(businessAccountingMethodForm: Form[AccountingMethod], id: String, businessCount: Int, isEditMode: Boolean, isGlobalEdit: Boolean)
           (implicit request: Request[AnyContent]): Html =
@@ -80,10 +78,8 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
               case Right(_) =>
                 if (isEditMode || isGlobalEdit) {
                   Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
-                } else if (isEnabled(StartDateBeforeLimit)) {
-                  Redirect(routes.FullIncomeSourceController.show(id))
                 } else {
-                  Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
+                  Redirect(routes.FullIncomeSourceController.show(id))
                 }
               case Left(_) => throw new InternalServerException("[BusinessAccountingMethodController][submit] - Could not save business accounting method")
             }
@@ -92,15 +88,13 @@ class BusinessAccountingMethodController @Inject()(businessAccountingMethod: Bus
     }
   }
 
-  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean, selfEmploymentCount: Int): Option[String] = {
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean, selfEmploymentCount: Int): String = {
     if ((isEditMode || isGlobalEdit) && selfEmploymentCount > 1) {
-      Some(routes.ChangeAccountingMethodController.show(id, isGlobalEdit).url)
+      routes.ChangeAccountingMethodController.show(id, isGlobalEdit).url
     } else if (isEditMode || isGlobalEdit) {
-      Some(routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = isGlobalEdit).url)
-    } else if (isEnabled(StartDateBeforeLimit)) {
-      Some(appConfig.yourIncomeSourcesUrl)
+      routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = isGlobalEdit).url
     } else {
-      None
+      appConfig.yourIncomeSourcesUrl
     }
 
   }

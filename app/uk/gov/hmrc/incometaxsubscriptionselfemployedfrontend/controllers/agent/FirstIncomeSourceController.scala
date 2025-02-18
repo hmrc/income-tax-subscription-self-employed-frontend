@@ -22,10 +22,10 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm.firstIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
@@ -55,9 +55,8 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
           multipleSelfEmploymentsService.fetchStreamlineBusiness(reference, id) map {
             case Right(streamlineBusiness) =>
               if (streamlineBusiness.isFirstBusiness) {
-                val form: Form[_] = firstIncomeSourceForm.fold(identity, identity)
                 Ok(view(
-                  firstIncomeSourceForm = form.bind(StreamlineIncomeSourceForm.createIncomeSourceData(
+                  firstIncomeSourceForm = firstIncomeSourceForm.bind(StreamlineIncomeSourceForm.createIncomeSourceData(
                     maybeTradeName = streamlineBusiness.trade,
                     maybeBusinessName = streamlineBusiness.name,
                     maybeStartDate = streamlineBusiness.startDate,
@@ -83,53 +82,28 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
   def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withAgentReference { reference =>
-        firstIncomeSourceForm match {
-          case Left(form) =>
-            form.bindFromRequest().fold(
-              formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
-                BadRequest(view(
-                  formWithErrors, id, isEditMode, isGlobalEdit, clientDetails
-                ))
-              }, {
-                case (trade, name, startDate, accountingMethod) =>
-                  saveDataAndContinue(
-                    reference = reference,
-                    id = id,
-                    trade = trade,
-                    name = name,
-                    startDate = Some(startDate),
-                    startDateBeforeLimit = None,
-                    accountingMethod = accountingMethod,
-                    isEditMode = isEditMode,
-                    isGlobalEdit = isGlobalEdit
-                  )
-              }
-            )
-          case Right(form) =>
-            form.bindFromRequest().fold(
-              formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
-                BadRequest(view(
-                  formWithErrors, id, isEditMode, isGlobalEdit, clientDetails
-                ))
-              }, {
-                case (trade, name, startDateBeforeLimit, accountingMethod) =>
-                  saveDataAndContinue(
-                    reference = reference,
-                    id = id,
-                    trade = trade,
-                    name = name,
-                    startDate = None,
-                    startDateBeforeLimit = startDateBeforeLimit match {
-                      case Yes => Some(true)
-                      case No => Some(false)
-                    },
-                    accountingMethod = accountingMethod,
-                    isEditMode = isEditMode,
-                    isGlobalEdit = isGlobalEdit
-                  )
-              }
-            )
-        }
+        firstIncomeSourceForm.bindFromRequest().fold(
+          formWithErrors => clientDetailsRetrieval.getClientDetails map { clientDetails =>
+            BadRequest(view(
+              formWithErrors, id, isEditMode, isGlobalEdit, clientDetails
+            ))
+          }, {
+            case (trade, name, startDateBeforeLimit, accountingMethod) =>
+              saveDataAndContinue(
+                reference = reference,
+                id = id,
+                trade = trade,
+                name = name,
+                startDateBeforeLimit = startDateBeforeLimit match {
+                  case Yes => true
+                  case No => false
+                },
+                accountingMethod = accountingMethod,
+                isEditMode = isEditMode,
+                isGlobalEdit = isGlobalEdit
+              )
+          }
+        )
       }
     }
   }
@@ -138,8 +112,7 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
                                   id: String,
                                   trade: String,
                                   name: String,
-                                  startDate: Option[DateModel],
-                                  startDateBeforeLimit: Option[Boolean],
+                                  startDateBeforeLimit: Boolean,
                                   accountingMethod: AccountingMethod,
                                   isEditMode: Boolean,
                                   isGlobalEdit: Boolean)(implicit hc: HeaderCarrier): Future[Result] = {
@@ -149,12 +122,11 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
       businessId = id,
       trade = trade,
       name = name,
-      startDate = startDate,
       startDateBeforeLimit = startDateBeforeLimit,
       accountingMethod = Some(accountingMethod)
     ) map {
       case Right(_) =>
-        if (startDateBeforeLimit.contains(false)) {
+        if (!startDateBeforeLimit) {
           Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
         } else if (isEditMode || isGlobalEdit) {
           Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
@@ -182,14 +154,6 @@ class FirstIncomeSourceController @Inject()(firstIncomeSource: FirstIncomeSource
       isEditMode = isEditMode,
       clientDetails = clientDetails
     )
-
-  private def firstIncomeSourceForm(implicit request: Request[_]) = {
-    if (isEnabled(StartDateBeforeLimit)) {
-      Right(StreamlineIncomeSourceForm.firstIncomeSourceFormNoDate)
-    } else {
-      Left(StreamlineIncomeSourceForm.firstIncomeSourceForm(_.toLongDate()))
-    }
-  }
 
 }
 

@@ -19,8 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks.MockAddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -33,13 +31,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModel
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
   with MockSessionDataService
-  with MockMultipleSelfEmploymentsService
-  with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    disable(StartDateBeforeLimit)
-    super.beforeEach()
-  }
+  with MockMultipleSelfEmploymentsService {
 
   val isAgent = true
 
@@ -213,23 +205,6 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         }
       }
 
-    }
-
-    "the start date before limit feature switch is enabled" should {
-      "redirect to sole trader check your answer page" when {
-        "the address lookup service returns valid data" in {
-          enable(StartDateBeforeLimit)
-          mockAuthSuccess()
-          mockFetchAccountingMethod(Right(None))
-          mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
-          mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
-
-          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe
-            Some(routes.SelfEmployedCYAController.show(businessId).url)
-        }
-      }
     }
 
     authorisationTests()

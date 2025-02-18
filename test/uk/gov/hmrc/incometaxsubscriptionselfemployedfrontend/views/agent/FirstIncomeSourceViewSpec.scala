@@ -21,23 +21,15 @@ import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.FirstIncomeSource
 
-class FirstIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
+class FirstIncomeSourceViewSpec extends ViewSpec {
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(StartDateBeforeLimit)
-  }
-
-  val form: Form[(String, String, DateModel, AccountingMethod)] = StreamlineIncomeSourceForm.firstIncomeSourceForm(_.toString)
+  val form: Form[(String, String, YesNo, AccountingMethod)] = StreamlineIncomeSourceForm.firstIncomeSourceForm
 
   val testClientDetails: ClientDetails = ClientDetails("FirstName LastName", "ZZ111111Z")
 
@@ -77,7 +69,7 @@ class FirstIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
         errors = Some(Seq(
           StreamlineIncomeSourceForm.businessTradeName -> "Enter the trade of your client’s business",
           StreamlineIncomeSourceForm.businessName -> "Enter your client’s name or the name of their business",
-          s"${StreamlineIncomeSourceForm.startDate}-${DateModelMapping.day}" -> "Enter the date your client’s business started trading",
+          StreamlineIncomeSourceForm.startDateBeforeLimit -> s"Select ‘Yes’ if this business started before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}",
           StreamlineIncomeSourceForm.accountingMethodBusiness -> "Select if your client uses cash basis accounting or traditional accounting"
         ))
       )
@@ -99,226 +91,121 @@ class FirstIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
         form.attr("action") mustBe testCall.url
       }
 
-      "if the start date before limit feature switch is enabled" should {
-        "have a text input to capture a trade name" in {
-          enable(StartDateBeforeLimit)
+      "have a text input to capture a trade name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
+          StreamlineIncomeSourceForm.businessTradeName,
+          FirstIncomeSourceMessages.Trade.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(FirstIncomeSourceMessages.Trade.hint)
+        )
+      }
 
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
-            StreamlineIncomeSourceForm.businessTradeName,
-            FirstIncomeSourceMessages.Trade.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(FirstIncomeSourceMessages.Trade.hint)
-          )
+      "have a text input to capture a business name" in {
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
+          name = StreamlineIncomeSourceForm.businessName,
+          label = FirstIncomeSourceMessages.Name.label,
+          isLabelHidden = false,
+          isPageHeading = false,
+          hint = Some(FirstIncomeSourceMessages.Name.hint)
+        )
+      }
+
+
+      "have a section to capture if the users start date is before the limit" in {
+        form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveRadioInput("fieldset")(
+          name = StreamlineIncomeSourceForm.startDateBeforeLimit,
+          legend = FirstIncomeSourceMessages.DateBeforeLimit.legend,
+          isHeading = false,
+          isLegendHidden = false,
+          hint = None,
+          errorMessage = None,
+          radioContents = Seq(
+            RadioItem(
+              content = Text("Yes"),
+              value = Some(YesNoMapping.option_yes)
+            ),
+            RadioItem(
+              content = Text("No"),
+              value = Some(YesNoMapping.option_no)
+            )
+          ),
+          isInline = true
+        )
+      }
+
+      "have a section to capture an accounting method" which {
+        def accountingMethodLabel: Element = mainContent.selectHead("p.govuk-body")
+
+        def accountingMethodDetails: Element = mainContent.selectHead("details")
+
+        def accountingMethodFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(4)")
+
+        "has a label outside of the fieldset" in {
+          accountingMethodLabel.text mustBe FirstIncomeSourceMessages.AccountingMethod.legend
         }
 
-        "have a text input to capture a business name" in {
-          enable(StartDateBeforeLimit)
+        "has a details block about accounting method" which {
+          "has a summary" in {
+            accountingMethodDetails.selectHead("summary").text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.summary
+          }
+          "has details" which {
+            def detail: Element = accountingMethodDetails.selectHead(".govuk-details__text")
 
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
-            name = StreamlineIncomeSourceForm.businessName,
-            label = FirstIncomeSourceMessages.Name.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(FirstIncomeSourceMessages.Name.hint)
-          )
+            "has a first paragraph" in {
+              detail.selectNth("p", 1).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.paraOne
+            }
+            "has a secondary paragraph" in {
+              detail.selectNth("p", 2).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.paraTwo
+            }
+            "has a bullet list" which {
+              def bulletList: Element = detail.selectHead("ul")
+
+              "has a first bullet point" in {
+                bulletList.selectNth("li", 1).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.bulletOne
+              }
+              "has a secondary bullet point" in {
+                bulletList.selectNth("li", 2).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.bulletTwo
+              }
+            }
+          }
         }
 
-
-        "have a section to capture if the users start date is before the limit" in {
-          enable(StartDateBeforeLimit)
-
-          form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveRadioInput("fieldset")(
-            name = StreamlineIncomeSourceForm.startDateBeforeLimit,
-            legend = FirstIncomeSourceMessages.DateBeforeLimit.legend,
+        "has the correct radio inputs" in {
+          accountingMethodFormGroup.mustHaveRadioInput(
+            selector = "fieldset"
+          )(
+            name = StreamlineIncomeSourceForm.accountingMethodBusiness,
+            legend = FirstIncomeSourceMessages.AccountingMethod.legend,
             isHeading = false,
-            isLegendHidden = false,
-            hint = None,
+            isLegendHidden = true,
+            hint = Some(FirstIncomeSourceMessages.AccountingMethod.hint),
             errorMessage = None,
             radioContents = Seq(
               RadioItem(
-                content = Text("Yes"),
-                value = Some(YesNoMapping.option_yes)
+                content = Text(FirstIncomeSourceMessages.AccountingMethod.Cash.label),
+                value = Some(Cash.toString)
               ),
               RadioItem(
-                content = Text("No"),
-                value = Some(YesNoMapping.option_no)
-              )
-            ),
-            isInline = true
-          )
-        }
-
-        "have a section to capture an accounting method" which {
-          def accountingMethodLabel: Element = mainContent.selectHead("p.govuk-body")
-
-          def accountingMethodDetails: Element = mainContent.selectHead("details")
-
-          def accountingMethodFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(4)")
-
-          "has a label outside of the fieldset" in {
-            enable(StartDateBeforeLimit)
-
-            accountingMethodLabel.text mustBe FirstIncomeSourceMessages.AccountingMethod.legend
-          }
-
-          "has a details block about accounting method" which {
-            "has a summary" in {
-              enable(StartDateBeforeLimit)
-
-              accountingMethodDetails.selectHead("summary").text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.summary
-            }
-            "has details" which {
-              def detail: Element = accountingMethodDetails.selectHead(".govuk-details__text")
-
-              "has a first paragraph" in {
-                enable(StartDateBeforeLimit)
-
-                detail.selectNth("p", 1).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.paraOne
-              }
-              "has a secondary paragraph" in {
-                enable(StartDateBeforeLimit)
-
-                detail.selectNth("p", 2).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.paraTwo
-              }
-              "has a bullet list" which {
-                enable(StartDateBeforeLimit)
-
-                def bulletList: Element = detail.selectHead("ul")
-
-                "has a first bullet point" in {
-                  enable(StartDateBeforeLimit)
-
-                  bulletList.selectNth("li", 1).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.bulletOne
-                }
-                "has a secondary bullet point" in {
-                  enable(StartDateBeforeLimit)
-
-                  bulletList.selectNth("li", 2).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.bulletTwo
-                }
-              }
-            }
-          }
-
-          "has the correct radio inputs" in {
-            enable(StartDateBeforeLimit)
-
-            accountingMethodFormGroup.mustHaveRadioInput(
-              selector = "fieldset"
-            )(
-              name = StreamlineIncomeSourceForm.accountingMethodBusiness,
-              legend = FirstIncomeSourceMessages.AccountingMethod.legend,
-              isHeading = false,
-              isLegendHidden = true,
-              hint = Some(FirstIncomeSourceMessages.AccountingMethod.hint),
-              errorMessage = None,
-              radioContents = Seq(
-                RadioItem(
-                  content = Text(FirstIncomeSourceMessages.AccountingMethod.Cash.label),
-                  value = Some(Cash.toString)
-                ),
-                RadioItem(
-                  content = Text(FirstIncomeSourceMessages.AccountingMethod.Accruals.label),
-                  value = Some(Accruals.toString)
-                )
+                content = Text(FirstIncomeSourceMessages.AccountingMethod.Accruals.label),
+                value = Some(Accruals.toString)
               )
             )
-          }
-        }
-      }
-
-      "if the start date before limit feature switch is disabled" should {
-        "have a text input to capture a trade name" in {
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
-            StreamlineIncomeSourceForm.businessTradeName,
-            FirstIncomeSourceMessages.Trade.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(FirstIncomeSourceMessages.Trade.hint)
           )
         }
 
-        "have a text input to capture a business name" in {
-          form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
-            name = StreamlineIncomeSourceForm.businessName,
-            label = FirstIncomeSourceMessages.Name.label,
-            isLabelHidden = false,
-            isPageHeading = false,
-            hint = Some(FirstIncomeSourceMessages.Name.hint)
-          )
-        }
+        "have a button group" which {
+          def buttonGroup: Element = form.selectHead(".govuk-button-group")
 
-
-        "have a section to capture the users start date" in {
-          form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveDateInput(
-            id = StreamlineIncomeSourceForm.startDate,
-            legend = FirstIncomeSourceMessages.Date.legend,
-            exampleDate = FirstIncomeSourceMessages.Date.hint,
-            isHeading = false,
-            isLegendHidden = false,
-            errorMessage = None,
-            dateInputsValues = Seq.empty
-          )
-        }
-
-        "have a section to capture an accounting method" which {
-          def accountingMethodLabel: Element = mainContent.selectHead("p.govuk-body")
-
-          def accountingMethodDetails: Element = mainContent.selectHead("details")
-
-          def accountingMethodFormGroup: Element = mainContent.selectHead(".govuk-form-group:nth-of-type(4)")
-
-          "has a label outside of the fieldset" in {
-            accountingMethodLabel.text mustBe FirstIncomeSourceMessages.AccountingMethod.legend
+          "has a save and continue button" in {
+            buttonGroup.selectHead(".govuk-button").text mustBe FirstIncomeSourceMessages.Buttons.saveAndContinue
           }
 
-          "has a details block about accounting method" which {
-            "has a summary" in {
-              accountingMethodDetails.selectHead("summary").text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.summary
-            }
-            "has details" which {
-              def detail: Element = accountingMethodDetails.selectHead(".govuk-details__text")
+          "has a save and come back later button" in {
+            val saveAndComeBackLater: Element = buttonGroup.selectHead(".govuk-button--secondary")
 
-              "has a first paragraph" in {
-                detail.selectNth("p", 1).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.paraOne
-              }
-              "has a secondary paragraph" in {
-                detail.selectNth("p", 2).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.paraTwo
-              }
-              "has a bullet list" which {
-                def bulletList: Element = detail.selectHead("ul")
-
-                "has a first bullet point" in {
-                  bulletList.selectNth("li", 1).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.bulletOne
-                }
-                "has a secondary bullet point" in {
-                  bulletList.selectNth("li", 2).text mustBe FirstIncomeSourceMessages.AccountingMethod.Details.bulletTwo
-                }
-              }
-            }
-          }
-
-          "has the correct radio inputs" in {
-            accountingMethodFormGroup.mustHaveRadioInput(
-              selector = "fieldset"
-            )(
-              name = StreamlineIncomeSourceForm.accountingMethodBusiness,
-              legend = FirstIncomeSourceMessages.AccountingMethod.legend,
-              isHeading = false,
-              isLegendHidden = true,
-              hint = Some(FirstIncomeSourceMessages.AccountingMethod.hint),
-              errorMessage = None,
-              radioContents = Seq(
-                RadioItem(
-                  content = Text(FirstIncomeSourceMessages.AccountingMethod.Cash.label),
-                  value = Some(Cash.toString)
-                ),
-                RadioItem(
-                  content = Text(FirstIncomeSourceMessages.AccountingMethod.Accruals.label),
-                  value = Some(Accruals.toString)
-                )
-              )
-            )
+            saveAndComeBackLater.text mustBe FirstIncomeSourceMessages.Buttons.saveAndComeBackLater
+            saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-income-source"
           }
         }
       }
@@ -339,23 +226,6 @@ class FirstIncomeSourceViewSpec extends ViewSpec with FeatureSwitching {
     object Name {
       val label = "What is the name of your client’s business?"
       val hint = "This is the business name your client used to register for Self Assessment. If their business does not have a name, enter your client’s full name."
-    }
-
-    object Date {
-      val legend = "When did your client’s business start trading?"
-      val hint = "We’ll use this date to calculate any Class 2 National Insurance charge. For example, 17 8 2014"
-
-      object Day {
-        val label = "Day"
-      }
-
-      object Month {
-        val label = "Month"
-      }
-
-      object Year {
-        val label = "Year"
-      }
     }
 
     object DateBeforeLimit {

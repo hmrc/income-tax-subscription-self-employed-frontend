@@ -84,7 +84,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
           } yield {
             saveResult match {
               case Right(_) =>
-                  Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode, isGlobalEdit))
+                Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode, isGlobalEdit))
               case Left(_) =>
                 throw new InternalServerException("[AddressLookupRoutingController][addressLookupRedirect] - Could not save business address")
             }

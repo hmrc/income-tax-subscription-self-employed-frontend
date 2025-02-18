@@ -28,38 +28,21 @@ object BusinessStartDateForm {
 
   def maxStartDate: LocalDate = LocalDate.now().plusDays(6)
 
-  def minStartDate: LocalDate = LocalDate.of(1900, 1, 1)
-
-  val minStartDateLimit: LocalDate = AccountingPeriodUtil.getStartDateLimit
+  def minStartDate: LocalDate = AccountingPeriodUtil.getStartDateLimit
 
   val startDate: String = "startDate"
 
-  val errorContext: String = "business-start-date"
-  val featureSwitchErrorContext: String = "business.start-date"
+  val errorContext: String = "business.start-date"
 
-  def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String,
-                            startDateFeatureSwitchEnabled: Boolean): Form[DateModel] = Form(
-
-    if (startDateFeatureSwitchEnabled) {
-      single(
-        startDate -> DateModelMapping.dateModelMapping(
-          errorContext = featureSwitchErrorContext,
-          minDate = Some(minStartDateLimit),
-          maxDate = Some(maxStartDate),
-          dateFormatter = Some(f)
-        )
+  def businessStartDateForm(maxStartDate: LocalDate, f: LocalDate => String): Form[DateModel] = Form(
+    single(
+      startDate -> DateModelMapping.dateModelMapping(
+        errorContext = errorContext,
+        minDate = Some(minStartDate),
+        maxDate = Some(maxStartDate),
+        dateFormatter = Some(f)
       )
-    } else {
-      single(
-        startDate -> DateModelMapping.dateModelMapping(
-          errorContext = errorContext,
-          minDate = Some(minStartDate),
-          maxDate = Some(maxStartDate),
-          dateFormatter = Some(f)
-        )
-      )
-    }
-
+    )
   )
 
 }

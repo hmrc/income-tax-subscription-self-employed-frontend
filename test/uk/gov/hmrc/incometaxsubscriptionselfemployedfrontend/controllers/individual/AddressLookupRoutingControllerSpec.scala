@@ -142,7 +142,6 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
       "redirect to sole trader check your answer page" when {
         "the address lookup service returns valid data" in {
           mockAuthSuccess()
-          mockFetchAccountingMethod(Right(Some(testAccountingMethodModel)))
           mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
           mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
@@ -158,7 +157,6 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
       "redirect to sole trader check your answer page" when {
         "the address lookup service returns valid data" in {
           mockAuthSuccess()
-          mockFetchAccountingMethod(Right(Some(testAccountingMethodModel)))
           mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
           mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
@@ -171,37 +169,16 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
     }
 
     "is not in edit mode" when {
-      "accounting method is defined" should {
-        "redirect to sole trader check your answers page" when {
-          "the address lookup service returns valid data" in {
-            mockAuthSuccess()
-            mockFetchAccountingMethod(Right(Some(testAccountingMethodModel)))
-            mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
-            mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
+      "redirect to sole trader check your answers page" when {
+        "the address lookup service returns valid data" in {
+          mockAuthSuccess()
+          mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
+          mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe
-              Some(routes.SelfEmployedCYAController.show(businessId).url)
-          }
-        }
-      }
-    }
-
-    "is not in edit mode" when {
-      "accounting method is not defined" should {
-        "redirect to sole trader accounting method page" when {
-          "the address lookup service returns valid data" in {
-            mockAuthSuccess()
-            mockFetchAccountingMethod(Right(None))
-            mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
-            mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
-
-            val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe
-              Some(routes.BusinessAccountingMethodController.show(businessId).url)
-          }
+          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe
+            Some(routes.SelfEmployedCYAController.show(businessId).url)
         }
       }
     }

@@ -31,8 +31,7 @@ import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{StreamlineIncomeSourceForm => IndividualStreamlineIncomeSourceForm}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{StreamlineIncomeSourceForm => IndividualStreamlineIncomeSourceForm, _}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
 
@@ -151,13 +150,13 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def submitBusinessStartDate(request: Option[DateModel], id: String, inEditMode: Boolean = false, isGlobalEdit: Boolean = false, featureSwitchEnabled: Boolean): WSResponse = {
+  def submitBusinessStartDate(request: Option[DateModel], id: String, inEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse = {
     val uri = s"/details/business-start-date?id=$id&isEditMode=$inEditMode&isGlobalEdit=$isGlobalEdit"
     post(uri)(
       request.fold(Map.empty[String, Seq[String]])(
         model =>
           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm(
-            BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString, featureSwitchEnabled
+            BusinessStartDateForm.maxStartDate, _.toString
           ).fill(model).data.map {
             case (k, v) =>
               (k, Seq(v))
@@ -339,6 +338,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
 
   }
+
   def removeHtmlMarkup(stringWithMarkup: String): String =
     stringWithMarkup.replaceAll("<.+?>", " ").replaceAll("[\\s]{2,}", " ").trim
 

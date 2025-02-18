@@ -174,17 +174,13 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
                        businessId: String,
                        trade: String,
                        name: String,
-                       startDate: Option[DateModel],
-                       startDateBeforeLimit: Option[Boolean],
+                       startDateBeforeLimit: Boolean,
                        accountingMethod: Option[AccountingMethod])
                       (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     saveData(
-      reference,
-      businessId,
-      startDate match {
-        case Some(_) => _.copy(name = Some(name), trade = Some(trade), startDate = startDate, confirmed = false)
-        case None => _.copy(name = Some(name), trade = Some(trade), startDateBeforeLimit = startDateBeforeLimit, confirmed = false)
-      },
+      reference = reference,
+      id = businessId,
+      businessUpdate = _.copy(name = Some(name), trade = Some(trade), startDateBeforeLimit = Some(startDateBeforeLimit), confirmed = false),
       accountingMethod = accountingMethod
     )
   }

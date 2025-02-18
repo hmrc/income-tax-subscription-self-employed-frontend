@@ -49,24 +49,6 @@ business.start-date.heading                                     = Start date
 business.start-date.caption                                     = Your sole trader business
 business.start-date.paragraph                                   = We need to know the exact start date.
 business.start-date.hint                                        = For example, 27 9 {0}
-error.business-start-date.day-month-year.empty                  = Enter the date your business started trading.
-error.business-start-date.day.empty                             = The date must include a day.
-error.business-start-date.month.empty                           = The date must include a month.
-error.business-start-date.year.empty                            = The date must include a year.
-error.business-start-date.day-month.empty                       = The date must include a day and a month.
-error.business-start-date.day-year.empty                        = The date must include a day and a year.
-error.business-start-date.month-year.empty                      = The date must include a month and a year.
-error.business-start-date.day-month-year.max-date               = The date the business started trading must be on or before <span class="govuk-nowrap">{0}</span>.
-error.business-start-date.day-month-year.min-date               = The date your business started must be on or after <span class="govuk-nowrap">{0}</span>.
-error.business-start-date.day-month-year.invalid                = The date must be a real date.
-error.business-start-date.day.invalid                           = The date must be a real date.
-error.business-start-date.month.invalid                         = The date must be a real date.
-error.business-start-date.year.invalid                          = The date must be a real date.
-error.business-start-date.day-month.invalid                     = The date must be a real date.
-error.business-start-date.day-year.invalid                      = The date must be a real date.
-error.business-start-date.month-year.invalid                    = The date must be a real date.
-error.business-start-date.year.length                           = The year must be in four digits. For example, 2020.
-### StartDateBeforeLimit f/s on validation:
 error.business.start-date.day-month-year.empty                  = Enter the date your business started trading
 error.business.start-date.day.empty                             = The date must include a day
 error.business.start-date.month.empty                           = The date must include a month

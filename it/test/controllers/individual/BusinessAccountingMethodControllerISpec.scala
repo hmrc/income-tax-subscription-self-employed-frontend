@@ -23,20 +23,10 @@ import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.StartDateBeforeLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
 
-class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(StartDateBeforeLimit)
-  }
-
-  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+class BusinessAccountingMethodControllerISpec extends ComponentSpecBase {
 
   val soleTraderBusinessesWithoutAccountingMethod: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = None)
 
@@ -110,7 +100,7 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/details/business-accounting-method" when {
     "the form data is valid and connector stores it successfully" when {
       "not in edit mode" should {
-        "redirect to self employed check your answer page" in {
+        "redirect to the full income source page" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAccountingMethod))
@@ -120,10 +110,10 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           When("POST /details/business-accounting-method is called")
           val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), id = id)
 
-          Then("Should return a SEE_OTHER with a redirect location of routing controller in Subscription FE")
+          Then("Should return a SEE_OTHER with a redirect location of full income source")
           res must have(
             httpStatus(SEE_OTHER),
-            redirectURI(BusinessCYAUri)
+            redirectURI(routes.FullIncomeSourceController.show(id).url)
           )
         }
       }
@@ -143,26 +133,6 @@ class BusinessAccountingMethodControllerISpec extends ComponentSpecBase with Fea
           res must have(
             httpStatus(SEE_OTHER),
             redirectURI(BusinessCYAUri)
-          )
-        }
-      }
-
-      "the start date before limit feature switch is enabled" should {
-        "redirect to the full income source page" in {
-          enable(StartDateBeforeLimit)
-          Given("I setup the Wiremock stubs")
-          stubAuthSuccess()
-          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAccountingMethod))
-          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
-          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-          When("POST /details/business-accounting-method is called")
-          val res = submitBusinessAccountingMethod(Some(testAccountingMethodModel), id = id)
-
-          Then("Should return a SEE_OTHER with a redirect location of full income source")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(routes.FullIncomeSourceController.show(id).url)
           )
         }
       }
