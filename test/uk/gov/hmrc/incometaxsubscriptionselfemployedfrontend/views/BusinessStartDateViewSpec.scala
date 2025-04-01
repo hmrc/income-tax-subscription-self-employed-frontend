@@ -84,7 +84,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     }
 
     "have a paragraph" in new Setup {
-      document.mainContent.getParagraphNth(1) mustBe BusinessStartDateMessages.paragraph
+      document.mainContent.getParagraphNth() mustBe BusinessStartDateMessages.paragraph
     }
 
     "have a Form" in new Setup {

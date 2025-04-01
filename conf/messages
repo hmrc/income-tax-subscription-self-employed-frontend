@@ -10,6 +10,7 @@ base.change                                                     = Change
 base.yes                                                        = Yes
 base.no                                                         = No
 base.add                                                        = Add
+base.section-caption.hidden                                     = This section is
 
 # Save and retrieve
 save-and-continue-button                                        = Save and continue
