@@ -580,7 +580,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
         }
       } else {
         checkpoint {
-          element.selectHead("span.govuk-caption-l").text mustBe caption
+          element.selectHead("h2.govuk-caption-l").text mustBe caption
         }
       }
 

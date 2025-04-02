@@ -105,7 +105,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
     }
 
     "have a page with a paragraph" in {
-      document().mainContent.selectNth("p", 2).text mustBe BusinessAddressConfirmationMessages.para
+      document().mainContent.selectNth("p", 1).text mustBe BusinessAddressConfirmationMessages.para
     }
 
     "have a summary list detailing the previous address" in {

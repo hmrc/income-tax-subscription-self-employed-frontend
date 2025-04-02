@@ -84,7 +84,7 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have a paragraph" in {
-      document().getParagraphNth(2) mustBe BusinessAccountingMethodMessages.line_1
+      document().getParagraphNth(1) mustBe BusinessAccountingMethodMessages.line_1
     }
 
     "have an accordion summary" in {
@@ -92,11 +92,11 @@ class BusinessAccountingMethodViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have an accordion sub heading" in {
-      document().getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordion_subheading
+      document().getParagraphNth(2) mustBe BusinessAccountingMethodMessages.accordion_subheading
     }
 
     "have an accordion heading" in {
-      document().getParagraphNth(4) mustBe BusinessAccountingMethodMessages.accordionLine_1
+      document().getParagraphNth(3) mustBe BusinessAccountingMethodMessages.accordionLine_1
     }
 
     "have an accordion bullets list 1" in {

@@ -10,6 +10,7 @@ base.change                                                     = Newid
 base.yes                                                        = Iawn
 base.no                                                         = Na
 base.add                                                        = Ychwanegu
+base.section-caption.hidden                                     = Teitl yr adran hon yw
 
 # Save and retrieve
 save-and-continue-button                                        = Cadw ac yn eich blaen
