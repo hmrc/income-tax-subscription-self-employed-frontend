@@ -40,15 +40,21 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
     }
 
     "transform a valid request to the date form case class" in {
-      val testDateDay = "6"
-      val testDateMonth = "4"
-      val testDateYear = "2022"
+
+      val validDate: LocalDate = LocalDate.now
 
       val testInput = Map(
-        s"$startDate-$day" -> testDateDay, s"$startDate-$month" -> testDateMonth, s"$startDate-$year" -> testDateYear
+        s"$startDate-$day" -> validDate.getDayOfMonth.toString,
+        s"$startDate-$month" -> validDate.getMonthValue.toString,
+        s"$startDate-$year" -> validDate.getYear.toString
       )
 
-      val expected = DateModel(testDateDay, testDateMonth, testDateYear)
+      val expected = DateModel(
+        validDate.getDayOfMonth.toString,
+        validDate.getMonthValue.toString,
+        validDate.getYear.toString
+      )
+
       val actual = form.bind(testInput).value
 
       actual shouldBe Some(expected)
