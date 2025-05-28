@@ -35,7 +35,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val heading: String = "Start date"
     val captionVisual = "Your sole trader business"
     val paragraph: String = "We need to know the exact start date."
-    val hint = "For example, 27 9 2022"
+    val hint = "For example, 27 9 2023"
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
