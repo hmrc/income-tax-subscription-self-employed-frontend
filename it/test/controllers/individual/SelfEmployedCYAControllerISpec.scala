@@ -112,6 +112,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       }
 
       "the user submits valid incomplete data" in {
+        disable(RemoveAccountingMethod)
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
