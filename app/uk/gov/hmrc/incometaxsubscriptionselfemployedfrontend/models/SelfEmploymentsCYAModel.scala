@@ -33,19 +33,33 @@ case class SelfEmploymentsCYAModel(id: String,
   private val businessAddressComplete: Boolean = businessAddress.isDefined
   private val accountingMethodComplete: Boolean = accountingMethod.isDefined
 
-  val isComplete: Boolean = {
-    startDateBeforeLimit match {
-      case Some(true) =>
-        businessNameComplete &&
-          businessTradeNameComplete &&
-          businessAddressComplete &&
-          accountingMethodComplete
-      case _ =>
-        businessStartDateComplete &&
+  def isComplete(removeAccountingMethod: Boolean): Boolean = {
+    if (removeAccountingMethod) {
+      startDateBeforeLimit match {
+        case Some(true) =>
           businessNameComplete &&
-          businessTradeNameComplete &&
-          businessAddressComplete &&
-          accountingMethodComplete
+            businessTradeNameComplete &&
+            businessAddressComplete
+        case _ =>
+          businessStartDateComplete &&
+            businessNameComplete &&
+            businessTradeNameComplete &&
+            businessAddressComplete
+      }
+    } else {
+      startDateBeforeLimit match {
+        case Some(true) =>
+          businessNameComplete &&
+            businessTradeNameComplete &&
+            businessAddressComplete &&
+            accountingMethodComplete
+        case _ =>
+          businessStartDateComplete &&
+            businessNameComplete &&
+            businessTradeNameComplete &&
+            businessAddressComplete &&
+            accountingMethodComplete
+      }
     }
   }
 
