@@ -32,8 +32,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.St
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Cash, DateModel, SoleTraderBusinesses}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ITSASessionKeys}
 
-import java.awt.Taskbar.Feature
-
 class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]

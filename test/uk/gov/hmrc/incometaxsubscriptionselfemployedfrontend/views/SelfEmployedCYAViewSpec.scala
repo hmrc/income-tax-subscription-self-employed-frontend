@@ -192,7 +192,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     }
 
     "have a summary of the self employment answers without accounting method" when {
-      "feature switch is enabled" when {
+      "remove accounting method feature switch is enabled" when {
         "in edit mode" when {
           "the answers are complete" in {
             enable(RemoveAccountingMethod)

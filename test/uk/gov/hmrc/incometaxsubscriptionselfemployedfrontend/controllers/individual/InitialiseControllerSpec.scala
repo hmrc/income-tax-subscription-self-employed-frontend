@@ -91,7 +91,7 @@ class InitialiseControllerSpec extends ControllerBaseSpec with MockMultipleSelfE
         .message mustBe "[InitialiseController][initialise] - Failure fetching sole trader businesses"
     }
 
-    "when feature switch is enabled" should {
+    "when remove accounting method feature switch is enabled" should {
       s"return $SEE_OTHER and redirect to Full Income Source page when a business already exists without accounting method" in {
         enable(RemoveAccountingMethod)
         mockAuthSuccess()

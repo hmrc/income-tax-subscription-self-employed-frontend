@@ -126,7 +126,7 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
   def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean, isFirstBusiness: Boolean): String = {
     if (isEditMode || isGlobalEdit) {
       routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit).url
-    } else if (isFirstBusiness && isEnabled(RemoveAccountingMethod)) {
+    } else if (isEnabled(RemoveAccountingMethod)) {
       appConfig.yourIncomeSourcesUrl
     } else if (isFirstBusiness) {
       routes.BusinessAccountingMethodController.show(id).url

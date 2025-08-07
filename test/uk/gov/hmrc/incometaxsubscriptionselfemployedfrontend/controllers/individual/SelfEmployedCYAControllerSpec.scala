@@ -118,7 +118,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
     }
 
-    "feature switch is enabled" should {
+    "remove accounting method feature switch is enabled" should {
       "return 303, (SEE_OTHER) and redirect to the your income sources page" when {
         "the user submits valid full data without accounting method" in {
           enable(RemoveAccountingMethod)

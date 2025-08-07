@@ -92,7 +92,7 @@ class InitialiseControllerISpec extends ComponentSpecBase with FeatureSwitching 
         httpStatus(INTERNAL_SERVER_ERROR))
     }
 
-    "the feature switch is enabled" should {
+    "the remove accounting method feature switch is enabled" should {
       "redirect to full income source page when there is already at least 1 business without accounting method" in {
         enable(RemoveAccountingMethod)
         Given("I setup the Wiremock stubs")

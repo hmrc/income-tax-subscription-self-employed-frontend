@@ -159,7 +159,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       }
     }
 
-    "feature switch is enabled" should {
+    "remove accounting method feature switch is enabled" should {
       "redirect to the your income source page" when {
         "the user submits valid full data without accounting method" in {
           enable(RemoveAccountingMethod)
