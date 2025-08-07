@@ -66,7 +66,11 @@ case class SelfEmploymentsCYAModel(id: String,
 }
 
 object SelfEmploymentsCYAModel {
-  def apply(id: String, soleTraderBusiness: Option[SoleTraderBusiness], accountingMethod: Option[AccountingMethod], totalSelfEmployments: Int, isFirstBusiness: Boolean): SelfEmploymentsCYAModel = {
+  def apply(id: String,
+            soleTraderBusiness: Option[SoleTraderBusiness],
+            accountingMethod: Option[AccountingMethod],
+            totalSelfEmployments: Int,
+            isFirstBusiness: Boolean): SelfEmploymentsCYAModel = {
     SelfEmploymentsCYAModel(
       id = id,
       confirmed = soleTraderBusiness.exists(_.confirmed),
