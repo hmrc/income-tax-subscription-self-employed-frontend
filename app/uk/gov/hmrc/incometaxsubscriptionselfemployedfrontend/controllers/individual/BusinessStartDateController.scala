@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUti
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessStartDate
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                             authService: AuthService,
-                                            businessStartDate: BusinessStartDateView)
+                                            businessStartDate: BusinessStartDate)
                                            (val sessionDataService: SessionDataService,
                                             val languageUtils: LanguageUtils,
                                             val appConfig: AppConfig)

@@ -34,78 +34,37 @@ class SelfEmploymentsCYAModelSpec extends PlaySpec {
     businessStartDate = Some(dateModel),
     businessName = Some("test name"),
     businessTradeName = Some("test trade"),
-    businessAddress = Some(address),
-    accountingMethod = Some(Cash),
-    totalSelfEmployments = 1,
-    isFirstBusiness = true
+    businessAddress = Some(address)
   )
 
   "SelfEmploymentsCYAModel.isComplete" must {
-
-    "when removeAccountingMethod is true" should {
-      "return true" when {
-        "start date before limit is defined and true" in {
-          fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None).isComplete(removeAccountingMethod = true) mustBe true
-        }
-        "start date before limit is defined and false and start date defined" in {
-          fullModel.copy(startDateBeforeLimit = Some(false)).isComplete(removeAccountingMethod = true) mustBe true
-        }
-        "start date before limit is not defined and start date defined" in {
-          fullModel.copy(startDateBeforeLimit = None).isComplete(removeAccountingMethod = true) mustBe true
-        }
+    "return true" when {
+      "start date before limit is defined and true" in {
+        fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None).isComplete mustBe true
       }
-
-      "return false" when {
-        "start date before limit is defined and true and name is not defined" in {
-          fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None, businessName = None).isComplete(removeAccountingMethod = true) mustBe false
-        }
-        "start date before limit is defined and true and trade is not defined" in {
-          fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None, businessTradeName = None).isComplete(removeAccountingMethod = true) mustBe false
-        }
-        "start date before limit is defined and true and address is not defined" in {
-          fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None, businessAddress = None).isComplete(removeAccountingMethod = true) mustBe false
-        }
-        "start date before limit is defined and false and start date is not defined" in {
-          fullModel.copy(startDateBeforeLimit = Some(false), businessStartDate = None).isComplete(removeAccountingMethod = true) mustBe false
-        }
-        "start date before limit is not defined and start date is not defined" in {
-          fullModel.copy(startDateBeforeLimit = None, businessStartDate = None).isComplete(removeAccountingMethod = true) mustBe false
-        }
+      "start date before limit is defined and false and start date defined" in {
+        fullModel.copy(startDateBeforeLimit = Some(false)).isComplete mustBe true
+      }
+      "start date before limit is not defined and start date defined" in {
+        fullModel.copy(startDateBeforeLimit = None).isComplete mustBe true
       }
     }
 
-    "when removeAccountingMethod is false" should {
-      "return true" when {
-        "start date before limit is defined and true and all fields are defined" in {
-          fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None).isComplete(removeAccountingMethod = false) mustBe true
-        }
-        "start date before limit is defined and false and all fields are defined" in {
-          fullModel.isComplete(removeAccountingMethod = false) mustBe true
-        }
-        "start date before limit is not defined and all fields are defined" in {
-          fullModel.copy(startDateBeforeLimit = None).isComplete(removeAccountingMethod = false) mustBe true
-        }
+    "return false" when {
+      "start date before limit is defined and true and name is not defined" in {
+        fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None, businessName = None).isComplete mustBe false
       }
-
-      "return false" when {
-        "start date before limit is defined and true and accounting method is not defined" in {
-          fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None, accountingMethod = None).isComplete(removeAccountingMethod = false) mustBe false
-        }
-        "start date before limit is defined and false and start date is not defined" in {
-          fullModel.copy(businessStartDate = None, accountingMethod = None).isComplete(removeAccountingMethod = false) mustBe false
-        }
-        "name is not defined" in {
-          fullModel.copy(businessName = None, accountingMethod = None).isComplete(removeAccountingMethod = false) mustBe false
-        }
-        "trade is not defined" in {
-          fullModel.copy(businessTradeName = None, accountingMethod = None).isComplete(removeAccountingMethod = false) mustBe false
-        }
-        "address is not defined" in {
-          fullModel.copy(businessAddress = None, accountingMethod = None).isComplete(removeAccountingMethod = false) mustBe false
-        }
-        "accounting method is not defined" in {
-          fullModel.copy(accountingMethod = None).isComplete(removeAccountingMethod = false) mustBe false
-        }
+      "start date before limit is defined and true and trade is not defined" in {
+        fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None, businessTradeName = None).isComplete mustBe false
+      }
+      "start date before limit is defined and true and address is not defined" in {
+        fullModel.copy(startDateBeforeLimit = Some(true), businessStartDate = None, businessAddress = None).isComplete mustBe false
+      }
+      "start date before limit is defined and false and start date is not defined" in {
+        fullModel.copy(startDateBeforeLimit = Some(false), businessStartDate = None).isComplete mustBe false
+      }
+      "start date before limit is not defined and start date is not defined" in {
+        fullModel.copy(startDateBeforeLimit = None, businessStartDate = None).isComplete mustBe false
       }
     }
   }

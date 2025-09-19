@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -60,8 +59,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         trade = Some("testBusinessTrade"),
         address = Some(Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))
       )
-    ),
-    accountingMethod = Some(Cash)
+    )
   )
 
   "show" when {
@@ -109,7 +107,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         }
 
         "the user submits valid incomplete data" in {
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
+          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(businesses = soleTraderBusinesses.businesses.map(_.copy(address = None))))))
 
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
           status(result) mustBe SEE_OTHER
@@ -121,8 +119,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
     "remove accounting method feature switch is enabled" should {
       "return 303, (SEE_OTHER) and redirect to the your income sources page" when {
         "the user submits valid full data without accounting method" in {
-          enable(RemoveAccountingMethod)
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
+          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
           mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
           val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)

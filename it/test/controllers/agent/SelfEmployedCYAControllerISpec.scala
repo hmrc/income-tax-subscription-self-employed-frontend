@@ -34,7 +34,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val incompleteSoleTraderBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
-    accountingMethod = None
+    businesses = soleTraderBusinesses.businesses.map(_.copy(address = None))
   )
 
   val completeSoleTraderBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
@@ -49,7 +49,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       stubAuthSuccess()
       stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
       stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-      
+
       When("GET /client/details/business-check-your-answers is called")
       val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
 

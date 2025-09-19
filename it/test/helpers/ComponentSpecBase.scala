@@ -169,19 +169,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientInitialise: WSResponse = get(s"/client/details")
 
-  def getBusinessNameConfirmation(id: String)(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
-    get(s"/details/confirm-business-name?id=$id", session)
-  }
-
-  def submitBusinessNameConfirmation(id: String, request: Option[YesNo])(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
-    post(s"/details/confirm-business-name?id=$id", session)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          BusinessNameConfirmationForm.businessNameConfirmationForm.fill(model).data.map { case (k, v) => (k, Seq(v)) }
-      )
-    )
-  }
-
   def getBusinessAddressConfirmation(id: String)(session: Map[String, String] = Map.empty[String, String]): WSResponse = {
     get(s"/details/confirm-business-address?id=$id", session)
   }
@@ -208,33 +195,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
-  def getBusinessName(id: String): WSResponse = get(s"/details/business-name?id=$id")
-
-  def submitBusinessName(id: String, inEditMode: Boolean, isGlobalEdit: Boolean, request: Option[String]): WSResponse = {
-    val uri = s"/details/business-name?id=$id&isEditMode=$inEditMode&isGlobalEdit=$isGlobalEdit"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          BusinessNameForm.businessNameValidationForm(Nil).fill(model).data.map { case (k, v) => (k, Seq(v)) }
-      )
-    )
-  }
-
-  def getBusinessTradeName(id: String): WSResponse = get(s"/details/business-trade?id=$id")
-
-  def submitBusinessTradeName(id: String, inEditMode: Boolean, isGlobalEdit: Boolean, request: Option[String]): WSResponse = {
-    val uri = s"/details/business-trade?id=$id&isEditMode=$inEditMode&isGlobalEdit=$isGlobalEdit"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          BusinessTradeNameForm.businessTradeNameValidationForm(Nil).fill(model).data.map {
-            case (k, v) =>
-              (k, Seq(v))
-          }
-      )
-    )
-  }
-
   def getTimeout: WSResponse = get(uri = "/timeout")
 
   def getClientTimeout: WSResponse = get(uri = "/client/timeout")
@@ -242,29 +202,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getKeepAlive: WSResponse = get(uri = "/keep-alive")
 
   def getClientKeepAlive: WSResponse = get(uri = "/client/keep-alive")
-
-
-  def getBusinessAccountingMethod(id: String, inEditMode: Boolean = false): WSResponse = get(s"/details/business-accounting-method?id=$id&isEditMode=$inEditMode")
-
-  def submitBusinessAccountingMethod(request: Option[AccountingMethod],
-                                     inEditMode: Boolean = false,
-                                     isGlobalEdit: Boolean = false,
-                                     id: String): WSResponse = {
-    val uri = s"/details/business-accounting-method?isEditMode=$inEditMode&id=$id&isGlobalEdit=$isGlobalEdit"
-    post(uri)(
-      request.fold(Map.empty[String, Seq[String]])(
-        model =>
-          BusinessAccountingMethodForm.businessAccountingMethodForm.fill(model).data.map {
-            case (k, v) =>
-              (k, Seq(v))
-          }
-      )
-    )
-  }
-
-  def getChangeAccountingMethod(id: String): WSResponse = get(s"/details/change-accounting-method?id=$id")
-
-  def submitChangeAccountingMethod(id: String): WSResponse = post(s"/details/change-accounting-method?id=$id")(Map.empty)
 
   def getBusinessCheckYourAnswers(id: String, isEditMode: Boolean): WSResponse = get(s"/details/business-check-your-answers?id=$id,isEditMode=$isEditMode")
 
@@ -287,41 +224,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientAddressLookup(itsaId: String, id: String, isEditMode: Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
 
-  def getFirstIncomeSource(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
-    get(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
-  }
-
-  def submitFirstIncomeSource(trade: Option[String],
-                              name: Option[String],
-                              startDate: Option[DateModel],
-                              startDateBeforeLimit: Option[Boolean],
-                              accountingMethod: Option[AccountingMethod],
-                              id: String,
-                              isEditMode: Boolean,
-                              isGlobalEdit: Boolean): WSResponse = {
-    post(s"/client/details/initial-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
-      StreamlineIncomeSourceForm.createIncomeSourceData(trade, name, startDate, startDateBeforeLimit, accountingMethod)
-        .map { case (k, v) => (k, Seq(v)) }
-    )
-  }
-
-  def getNextIncomeSource(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
-    get(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
-  }
-
-  def submitNextIncomeSource(trade: Option[String],
-                             name: Option[String],
-                             startDate: Option[DateModel],
-                             startDateBeforeLimit: Option[Boolean],
-                             id: String,
-                             isEditMode: Boolean,
-                             isGlobalEdit: Boolean): WSResponse = {
-    post(s"/client/details/subsequent-sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
-      StreamlineIncomeSourceForm.createIncomeSourceData(trade, name, startDate, startDateBeforeLimit, None)
-        .map { case (k, v) => (k, Seq(v)) }
-    )
-  }
-
   def getClientFullIncomeSource(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
     get(s"/client/details/sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
   }
@@ -334,7 +236,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
                                    isEditMode: Boolean,
                                    isGlobalEdit: Boolean): WSResponse = {
     post(s"/client/details/sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
-      StreamlineIncomeSourceForm.createIncomeSourceData(trade, name, startDate, startDateBeforeLimit, None)
+      StreamlineIncomeSourceForm.createIncomeSourceData(trade, name, startDate, startDateBeforeLimit)
         .map { case (k, v) => (k, Seq(v)) }
     )
   }

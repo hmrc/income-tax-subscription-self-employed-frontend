@@ -25,11 +25,10 @@ import play.api.http.Status._
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.{FullIncomeSourceController, routes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Cash, DateModel, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusinesses}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ITSASessionKeys}
 
 class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwitching {
@@ -37,19 +36,14 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   lazy val fullIncomeSourceController: FullIncomeSourceController = app.injector.instanceOf[FullIncomeSourceController]
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(RemoveAccountingMethod)
-  }
-
   val clearedSoleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
     businesses = Seq(soleTraderBusiness.copy(
       trade = None,
       name = None,
       startDate = None,
       startDateBeforeLimit = None
-    )),
-    accountingMethod = Some(Cash))
+    ))
+  )
 
 
   s"GET ${routes.FullIncomeSourceController.show(id)}" when {
@@ -536,40 +530,24 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
   }
 
   "backUrl" when {
-    def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean, isFirstBusiness: Boolean): String =
-      fullIncomeSourceController.backUrl(id, isEditMode, isGlobalEdit, isFirstBusiness)
+    def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean): String =
+      fullIncomeSourceController.backUrl(id, isEditMode, isGlobalEdit)
 
     "not in edit mode" should {
-      "redirect to accounting method when it is the first business" in {
-        backUrl(isEditMode = false, isGlobalEdit = false, isFirstBusiness = true) mustBe routes.BusinessAccountingMethodController.show(id).url
-      }
       "redirect to your income sources page when it is not the first business" in {
-        backUrl(isEditMode = false, isGlobalEdit = false, isFirstBusiness = false) mustBe appConfig.yourIncomeSourcesUrl
+        backUrl(isEditMode = false, isGlobalEdit = false) mustBe appConfig.yourIncomeSourcesUrl
       }
     }
 
     "in edit mode" should {
-      "redirect to sole trader CYA when it is the first business" in {
-        backUrl(isEditMode = true, isGlobalEdit = false, isFirstBusiness = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
-      }
-      "redirect to sole trader CYA when it is not the first business" in {
-        backUrl(isEditMode = true, isGlobalEdit = false, isFirstBusiness = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+      "redirect to sole trader CYA" in {
+        backUrl(isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
       }
     }
 
     "in global edit mode" should {
-      "redirect to sole trader CYA when it is the first business" in {
-        backUrl(isEditMode = true, isGlobalEdit = true, isFirstBusiness = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
-      }
-      "redirect to sole trader CYA when it is not the first business" in {
-        backUrl(isEditMode = true, isGlobalEdit = true, isFirstBusiness = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
-      }
-    }
-
-    "when the feature switch is enabled" should {
-      "redirect to your income sources page when its the first business without accounting method" in {
-        enable(RemoveAccountingMethod)
-        backUrl(isEditMode = false, isGlobalEdit = false, isFirstBusiness = true) mustBe appConfig.yourIncomeSourcesUrl
+      "redirect to sole trader CYA" in {
+        backUrl(isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
       }
     }
   }

@@ -19,22 +19,11 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SoleTraderBusiness, SoleTraderBusinesses}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockSessionDataService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 
-class InitialiseControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService
-  with MockMultipleSelfEmploymentsService
-  with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(RemoveAccountingMethod)
-  }
+class InitialiseControllerSpec extends ControllerBaseSpec with MockSessionDataService {
 
   override val controllerName: String = "InitialiseController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
@@ -43,61 +32,20 @@ class InitialiseControllerSpec extends ControllerBaseSpec
 
   when(mockUuid.generateId).thenReturn("testId")
 
-
   object TestInitialiseController extends InitialiseController(
     mockMessagesControllerComponents,
-    mockMultipleSelfEmploymentsService,
     mockAuthService,
     mockUuid
   )(appConfig, mockSessionDataService)
 
   "initialise" when {
-    "the remove accounting method feature switch is enabled" should {
-      s"return $SEE_OTHER and redirect to the full income source page" in {
-        enable(RemoveAccountingMethod)
-        mockAuthSuccess()
+    s"return $SEE_OTHER and redirect to the full income source page" in {
+      mockAuthSuccess()
 
-        val result = TestInitialiseController.initialise(fakeRequest)
+      val result = TestInitialiseController.initialise(fakeRequest)
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.FullIncomeSourceController.show("testId").url)
-      }
-    }
-    "the remove accounting method feature switch is disabled" should {
-      s"return $SEE_OTHER and redirect to the first sole trader income source page" when {
-        "there are no businesses in the sole trader businesses" in {
-
-          mockAuthSuccess()
-          mockFetchSoleTraderBusinesses(Right(Some(SoleTraderBusinesses(Seq.empty))))
-
-          val result = TestInitialiseController.initialise(fakeRequest)
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.FirstIncomeSourceController.show("testId").url)
-        }
-        "there is no sole trader businesses stored" in {
-
-          mockAuthSuccess()
-          mockFetchSoleTraderBusinesses(Right(None))
-
-          val result = TestInitialiseController.initialise(fakeRequest)
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.FirstIncomeSourceController.show("testId").url)
-        }
-      }
-      s"return $SEE_OTHER and redirect to the next sole trader income source page" when {
-        "there are businesses already" in {
-
-          mockAuthSuccess()
-          mockFetchSoleTraderBusinesses(Right(Some(SoleTraderBusinesses(Seq(SoleTraderBusiness(id = "previousId"))))))
-
-          val result = TestInitialiseController.initialise(fakeRequest)
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.NextIncomeSourceController.show("testId").url)
-        }
-      }
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.FullIncomeSourceController.show("testId").url)
     }
   }
 

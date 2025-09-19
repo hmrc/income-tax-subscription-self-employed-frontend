@@ -20,8 +20,6 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
-import java.time.LocalDate
-
 
 object IntegrationTestConstants {
 
@@ -37,8 +35,6 @@ object IntegrationTestConstants {
   val ClientBusinessAddressCheckUri = s"$baseURI/client/address-lookup-check"
   val BusinessNameUri = s"$baseURI/details/business-name"
   val BusinessTradeNameUri = s"$baseURI/details/business-trade"
-  val BusinessAccountingMethodUri = s"$baseURI/details/business-accounting-method"
-  val ClientBusinessAccountingMethodUri = s"$baseURI/client/details/business-accounting-method"
   val BusinessListCYAUri = s"$baseURI/details/business-list"
   val BusinessAddressConfirmationUri = s"$baseURI/details/confirm-business-address"
   val BusinessCYAUri = s"$baseURI/details/business-check-your-answers"
@@ -56,7 +52,9 @@ object IntegrationTestConstants {
   val ggSignOutURI = s"/bas-gateway/sign-out-without-state"
 
   def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
+
   def businessAddressCheckUri(itsaId: String): String = s"$baseURI/address-lookup-check/$itsaId"
+
   def businessAddressLookupRedirectUri(itsaId: String): String = s"$baseURI/details/address-lookup/$itsaId"
 
   object Auth {
@@ -66,8 +64,6 @@ object IntegrationTestConstants {
            "externalId":"$externalId"
         }""")
   }
-
-  val testAccountingMethodModel: AccountingMethod = Cash
 
   val referrerPath = "dummyPath"
   val referrerQueryString = "dummyQueryString"
@@ -89,8 +85,7 @@ object IntegrationTestConstants {
   val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
     businesses = Seq(
       soleTraderBusiness
-    ),
-    accountingMethod = Some(Cash)
+    )
   )
 
   def testAddressLookupConfig(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {

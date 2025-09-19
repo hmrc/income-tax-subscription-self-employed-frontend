@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm.nextIncomeSourceForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm.fullIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{No, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
@@ -47,12 +47,11 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
     multipleSelfEmploymentsService.fetchStreamlineBusiness(request.reference, id) map {
       case Right(streamlineBusiness) =>
         Ok(view(
-          nextIncomeSourceForm = nextIncomeSourceForm.bind(StreamlineIncomeSourceForm.createIncomeSourceData(
+          nextIncomeSourceForm = fullIncomeSourceForm.bind(StreamlineIncomeSourceForm.createIncomeSourceData(
             maybeTradeName = streamlineBusiness.trade,
             maybeBusinessName = streamlineBusiness.name,
             maybeStartDate = streamlineBusiness.startDate,
-            maybeStartDateBeforeLimit = streamlineBusiness.startDateBeforeLimit,
-            maybeAccountingMethod = None
+            maybeStartDateBeforeLimit = streamlineBusiness.startDateBeforeLimit
           )).discardingErrors,
           id = id,
           isEditMode = isEditMode,
@@ -64,7 +63,7 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
   }
 
   def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
-    nextIncomeSourceForm.bindFromRequest().fold(
+    fullIncomeSourceForm.bindFromRequest().fold(
       formWithErrors =>
         Future.successful(BadRequest(view(
           formWithErrors, id, isEditMode, isGlobalEdit
@@ -97,8 +96,7 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
       businessId = id,
       trade = trade,
       name = name,
-      startDateBeforeLimit = startDateBeforeLimit,
-      accountingMethod = None
+      startDateBeforeLimit = startDateBeforeLimit
     ) map {
       case Right(_) =>
         if (!startDateBeforeLimit) {

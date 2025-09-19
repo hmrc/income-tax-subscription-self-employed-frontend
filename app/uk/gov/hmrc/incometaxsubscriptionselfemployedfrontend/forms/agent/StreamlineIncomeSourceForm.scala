@@ -16,16 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
+import play.api.data.Form
 import play.api.data.Forms.tuple
 import play.api.data.validation.{Constraint, Invalid}
-import play.api.data.{Form, Mapping}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping.yesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.{AccountingMethodMapping, YesNoMapping}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.MappingUtil.trimmedText
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Accruals.ACCRUALS
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Cash.CASH
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil.getStartDateLimit
@@ -52,24 +50,7 @@ object StreamlineIncomeSourceForm {
 
   val startDateBeforeLimit: String = "start-date-before-limit"
 
-  val accountingMethodBusiness: String = "accounting-method"
-  val businessAccountingMethod: Mapping[AccountingMethod] = AccountingMethodMapping(
-    errInvalid = Invalid(s"agent.error.$pageIdentifier.$accountingMethodBusiness.invalid"),
-    errEmpty = Some(Invalid(s"agent.error.$pageIdentifier.$accountingMethodBusiness.invalid"))
-  )
-
-  def firstIncomeSourceForm: Form[(String, String, YesNo, AccountingMethod)] = Form(
-    tuple(
-      businessTradeName -> trimmedText.verifying(tradeNameEmpty andThen tradeCharsValid andThen tradeTooLong andThen tradeTooShort),
-      businessName -> trimmedText.verifying(nameNotEmpty andThen nameMaxLength andThen nameValidChars),
-      startDateBeforeLimit -> yesNoMapping(
-        yesNoInvalid = Invalid(s"agent.error.$pageIdentifier.$startDateBeforeLimit.invalid", AccountingPeriodUtil.getStartDateLimit.getYear.toString)
-      ),
-      accountingMethodBusiness -> businessAccountingMethod
-    )
-  )
-
-  def nextIncomeSourceForm: Form[(String, String, YesNo)] = Form(
+  def fullIncomeSourceForm: Form[(String, String, YesNo)] = Form(
     tuple(
       businessTradeName -> trimmedText.verifying(tradeNameEmpty andThen tradeCharsValid andThen tradeTooLong andThen tradeTooShort),
       businessName -> trimmedText.verifying(nameNotEmpty andThen nameMaxLength andThen nameValidChars),
@@ -82,8 +63,7 @@ object StreamlineIncomeSourceForm {
   def createIncomeSourceData(maybeTradeName: Option[String],
                              maybeBusinessName: Option[String],
                              maybeStartDate: Option[DateModel],
-                             maybeStartDateBeforeLimit: Option[Boolean],
-                             maybeAccountingMethod: Option[AccountingMethod]): Map[String, String] = {
+                             maybeStartDateBeforeLimit: Option[Boolean]): Map[String, String] = {
 
     val tradeNameMap: Map[String, String] = maybeTradeName.map(name => Map(businessTradeName -> name)).getOrElse(Map.empty)
     val businessNameMap: Map[String, String] = maybeBusinessName.map(name => Map(businessName -> name)).getOrElse(Map.empty)
@@ -105,12 +85,7 @@ object StreamlineIncomeSourceForm {
       }
     }
 
-    val accountingMethodMap: Map[String, String] = maybeAccountingMethod.fold(Map.empty[String, String]) {
-      case Cash => Map(accountingMethodBusiness -> CASH)
-      case Accruals => Map(accountingMethodBusiness -> ACCRUALS)
-    }
-
-    tradeNameMap ++ businessNameMap ++ startDateBeforeLimitMap ++ accountingMethodMap
+    tradeNameMap ++ businessNameMap ++ startDateBeforeLimitMap
 
   }
 }

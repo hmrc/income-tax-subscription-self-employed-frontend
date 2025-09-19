@@ -88,15 +88,15 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           stubAuthSuccess()
           disable(EnableUseRealAddressLookup)
 
-            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
-            stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
-            stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
-            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
+          stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")
           val res = getAddressLookupResponse(id, addressId, isEditMode = false)
 
-          Then("Should return a SEE_OTHER with a redirect location of business check your answers method")
+          Then("Should return a SEE_OTHER with a redirect location of business check your answers")
           res must have(
             httpStatus(SEE_OTHER),
             redirectURI(BusinessCYAUri)
@@ -158,15 +158,15 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
             Given("I setup the Wiremock stubs")
             stubAuthSuccess()
             enable(EnableUseRealAddressLookup)
-            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
+            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
             stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
-            stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses.copy(accountingMethod = None)))(OK)
+            stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
             When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")
             val res = getAddressLookupResponse(id, addressId, isEditMode = false)
 
-            Then("Should return a SEE_OTHER with a redirect location of business check your answers method")
+            Then("Should return a SEE_OTHER with a redirect location of business check your answers")
             res must have(
               httpStatus(SEE_OTHER),
               redirectURI(BusinessCYAUri)
@@ -180,7 +180,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
             stubAuthSuccess()
             enable(EnableUseRealAddressLookup)
 
-            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress.copy(accountingMethod = None)))
+            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
             getAddressDetailsUrlNoId(OK, Json.toJson(address)(Address.format))
 
             When(s"GET $clientOrIndividual/details/address-lookup/" + id + " is called")

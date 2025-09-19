@@ -22,7 +22,6 @@ import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
@@ -49,11 +48,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 
   def backUrl(id: String): String = {
-    if (isEnabled(RemoveAccountingMethod)) {
-      controllers.agent.routes.FullIncomeSourceController.show(id = id).url
-    } else {
-      controllers.agent.routes.FirstIncomeSourceController.show(id = id).url
-    }
+    controllers.agent.routes.FullIncomeSourceController.show(id = id).url
   }
 
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>

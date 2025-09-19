@@ -18,45 +18,26 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 
 import _root_.uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.SoleTraderBusinesses
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, SessionDataService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
                                      authService: AuthService,
-                                     multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                      uuidGen: UUIDGenerator)
                                     (val appConfig: AppConfig,
                                      val sessionDataService: SessionDataService)
-                                    (implicit val ec: ExecutionContext) extends FrontendController(mcc) with FeatureSwitching with ReferenceRetrieval {
+                                    (implicit val ec: ExecutionContext) extends FrontendController(mcc) with ReferenceRetrieval {
 
   def initialise: Action[AnyContent] = Action.async { implicit request =>
     val id = uuidGen.generateId
-
     authService.authorised() {
-      withIndividualReference { reference =>
-        multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
-          case Right(Some(SoleTraderBusinesses(_, Some(_)))) =>
-            Redirect(routes.FullIncomeSourceController.show(id))
-          case Right(_) =>
-            if (isEnabled(RemoveAccountingMethod)) {
-              Redirect(routes.FullIncomeSourceController.show(id))
-            } else {
-              Redirect(routes.BusinessAccountingMethodController.show(id))
-            }
-          case Left(_) =>
-            throw new InternalServerException("[InitialiseController][initialise] - Failure fetching sole trader businesses")
-        }
-      }
+      Future.successful(Redirect(routes.FullIncomeSourceController.show(id)))
     }
   }
 }

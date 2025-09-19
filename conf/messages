@@ -26,24 +26,6 @@ agent-base.title.error                                          = Error: {0} - U
 ## Service Name
 base.agent.service-name                                         = Use software to report your client’s Income Tax
 
-# Business name confirmation
-individual.business-name-confirmation.heading                   = Is your business trading name the same as your own name?
-individual.business-name-confirmation.heading.second            = Is your business trading name the same as the first one you added?
-individual.business-name-confirmation.heading.caption           = Sole trader
-individual.business-name-confirmation.summary.business-name     = Business name
-individual.business-name-confirmation.form.heading              = Is this name correct?
-error.individual.business-name-confirmation.empty               = Select ‘Yes’ if your business trading name is the same as your own name
-
-# Business Name
-business.name.caption                                           = Sole trader
-business.name.title                                             = What is the name of your business?
-business.name.heading                                           = What is the name of your business?
-business.name.hint1                                             = This is the business name you used to register for Self Assessment. If your sole trader business does not have a separate name, enter your own first and last name.
-business.name.hint2                                             = The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, '', \, /, -.
-error.business-name.empty                                       = Enter your name or the name of your business.
-error.business-name.max-length                                  = Business name must be between 1 and 105 characters.
-error.business-name.invalid-character                           = Business name can only include characters listed.
-
 # Business start date
 business.start-date.title                                       = Start date for sole trader business
 business.start-date.heading                                     = Start date
@@ -67,18 +49,6 @@ error.business.start-date.day-month.invalid                     = The date must 
 error.business.start-date.day-year.invalid                      = The date must be a real date
 error.business.start-date.month-year.invalid                    = The date must be a real date
 error.business.start-date.year.length                           = Year must include 4 numbers
-###
-
-# Business trade name
-business.trade-name.title                                       = What is the trade of your business?
-business.trade-name.heading                                     = What is the trade of your business?
-business.trade-name.caption                                     = Sole trader
-business.trade-name.hint                                        = For example: plumbing, electrical work, consulting.
-error.business-trade-name.empty                                 = Enter the trade of your business.
-error.business-trade-name.max-length                            = Business trade must be 35 characters or fewer.
-error.business-trade-name.min-length                            = Your business trade name must include at least two letters (upper or lower case)
-error.business-trade-name.duplicate                             = You cannot enter the same trade and same business name.
-error.business-trade-name.invalid                               = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
 
 # Business address confirmation
 individual.business-address-confirmation.heading                = Confirm business address
@@ -98,31 +68,6 @@ address-lookup.edit-page.heading                                = Enter business
 address-lookup.edit-page.postcode-label                         = Postcode (optional)
 address-lookup.confirm-page.title                               = Confirm business address
 address-lookup.confirm-page.heading                             = Confirm business address
-
-# Business Accounting Method page
-business.accounting-method.title                                = What accounting method do you use for your sole trader business?
-business.accounting-method.heading                              = What accounting method do you use for your sole trader business?
-business.accounting-method.caption                              = Sole trader
-business.accounting-method.line-1                               = If you have more than one sole trader business, all your businesses need to have the same accounting method.
-business.accounting-method.accordion                            = Help with accounting methods
-business.accounting-method.accordion.subheading                 = Example
-business.accounting-method.accordion.line-1                     = You created an invoice for someone in March 2017, but did not receive the money until May 2017. If you tell HMRC you received this income in:
-business.accounting-method.accordion.bullet-1                   = May 2017, you use ‘cash basis accounting’
-business.accounting-method.accordion.bullet-2                   = March 2017, you use ‘traditional accounting’
-business.accounting-method.cash                                 = <span class="heading-small">Cash basis accounting</span><br>You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method.
-business.accounting-method.cash.label                           = Cash basis accounting
-business.accounting-method.cash.hint                            = You record on the date you receive money or pay a bill. Most sole traders and small businesses use this method.
-business.accounting-method.accruals                             = <span class="heading-small">Traditional accounting</span><br>You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘traditional accounting’.
-business.accounting-method.accruals.label                       = Traditional accounting
-business.accounting-method.accruals.hint                        = You record on the date you send or receive an invoice, even if you do not receive or pay any money. This is also called ‘accruals’ or ‘standard accounting’.
-error.business-accounting-method.invalid                        = Select if you use cash basis accounting or traditional accounting.
-error.business-accounting-method.empty                          = Select if you use cash basis accounting or traditional accounting.
-
-# Change accounting method page
-business.change-accounting-method.heading                       = Changing accounting method
-business.change-accounting-method.line-1                        = If you have more than one sole trader business, all your businesses must have the same accounting method.
-business.change-accounting-method.warning                       = Warning
-business.change-accounting-method.warning-text                  = If you change the accounting method for this business, it will automatically update the accounting method across all your sole trader businesses.
 
 # Sole trader streamline
 individual.full-income-source.heading                                     = Your sole trader business
@@ -150,26 +95,14 @@ self-employed-cya.business-name                                 = Business name
 self-employed-cya.business-trade                                = Trade
 self-employed-cya.business-trade.change-hidden                  = Trade
 self-employed-cya.business-address                              = Address
-self-employed-cya.accounting-method                             = Accounting method for sole trader income
-self-employed-cya.accounting-method.cash                        = Cash basis accounting
-self-employed-cya.accounting-method.accruals                    = Traditional accounting
 self-employed-cya.title                                         = Check your answers - sole trader business
 self-employed-cya.heading                                       = Check your answers
 self-employed-cya.caption                                       = Sole trader
 
-# Agent Business Name
-agent.business.name.title                                       = What is the name of your client’s business?
-agent.business.name.heading                                     = What is the name of your client’s business?
-agent.business.name.hint1                                       = This is the business name they used to register for Self Assessment. If their sole trader business does not have a name, enter your client’s name.
-agent.business.name.hint2                                       = The business name you enter can only include upper or lower case letters, full stops, commas, digits, &, '', \, /, -.
-error.agent.business-name.empty                                 = Enter your client’s name or the name of their business.
-error.agent.business-name.max-length                            = Business name must be between 1 and 105 characters.
-error.agent.business-name.invalid-character                     = Business name can only include characters listed.
-agent.business.name.caption                                     = {0} | {1}
-
 # Agent Business start date
 business.agent.start-date.title                                 = Start date for sole trader business
 business.agent.start-date.heading                               = Start date for {0}
+business.agent.start-date.caption                               = {0} | {1}
 business.agent.start-date.para                                  = We need to know the exact start date.
 business.agent.start-date.hint                                  = For example, 27 9 {0}
 agent.error.business-start-date.day-month-year.empty            = Enter the date your client’s business started trading
@@ -190,16 +123,6 @@ agent.error.business-start-date.day-year.invalid                = The date must 
 agent.error.business-start-date.month-year.invalid              = The date must be a real date
 agent.error.business-start-date.year.length                     = Year must include 4 numbers
 
-#Agent Trade Name
-business.agent.trade-name.title                                 = What is the trade of your client’s business?
-business.agent.trade-name.heading                               = What is the trade of your client’s business?
-business.agent.trade-name.hint                                  = For example: plumbing, electrical work, consulting.
-error.agent.business-trade-name.empty                           = Enter the trade of your client’s business.
-error.agent.business-trade-name.max-length                      = Business trade must be 35 characters or fewer.
-error.agent.business-trade-name.min-length                      = Your business trade name must include at least two letters (upper or lower case)
-error.agent.business-trade-name.invalid                         = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
-error.agent.business-trade-name.duplicate                       = You cannot enter the same trade and same business name.
-
 #Agent Business Address Confirmation
 agent.business-address-confirmation.heading                     = Confirm business address
 agent.business-address-confirmation.heading.caption             = {0} | {1}
@@ -219,15 +142,6 @@ agent.address-lookup.edit-page.postcode-label                   = Postcode
 agent.address-lookup.confirm-page.title                         = Confirm client’s business address
 agent.address-lookup.confirm-page.heading                       = Confirm client’s business address
 
-# Agent Business Accounting Method page
-agent.business.accounting-method.title                          = What accounting method does your client use for their sole trader businesses?
-agent.business.accounting-method.heading                        = What accounting method does your client use for their sole trader businesses?
-agent.business.accounting-method.hint                           = All your client’s sole trader businesses must use the same accounting method.
-agent.business.accounting-method.cash                           = Cash basis accounting
-agent.business.accounting-method.accruals                       = Traditional accounting
-agent.error.business-accounting-method.invalid                  = Select an accounting method.
-agent.error.business-accounting-method.empty                    = Select an accounting method.
-
 #Self Employed CYA
 agent.self-employed-cya.trading-start-date                      = Trading start date
 agent.self-employed-cya.trading-start-date.change               = Change trading start date
@@ -241,14 +155,9 @@ agent.self-employed-cya.business-trade.add                      = Add type of tr
 agent.self-employed-cya.business-address                        = Address
 agent.self-employed-cya.business-address.change                 = Change address
 agent.self-employed-cya.business-address.add                    = Add address
-agent.self-employed-cya.accounting-method                       = Accounting method for sole trader income
-agent.self-employed-cya.accounting-method.change                = Change accounting method for sole trader income
-agent.self-employed-cya.accounting-method.add                   = Add accounting method for sole trader income
-agent.self-employed-cya.accounting-method.cash                  = Cash basis accounting
-agent.self-employed-cya.accounting-method.accruals              = Traditional accounting
 agent.self-employed-cya.title                                   = Check your answers - sole trader business
 agent.self-employed-cya.heading                                 = Check your answers
-agent.self-employed-cya.caption                                 = Sole trader business you entered
+agent.self-employed-cya.caption                                 = {0} | {1}
 
 # Self Employed CYA
 agent.self-employed-cya.business-trade.streamline               = Trade
@@ -256,10 +165,7 @@ agent.self-employed-cya.business-trade.change-hidden            = Trade
 agent.self-employed-cya.trading-start-date.streamline           = Start date
 agent.self-employed-cya.start-date-before-limit.label           = Before 6 April {0}
 agent.self-employed-cya.trading-start-date.change.streamline    = Change start date
-agent.self-employed-cya.accounting-method.streamline            = Accounting method
-agent.self-employed-cya.accounting-method.change.streamline     = Change accounting method
 agent.self-employed-cya.business-address.streamline             = Address
-agent.self-employed-cya.accounting-method.add.streamline        = Add accounting method
 
 agent.full-income-source.heading                                     = Your client’s sole trader business
 agent.full-income-source.caption                                     = {0} | {1}
@@ -270,15 +176,6 @@ agent.full-income-source.name.hint                                   = This is t
 agent.full-income-source.start-date.legend                           = When did your client’s business start trading?
 agent.full-income-source.start-date.hint                             = We’ll use this date to calculate any Class 2 National Insurance charge.<br>For example, 17 8 2014
 agent.full-income-source.start-date-before-limit.legend              = Did this business start before 6 April {0}?
-agent.full-income-source.accounting-method.legend                    = What accounting method does your client use for their sole trader businesses?
-agent.full-income-source.accounting-method.hint                      = All your client’s sole trader businesses must use the same accounting method.
-agent.full-income-source.accounting-method.details.summary           = Help with accounting method
-agent.full-income-source.accounting-method.details.para-one          = Example
-agent.full-income-source.accounting-method.details.para-two          = Your client created an invoice for someone in March 2017, but did not receive the money until May 2017. If your client tells HMRC they received this income in:
-agent.full-income-source.accounting-method.details.bullet-one        = May 2017, they use cash basis accounting
-agent.full-income-source.accounting-method.details.bullet-two        = March 2017, you use traditional accounting
-agent.full-income-source.accounting-method.cash                      = Cash basis accounting
-agent.full-income-source.accounting-method.accruals                  = Traditional accounting
 agent.error.full-income-source.business-trade.empty                  = Enter the trade of your client’s business
 agent.error.full-income-source.business-trade.max-length             = Business trade must be 35 characters or less
 agent.error.full-income-source.business-trade.min-length             = Your business trade name must include at least two letters (upper or lower case)
@@ -304,4 +201,3 @@ agent.error.full-income-source.start-date.day-year.invalid           = The date 
 agent.error.full-income-source.start-date.month-year.invalid         = The date must be a real date
 agent.error.full-income-source.start-date.year.length                = The year must include 4 numbers
 agent.error.full-income-source.start-date-before-limit.invalid       = Select ‘Yes’ if this business started before 6 April {0}
-agent.error.full-income-source.accounting-method.invalid             = Select if your client uses cash basis accounting or traditional accounting

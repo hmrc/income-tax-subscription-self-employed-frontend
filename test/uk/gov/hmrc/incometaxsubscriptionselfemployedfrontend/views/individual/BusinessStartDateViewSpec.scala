@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -25,7 +25,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessStartDate
 
 class BusinessStartDateViewSpec extends ViewSpec {
 
@@ -50,7 +50,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
   private val startDateBeforeLimitMaxDateError = FormError("startDate", "error.business.start-date.day-month-year.max-date", List("11 April 2021"))
   private val startDateBeforeLimitMinDateError = FormError("startDate", "error.business.start-date.day-month-year.min-date", List("6 April 2021"))
 
-  val businessStartDateView: BusinessStartDateView = app.injector.instanceOf[BusinessStartDateView]
+  val businessStartDateView: BusinessStartDate = app.injector.instanceOf[BusinessStartDate]
 
   class Setup(
                isEditMode: Boolean = false,

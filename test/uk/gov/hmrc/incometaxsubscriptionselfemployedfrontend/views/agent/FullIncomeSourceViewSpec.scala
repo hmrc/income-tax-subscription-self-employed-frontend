@@ -27,9 +27,9 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.NextIncomeSource
 
-class NextIncomeSourceViewSpec extends ViewSpec {
+class FullIncomeSourceViewSpec extends ViewSpec {
 
-  val form: Form[(String, String, YesNo)] = StreamlineIncomeSourceForm.nextIncomeSourceForm
+  val form: Form[(String, String, YesNo)] = StreamlineIncomeSourceForm.fullIncomeSourceForm
 
   val testClientDetails: ClientDetails = ClientDetails("FirstName LastName", "ZZ111111Z")
 

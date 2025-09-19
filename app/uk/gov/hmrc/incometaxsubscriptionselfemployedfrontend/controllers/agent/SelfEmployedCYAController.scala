@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SelfEmploymentsCYAModel, SoleTraderBusiness}
@@ -61,7 +60,7 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   def submit(id: String, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     withAgentReference { reference =>
       withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-        if (selfEmploymentCYAModel.isComplete(isEnabled(RemoveAccountingMethod))) {
+        if (selfEmploymentCYAModel.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
             case Right(_) =>
               if (isGlobalEdit) Redirect(appConfig.globalCYAUrl)
@@ -79,23 +78,22 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])
                                         (implicit hc: HeaderCarrier): Future[Result] =
     for {
-      (businesses, accountingMethod) <- fetchBusinessListAndAccountingMethod(reference)
+      businesses <- fetchBusinessList(reference)
       business = businesses.find(_.id == id)
-      isFirstBusiness = businesses.headOption.exists(_.id == id)
-      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, businesses.length, isFirstBusiness))
+      result <- f(SelfEmploymentsCYAModel(id, business))
     } yield result
 
-  private def fetchBusinessListAndAccountingMethod(reference: String)(implicit hc: HeaderCarrier) = {
+  private def fetchBusinessList(reference: String)(implicit hc: HeaderCarrier) = {
     multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference)
       .map(_.getOrElse(throw new FetchSoleTraderBusinessesException))
       .map {
-        case Some(soleTraderBusinesses) => (soleTraderBusinesses.businesses, soleTraderBusinesses.accountingMethod)
-        case None => (Seq.empty[SoleTraderBusiness], None)
+        case Some(soleTraderBusinesses) => soleTraderBusinesses.businesses
+        case None => Seq.empty[SoleTraderBusiness]
       }
   }
 
   private class FetchSoleTraderBusinessesException extends InternalServerException(
-    "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
+    "[SelfEmployedCYAController][fetchBusinessList] - Failed to retrieve sole trader businesses"
   )
 
   def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean, isConfirmed: Boolean): Option[String] = {
