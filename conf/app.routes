@@ -10,21 +10,6 @@ GET        /details                                     uk.gov.hmrc.incometaxsub
 GET        /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST       /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
-GET        /details/confirm-business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameConfirmationController.show(id: String)
-POST       /details/confirm-business-name               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameConfirmationController.submit(id: String)
-
-GET        /details/business-name                       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST       /details/business-name                       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-
-GET        /details/business-trade                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST       /details/business-trade                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-
-GET        /details/change-accounting-method            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.ChangeAccountingMethodController.show(id: String, isGlobalEdit: Boolean ?= false)
-POST       /details/change-accounting-method            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.ChangeAccountingMethodController.submit(id: String, isGlobalEdit: Boolean ?= false)
-
-GET        /details/business-accounting-method          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAccountingMethodController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST       /details/business-accounting-method          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAccountingMethodController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-
 GET        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST       /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SelfEmployedCYAController.submit(id: String, isGlobalEdit: Boolean ?= false)
 
@@ -41,5 +26,5 @@ POST       /details/sole-trader-business                uk.gov.hmrc.incometaxsub
 
 GET        /logout                                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut
 
-GET         /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.keepAlive
-GET         /timeout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.timeout
+GET        /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.keepAlive
+GET        /timeout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.timeout

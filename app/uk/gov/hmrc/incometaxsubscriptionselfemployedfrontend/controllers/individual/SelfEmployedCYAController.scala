@@ -20,11 +20,10 @@ import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SelfEmploymentsCYAModel, SoleTraderBusiness}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmployedCYA
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
@@ -58,7 +57,7 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   def submit(id: String, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     withIndividualReference { reference =>
       withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-        if (selfEmploymentCYAModel.isComplete(isEnabled(RemoveAccountingMethod))) {
+        if (selfEmploymentCYAModel.isComplete) {
           multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
             case Right(_) =>
               if (isGlobalEdit) Redirect(appConfig.individualGlobalCYAUrl)
@@ -76,18 +75,17 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   private def withSelfEmploymentCYAModel(reference: String, id: String)(f: SelfEmploymentsCYAModel => Future[Result])
                                         (implicit hc: HeaderCarrier): Future[Result] =
     for {
-      (businesses, accountingMethod) <- fetchBusinessListAndAccountingMethod(reference)
+      businesses <- fetchBusinessList(reference)
       business = businesses.find(_.id == id)
-      isFirstBusiness = businesses.headOption.exists(_.id == id)
-      result <- f(SelfEmploymentsCYAModel(id, business, accountingMethod, businesses.length, isFirstBusiness))
+      result <- f(SelfEmploymentsCYAModel(id, business))
     } yield result
 
-  private def fetchBusinessListAndAccountingMethod(reference: String)(implicit hc: HeaderCarrier) = {
+  private def fetchBusinessList(reference: String)(implicit hc: HeaderCarrier) = {
     multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference)
       .map(_.getOrElse(throw new FetchSoleTraderBusinessesException))
       .map {
-        case Some(soleTraderBusinesses) => (soleTraderBusinesses.businesses, soleTraderBusinesses.accountingMethod)
-        case None => (Seq.empty[SoleTraderBusiness], None)
+        case Some(soleTraderBusinesses) => soleTraderBusinesses.businesses
+        case None => Seq.empty[SoleTraderBusiness]
       }
   }
 

@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
@@ -33,11 +32,6 @@ import scala.concurrent.Future
 
 class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with MockSessionDataService with MockSelfEmployedCYA with MockClientDetailsRetrieval with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(RemoveAccountingMethod)
-  }
 
   val id: String = "testId"
 
@@ -67,8 +61,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         trade = Some("testBusinessTrade"),
         address = Some(Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))
       )
-    ),
-    accountingMethod = Some(Cash)
+    )
   )
 
   "show" should {
@@ -78,7 +71,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
+          .message mustBe "[SelfEmployedCYAController][fetchBusinessList] - Failed to retrieve sole trader businesses"
       }
     }
     "return OK" when {
@@ -114,7 +107,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         intercept[InternalServerException](await(TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)))
-          .message mustBe "[SelfEmployedCYAController][fetchBusinessListAndAccountingMethod] - Failed to retrieve sole trader businesses"
+          .message mustBe "[SelfEmployedCYAController][fetchBusinessList] - Failed to retrieve sole trader businesses"
       }
       "there was a problem confirming the business" in {
         mockAuthSuccess()
@@ -126,46 +119,23 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
     }
     "return 303 (SEE_OTHER) to the your income sources page" when {
-      "the remove accounting method feature switch is enabled" when {
-        "the user submits valid full data without an accounting method" in {
-          enable(RemoveAccountingMethod)
+      "the user submits valid full data without an accounting method" in {
 
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
-          mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
+        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
+        mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
-        }
-        "the user submits valid incomplete data" in {
-          enable(RemoveAccountingMethod)
-
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(
-            accountingMethod = None,
-            businesses = soleTraderBusinesses.businesses.map(_.copy(address = None))
-          ))))
-
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
-        }
+        val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
       }
-      "the remove accounting method feature switch is disabled" when {
-        "the user submits valid full data" in {
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
-          mockConfirmBusiness(id)(Right(PostSubscriptionDetailsSuccessResponse))
+      "the user submits valid incomplete data" in {
+        mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(
+          businesses = soleTraderBusinesses.businesses.map(_.copy(address = None))
+        ))))
 
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
-        }
-        "the user submits valid incomplete data" in {
-          mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses.copy(accountingMethod = None))))
-
-          val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
-        }
+        val result: Future[Result] = TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(appConfig.clientYourIncomeSourcesUrl)
       }
     }
 

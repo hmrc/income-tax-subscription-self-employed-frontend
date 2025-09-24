@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.StreamlineIncomeSourceForm
@@ -62,8 +61,7 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
             )).discardingErrors,
             id = id,
             isEditMode = isEditMode,
-            isGlobalEdit = isGlobalEdit,
-            isFirstBusiness = streamlineBusiness.isFirstBusiness
+            isGlobalEdit = isGlobalEdit
           ))
         }
       }
@@ -74,9 +72,10 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
     authService.authorised() {
       withIndividualReference { reference =>
         StreamlineIncomeSourceForm.fullIncomeSourceForm.bindFromRequest().fold(
-          formWithErrors => fetchBusiness(reference, id) map { streamlineBusiness =>
-            BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit, streamlineBusiness.isFirstBusiness))
-          }, {
+          formWithErrors => {
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
+          },
+          {
             case (trade, name, startDateBeforeLimit) =>
               multipleSelfEmploymentsService.saveStreamlinedIncomeSource(
                 reference = reference,
@@ -86,8 +85,7 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
                 startDateBeforeLimit = startDateBeforeLimit match {
                   case Yes => true
                   case No => false
-                },
-                accountingMethod = None
+                }
               ) map {
                 case Right(_) =>
                   if (startDateBeforeLimit == No) {
@@ -114,22 +112,18 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
   }
 
   private def view(fullIncomeSourceForm: Form[_], id: String,
-                   isEditMode: Boolean, isGlobalEdit: Boolean, isFirstBusiness: Boolean)
+                   isEditMode: Boolean, isGlobalEdit: Boolean)
                   (implicit request: Request[AnyContent]): Html =
     fullIncomeSource(
       fullIncomeSourceForm = fullIncomeSourceForm,
       postAction = routes.FullIncomeSourceController.submit(id, isEditMode, isGlobalEdit),
-      backUrl = backUrl(id, isEditMode, isGlobalEdit, isFirstBusiness),
+      backUrl = backUrl(id, isEditMode, isGlobalEdit),
       isEditMode = isEditMode
     )
 
-  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean, isFirstBusiness: Boolean): String = {
+  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
     if (isEditMode || isGlobalEdit) {
       routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit).url
-    } else if (isEnabled(RemoveAccountingMethod)) {
-      appConfig.yourIncomeSourcesUrl
-    } else if (isFirstBusiness) {
-      routes.BusinessAccountingMethodController.show(id).url
     } else {
       appConfig.yourIncomeSourcesUrl
     }

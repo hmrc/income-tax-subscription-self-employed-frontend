@@ -24,7 +24,6 @@ object TestModels {
   val testBusinessNameModel: String = "Business"
   val testValidBusinessTradeName: String = "Plumbing"
   val testValidBusinessTradeNameModel: String = testValidBusinessTradeName
-  val testAccountingMethodModel: AccountingMethod = Cash
 
   val mockBusinessNameModel: String = "ITSA me, Mario"
 

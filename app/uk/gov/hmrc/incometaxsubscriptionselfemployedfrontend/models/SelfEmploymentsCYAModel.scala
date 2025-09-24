@@ -22,55 +22,31 @@ case class SelfEmploymentsCYAModel(id: String,
                                    businessStartDate: Option[DateModel] = None,
                                    businessName: Option[String] = None,
                                    businessTradeName: Option[String] = None,
-                                   businessAddress: Option[Address] = None,
-                                   accountingMethod: Option[AccountingMethod] = None,
-                                   totalSelfEmployments: Int,
-                                   isFirstBusiness: Boolean) {
+                                   businessAddress: Option[Address] = None) {
 
   private val businessStartDateComplete: Boolean = businessStartDate.isDefined
   private val businessNameComplete: Boolean = businessName.isDefined
   private val businessTradeNameComplete: Boolean = businessTradeName.isDefined
   private val businessAddressComplete: Boolean = businessAddress.isDefined
-  private val accountingMethodComplete: Boolean = accountingMethod.isDefined
 
-  def isComplete(removeAccountingMethod: Boolean): Boolean = {
-    if (removeAccountingMethod) {
-      startDateBeforeLimit match {
-        case Some(true) =>
+  val isComplete: Boolean = {
+    startDateBeforeLimit match {
+      case Some(true) =>
+        businessNameComplete &&
+          businessTradeNameComplete &&
+          businessAddressComplete
+      case _ =>
+        businessStartDateComplete &&
           businessNameComplete &&
-            businessTradeNameComplete &&
-            businessAddressComplete
-        case _ =>
-          businessStartDateComplete &&
-            businessNameComplete &&
-            businessTradeNameComplete &&
-            businessAddressComplete
-      }
-    } else {
-      startDateBeforeLimit match {
-        case Some(true) =>
-          businessNameComplete &&
-            businessTradeNameComplete &&
-            businessAddressComplete &&
-            accountingMethodComplete
-        case _ =>
-          businessStartDateComplete &&
-            businessNameComplete &&
-            businessTradeNameComplete &&
-            businessAddressComplete &&
-            accountingMethodComplete
-      }
+          businessTradeNameComplete &&
+          businessAddressComplete
     }
   }
 
 }
 
 object SelfEmploymentsCYAModel {
-  def apply(id: String,
-            soleTraderBusiness: Option[SoleTraderBusiness],
-            accountingMethod: Option[AccountingMethod],
-            totalSelfEmployments: Int,
-            isFirstBusiness: Boolean): SelfEmploymentsCYAModel = {
+  def apply(id: String, soleTraderBusiness: Option[SoleTraderBusiness]): SelfEmploymentsCYAModel = {
     SelfEmploymentsCYAModel(
       id = id,
       confirmed = soleTraderBusiness.exists(_.confirmed),
@@ -78,10 +54,7 @@ object SelfEmploymentsCYAModel {
       businessStartDate = soleTraderBusiness.flatMap(_.startDate),
       businessName = soleTraderBusiness.flatMap(_.name),
       businessTradeName = soleTraderBusiness.flatMap(_.trade),
-      businessAddress = soleTraderBusiness.flatMap(_.address),
-      accountingMethod = accountingMethod,
-      totalSelfEmployments = totalSelfEmployments,
-      isFirstBusiness = isFirstBusiness
+      businessAddress = soleTraderBusiness.flatMap(_.address)
     )
   }
 }

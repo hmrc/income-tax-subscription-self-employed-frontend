@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.SelfEmployedCYA
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.SelfEmployedCYA
 
 import java.time.format.DateTimeFormatter
 
 class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    disable(RemoveAccountingMethod)
-  }
 
   val checkYourAnswers: SelfEmployedCYA = app.injector.instanceOf[SelfEmployedCYA]
   val implicitDateFormatter: ImplicitDateFormatter = app.injector.instanceOf[ImplicitDateFormatterImpl]
@@ -47,19 +41,12 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     businessStartDate = Some(DateModel("1", "1", "2018")),
     businessName = Some(s"ABC Limited"),
     businessTradeName = Some(s"Plumbing"),
-    businessAddress = Some(Address(Seq(s"line 1"), Some("TF3 4NT"))),
-    accountingMethod = Some(Cash),
-    totalSelfEmployments = 1,
-    isFirstBusiness = true
+    businessAddress = Some(Address(Seq(s"line 1"), Some("TF3 4NT")))
   )
 
   val emptySelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
-    id = testId,
-    totalSelfEmployments = 1,
-    isFirstBusiness = true
+    id = testId
   )
-
-  val multiBusinessCYAModel: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel.copy(totalSelfEmployments = 2)
 
   def page(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel, isGlobalEdit: Boolean): HtmlFormat.Appendable = {
     checkYourAnswers(
@@ -96,7 +83,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
-    "have a summary of the self employment answers" when {
+    "have a summary of the self employment answers without accounting method" when {
       "in edit mode" when {
         "the answers are complete" in {
           document().mainContent.mustHaveSummaryList(".govuk-summary-list")(
@@ -104,19 +91,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
               tradeRow(Some("Plumbing")),
               nameRow(Some("ABC Limited")),
               startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-              addressRow(Some("line 1 TF3 4NT")),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false)
-            )
-          )
-        }
-        "there exists multiple businesses" in {
-          document(multiBusinessCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing")),
-              nameRow(Some("ABC Limited")),
-              startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-              addressRow(Some("line 1 TF3 4NT")),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = true)
+              addressRow(Some("line 1 TF3 4NT"))
             )
           )
         }
@@ -126,8 +101,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
               tradeRow(None),
               nameRow(None),
               startDateRow(None),
-              addressRow(None),
-              accountingMethodRow(None, multipleBusinesses = false)
+              addressRow(None)
             )
           )
         }
@@ -139,19 +113,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
               tradeRow(Some("Plumbing"), globalEditMode = true),
               nameRow(Some("ABC Limited"), globalEditMode = true),
               startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel), globalEditMode = true),
-              addressRow(Some("line 1 TF3 4NT"), globalEditMode = true),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false, globalEditMode = true)
-            )
-          )
-        }
-        "there exists multiple businesses" in {
-          document(multiBusinessCYAModel, isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing"), globalEditMode = true),
-              nameRow(Some("ABC Limited"), globalEditMode = true),
-              startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel), globalEditMode = true),
-              addressRow(Some("line 1 TF3 4NT"), globalEditMode = true),
-              accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = true, globalEditMode = true)
+              addressRow(Some("line 1 TF3 4NT"), globalEditMode = true)
             )
           )
         }
@@ -161,8 +123,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
               tradeRow(None, globalEditMode = true),
               nameRow(None, globalEditMode = true),
               startDateRow(None, globalEditMode = true),
-              addressRow(None, globalEditMode = true),
-              accountingMethodRow(None, multipleBusinesses = false, globalEditMode = true)
+              addressRow(None, globalEditMode = true)
             )
           )
         }
@@ -173,8 +134,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             tradeRow(Some("Plumbing")),
             nameRow(Some("ABC Limited")),
             startDateRow(value = Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-            addressRow(Some("line 1 TF3 4NT")),
-            accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false)
+            addressRow(Some("line 1 TF3 4NT"))
           )
         )
       }
@@ -184,107 +144,9 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             tradeRow(Some("Plumbing")),
             nameRow(Some("ABC Limited")),
             startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyy")))),
-            addressRow(Some("line 1 TF3 4NT")),
-            accountingMethodRow(Some("Cash basis accounting"), multipleBusinesses = false)
+            addressRow(Some("line 1 TF3 4NT"))
           )
         )
-      }
-    }
-
-    "have a summary of the self employment answers without accounting method" when {
-      "remove accounting method feature switch is enabled" when {
-        "in edit mode" when {
-          "the answers are complete" in {
-            enable(RemoveAccountingMethod)
-            document().mainContent.mustHaveSummaryList(".govuk-summary-list")(
-              rows = Seq(
-                tradeRow(Some("Plumbing")),
-                nameRow(Some("ABC Limited")),
-                startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-                addressRow(Some("line 1 TF3 4NT"))
-              )
-            )
-          }
-          "there exists multiple businesses" in {
-            enable(RemoveAccountingMethod)
-            document(multiBusinessCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-              rows = Seq(
-                tradeRow(Some("Plumbing")),
-                nameRow(Some("ABC Limited")),
-                startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-                addressRow(Some("line 1 TF3 4NT"))
-              )
-            )
-          }
-          "the answers are not complete" in {
-            enable(RemoveAccountingMethod)
-            document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-              rows = Seq(
-                tradeRow(None),
-                nameRow(None),
-                startDateRow(None),
-                addressRow(None)
-              )
-            )
-          }
-        }
-        "in global mode" when {
-          "the answers are complete" in {
-            enable(RemoveAccountingMethod)
-            document(isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-              rows = Seq(
-                tradeRow(Some("Plumbing"), globalEditMode = true),
-                nameRow(Some("ABC Limited"), globalEditMode = true),
-                startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel), globalEditMode = true),
-                addressRow(Some("line 1 TF3 4NT"), globalEditMode = true)
-              )
-            )
-          }
-          "there exists multiple businesses" in {
-            enable(RemoveAccountingMethod)
-            document(multiBusinessCYAModel, isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-              rows = Seq(
-                tradeRow(Some("Plumbing"), globalEditMode = true),
-                nameRow(Some("ABC Limited"), globalEditMode = true),
-                startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel), globalEditMode = true),
-                addressRow(Some("line 1 TF3 4NT"), globalEditMode = true)
-              )
-            )
-          }
-          "the answers are not complete" in {
-            enable(RemoveAccountingMethod)
-            document(emptySelfEmploymentsCYAModel, isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-              rows = Seq(
-                tradeRow(None, globalEditMode = true),
-                nameRow(None, globalEditMode = true),
-                startDateRow(None, globalEditMode = true),
-                addressRow(None, globalEditMode = true)
-              )
-            )
-          }
-        }
-        "start date is before the limit" in {
-          enable(RemoveAccountingMethod)
-          document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing")),
-              nameRow(Some("ABC Limited")),
-              startDateRow(value = Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-              addressRow(Some("line 1 TF3 4NT"))
-            )
-          )
-        }
-        "start date is after the limit" in {
-          enable(RemoveAccountingMethod)
-          document(fullSelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(
-            rows = Seq(
-              tradeRow(Some("Plumbing")),
-              nameRow(Some("ABC Limited")),
-              startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyy")))),
-              addressRow(Some("line 1 TF3 4NT"))
-            )
-          )
-        }
       }
     }
 
@@ -347,22 +209,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     )
   )
 
-  private def accountingMethodRow(value: Option[String], multipleBusinesses: Boolean, globalEditMode: Boolean = false) = SummaryListRowValues(
-    key = CheckYourAnswersMessages.accountingMethod,
-    value = value,
-    actions = Seq(
-      SummaryListActionValues(
-        href = if (multipleBusinesses) {
-          routes.ChangeAccountingMethodController.show(testId, isGlobalEdit = globalEditMode).url
-        } else {
-          routes.BusinessAccountingMethodController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url
-        },
-        text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + s" ${CheckYourAnswersMessages.accountingMethod}",
-        visuallyHidden = CheckYourAnswersMessages.accountingMethod
-      )
-    )
-  )
-
   object CheckYourAnswersMessages {
     val captionVisual = "Sole trader"
     val heading = "Check your answers"
@@ -375,7 +221,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     val businessName = "Business name"
     val businessAddress = "Address"
     val businessTrade = "Trade"
-    val accountingMethod = "Accounting method for sole trader income"
     val startDateBeforeLimitLabel = s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"
   }
 }

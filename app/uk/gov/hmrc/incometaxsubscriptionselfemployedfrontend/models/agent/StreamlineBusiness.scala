@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent
 
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{AccountingMethod, DateModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 
 case class StreamlineBusiness(
                                trade: Option[String],
                                name: Option[String],
                                startDate: Option[DateModel],
                                startDateBeforeLimit: Option[Boolean],
-                               accountingMethod: Option[AccountingMethod],
                                isFirstBusiness: Boolean
                              )

@@ -49,7 +49,6 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
     lines = Seq("1 Long Road", "Lonely Town"),
     postcode = Some("ZZ1 1ZZ")
   )
-  val accountingMethod: AccountingMethod = Cash
 
   val soleTraderBusiness: SoleTraderBusiness = SoleTraderBusiness(
     id = id,
@@ -76,15 +75,13 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
   )
 
   val soleTraderBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(
-    businesses = Seq(soleTraderBusiness),
-    accountingMethod = Some(accountingMethod)
+    businesses = Seq(soleTraderBusiness)
   )
 
   def multipleSoleTraderBusinesses(
                                     otherBusiness: SoleTraderBusiness = soleTraderBusinessTwo()
                                   ): SoleTraderBusinesses = SoleTraderBusinesses(
-    businesses = Seq(soleTraderBusiness, otherBusiness),
-    accountingMethod = Some(accountingMethod)
+    businesses = Seq(soleTraderBusiness, otherBusiness)
   )
 
   "fetchSoleTraderBusinesses" must {
@@ -825,176 +822,6 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
     }
   }
 
-  "fetchAccountingMethod" must {
-    "return an accounting method" when {
-      "there are sole trader businesses and the accounting method exists" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses))
-        )
-
-        await(service.fetchAccountingMethod(testReference)) mustBe Right(Some(accountingMethod))
-      }
-    }
-    "return no accounting method" when {
-      "there are sole trader businesses but no accounting method set" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses.copy(accountingMethod = None)))
-        )
-
-        await(service.fetchAccountingMethod(testReference)) mustBe Right(None)
-      }
-      "there are no sole trader businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(None)
-        )
-
-        await(service.fetchAccountingMethod(testReference)) mustBe Right(None)
-      }
-    }
-    "return an error" when {
-      "an error was returned when retrieving sole trader businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.fetchAccountingMethod(testReference)) mustBe
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-      }
-    }
-  }
-
-  "saveAccountingMethod" must {
-    "return a save successful response" when {
-      "there are already existing sole trader businesses with an accounting method" in new Setup {
-        val saveData: AccountingMethod = Accruals
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there are already existing sole trader businesses without an accounting method" in new Setup {
-        val saveData: AccountingMethod = Accruals
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there are already existing sole trader businesses with an updated accounting method" in new Setup {
-        val saveData: AccountingMethod = Accruals
-
-        val business1: SoleTraderBusiness = soleTraderBusiness.copy(id = id, confirmed = true)
-        val business2: SoleTraderBusiness = soleTraderBusiness.copy(id = s"$id-2", confirmed = true)
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(business1, business2))
-
-        val updatedBusiness1: SoleTraderBusiness = business1.copy(confirmed = false)
-        val updatedBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(
-          businesses = Seq(updatedBusiness1, business2),
-          accountingMethod = Some(saveData)
-        )
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, updatedBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-
-      }
-      "no sole trader businesses were returned" in new Setup {
-        val saveData: AccountingMethod = Accruals
-        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq.empty[SoleTraderBusiness], accountingMethod = Some(saveData))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(None)
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-    }
-    "return an error" when {
-      "there was an error fetching the sole trader businesses" in new Setup {
-        val saveData: AccountingMethod = Accruals
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-      "there was an error saving the sole trader businesses" in new Setup {
-        val saveData: AccountingMethod = Accruals
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-      "there was an error deleting the income source completed field" in new Setup {
-        val saveData: AccountingMethod = Accruals
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(accountingMethod = Some(saveData))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveAccountingMethod(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-    }
-  }
-
   "fetchFirstAddress" must {
     "return an address" when {
       "an address already exists" in new Setup {
@@ -1162,13 +989,13 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(None))
 
         await(service.fetchStreamlineBusiness(testReference, id)) mustBe
-          Right(StreamlineBusiness(None, None, None, None, None, isFirstBusiness = true))
+          Right(StreamlineBusiness(None, None, None, None, isFirstBusiness = true))
       }
       "the requested business does not exist in the list of existing businesses" in new Setup {
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
 
         await(service.fetchStreamlineBusiness(testReference, s"$id-2")) mustBe
-          Right(StreamlineBusiness(None, None, None, None, Some(accountingMethod), isFirstBusiness = false))
+          Right(StreamlineBusiness(None, None, None, None, isFirstBusiness = false))
       }
       "the requested business exists in the list and it's the first business" in new Setup {
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
@@ -1179,7 +1006,6 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
             name = Some(name),
             startDate = Some(date),
             startDateBeforeLimit = Some(false),
-            accountingMethod = Some(accountingMethod),
             isFirstBusiness = true
           ))
       }
@@ -1192,7 +1018,6 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
             name = None,
             startDate = None,
             startDateBeforeLimit = None,
-            accountingMethod = Some(accountingMethod),
             isFirstBusiness = false
           ))
       }

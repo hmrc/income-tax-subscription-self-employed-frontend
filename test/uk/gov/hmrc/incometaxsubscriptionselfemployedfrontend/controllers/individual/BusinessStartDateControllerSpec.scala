@@ -29,14 +29,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.Bu
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testValidStartDateAfterLimit
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.{BusinessStartDate => BusinessStartDateView}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessStartDate
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService with MockSessionDataService {
 
   val id: String = "testId"
 
-  private val businessStartDate = mock[BusinessStartDateView]
+  private val businessStartDate = mock[BusinessStartDate]
   when(businessStartDate(any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
 
   override val controllerName: String = "BusinessStartDateController"

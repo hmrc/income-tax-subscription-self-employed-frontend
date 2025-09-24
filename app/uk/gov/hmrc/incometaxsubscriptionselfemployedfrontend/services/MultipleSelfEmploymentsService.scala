@@ -80,17 +80,16 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
                              (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, StreamlineBusiness]] = {
     fetchSoleTraderBusinesses(reference) map { result =>
       result map {
-        case Some(SoleTraderBusinesses(businesses, maybeAccountingMethod)) =>
+        case Some(SoleTraderBusinesses(businesses)) =>
           val maybeFirstBusiness: Option[SoleTraderBusiness] = businesses.find(_.id == id)
           StreamlineBusiness(
             trade = maybeFirstBusiness.flatMap(_.trade),
             name = maybeFirstBusiness.flatMap(_.name),
             startDate = maybeFirstBusiness.flatMap(_.startDate),
             startDateBeforeLimit = maybeFirstBusiness.flatMap(_.startDateBeforeLimit),
-            accountingMethod = maybeAccountingMethod,
             isFirstBusiness = businesses.headOption.exists(_.id == id)
           )
-        case None => StreamlineBusiness(None, None, None, None, None, isFirstBusiness = true)
+        case None => StreamlineBusiness(None, None, None, None, isFirstBusiness = true)
       }
     }
   }
@@ -99,7 +98,7 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
                    (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[SoleTraderBusiness]]] = {
     fetchSoleTraderBusinesses(reference) map { result =>
       result map {
-        case Some(SoleTraderBusinesses(businesses, _)) =>
+        case Some(SoleTraderBusinesses(businesses)) =>
           businesses.find(_.id == id)
         case None => None
       }
@@ -108,8 +107,7 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
 
   private def saveData(reference: String,
                        id: String,
-                       businessUpdate: SoleTraderBusiness => SoleTraderBusiness,
-                       accountingMethod: Option[AccountingMethod] = None)
+                       businessUpdate: SoleTraderBusiness => SoleTraderBusiness)
                       (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
 
     def updateSoleTraderBusinesses(soleTraderBusinesses: SoleTraderBusinesses): SoleTraderBusinesses = {
@@ -131,8 +129,6 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
         case None => SoleTraderBusinesses(businesses = Seq.empty[SoleTraderBusiness])
       } map updateSoleTraderBusinesses
     } flatMap {
-      case Right(soleTraderBusinesses) if accountingMethod.isDefined =>
-        saveSoleTraderBusinesses(reference, soleTraderBusinesses.copy(accountingMethod = accountingMethod))
       case Right(soleTraderBusinesses) =>
         saveSoleTraderBusinesses(reference, soleTraderBusinesses)
       case Left(_) => Future.successful(Left(SaveSelfEmploymentDataFailure))
@@ -171,45 +167,16 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
   }
 
   def saveStreamlinedIncomeSource(reference: String,
-                       businessId: String,
-                       trade: String,
-                       name: String,
-                       startDateBeforeLimit: Boolean,
-                       accountingMethod: Option[AccountingMethod])
-                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+                                  businessId: String,
+                                  trade: String,
+                                  name: String,
+                                  startDateBeforeLimit: Boolean)
+                                 (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     saveData(
       reference = reference,
       id = businessId,
-      businessUpdate = _.copy(name = Some(name), trade = Some(trade), startDateBeforeLimit = Some(startDateBeforeLimit), confirmed = false),
-      accountingMethod = accountingMethod
+      businessUpdate = _.copy(name = Some(name), trade = Some(trade), startDateBeforeLimit = Some(startDateBeforeLimit), confirmed = false)
     )
-  }
-
-  def fetchAccountingMethod(reference: String)(implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[AccountingMethod]]] = {
-    fetchSoleTraderBusinesses(reference) map {
-      case Right(soleTraderBusinesses) => Right(soleTraderBusinesses.flatMap(_.accountingMethod))
-      case Left(value) => Left(value)
-    }
-  }
-
-  def saveAccountingMethod(reference: String, businessId: String, accountingMethod: AccountingMethod)
-                          (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-
-    fetchSoleTraderBusinesses(reference) map { result =>
-      result map {
-        case Some(soleTraderBusinesses) =>
-          soleTraderBusinesses.copy(accountingMethod = Some(accountingMethod),
-            businesses = soleTraderBusinesses.businesses.map {
-              case business if business.id == businessId => business.copy(confirmed = false)
-              case business => business
-            }
-          )
-        case None => SoleTraderBusinesses(Seq.empty[SoleTraderBusiness], accountingMethod = Some(accountingMethod))
-      }
-    } flatMap {
-      case Right(businesses) => saveSoleTraderBusinesses(reference, businesses)
-      case Left(_) => Future.successful(Left(SaveSelfEmploymentDataFailure))
-    }
   }
 
   def fetchFirstAddress(reference: String)

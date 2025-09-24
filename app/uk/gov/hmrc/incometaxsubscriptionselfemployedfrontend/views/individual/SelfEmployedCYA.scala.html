@@ -20,8 +20,6 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.models.ChangeLink
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.RemoveAccountingMethod
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitchingImpl
 
 @this(
     mainTemplate: PrincipalMainTemplate,
@@ -29,8 +27,7 @@
     govukSummaryList: GovukSummaryList,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
     implicitDateFormatter: ImplicitDateFormatterImpl,
-    pageHeadingHelper: PageHeadingHelper,
-    featureSwitching: FeatureSwitchingImpl
+    pageHeadingHelper: PageHeadingHelper
 )
 
 @(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], isGlobalEdit: Boolean)(implicit request: Request[_], messages: Messages)
@@ -52,10 +49,6 @@
             businessName(answers.businessName, answers.id),
             tradingStartDate(answers.businessStartDate, answers.startDateBeforeLimit, answers.id),
             businessAddress(answers.businessAddress, answers.id)
-        ) ++ (if (!featureSwitching.isEnabled(RemoveAccountingMethod))
-                Seq(accountingMethod(answers.accountingMethod, answers.totalSelfEmployments, answers.id))
-             else
-                Seq.empty
         )
     ))
 
@@ -126,21 +119,5 @@
         changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId,
         htmlValue = true
-    )
-}
-
-@accountingMethod(accountingMethod: Option[AccountingMethod], businessCount: Int, businessId: String) = @{
-    simpleSummaryListRow(
-        key = messages("self-employed-cya.accounting-method"),
-        value = accountingMethod map {
-            case Cash => messages("self-employed-cya.accounting-method.cash")
-            case Accruals => messages("self-employed-cya.accounting-method.accruals")
-        },
-        changeHref = if(businessCount > 1) {
-            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.ChangeAccountingMethodController.show(businessId, isGlobalEdit = isGlobalEdit).url
-        } else {
-            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessAccountingMethodController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
-        },
-        id = businessId
     )
 }
