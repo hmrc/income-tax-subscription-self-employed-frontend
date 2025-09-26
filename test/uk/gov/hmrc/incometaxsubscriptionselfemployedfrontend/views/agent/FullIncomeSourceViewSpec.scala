@@ -25,7 +25,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Streaml
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ViewSpec}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.NextIncomeSource
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.FullIncomeSource
 
 class FullIncomeSourceViewSpec extends ViewSpec {
 
@@ -33,10 +33,10 @@ class FullIncomeSourceViewSpec extends ViewSpec {
 
   val testClientDetails: ClientDetails = ClientDetails("FirstName LastName", "ZZ111111Z")
 
-  val nextIncomeSource: NextIncomeSource = app.injector.instanceOf[NextIncomeSource]
+  val nextIncomeSource: FullIncomeSource = app.injector.instanceOf[FullIncomeSource]
 
   def view(errors: Boolean = false): HtmlFormat.Appendable = nextIncomeSource(
-    nextIncomeSourceForm = if (errors) {
+    fullIncomeSourceForm = if (errors) {
       form.bind(Map.empty[String, String])
     } else {
       form
@@ -51,18 +51,18 @@ class FullIncomeSourceViewSpec extends ViewSpec {
 
   def mainContent: Element = document.mainContent
 
-  "NextIncomeSource" must {
+  "FullIncomeSource" must {
     "use the correct template" when {
       "there are no errors" in new TemplateViewTest(
         view = view(),
-        title = NextIncomeSourceMessages.heading,
+        title = FullIncomeSourceMessages.heading,
         isAgent = true,
         backLink = Some(testBackUrl),
         hasSignOutLink = true
       )
       "there are errors" in new TemplateViewTest(
         view = view(errors = true),
-        title = NextIncomeSourceMessages.heading,
+        title = FullIncomeSourceMessages.heading,
         isAgent = true,
         backLink = Some(testBackUrl),
         hasSignOutLink = true,
@@ -76,8 +76,8 @@ class FullIncomeSourceViewSpec extends ViewSpec {
 
     "have the correct heading and caption" in {
       mainContent.mustHaveHeadingAndCaption(
-        heading = NextIncomeSourceMessages.heading,
-        caption = NextIncomeSourceMessages.caption(testClientDetails.name, testClientDetails.formattedNino),
+        heading = FullIncomeSourceMessages.heading,
+        caption = FullIncomeSourceMessages.caption(testClientDetails.name, testClientDetails.formattedNino),
         isSection = false
       )
     }
@@ -93,27 +93,27 @@ class FullIncomeSourceViewSpec extends ViewSpec {
       "have a text input to capture a trade name" in {
         form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
           StreamlineIncomeSourceForm.businessTradeName,
-          NextIncomeSourceMessages.Trade.label,
+          FullIncomeSourceMessages.Trade.label,
           isLabelHidden = false,
           isPageHeading = false,
-          hint = Some(NextIncomeSourceMessages.Trade.hint)
+          hint = Some(FullIncomeSourceMessages.Trade.hint)
         )
       }
 
       "have a text input to capture a business name" in {
         form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
           StreamlineIncomeSourceForm.businessName,
-          NextIncomeSourceMessages.Name.label,
+          FullIncomeSourceMessages.Name.label,
           isLabelHidden = false,
           isPageHeading = false,
-          hint = Some(NextIncomeSourceMessages.Name.hint)
+          hint = Some(FullIncomeSourceMessages.Name.hint)
         )
       }
 
       "have a section to capture if the users start date is before the limit" in {
         form.selectHead(".govuk-form-group:nth-of-type(3)").mustHaveRadioInput("fieldset")(
           name = StreamlineIncomeSourceForm.startDateBeforeLimit,
-          legend = NextIncomeSourceMessages.DateBeforeLimit.legend,
+          legend = FullIncomeSourceMessages.DateBeforeLimit.legend,
           isHeading = false,
           isLegendHidden = false,
           hint = None,
@@ -136,20 +136,20 @@ class FullIncomeSourceViewSpec extends ViewSpec {
         def buttonGroup: Element = form.selectHead(".govuk-button-group")
 
         "has a save and continue button" in {
-          buttonGroup.selectHead(".govuk-button").text mustBe NextIncomeSourceMessages.Buttons.saveAndContinue
+          buttonGroup.selectHead(".govuk-button").text mustBe FullIncomeSourceMessages.Buttons.saveAndContinue
         }
 
         "has a save and come back later button" in {
           val saveAndComeBackLater: Element = buttonGroup.selectHead(".govuk-button--secondary")
 
-          saveAndComeBackLater.text mustBe NextIncomeSourceMessages.Buttons.saveAndComeBackLater
+          saveAndComeBackLater.text mustBe FullIncomeSourceMessages.Buttons.saveAndComeBackLater
           saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-income-source"
         }
       }
     }
   }
 
-  object NextIncomeSourceMessages {
+  object FullIncomeSourceMessages {
 
     def caption(name: String, nino: String): String = s"$name | $nino"
 

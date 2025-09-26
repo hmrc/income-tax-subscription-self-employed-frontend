@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.Request
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 
@@ -46,5 +46,5 @@ class ClientDetailsRetrieval @Inject()(sessionDataService: SessionDataService)(i
   private class FetchFromSessionException(error: String) extends InternalServerException(
     s"[ClientDetailsRetrieval][getClientDetails] - failure when fetching nino from session: $error"
   )
-  
+
 }

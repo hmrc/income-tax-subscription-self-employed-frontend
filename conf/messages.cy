@@ -78,6 +78,14 @@ individual.error.full-income-source.business-name.min-length            = Mae’
 individual.error.full-income-source.business-name.invalid               = Gall enw’r busnes gynnwys y cymeriadau a restrir yn unig.
 individual.error.full-income-source.start-date-before-limit.empty       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
 
+# Duplicate details page
+individual.duplicate-details.heading                            = Mae problem wedi codi
+individual.duplicate-details.para-one                           = Ni allwch nodi ({0}) fel masnach ddwywaith ar gyfer {1}.
+individual.duplicate-details.options.lead-in                    = Gallwch wneud y canlynol:
+individual.duplicate-details.options.change-original-entry      = newid y cofnod gwreiddiol
+individual.duplicate-details.options.add-different-business     = ychwanegu busnes unig fasnachwr gwahanol
+individual.duplicate-details.options.return-to-income-sources   = ewch i’r rhestr o’ch ffynonellau incwm
+
 # Self Employed CYA
 self-employed-cya.trading-start-date                            = Dyddiad dechrau
 self-employed-cya.start-date-before-limit.label                 = Cyn 6 Ebrill {0}
@@ -181,3 +189,11 @@ agent.error.full-income-source.start-date.day-year.invalid           = Rhaid i�
 agent.error.full-income-source.start-date.month-year.invalid         = Rhaid i’r dyddiad fod yn ddyddiad go iawn
 agent.error.full-income-source.start-date.year.length                = Mae’n rhaid i flwyddyn fod yn bedwar rhif
 agent.error.full-income-source.start-date-before-limit.invalid       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
+
+# Duplicate details page
+agent.duplicate-details.heading                            = Mae problem wedi codi
+agent.duplicate-details.para-one                           = Ni allwch nodi ({0}) fel masnach ddwywaith ar gyfer {1}.
+agent.duplicate-details.options.lead-in                    = Gallwch wneud y canlynol:
+agent.duplicate-details.options.change-original-entry      = newid y cofnod gwreiddiol
+agent.duplicate-details.options.add-different-business     = ychwanegu busnes unig fasnachwr gwahanol
+agent.duplicate-details.options.return-to-income-sources   = ewch i’r rhestr o ffynonellau incwm eich cleient

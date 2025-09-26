@@ -24,9 +24,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.auth.core.{AuthorisationException, InvalidBearerToken}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockAuthService
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ITSASessionKeys, UnitTestTrait}
-import scala.language.implicitConversions
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
+import scala.language.implicitConversions
 
 trait ControllerBaseSpec extends UnitTestTrait with MockAuthService {
 

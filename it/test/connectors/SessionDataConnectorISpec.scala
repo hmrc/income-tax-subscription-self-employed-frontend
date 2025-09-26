@@ -24,6 +24,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.SessionDataConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser.{InvalidJson, UnexpectedStatusFailure}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.SaveSessionDataHttpParser
 
 class SessionDataConnectorISpec extends ComponentSpecBase {
 
@@ -70,6 +71,27 @@ class SessionDataConnectorISpec extends ComponentSpecBase {
 
       await(res) mustBe Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
 
+    }
+  }
+
+  "saveSessionData" must {
+    "return a successful response" when {
+      "an OK response was returned" in {
+        stubSaveSessionData(id, DummyModel("test"))(OK)
+
+        val res = connector.saveSessionData(id, DummyModel("test"))
+
+        await(res) mustBe Right(SaveSessionDataHttpParser.SaveSessionDataSuccessResponse)
+      }
+    }
+    "return an unexpected status failure" when {
+      "an unexpected status was returned" in {
+        stubSaveSessionData(id, DummyModel("test"))(INTERNAL_SERVER_ERROR)
+
+        val res = connector.saveSessionData(id, DummyModel("test"))
+
+        await(res) mustBe Left(SaveSessionDataHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
     }
   }
 

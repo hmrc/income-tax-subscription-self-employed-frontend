@@ -12,6 +12,9 @@ POST        /details/business-start-date               uk.gov.hmrc.incometaxsubs
 GET         /details/sole-trader-business              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FullIncomeSourceController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST        /details/sole-trader-business              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FullIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
+# Duplicate details page
+GET         /details/error/duplicate-details           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DuplicateDetailsController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+
 #Address Lookup routing
 GET         /address-lookup-check/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.checkAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
 GET         /address-lookup-initialise/:businessId     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)

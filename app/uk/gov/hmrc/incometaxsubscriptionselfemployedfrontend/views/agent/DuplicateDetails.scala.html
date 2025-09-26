@@ -1,0 +1,57 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected._
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
+
+@this(
+    mainTemplate: AgentMainTemplate,
+    pageHeadingHelper: PageHeadingHelper,
+    p: Paragraph,
+    ul: UnorderedList,
+    a: Anchor,
+    appConfig: AppConfig
+)
+
+@(id: String, trade: String, name: String, isEditMode: Boolean, isGlobalEdit: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+
+@mainTemplate(title = messages("agent.duplicate-details.heading"), backLink = Some(BackLink(href = backUrl))) {
+
+    <h1 class="govuk-heading-l">@messages("agent.duplicate-details.heading")</h1>
+
+    @p(messages("agent.duplicate-details.para-one", trade, name))
+
+    @ul(
+        leadInLine = messages("agent.duplicate-details.options.lead-in"),
+        items = Seq(
+            a(
+                text = messages("agent.duplicate-details.options.change-original-entry"),
+                href = routes.FullIncomeSourceController.show(id = id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit).url
+            ),
+            a(
+                text = messages("agent.duplicate-details.options.add-different-business"),
+                href = routes.InitialiseController.initialise.url
+            ),
+            a(
+                text = messages("agent.duplicate-details.options.return-to-income-sources"),
+                href = appConfig.clientYourIncomeSourcesUrl
+            )
+        )
+    )
+
+}

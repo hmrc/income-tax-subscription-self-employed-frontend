@@ -275,5 +275,52 @@ class StreamlineIncomeSourceFormSpec extends PlaySpec {
       startDateBeforeLimit -> YesNoMapping.option_yes
     )
   }
+
+  "createIncomeSourceData" should {
+    "return an empty mapping" when {
+      "nothing is supplied" in {
+        val result = createIncomeSourceData(None, None, None, None)
+
+        result mustBe Map.empty[String, String]
+      }
+    }
+    "return a mapping of the trade key to the value" when {
+      "a trade is supplied" in {
+        val result = createIncomeSourceData(maybeTradeName = Some("test trade"), None, None, None)
+
+        result mustBe Map(businessTradeName -> "test trade")
+      }
+    }
+    "return a mapping of the name key to the value" when {
+      "a name is supplied" in {
+        val result = createIncomeSourceData(None, maybeBusinessName = Some("test name"), None, None)
+
+        result mustBe Map(businessName -> "test name")
+      }
+    }
+    "return a mapping of the start date before limit key to a value" when {
+      "start date before limit is provided as true" in {
+        val result = createIncomeSourceData(None, None, None, maybeStartDateBeforeLimit = Some(true))
+
+        result mustBe Map(startDateBeforeLimit -> "Yes")
+      }
+      "start date before limit is provided as false" in {
+        val result = createIncomeSourceData(None, None, None, maybeStartDateBeforeLimit = Some(false))
+
+        result mustBe Map(startDateBeforeLimit -> "No")
+      }
+      "start date is provided as a date before the limit" in {
+        val result = createIncomeSourceData(None, None, maybeStartDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit.minusDays(1))), None)
+
+        result mustBe Map(startDateBeforeLimit -> "Yes")
+      }
+      "start date is provided as a date after the limit" in {
+        val result = createIncomeSourceData(None, None, maybeStartDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)), None)
+
+        result mustBe Map(startDateBeforeLimit -> "No")
+      }
+    }
+  }
+
 }
 

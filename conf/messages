@@ -77,6 +77,13 @@ individual.error.full-income-source.business-name.min-length              = Busi
 individual.error.full-income-source.business-name.invalid                 = Business name can only include characters listed
 individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
 
+# Duplicate details page
+individual.duplicate-details.heading                            = There is a problem
+individual.duplicate-details.para-one                           = You cannot enter the trade ({0}) twice for the business named {1}.
+individual.duplicate-details.options.lead-in                    = You can:
+individual.duplicate-details.options.change-original-entry      = change the original entry
+individual.duplicate-details.options.add-different-business     = add a different sole trader business
+individual.duplicate-details.options.return-to-income-sources   = go to your income sources
 
 #Self Employed CYA
 self-employed-cya.trading-start-date                            = Start date
@@ -181,3 +188,11 @@ agent.error.full-income-source.start-date.day-year.invalid           = The date 
 agent.error.full-income-source.start-date.month-year.invalid         = The date must be a real date
 agent.error.full-income-source.start-date.year.length                = The year must include 4 numbers
 agent.error.full-income-source.start-date-before-limit.invalid       = Select ‘Yes’ if this business started before 6 April {0}
+
+# Duplicate details page
+agent.duplicate-details.heading                            = There is a problem
+agent.duplicate-details.para-one                           = You cannot enter the trade ({0}) twice for the business named {1}.
+agent.duplicate-details.options.lead-in                    = You can:
+agent.duplicate-details.options.change-original-entry      = change the original entry
+agent.duplicate-details.options.add-different-business     = add a different sole trader business
+agent.duplicate-details.options.return-to-income-sources   = go to your client’s income sources
