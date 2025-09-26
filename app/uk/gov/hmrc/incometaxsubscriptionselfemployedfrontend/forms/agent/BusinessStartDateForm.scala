@@ -18,13 +18,14 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import play.api.data.Form
 import play.api.data.Forms.single
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{isAfter, isBefore}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.LocalDateMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 import java.time.LocalDate
 
-object BusinessStartDateForm {
+object BusinessStartDateForm extends LocalDateMapping {
 
   def maxStartDate: LocalDate = LocalDate.now().plusDays(6)
 
@@ -34,15 +35,18 @@ object BusinessStartDateForm {
 
   val errorContext: String = "business-start-date"
 
+  val prefix = Some("agent.")
   def businessStartDateForm(minStartDate: LocalDate, maxStartDate: LocalDate, f: LocalDate => String): Form[DateModel] = Form(
     single(
-      startDate -> DateModelMapping.dateModelMapping(
-        isAgent = true,
-        errorContext = errorContext,
-        minDate = Some(minStartDate),
-        maxDate = Some(maxStartDate),
-        dateFormatter = Some(f)
-      )
+      startDate -> localDate(
+        invalidKey = s"agent.error.$errorContext.invalid",
+        allRequiredKey = s"agent.error.$errorContext.empty",
+        twoRequiredKey = s"agent.error.$errorContext.required.two",
+        requiredKey = s"agent.error.$errorContext.required",
+        invalidYearKey = s"agent.error.$errorContext.year.length"
+      ).transform(DateModel.dateConvert, DateModel.dateConvert)
+        .verifying(isAfter(minStartDate, errorContext, f, prefix))
+        .verifying(isBefore(maxStartDate, errorContext, f, prefix))
     )
   )
 

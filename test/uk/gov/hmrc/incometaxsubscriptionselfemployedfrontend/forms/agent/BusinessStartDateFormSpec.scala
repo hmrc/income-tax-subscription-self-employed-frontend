@@ -30,103 +30,73 @@ import java.time.LocalDate
 
 class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
+  val startDate: String = BusinessStartDateForm.startDate
+  val dayKeyError: String = s"$startDate-dateDay"
+  val monthKeyError: String = s"$startDate-dateMonth"
+  val yearKeyError: String = s"$startDate-dateYear"
+
   def form: Form[DateModel] = {
     businessStartDateForm(BusinessStartDateForm.minStartDate, BusinessStartDateForm.maxStartDate, d => d.toString)
   }
 
   "The Business Start Date Form" should {
-    "transform a valid request to the date form case class" in {
+    val errorContext = "business-start-date"
+    val empty        = s"agent.error.$errorContext.empty"
+    val required     = s"agent.error.$errorContext.required"
+    val requiredTwo  = s"agent.error.$errorContext.required.two"
+    val invalid      = s"agent.error.$errorContext.invalid"
+    val yearLength   = s"agent.error.$errorContext.year.length"
+    val beforeMax    = s"agent.error.$errorContext.day-month-year.max-date"
+    val beforeMin    = s"agent.error.$errorContext.day-month-year.min-date"
 
-      val validDate: LocalDate = LocalDate.now
+    "output the appropriate error messages for the start date" when {
+      "the date is not supplied to the map" in {
+        form.bind(DataMap.EmptyMap).errors must contain(FormError(startDate, empty))
+      }
+      "it is not within 7 days from the current date" in {
+        val sevenDaysInFuture: LocalDate = LocalDate.now.plusDays(7)
+        val maxTest = form.bind(DataMap.date(startDate)(
+          sevenDaysInFuture.getDayOfMonth.toString,
+          sevenDaysInFuture.getMonthValue.toString,
+          sevenDaysInFuture.getYear.toString
+        ))
+        maxTest.errors must contain(FormError(startDate, beforeMax, Seq(BusinessStartDateForm.maxStartDate.plusDays(1).toString)))
+      }
 
-      val testInput = Map(
-        s"$startDate-$day" -> validDate.getDayOfMonth.toString,
-        s"$startDate-$month" -> validDate.getMonthValue.toString,
-        s"$startDate-$year" -> validDate.getYear.toString
-      )
-
-      val expected = DateModel(
-        validDate.getDayOfMonth.toString,
-        validDate.getMonthValue.toString,
-        validDate.getYear.toString
-      )
-
-      val actual = form.bind(testInput).value
-
-      actual shouldBe Some(expected)
-    }
-
-    "when testing the validation" should {
-
-      "output the appropriate error messages for the start date" when {
-        val empty = "agent.error.business-start-date.day-month-year.empty"
-        val beforeMax = "agent.error.business-start-date.day-month-year.max-date"
-        val beforeMin = "agent.error.business-start-date.day-month-year.min-date"
-
-        val dayKeyError: String = s"$startDate-$day"
-        val monthKeyError: String = s"$startDate-$month"
-        val yearKeyError: String = s"$startDate-$year"
-
-        val errorContext: String = "agent.error.business-start-date"
-
-        "the date is not supplied to the map" in {
-          form.bind(DataMap.EmptyMap).errors must contain(FormError(dayKeyError, empty))
+      "it is before 1900" in {
+        val minTest = form.bind(DataMap.date(startDate)("31", "12", "1899"))
+        minTest.errors must contain(FormError(startDate, beforeMin, Seq(BusinessStartDateForm.minStartDate.minusDays(1).toString)))
+      }
+      "it is missing the day" in {
+        form.bind(DataMap.date(startDate)("", "4", "2017")).errors must contain(FormError(startDate, required, Seq("day")))
+      }
+      "it is missing the month" in {
+        form.bind(DataMap.date(startDate)("1", "", "2017")).errors must contain(FormError(startDate, required, Seq("month")))
+      }
+      "it is missing the year" in {
+        form.bind(DataMap.date(startDate)("1", "1", "")).errors must contain(FormError(startDate, required, Seq("year")))
+      }
+      "it is missing multiple fields" in {
+        form.bind(DataMap.date(startDate)("", "", "2017")).errors must contain(FormError(startDate, requiredTwo, Seq("day", "month")))
+      }
+      "it has an invalid day" in {
+        form.bind(DataMap.date(startDate)("0", "1", "2017")).errors must contain(FormError(dayKeyError, invalid, Seq("day")))
+      }
+      "it has an invalid month" in {
+        form.bind(DataMap.date(startDate)("1", "13", "2017")).errors must contain(FormError(monthKeyError, invalid, Seq("month")))
+      }
+      "it has an invalid year" in {
+        form.bind(DataMap.date(startDate)("1", "1", "abcd")).errors must contain(FormError(yearKeyError, yearLength, Seq("year")))
+      }
+      "it has multiple invalid fields" in {
+        form.bind(DataMap.date(startDate)("0", "0", "2017")).errors must contain(FormError(startDate, invalid))
+      }
+      "the year provided is not the correct length" when {
+        "the year is 3 digits" in {
+          form.bind(DataMap.date(startDate)("1", "1", "123")).errors must contain(FormError(yearKeyError, yearLength, Seq("year")))
         }
-        "it is not within 7 days from the current date" in {
-          val sevenDaysInFuture: LocalDate = LocalDate.now.plusDays(7)
-          val maxTest = form.bind(DataMap.date(startDate)(
-            sevenDaysInFuture.getDayOfMonth.toString,
-            sevenDaysInFuture.getMonthValue.toString,
-            sevenDaysInFuture.getYear.toString
-          ))
-          maxTest.errors must contain(FormError(dayKeyError, beforeMax, Seq(BusinessStartDateForm.maxStartDate.toString)))
-        }
-
-        "it is before 1900" in {
-          val minTest = form.bind(DataMap.date(startDate)("31", "12", "1899"))
-          minTest.errors must contain(FormError(dayKeyError, beforeMin, Seq(BusinessStartDateForm.minStartDate.toString)))
-        }
-        "it is missing the day" in {
-          val test = form.bind(DataMap.date(startDate)("", "4", "2017"))
-          test.errors must contain(FormError(dayKeyError, s"$errorContext.day.empty"))
-        }
-        "it is missing the month" in {
-          val test = form.bind(DataMap.date(startDate)("1", "", "2017"))
-          test.errors must contain(FormError(monthKeyError, s"$errorContext.month.empty"))
-        }
-        "it is missing the year" in {
-          val test = form.bind(DataMap.date(startDate)("1", "1", ""))
-          test.errors must contain(FormError(yearKeyError, s"$errorContext.year.empty"))
-        }
-        "it is missing multiple fields" in {
-          val test = form.bind(DataMap.date(startDate)("", "", "2017"))
-          test.errors must contain(FormError(dayKeyError, s"$errorContext.day-month.empty"))
-        }
-        "it has an invalid day" in {
-          val test = form.bind(DataMap.date(startDate)("0", "1", "2017"))
-          test.errors must contain(FormError(dayKeyError, s"$errorContext.day.invalid"))
-        }
-        "it has an invalid month" in {
-          val test = form.bind(DataMap.date(startDate)("1", "13", "2017"))
-          test.errors must contain(FormError(monthKeyError, s"$errorContext.month.invalid"))
-        }
-        "it has an invalid year" in {
-          val test = form.bind(DataMap.date(startDate)("1", "1", "invalid"))
-          test.errors must contain(FormError(yearKeyError, s"$errorContext.year.invalid"))
-        }
-        "it has multiple invalid fields" in {
-          val test = form.bind(DataMap.date(startDate)("0", "0", "2017"))
-          test.errors must contain(FormError(dayKeyError, s"$errorContext.day-month.invalid"))
-        }
-        "the year provided is not the correct length" when {
-          "the year is 3 digits" in {
-            val test = form.bind(DataMap.date(startDate)("1", "1", "123"))
-            test.errors must contain(FormError(yearKeyError, s"$errorContext.year.length"))
-          }
-          "the year is 5 digits" in {
-            val test = form.bind(DataMap.date(startDate)("1", "1", "12345"))
-            test.errors must contain(FormError(yearKeyError, s"$errorContext.year.length"))
-          }
+        "the year is 5 digits" in {
+          form.bind(DataMap.date(startDate)("1", "1", "12345")).errors must contain(FormError(yearKeyError, yearLength, Seq("year")))
         }
       }
     }

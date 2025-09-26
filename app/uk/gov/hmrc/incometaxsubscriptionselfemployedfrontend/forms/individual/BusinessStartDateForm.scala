@@ -18,13 +18,14 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 
 import play.api.data.Form
 import play.api.data.Forms.single
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{isAfter, isBefore}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.LocalDateMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 
 import java.time.LocalDate
 
-object BusinessStartDateForm {
+object BusinessStartDateForm extends LocalDateMapping {
 
   def maxStartDate: LocalDate = LocalDate.now().plusDays(6)
 
@@ -36,12 +37,15 @@ object BusinessStartDateForm {
 
   def businessStartDateForm(maxStartDate: LocalDate, f: LocalDate => String): Form[DateModel] = Form(
     single(
-      startDate -> DateModelMapping.dateModelMapping(
-        errorContext = errorContext,
-        minDate = Some(minStartDate),
-        maxDate = Some(maxStartDate),
-        dateFormatter = Some(f)
-      )
+      startDate -> localDate(
+        invalidKey = s"error.$errorContext.invalid",
+        allRequiredKey = s"error.$errorContext.empty",
+        twoRequiredKey = s"error.$errorContext.required.two",
+        requiredKey = s"error.$errorContext.required",
+        invalidYearKey = s"error.$errorContext.year.length"
+      ).transform(DateModel.dateConvert, DateModel.dateConvert)
+        .verifying(isAfter(minStartDate, errorContext, f))
+        .verifying(isBefore(maxStartDate, errorContext, f))
     )
   )
 
