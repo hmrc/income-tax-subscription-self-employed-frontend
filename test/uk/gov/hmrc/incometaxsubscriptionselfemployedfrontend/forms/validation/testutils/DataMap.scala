@@ -17,7 +17,7 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils
 
 import play.api.data.validation._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.DateModelMapping
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.LocalDateMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil._
 
 object DataMap {
@@ -30,8 +30,11 @@ object DataMap {
 
     def DataMap(elems: (String, String)*): DataMap = Map(elems: _*)
 
+    private val dayKey   = "dateDay"
+    private val monthKey = "dateMonth"
+    private val yearKey  = "dateYear"
     def date(prefix: String)(day: String, month: String, year: String): DataMap =
-      Map(s"$prefix-${DateModelMapping.day}" -> day, s"$prefix-${DateModelMapping.month}" -> month, s"$prefix-${DateModelMapping.year}" -> year)
+      Map(s"$prefix-$dayKey" -> day, s"$prefix-$monthKey" -> month, s"$prefix-$yearKey" -> year)
 
     val emptyDate: String => DataMap = (prefix: String) => date(prefix)("", "", "")
 
