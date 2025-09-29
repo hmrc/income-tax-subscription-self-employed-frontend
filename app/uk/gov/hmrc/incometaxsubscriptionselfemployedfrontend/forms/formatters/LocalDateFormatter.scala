@@ -18,6 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
+import play.api.i18n.Messages
 
 import java.time.{LocalDate, Month}
 import scala.util.control.Exception.nonFatalCatch
@@ -30,7 +31,7 @@ private[formatters] class LocalDateFormatter(
                                               requiredKey: String,
                                               invalidYearKey: String,
                                               args: Seq[String] = Seq.empty
-                                            ) extends Formatter[LocalDate] with Formatters {
+                                            )(implicit messages: Messages) extends Formatter[LocalDate] with Formatters {
 
   private val fieldKeys: Seq[String] = Seq("Day", "Month", "Year")
 
@@ -39,13 +40,14 @@ private[formatters] class LocalDateFormatter(
       case Success(date) =>
         Right(date)
       case Failure(_) =>
-        Left(Seq(FormError(key, invalidKey, args)))
+        Left(Seq(FormError(s"$key-dateDay", invalidKey, args)))
     }
   }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
     def dayLengthInvalid(day: Int): Boolean = day < 1 || day > 31
+
     def yearLengthInvalid(year: Int): Boolean = year.toString.length != 4
 
     val dayFormatter = new DayYearFormatter(requiredKey, invalidKey, invalidKey, additionalValidation = dayLengthInvalid, Seq("day"))
@@ -67,7 +69,7 @@ private[formatters] class LocalDateFormatter(
       } yield date
       case errors =>
         if (errors.size > 1) {
-          Left(Seq(FormError(key, invalidKey)))
+          Left(Seq(FormError(errors.head.head.key, invalidKey)))
         } else {
           Left(errors.flatten.toSeq)
         }
@@ -86,15 +88,27 @@ private[formatters] class LocalDateFormatter(
       .map(_._1)
       .toSeq
 
+    def firstMissingField(key: String) = {
+      if (missingFields.contains("Day")) {
+        s"$key-dateDay"
+      } else if (missingFields.contains("Month")) {
+        s"$key-dateMonth"
+      } else {
+        s"$key-dateYear"
+      }
+    }
+
+    lazy val missingFieldsMessage = missingFields.map(field => messages(s"base.${field.toLowerCase}"))
+
     fields.count(_._2.isDefined) match {
       case 3 =>
         formatDate(key, data)
       case 2 =>
-        Left(Seq(FormError(key, s"$requiredKey", missingFields.map(_.toLowerCase) ++ args)))
+        Left(Seq(FormError(firstMissingField(key), s"$requiredKey", missingFieldsMessage.map(_.toLowerCase) ++ args)))
       case 1 =>
-        Left(Seq(FormError(key, twoRequiredKey, missingFields.map(_.toLowerCase) ++ args)))
+        Left(Seq(FormError(firstMissingField(key), twoRequiredKey, missingFieldsMessage.map(_.toLowerCase) ++ args)))
       case _ =>
-        Left(Seq(FormError(key, allRequiredKey, args)))
+        Left(Seq(FormError(firstMissingField(key), allRequiredKey, args)))
     }
   }
 

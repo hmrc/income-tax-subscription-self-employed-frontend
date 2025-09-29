@@ -18,6 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual
 
 import play.api.data.Form
 import play.api.data.Forms.single
+import play.api.i18n.Messages
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints.StringConstraints.{isAfter, isBefore}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.LocalDateMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
@@ -35,7 +36,7 @@ object BusinessStartDateForm extends LocalDateMapping {
 
   val errorContext: String = "business.start-date"
 
-  def businessStartDateForm(maxStartDate: LocalDate, f: LocalDate => String): Form[DateModel] = Form(
+  def businessStartDateForm(maxStartDate: LocalDate, f: LocalDate => String)(implicit messages: Messages): Form[DateModel] = Form(
     single(
       startDate -> localDate(
         invalidKey = s"error.$errorContext.invalid",

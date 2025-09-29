@@ -18,16 +18,15 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.{Form, FormError}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.{businessStartDateForm, startDate}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils.DataMap.DataMap
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, UnitTestTrait}
 
 import java.time.LocalDate
 
-class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
+class BusinessStartDateFormSpec extends PlaySpec with UnitTestTrait {
 
   val startDate: String = BusinessStartDateForm.startDate
   val dayKeyError: String = s"$startDate-dateDay"
@@ -40,17 +39,17 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   "The Business Start Date Form" should {
     val errorContext = "business-start-date"
-    val empty        = s"agent.error.$errorContext.empty"
-    val required     = s"agent.error.$errorContext.required"
-    val requiredTwo  = s"agent.error.$errorContext.required.two"
-    val invalid      = s"agent.error.$errorContext.invalid"
-    val yearLength   = s"agent.error.$errorContext.year.length"
-    val beforeMax    = s"agent.error.$errorContext.day-month-year.max-date"
-    val beforeMin    = s"agent.error.$errorContext.day-month-year.min-date"
+    val empty = s"agent.error.$errorContext.empty"
+    val required = s"agent.error.$errorContext.required"
+    val requiredTwo = s"agent.error.$errorContext.required.two"
+    val invalid = s"agent.error.$errorContext.invalid"
+    val yearLength = s"agent.error.$errorContext.year.length"
+    val beforeMax = s"agent.error.$errorContext.day-month-year.max-date"
+    val beforeMin = s"agent.error.$errorContext.day-month-year.min-date"
 
     "output the appropriate error messages for the start date" when {
       "the date is not supplied to the map" in {
-        form.bind(DataMap.EmptyMap).errors must contain(FormError(startDate, empty))
+        form.bind(DataMap.EmptyMap).errors must contain(FormError(dayKeyError, empty))
       }
       "it is not within 7 days from the current date" in {
         val sevenDaysInFuture: LocalDate = LocalDate.now.plusDays(7)
@@ -67,16 +66,16 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         minTest.errors must contain(FormError(startDate, beforeMin, Seq(BusinessStartDateForm.minStartDate.minusDays(1).toString)))
       }
       "it is missing the day" in {
-        form.bind(DataMap.date(startDate)("", "4", "2017")).errors must contain(FormError(startDate, required, Seq("day")))
+        form.bind(DataMap.date(startDate)("", "4", "2017")).errors must contain(FormError(dayKeyError, required, Seq("day")))
       }
       "it is missing the month" in {
-        form.bind(DataMap.date(startDate)("1", "", "2017")).errors must contain(FormError(startDate, required, Seq("month")))
+        form.bind(DataMap.date(startDate)("1", "", "2017")).errors must contain(FormError(monthKeyError, required, Seq("month")))
       }
       "it is missing the year" in {
-        form.bind(DataMap.date(startDate)("1", "1", "")).errors must contain(FormError(startDate, required, Seq("year")))
+        form.bind(DataMap.date(startDate)("1", "1", "")).errors must contain(FormError(yearKeyError, required, Seq("year")))
       }
       "it is missing multiple fields" in {
-        form.bind(DataMap.date(startDate)("", "", "2017")).errors must contain(FormError(startDate, requiredTwo, Seq("day", "month")))
+        form.bind(DataMap.date(startDate)("", "", "2017")).errors must contain(FormError(dayKeyError, requiredTwo, Seq("day", "month")))
       }
       "it has an invalid day" in {
         form.bind(DataMap.date(startDate)("0", "1", "2017")).errors must contain(FormError(dayKeyError, invalid, Seq("day")))
@@ -88,7 +87,7 @@ class BusinessStartDateFormSpec extends PlaySpec with GuiceOneAppPerSuite {
         form.bind(DataMap.date(startDate)("1", "1", "abcd")).errors must contain(FormError(yearKeyError, yearLength, Seq("year")))
       }
       "it has multiple invalid fields" in {
-        form.bind(DataMap.date(startDate)("0", "0", "2017")).errors must contain(FormError(startDate, invalid))
+        form.bind(DataMap.date(startDate)("0", "0", "2017")).errors must contain(FormError(dayKeyError, invalid))
       }
       "the year provided is not the correct length" when {
         "the year is 3 digits" in {
