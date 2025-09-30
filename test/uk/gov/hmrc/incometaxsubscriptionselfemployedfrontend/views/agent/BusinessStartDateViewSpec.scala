@@ -62,7 +62,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
   def document(error: Option[FormError] = None): Document =
     Jsoup.parse(page(error).body)
 
-  private val emptyFormError = FormError(BusinessStartDateForm.startDate, "agent.error.business-start-date.day-month-year.empty")
+  private val emptyFormError = FormError(BusinessStartDateForm.startDate, "agent.error.business-start-date.empty")
   private val dateTooLateFormError = FormError("startDate", "agent.error.business-start-date.day-month-year.max-date", List("11 April 2021"))
   private val dateTooEarlyFormError = FormError("startDate", "agent.error.business-start-date.day-month-year.min-date", List("11 April 2021"))
 

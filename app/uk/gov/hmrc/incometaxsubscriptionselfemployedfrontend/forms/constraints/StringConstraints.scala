@@ -18,6 +18,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.constraints
 
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.constraint
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
+
+import java.time.LocalDate
 
 object StringConstraints {
 
@@ -53,5 +56,36 @@ object StringConstraints {
   val noLeadingSpace: String => Constraint[String] = msgKey => constraint[String](
     x => if (x.headOption.contains(" ".head)) Invalid(msgKey) else Valid
   )
+
+
+  def isAfter(
+               minDate: LocalDate,
+               errorContext: String,
+               convert: LocalDate => String,
+               prefix: Option[String] = None
+             ): Constraint[DateModel] =
+    constraint[DateModel] { dateModel =>
+      val date = minDate.minusDays(1)
+      if (dateModel.toLocalDate.isAfter(date)) {
+        Valid
+      } else {
+        Invalid(s"${prefix.getOrElse("")}error.$errorContext.day-month-year.min-date", convert(date))
+      }
+    }
+
+  def isBefore(
+                maxDate: LocalDate,
+                errorContext: String,
+                convert: LocalDate => String,
+                prefix: Option[String] = None
+              ): Constraint[DateModel] =
+    constraint[DateModel] { dateModel =>
+      val date = maxDate.plusDays(1)
+      if (dateModel.toLocalDate.isBefore(date)) {
+        Valid
+      } else {
+        Invalid(s"${prefix.getOrElse("")}error.$errorContext.day-month-year.max-date", convert(date))
+      }
+    }
 
 }

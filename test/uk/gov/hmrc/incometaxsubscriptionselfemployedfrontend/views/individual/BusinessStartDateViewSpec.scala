@@ -45,7 +45,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val minDate = "The date must be on or after 6 April 2021"
   }
 
-  private val emptyError: FormError = FormError("startDate", "error.business.start-date.day-month-year.empty")
+  private val emptyError: FormError = FormError("startDate", "error.business.start-date.empty")
 
   private val startDateBeforeLimitMaxDateError = FormError("startDate", "error.business.start-date.day-month-year.max-date", List("11 April 2021"))
   private val startDateBeforeLimitMinDateError = FormError("startDate", "error.business.start-date.day-month-year.min-date", List("6 April 2021"))
