@@ -20,8 +20,9 @@ import org.scalatestplus.play.PlaySpec
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{DeleteSubscriptionDetailsHttpParser, GetSelfEmploymentsHttpParser, PostSelfEmploymentsHttpParser}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockIncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent.StreamlineBusiness
@@ -83,6 +84,51 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
                                   ): SoleTraderBusinesses = SoleTraderBusinesses(
     businesses = Seq(soleTraderBusiness, otherBusiness)
   )
+
+  val streamlineBusiness: StreamlineBusiness = StreamlineBusiness(
+    trade = Some(trade),
+    name = Some(name),
+    startDate = Some(date),
+    startDateBeforeLimit = Some(false)
+  )
+
+  "fetchStreamlineData" must {
+    "return streamline business data" when {
+      "the details for the specified details were returned from the connector" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses))
+        )
+
+        await(service.fetchStreamlineData(testReference, id)) mustBe Some(streamlineBusiness)
+      }
+    }
+    "return no streamline business data" when {
+      "no businesses were returned from the connector" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(None)
+        )
+
+        await(service.fetchStreamlineData(testReference, id)) mustBe None
+      }
+      "only a different business was returned from the connector" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Right(Some(soleTraderBusinesses))
+        )
+
+        await(service.fetchStreamlineData(testReference, "id-two")) mustBe None
+      }
+    }
+    "throw an exception" when {
+      "an error was returned from the connector" in new Setup {
+        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
+          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        )
+
+        intercept[InternalServerException](await(service.fetchStreamlineData(testReference, id)))
+          .message mustBe s"[MultipleSelfEmploymentsService][fetchStreamlineData] - Unable to fetch sole trader businesses - ${GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)}"
+      }
+    }
+  }
 
   "fetchSoleTraderBusinesses" must {
     "return sole trader businesses" when {
@@ -338,266 +384,6 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
         )
 
         await(service.saveStartDate(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-    }
-  }
-
-  "saveName" must {
-    "return a save successful response" when {
-      "there was an already existing business which had its start date updated" in new Setup {
-        val saveData: String = "test other name"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveName(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there was an already existing business which had its start date added" in new Setup {
-        val saveData: String = "test other name"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None)))
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveName(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there is an already existing business which does not match the saved data id" in new Setup {
-        val saveData: String = "test other name"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = multipleSoleTraderBusinesses(soleTraderBusinessTwo(name = Some(saveData)))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveName(testReference, s"$id-2", saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there was no existing business matching the id, one was created with the id and start date" in new Setup {
-        val saveData: String = "test other name"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(SoleTraderBusiness(id, name = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveName(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "no sole trader businesses were returned" in new Setup {
-        val saveData: String = "test other name"
-        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id, name = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(None)
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveName(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-    }
-    "return an error" when {
-      "there was an error fetching the sole trader businesses" in new Setup {
-        val saveData: String = "test other name"
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveName(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-      "there was an error saving the sole trader businesses" in new Setup {
-        val saveData: String = "test other name"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveName(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-    }
-  }
-
-  "saveTrade" must {
-    "return a save successful response" when {
-      "there was an already existing business which had its start date updated" in new Setup {
-        val saveData: String = "test other trade"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveTrade(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there was an already existing business which had its start date added" in new Setup {
-        val saveData: String = "test other trade"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = None)))
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveTrade(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there is an already existing business which does not match the saved data id" in new Setup {
-        val saveData: String = "test other trade"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = multipleSoleTraderBusinesses(soleTraderBusinessTwo(trade = Some(saveData)))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveTrade(testReference, s"$id-2", saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "there was no existing business matching the id, one was created with the id and start date" in new Setup {
-        val saveData: String = "test other trade"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(SoleTraderBusiness(id, trade = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveTrade(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-      "no sole trader businesses were returned" in new Setup {
-        val saveData: String = "test other trade"
-        val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id, trade = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(None)
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Right(DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsSuccessResponse)
-        )
-
-        await(service.saveTrade(testReference, id, saveData)) mustBe
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-      }
-    }
-    "return an error" when {
-      "there was an error fetching the sole trader businesses" in new Setup {
-        val saveData: String = "test other trade"
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveTrade(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-      "there was an error saving the sole trader businesses" in new Setup {
-        val saveData: String = "test other trade"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Left(PostSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveTrade(testReference, id, saveData)) mustBe
-          Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
-      }
-      "there was an error deleting the income source completed field" in new Setup {
-        val saveData: String = "test other trade"
-        val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
-        val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(trade = Some(saveData))))
-
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(oldBusinesses))
-        )
-        mockSaveSubscriptionDetails(testReference, soleTraderBusinessesKey, newBusinesses)(
-          Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
-        )
-        mockDeleteSubscriptionDetails(testReference, incomeSourcesComplete)(
-          Left(DeleteSubscriptionDetailsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.saveTrade(testReference, id, saveData)) mustBe
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
     }
@@ -866,160 +652,6 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
 
         await(service.fetchFirstAddress(testReference)) mustBe
           Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-      }
-    }
-  }
-
-  "fetchFirstBusinessName" must {
-    "return a business name" when {
-      "a business name already exists" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
-
-        await(service.fetchFirstBusinessName(testReference)) mustBe Right(Some(name))
-      }
-    }
-    "return no business name" when {
-      "there are multiple businesses without business names" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None), soleTraderBusinessTwo()))))
-        )
-
-        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
-      }
-      "there is a single business without a business name" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None)))))
-        )
-
-        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
-      }
-      "there are no remaining businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])))
-        )
-
-        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
-      }
-      "there are no sole trader businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(None))
-
-        await(service.fetchFirstBusinessName(testReference)) mustBe Right(None)
-      }
-    }
-    "return an error" when {
-      "there was a problem getting the sole trader businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.fetchFirstBusinessName(testReference)) mustBe
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-      }
-    }
-  }
-
-  "fetchAllNameTradeCombos" must {
-    "return the trade name combos list" when {
-      "a business exists with all information" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
-
-        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq(
-          (id, Some(name), Some(trade))
-        ))
-      }
-      "a business exists with minimal information" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(name = None, trade = None)))))
-        )
-
-        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq(
-          (id, None, None)
-        ))
-      }
-      "multiple businesses exist" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(multipleSoleTraderBusinesses(soleTraderBusinessTwo())))
-        )
-
-        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq(
-          (id, Some(name), Some(trade)),
-          (s"$id-2", None, None)
-        ))
-      }
-      "no businesses are present in the sole trader businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(Some(soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])))
-        )
-
-        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq())
-      }
-      "no sole trader businesses was found" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Right(None)
-        )
-
-        await(service.fetchAllNameTradeCombos(testReference)) mustBe Right(Seq())
-      }
-    }
-    "return an error" when {
-      "there was a problem fetching the sole trader businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.fetchAllNameTradeCombos(testReference)) mustBe
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-      }
-    }
-  }
-
-  "fetchStreamlineBusiness" should {
-    "return a GetSelfEmploymentsFailure" when {
-      "there was a problem retrieving businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
-        await(service.fetchStreamlineBusiness(testReference, id)) mustBe
-          Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-      }
-    }
-    "return a streamline business" when {
-      "there are no businesses currently" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(None))
-
-        await(service.fetchStreamlineBusiness(testReference, id)) mustBe
-          Right(StreamlineBusiness(None, None, None, None, isFirstBusiness = true))
-      }
-      "the requested business does not exist in the list of existing businesses" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
-
-        await(service.fetchStreamlineBusiness(testReference, s"$id-2")) mustBe
-          Right(StreamlineBusiness(None, None, None, None, isFirstBusiness = false))
-      }
-      "the requested business exists in the list and it's the first business" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(soleTraderBusinesses)))
-
-        await(service.fetchStreamlineBusiness(testReference, id)) mustBe
-          Right(StreamlineBusiness(
-            trade = Some(trade),
-            name = Some(name),
-            startDate = Some(date),
-            startDateBeforeLimit = Some(false),
-            isFirstBusiness = true
-          ))
-      }
-      "the requested business exists in the list and it's not the first business" in new Setup {
-        mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(Right(Some(multipleSoleTraderBusinesses())))
-
-        await(service.fetchStreamlineBusiness(testReference, s"$id-2")) mustBe
-          Right(StreamlineBusiness(
-            trade = None,
-            name = None,
-            startDate = None,
-            startDateBeforeLimit = None,
-            isFirstBusiness = false
-          ))
       }
     }
   }

@@ -22,6 +22,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.SessionDataConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser.GetSessionDataFailure
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.SaveSessionDataHttpParser.{SaveSessionDataFailure, SaveSessionDataSuccess}
 
 import scala.concurrent.Future
 
@@ -38,6 +39,12 @@ trait MockSessionDataConnector extends MockitoSugar with BeforeAndAfterEach {
   def mockGetSessionData[T](id: String)
                            (result: Either[GetSessionDataFailure, Option[T]]): Unit = {
     when(mockSessionDataConnector.getSessionData[T](ArgumentMatchers.eq(id))(ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(result))
+  }
+
+  def mockSaveSessionData[T](id: String, data: T)
+                            (result: Either[SaveSessionDataFailure, SaveSessionDataSuccess]): Unit = {
+    when(mockSessionDataConnector.saveSessionData(ArgumentMatchers.eq(id), ArgumentMatchers.eq(data))(ArgumentMatchers.any(), ArgumentMatchers.any()))
       .thenReturn(Future.successful(result))
   }
 

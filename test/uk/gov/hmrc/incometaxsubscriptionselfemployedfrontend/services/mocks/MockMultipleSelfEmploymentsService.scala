@@ -67,28 +67,6 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
     ).thenReturn(Future.successful(response))
   }
 
-  def mockSaveBusinessName(businessId: String, businessName: String)
-                          (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
-    when(
-      mockMultipleSelfEmploymentsService.saveName(
-        any(),
-        ArgumentMatchers.eq(businessId),
-        ArgumentMatchers.eq(businessName)
-      )(any())
-    ).thenReturn(Future.successful(response))
-  }
-
-  def mockSaveBusinessTrade(businessId: String, businessTrade: String)
-                           (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
-    when(
-      mockMultipleSelfEmploymentsService.saveTrade(
-        any(),
-        ArgumentMatchers.eq(businessId),
-        ArgumentMatchers.eq(businessTrade)
-      )(any())
-    ).thenReturn(Future.successful(response))
-  }
-
   def mockSaveBusinessAddress(businessId: String, businessAddress: Address)
                              (response: Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]): Unit = {
     when(
@@ -112,16 +90,6 @@ trait MockMultipleSelfEmploymentsService extends PlaySpec with MockitoSugar with
 
   def mockFetchFirstAddress(response: Either[GetSelfEmploymentsFailure, Option[Address]]): Unit = {
     when(mockMultipleSelfEmploymentsService.fetchFirstAddress(any())(any()))
-      .thenReturn(Future.successful(response))
-  }
-
-  def mockFetchFirstBusinessName(response: Either[GetSelfEmploymentsFailure, Option[String]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchFirstBusinessName(any())(any()))
-      .thenReturn(Future.successful(response))
-  }
-
-  def mockFetchAllNameTradeCombos(response: Either[GetSelfEmploymentsFailure, Seq[(String, Option[String], Option[String])]]): Unit = {
-    when(mockMultipleSelfEmploymentsService.fetchAllNameTradeCombos(any())(any()))
       .thenReturn(Future.successful(response))
   }
 

@@ -32,9 +32,9 @@
     pageHeadingHelper: PageHeadingHelper
 )
 
-@(nextIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
+@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(nextIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
+@mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(fullIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
 
     @pageHeadingHelper(
         heading = messages("agent.full-income-source.heading"),
@@ -45,7 +45,7 @@
     @form(action = postAction) {
 
         @textInputHelper(
-            field = nextIncomeSourceForm(StreamlineIncomeSourceForm.businessTradeName),
+            field = fullIncomeSourceForm(StreamlineIncomeSourceForm.businessTradeName),
             label = messages("agent.full-income-source.trade.label"),
             hint = Some(Html(messages("agent.full-income-source.trade.hint"))),
             isPageHeading = false,
@@ -53,7 +53,7 @@
         )
 
         @textInputHelper(
-            field = nextIncomeSourceForm(StreamlineIncomeSourceForm.businessName),
+            field = fullIncomeSourceForm(StreamlineIncomeSourceForm.businessName),
             label = messages("agent.full-income-source.name.label"),
             hint = Some(Html(messages("agent.full-income-source.name.hint"))),
             isPageHeading = false,
@@ -61,7 +61,7 @@
         )
 
         @radioHelper(
-            field = nextIncomeSourceForm(StreamlineIncomeSourceForm.startDateBeforeLimit),
+            field = fullIncomeSourceForm(StreamlineIncomeSourceForm.startDateBeforeLimit),
             legend = messages("agent.full-income-source.start-date-before-limit.legend", AccountingPeriodUtil.getStartDateLimit.getYear.toString),
             isPageHeading = false,
             customHeadingClass = Some("govuk-!-font-weight-bold"),

@@ -17,176 +17,56 @@
 package controllers.agent
 
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
-import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
+import connectors.stubs.SessionDataConnectorStub.{stubGetSessionData, stubSaveSessionData}
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants._
-import helpers.servicemocks.AuthStub._
+import helpers.servicemocks.AuthStub
 import play.api.http.Status._
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.{FullIncomeSourceController, routes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ITSASessionKeys}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, SoleTraderBusiness, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class FullIncomeSourceControllerISpec extends ComponentSpecBase {
 
-  val testNino = "test-nino"
-
-  val date: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
-
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   lazy val fullIncomeSourceController: FullIncomeSourceController = app.injector.instanceOf[FullIncomeSourceController]
 
-  val emptySoleTraderBusinesses = SoleTraderBusinesses(Seq.empty)
-  val clearedSoleTraderBusinesses: SoleTraderBusinesses =
-    soleTraderBusinesses.copy(
-      businesses = Seq(soleTraderBusiness.copy(startDateBeforeLimit = None, startDate = None, name = None, trade = None, confirmed = false))
-    )
+  val duplicateDetails: DuplicateDetails = DuplicateDetails(
+    id = id,
+    name = "test duplicate name",
+    trade = "test duplicate trade",
+    startDateBeforeLimit = true
+  )
 
   s"GET ${routes.FullIncomeSourceController.show(id)}" when {
-    "unauthenticated" should {
+    "the user is unauthorised" should {
       "redirect to the login page" in {
-        stubUnauthorised()
+        AuthStub.stubUnauthorised()
 
-        val res = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
+        val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
-        res must have(
+        result must have(
           httpStatus(SEE_OTHER),
-          redirectURI("/bas-gateway/sign-in")
+          redirectURI(ggSignInURI)
         )
       }
     }
-    "no reference is in session" should {
-      "redirect to the your client's income sources pages" in {
-        stubAuthSuccess()
-        stubGetSessionData(ITSASessionKeys.REFERENCE)(NO_CONTENT)
-
-        val res = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
-
-        Then("should return an INTERNAL_SERVER_ERROR")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(clientYourIncomeSources)
-        )
-      }
-    }
-    "the connector returns an error from the backend" should {
-      "display the technical difficulties page" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
-
-        Then("should return an INTERNAL_SERVER_ERROR")
-        res must have(
-          httpStatus(INTERNAL_SERVER_ERROR)
-        )
-      }
-    }
-    "the Connector receives no content for that business" should {
-      "return the page with no prepopulated fields" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(emptySoleTraderBusinesses))
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
-
-        Then("should return an OK with the next sole trader business page")
-        res must have(
-          httpStatus(OK),
-          pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
-          textField(StreamlineIncomeSourceForm.businessTradeName, ""),
-          textField(StreamlineIncomeSourceForm.businessName, ""),
-          radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, None)
-        )
-      }
-    }
-
-    "the business requested is returned back with no fields filled" should {
-      "return the page with no prepopulated fields" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
-
-        Then("should return an OK with the next sole trader business page")
-        res must have(
-          httpStatus(OK),
-          pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
-          textField(StreamlineIncomeSourceForm.businessTradeName, ""),
-          textField(StreamlineIncomeSourceForm.businessName, ""),
-          radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, None)
-        )
-      }
-    }
-
-    "connector returns a previously filled in business which had a start date older than the limit" should {
-      "show the current business with the fields" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
+    "the user has previously entered valid details" should {
+      "display the page with the fields filled" in {
+        AuthStub.stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
           responseStatus = OK,
-          responseBody = Json.toJson(
-            soleTraderBusinesses.copy(
-              businesses = Seq(
-                soleTraderBusiness.copy(
-                  id = id,
-                  startDateBeforeLimit = None,
-                  startDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit.minusDays(1)))
-                )
-              )
-            )
-          )
+          responseBody = Json.toJson(soleTraderBusinesses)
         )
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = true, isGlobalEdit = false)
+        val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
-        Then("should return an OK with the next sole trader business page")
-        res must have(
-          httpStatus(OK),
-          pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
-          textField(StreamlineIncomeSourceForm.businessTradeName, "test trade"),
-          textField(StreamlineIncomeSourceForm.businessName, "test name"),
-          radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, Some("Yes"))
-        )
-      }
-    }
-
-    "connector returns a previously filled in business which had a start date sooner than the limit" should {
-      "show the current business with the fields" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
-          responseStatus = OK,
-          responseBody = Json.toJson(
-            soleTraderBusinesses.copy(
-              businesses = Seq(
-                soleTraderBusiness.copy(
-                  id = id,
-                  startDateBeforeLimit = None,
-                  startDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit))
-                )
-              )
-            )
-          )
-        )
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = true, isGlobalEdit = false)
-
-        Then("should return an OK with the next sole trader business page")
-        res must have(
+        result must have(
           httpStatus(OK),
           pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
           textField(StreamlineIncomeSourceForm.businessTradeName, "test trade"),
@@ -195,473 +75,373 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
         )
       }
     }
-
-    "connector returns a previously filled in business which had selected their start date is before the limit" should {
-      "show the current business with the fields" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
-          responseStatus = OK,
-          responseBody = Json.toJson(
-            soleTraderBusinesses.copy(
-              businesses = Seq(
-                soleTraderBusiness.copy(
-                  id = id,
-                  startDateBeforeLimit = Some(true),
-                  startDate = None
-                )
-              )
-            )
+    "the user has previously entered duplicate details" should {
+      "display the page with the fields filled" when {
+        "the duplicate details were for the same business they are accessing" in {
+          AuthStub.stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+          stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(
+            responseStatus = OK,
+            responseBody = Json.toJson(duplicateDetails)(DuplicateDetails.encryptedFormat)
           )
-        )
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = true, isGlobalEdit = false)
+          val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
-        Then("should return an OK with the next sole trader business page")
-        res must have(
-          httpStatus(OK),
-          pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
-          textField(StreamlineIncomeSourceForm.businessTradeName, "test trade"),
-          textField(StreamlineIncomeSourceForm.businessName, "test name"),
-          radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, Some("Yes"))
-        )
+          result must have(
+            httpStatus(OK),
+            pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
+            textField(StreamlineIncomeSourceForm.businessTradeName, "test duplicate trade"),
+            textField(StreamlineIncomeSourceForm.businessName, "test duplicate name"),
+            radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, Some("Yes"))
+          )
+        }
+      }
+      "display the page with the fields empty" when {
+        "the duplicate details were for a different business" in {
+          AuthStub.stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+          stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(
+            responseStatus = OK,
+            responseBody = Json.toJson(duplicateDetails.copy(id = "id-two"))(DuplicateDetails.encryptedFormat)
+          )
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+          val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
+
+          result must have(
+            httpStatus(OK),
+            pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
+            textField(StreamlineIncomeSourceForm.businessTradeName, ""),
+            textField(StreamlineIncomeSourceForm.businessName, ""),
+            radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, None)
+          )
+        }
       }
     }
-
-    "connector returns a previously filled in business which had selected their start date is after the limit but the stored date is before" should {
-      "show the current business with the fields" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
-          responseStatus = OK,
-          responseBody = Json.toJson(
-            soleTraderBusinesses.copy(
-              businesses = Seq(
-                soleTraderBusiness.copy(
-                  id = id,
-                  startDateBeforeLimit = Some(false),
-                  startDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit.minusDays(1)))
-                )
-              )
-            )
-          )
-        )
+    "the user has not been on the page before for this business" should {
+      "display the page with the fields empty" in {
+        AuthStub.stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+        stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(NO_CONTENT)
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = true, isGlobalEdit = false)
+        val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
-        Then("should return an OK with the next sole trader business page")
-        res must have(
+        result must have(
           httpStatus(OK),
           pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
-          textField(StreamlineIncomeSourceForm.businessTradeName, "test trade"),
-          textField(StreamlineIncomeSourceForm.businessName, "test name"),
-          radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, Some("Yes"))
-        )
-      }
-    }
-
-    "connector returns a previously filled in business which had selected their start date is after the limit and it still is" should {
-      "show the current business with the fields" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
-          responseStatus = OK,
-          responseBody = Json.toJson(
-            soleTraderBusinesses.copy(
-              businesses = Seq(
-                soleTraderBusiness.copy(
-                  id = id,
-                  startDateBeforeLimit = Some(false),
-                  startDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit))
-                )
-              )
-            )
-          )
-        )
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-
-        When(s"GET ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = getClientFullIncomeSource(id, isEditMode = true, isGlobalEdit = false)
-
-        Then("should return an OK with the next sole trader business page")
-        res must have(
-          httpStatus(OK),
-          pageTitle(messages("agent.full-income-source.heading") + agentTitleSuffix),
-          textField(StreamlineIncomeSourceForm.businessTradeName, "test trade"),
-          textField(StreamlineIncomeSourceForm.businessName, "test name"),
-          radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, Some("No"))
+          textField(StreamlineIncomeSourceForm.businessTradeName, ""),
+          textField(StreamlineIncomeSourceForm.businessName, ""),
+          radioButtonSet(StreamlineIncomeSourceForm.startDateBeforeLimit, None)
         )
       }
     }
   }
 
-  s"POST ${routes.FullIncomeSourceController.show(id)}" when {
-    "unauthenticated" should {
+  s"POST ${routes.FullIncomeSourceController.submit(id)}" when {
+    "the user is unauthorised" should {
       "redirect to the login page" in {
-        stubUnauthorised()
+        AuthStub.stubUnauthorised()
 
-        val res = submitClientFullIncomeSource(None, None, None, None, id, isEditMode = false, isGlobalEdit = false)
-
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI("/bas-gateway/sign-in")
-        )
-      }
-    }
-    "no reference is in session" should {
-      "redirect to the your client's income sources pages" in {
-        stubAuthSuccess()
-        stubGetSessionData(ITSASessionKeys.REFERENCE)(NO_CONTENT)
-
-        val res = submitClientFullIncomeSource(None, None, None, None, id, isEditMode = false, isGlobalEdit = false)
-
-        Then("should return an INTERNAL_SERVER_ERROR")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(clientYourIncomeSources)
-        )
-      }
-    }
-
-    "the connector returns an error when saving the streamline business" should {
-      "display the technical difficulties page" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(INTERNAL_SERVER_ERROR)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When(s"POST ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = submitClientFullIncomeSource(
+        val result = submitClientFullIncomeSource(
           trade = Some("test trade"),
           name = Some("test name"),
-          startDate = Some(date),
-          startDateBeforeLimit = None,
-          id = id,
-          isEditMode = false,
-          isGlobalEdit = false
-        )
-
-        Then("should return an INTERNAL_SERVER_ERROR")
-        res must have(
-          httpStatus(INTERNAL_SERVER_ERROR)
-        )
-      }
-    }
-    "the connector returns an error when fetching the streamline business" should {
-      "display the technical difficulties page" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR, Json.toJson(clearedSoleTraderBusinesses))
-
-        When(s"POST ${routes.FullIncomeSourceController.submit(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = Some("test trade"),
-          name = Some("test name"),
-          startDate = Some(date),
-          startDateBeforeLimit = None,
-          id = id,
-          isEditMode = false,
-          isGlobalEdit = false
-        )
-
-        Then("should return an INTERNAL_SERVER_ERROR")
-        res must have(
-          httpStatus(INTERNAL_SERVER_ERROR)
-        )
-      }
-    }
-    "not in edit mode" when {
-      "the form data is valid they do not need to provide a start date" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubSaveSubscriptionData(
-          reference = reference,
-          id = soleTraderBusinessesKey,
-          body = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None, startDateBeforeLimit = Some(true)))))
-        )(OK)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When(s"POST ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = Some("test trade"),
-          name = Some("test name"),
-          startDate = None,
           startDateBeforeLimit = Some(true),
           id = id,
           isEditMode = false,
           isGlobalEdit = false
         )
 
-        Then("Should return a SEE_OTHER with a redirect location of the check address route")
-        res must have(
+        result must have(
           httpStatus(SEE_OTHER),
-          redirectURI(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
+          redirectURI(ggSignInURI)
         )
       }
-
-      "the form data is valid they need to provide a start date" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
+    }
+    "the user submits invalid data in one of the fields" should {
+      "return a bad request with the page content" in {
+        AuthStub.stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
+
+        val result = submitClientFullIncomeSource(
+          trade = None,
+          name = None,
+          startDateBeforeLimit = None,
+          id = id,
+          isEditMode = false,
+          isGlobalEdit = false
+        )
+
+        result must have(
+          httpStatus(BAD_REQUEST),
+          pageTitle("Error: " + messages("agent.full-income-source.heading") + agentTitleSuffix)
+        )
+      }
+    }
+    "the user submits valid data with a start date before limit set to false" should {
+      "save the result as a sole trader business and continue to the business start date page" in {
+        AuthStub.stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
         stubSaveSubscriptionData(
           reference = reference,
           id = soleTraderBusinessesKey,
-          body = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None, startDateBeforeLimit = Some(false)))))
+          body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            id = id,
+            startDateBeforeLimit = Some(false),
+            name = Some("test name"),
+            trade = Some("test trade")
+          ))))
         )(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
-        When(s"POST ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = submitClientFullIncomeSource(
+        val result = submitClientFullIncomeSource(
           trade = Some("test trade"),
           name = Some("test name"),
-          startDate = None,
           startDateBeforeLimit = Some(false),
           id = id,
           isEditMode = false,
           isGlobalEdit = false
         )
 
-        Then("Should return a SEE_OTHER with a redirect location of the start date route")
-        res must have(
+        result must have(
           httpStatus(SEE_OTHER),
           redirectURI(routes.BusinessStartDateController.show(id).url)
         )
       }
+    }
+    "the user submits valid data with a start date before limit set to true" when {
+      "not in edit mode" should {
+        "save the result as a sole trader business and continue to the address lookup router" in {
+          AuthStub.stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+          stubSaveSubscriptionData(
+            reference = reference,
+            id = soleTraderBusinessesKey,
+            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+              id = id,
+              startDateBeforeLimit = Some(true),
+              name = Some("test name"),
+              trade = Some("test trade")
+            ))))
+          )(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
-      "the form data is invalid" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
+          val result = submitClientFullIncomeSource(
+            trade = Some("test trade"),
+            name = Some("test name"),
+            startDateBeforeLimit = Some(true),
+            id = id,
+            isEditMode = false,
+            isGlobalEdit = false
+          )
 
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
+          )
+        }
+      }
+      "the user submits data which is partially the same as another business they have entered" should {
+        "redirect as normal" when {
+          "the name is the same but the trade is not" in {
+            AuthStub.stubAuthSuccess()
+            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+              responseStatus = OK,
+              responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+                id = id,
+                startDateBeforeLimit = Some(true),
+                name = Some("test duplicate name"),
+                trade = Some("test other trade")
+              ))))
+            )
+            stubSaveSubscriptionData(
+              reference = reference,
+              id = soleTraderBusinessesKey,
+              body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+                id = id,
+                startDateBeforeLimit = Some(true),
+                name = Some("test duplicate name"),
+                trade = Some("test new trade")
+              ))))
+            )(OK)
+            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+            stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+            val result = submitClientFullIncomeSource(
+              trade = Some("test new trade"),
+              name = Some("test duplicate name"),
+              startDateBeforeLimit = Some(true),
+              id = id,
+              isEditMode = false,
+              isGlobalEdit = false
+            )
+
+            result must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
+            )
+          }
+          "the trade is the same but the name is not" in {
+            AuthStub.stubAuthSuccess()
+            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+              responseStatus = OK,
+              responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+                id = id,
+                startDateBeforeLimit = Some(true),
+                name = Some("test other name"),
+                trade = Some("test duplicate trade")
+              ))))
+            )
+            stubSaveSubscriptionData(
+              reference = reference,
+              id = soleTraderBusinessesKey,
+              body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+                id = id,
+                startDateBeforeLimit = Some(true),
+                name = Some("test new name"),
+                trade = Some("test duplicate trade")
+              ))))
+            )(OK)
+            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+            stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+            val result = submitClientFullIncomeSource(
+              trade = Some("test duplicate trade"),
+              name = Some("test new name"),
+              startDateBeforeLimit = Some(true),
+              id = id,
+              isEditMode = false,
+              isGlobalEdit = false
+            )
+
+            result must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
+            )
+          }
+        }
+      }
+      "in edit mode" should {
+        "save the result as a sole trader business and continue to the check your answers" in {
+          AuthStub.stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+          stubSaveSubscriptionData(
+            reference = reference,
+            id = soleTraderBusinessesKey,
+            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+              id = id,
+              startDateBeforeLimit = Some(true),
+              name = Some("test name"),
+              trade = Some("test trade")
+            ))))
+          )(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+          val result = submitClientFullIncomeSource(
+            trade = Some("test trade"),
+            name = Some("test name"),
+            startDateBeforeLimit = Some(true),
+            id = id,
+            isEditMode = true,
+            isGlobalEdit = false
+          )
+
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+          )
+        }
+      }
+      "in global edit mode" should {
+        "save the result as a sole trader business and continue to the check your answers" in {
+          AuthStub.stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+          stubSaveSubscriptionData(
+            reference = reference,
+            id = soleTraderBusinessesKey,
+            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+              id = id,
+              startDateBeforeLimit = Some(true),
+              name = Some("test name"),
+              trade = Some("test trade")
+            ))))
+          )(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+          val result = submitClientFullIncomeSource(
+            trade = Some("test trade"),
+            name = Some("test name"),
+            startDateBeforeLimit = Some(true),
+            id = id,
+            isEditMode = false,
+            isGlobalEdit = true
+          )
+
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(routes.SelfEmployedCYAController.show(id, isGlobalEdit = true).url)
+          )
+        }
+      }
+    }
+    "the user submits duplicate business details" should {
+      "save the details to session and continue to the duplicate details page" in {
+        AuthStub.stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+          responseStatus = OK,
+          responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            id = id,
+            startDateBeforeLimit = Some(false),
+            name = Some("test duplicate name"),
+            trade = Some("test duplicate trade")
+          ))))
+        )
+        stubSaveSessionData(ITSASessionKeys.DUPLICATE_DETAILS, duplicateDetails)(OK)(DuplicateDetails.encryptedFormat)
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
-        When(s"POST ${routes.FullIncomeSourceController.show(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = None,
-          name = None,
-          startDate = None,
-          startDateBeforeLimit = None,
+        val result = submitClientFullIncomeSource(
+          trade = Some("test duplicate trade"),
+          name = Some("test duplicate name"),
+          startDateBeforeLimit = Some(true),
           id = id,
           isEditMode = false,
           isGlobalEdit = false
         )
 
-        Then("Should return a BAD_REQUEST")
-        res must have(
-          httpStatus(BAD_REQUEST)
-        )
-      }
-    }
-
-    "in edit mode" when {
-      "the form data is valid and they do not need to provide a start date" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubSaveSubscriptionData(
-          reference = reference,
-          id = soleTraderBusinessesKey,
-          body = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None, startDateBeforeLimit = Some(true)))))
-        )(OK)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When(s"POST ${routes.FullIncomeSourceController.submit(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = Some("test trade"),
-          name = Some("test name"),
-          startDate = None,
-          startDateBeforeLimit = Some(true),
-          id = id,
-          isEditMode = true,
-          isGlobalEdit = false
-        )
-
-        Then("Should return a SEE_OTHER with a redirect location of the check address route")
-        res must have(
+        result must have(
           httpStatus(SEE_OTHER),
-          redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
-        )
-      }
-
-      "the form data is valid and their start date is not before the limit" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(
-          trade = None, name = None, startDate = None, startDateBeforeLimit = Some(true)
-        )))))
-        stubSaveSubscriptionData(
-          reference = reference,
-          id = soleTraderBusinessesKey,
-          body = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None, startDateBeforeLimit = Some(false)))))
-        )(OK)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When(s"POST ${routes.FullIncomeSourceController.submit(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = Some("test trade"),
-          name = Some("test name"),
-          startDate = Some(DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)),
-          startDateBeforeLimit = Some(false),
-          id = id,
-          isEditMode = true,
-          isGlobalEdit = false
-        )
-
-        Then("Should return a SEE_OTHER with a redirect location of the check address route")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(routes.BusinessStartDateController.show(id, isEditMode = true).url)
-        )
-      }
-
-      "the form data is invalid" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-
-        When(s"POST ${routes.FullIncomeSourceController.submit(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = None,
-          name = None,
-          startDate = None,
-          startDateBeforeLimit = None,
-          id = id,
-          isEditMode = true,
-          isGlobalEdit = false
-        )
-
-        Then("Should return a BAD_REQUEST")
-        res must have(
-          httpStatus(BAD_REQUEST)
-        )
-      }
-    }
-    "in global edit mode" when {
-      "the form data is valid they do not need to provide a start date" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubSaveSubscriptionData(
-          reference = reference,
-          id = soleTraderBusinessesKey,
-          body = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None, startDateBeforeLimit = Some(true)))))
-        )(OK)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When(s"POST ${routes.FullIncomeSourceController.submit(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = Some("test trade"),
-          name = Some("test name"),
-          startDate = None,
-          startDateBeforeLimit = Some(true),
-          id = id,
-          isEditMode = true,
-          isGlobalEdit = true
-        )
-
-        Then("Should return a SEE_OTHER with a redirect location of the check address route")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url)
-        )
-      }
-
-      "the form data is valid they need to provide a start date" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubSaveSubscriptionData(
-          reference = reference,
-          id = soleTraderBusinessesKey,
-          body = Json.toJson(soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(startDate = None, startDateBeforeLimit = Some(false)))))
-        )(OK)
-        stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
-
-        When(s"POST ${routes.FullIncomeSourceController.submit(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = Some("test trade"),
-          name = Some("test name"),
-          startDate = None,
-          startDateBeforeLimit = Some(false),
-          id = id,
-          isEditMode = true,
-          isGlobalEdit = true
-        )
-
-        Then("Should return a SEE_OTHER with a redirect location of the check address route")
-        res must have(
-          httpStatus(SEE_OTHER),
-          redirectURI(routes.BusinessStartDateController.show(id, isEditMode = true).url)
-        )
-      }
-
-      "the form data is invalid" in {
-        Given("I setup the Wiremock stubs")
-        stubAuthSuccess()
-
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(clearedSoleTraderBusinesses))
-        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
-
-        When(s"POST ${routes.FullIncomeSourceController.submit(id)} is called")
-        val res = submitClientFullIncomeSource(
-          trade = None,
-          name = None,
-          startDate = None,
-          startDateBeforeLimit = None,
-          id = id,
-          isEditMode = true,
-          isGlobalEdit = true
-        )
-
-        Then("Should return a BAD_REQUEST")
-        res must have(
-          httpStatus(BAD_REQUEST)
+          redirectURI(routes.DuplicateDetailsController.show(id).url)
         )
       }
     }
   }
 
-  "backUrl" must {
-    def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean): String = fullIncomeSourceController.backUrl(id, isEditMode, isGlobalEdit)
+  "backUrl" when {
+    def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean): String =
+      fullIncomeSourceController.backUrl(id, isEditMode, isGlobalEdit)
 
-    "redirect to Self Employment CYA" when {
-      "in edit mode" in {
-        backUrl(isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
-      }
-      "in global edit mode" in {
-        backUrl(isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
-
+    "not in edit mode" should {
+      "redirect to your income sources page when it is not the first business" in {
+        backUrl(isEditMode = false, isGlobalEdit = false) mustBe appConfig.clientYourIncomeSourcesUrl
       }
     }
-    "redirect to Your Income Sources" when {
-      "not in edit mode or global edit mode" in {
-        backUrl(isEditMode = false, isGlobalEdit = false) must include(clientYourIncomeSources)
+
+    "in edit mode" should {
+      "redirect to sole trader CYA" in {
+        backUrl(isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
+      }
+    }
+
+    "in global edit mode" should {
+      "redirect to sole trader CYA" in {
+        backUrl(isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
       }
     }
   }
 }
+

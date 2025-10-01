@@ -16,23 +16,47 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.SessionDataConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser.GetSessionDataFailure
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser.GetSessionDataResponse
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.SaveSessionDataHttpParser.SaveSessionDataSuccess
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DuplicateDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionDataService @Inject()(sessionDataConnector: SessionDataConnector) {
+class SessionDataService @Inject()(applicationCrypto: ApplicationCrypto, sessionDataConnector: SessionDataConnector)
+                                  (implicit ec: ExecutionContext) {
 
-  def fetchReference(implicit hc: HeaderCarrier): Future[Either[GetSessionDataFailure, Option[String]]] = {
+  implicit val jsonCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+
+  def fetchReference(implicit hc: HeaderCarrier): Future[GetSessionDataResponse[String]] = {
     sessionDataConnector.getSessionData[String](ITSASessionKeys.REFERENCE)
   }
 
-  def fetchNino(implicit hc: HeaderCarrier): Future[Either[GetSessionDataFailure, Option[String]]] = {
+  def fetchNino(implicit hc: HeaderCarrier): Future[GetSessionDataResponse[String]] = {
     sessionDataConnector.getSessionData[String](ITSASessionKeys.NINO)
+  }
+
+  def getDuplicateDetails(id: String)(implicit hc: HeaderCarrier): Future[Option[DuplicateDetails]] = {
+    sessionDataConnector.getSessionData[DuplicateDetails](ITSASessionKeys.DUPLICATE_DETAILS)(implicitly, DuplicateDetails.encryptedFormat) map {
+      case Right(maybeDuplicateDetails) =>
+        maybeDuplicateDetails.filter(_.id == id)
+      case Left(error) =>
+        throw new InternalServerException(s"[SessionDataService][getDuplicateDetails] - Unable to get duplicate details from session - $error")
+    }
+  }
+
+  def saveDuplicateDetails(duplicateBusinessDetails: DuplicateDetails)(implicit hc: HeaderCarrier): Future[SaveSessionDataSuccess] = {
+    sessionDataConnector.saveSessionData(ITSASessionKeys.DUPLICATE_DETAILS, duplicateBusinessDetails)(implicitly, DuplicateDetails.encryptedFormat) map {
+      case Right(success) =>
+        success
+      case Left(error) =>
+        throw new InternalServerException(s"[SessionDataService][saveDuplicateDetails] - Unable to save duplicate details to session - $error")
+    }
   }
 
 }

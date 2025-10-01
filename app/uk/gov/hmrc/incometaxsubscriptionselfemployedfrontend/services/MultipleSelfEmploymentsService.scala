@@ -17,7 +17,7 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsFailure
@@ -76,21 +76,20 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
     }
   }
 
-  def fetchStreamlineBusiness(reference: String, id: String)
-                             (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, StreamlineBusiness]] = {
-    fetchSoleTraderBusinesses(reference) map { result =>
-      result map {
-        case Some(SoleTraderBusinesses(businesses)) =>
-          val maybeFirstBusiness: Option[SoleTraderBusiness] = businesses.find(_.id == id)
+  def fetchStreamlineData(reference: String, id: String)(implicit hc: HeaderCarrier): Future[Option[StreamlineBusiness]] = {
+    fetchSoleTraderBusinesses(reference) map {
+      case Right(Some(soleTraderBusinesses)) =>
+        soleTraderBusinesses.businesses.find(_.id == id) map { business =>
           StreamlineBusiness(
-            trade = maybeFirstBusiness.flatMap(_.trade),
-            name = maybeFirstBusiness.flatMap(_.name),
-            startDate = maybeFirstBusiness.flatMap(_.startDate),
-            startDateBeforeLimit = maybeFirstBusiness.flatMap(_.startDateBeforeLimit),
-            isFirstBusiness = businesses.headOption.exists(_.id == id)
+            trade = business.trade,
+            name = business.name,
+            startDate = business.startDate,
+            startDateBeforeLimit = business.startDateBeforeLimit
           )
-        case None => StreamlineBusiness(None, None, None, None, isFirstBusiness = true)
-      }
+        }
+      case Right(None) => None
+      case Left(error) =>
+        throw new InternalServerException(s"[MultipleSelfEmploymentsService][fetchStreamlineData] - Unable to fetch sole trader businesses - $error")
     }
   }
 
@@ -146,16 +145,6 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
     saveData(reference, businessId, _.copy(startDate = Some(startDate), confirmed = false))
   }
 
-  def saveName(reference: String, businessId: String, name: String)
-              (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(reference, businessId, _.copy(name = Some(name), confirmed = false))
-  }
-
-  def saveTrade(reference: String, businessId: String, trade: String)
-               (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
-    saveData(reference, businessId, _.copy(trade = Some(trade), confirmed = false))
-  }
-
   def saveAddress(reference: String, businessId: String, address: Address)
                  (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     saveData(reference, businessId, _.copy(address = Some(address), confirmed = false))
@@ -186,27 +175,6 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
         maybeBusinesses.flatMap { soleTraderBusinesses =>
           soleTraderBusinesses.businesses.flatMap(_.address).headOption
         }
-      }
-    }
-  }
-
-  def fetchFirstBusinessName(reference: String)
-                            (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[String]]] = {
-    fetchSoleTraderBusinesses(reference) map { result =>
-      result.map { maybeBusinesses =>
-        maybeBusinesses.flatMap { soleTraderBusinesses =>
-          soleTraderBusinesses.businesses.flatMap(_.name).headOption
-        }
-      }
-    }
-  }
-
-  def fetchAllNameTradeCombos(reference: String)
-                             (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Seq[(String, Option[String], Option[String])]]] = {
-    fetchSoleTraderBusinesses(reference) map { result =>
-      result map {
-        case Some(soleTraderBusinesses) => soleTraderBusinesses.businesses.map(business => (business.id, business.name, business.trade))
-        case None => Seq.empty[(String, Option[String], Option[String])]
       }
     }
   }

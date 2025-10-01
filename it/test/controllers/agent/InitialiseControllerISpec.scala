@@ -19,11 +19,8 @@ package controllers.agent
 import helpers.ComponentSpecBase
 import helpers.servicemocks.AuthStub.stubAuthSuccess
 import play.api.http.Status._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 
 class InitialiseControllerISpec extends ComponentSpecBase {
-
-  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details" when {
     "redirect to the full sole trader income source page" in {

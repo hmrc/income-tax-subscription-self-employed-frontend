@@ -18,15 +18,13 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent.StreamlineBusiness
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{No, Yes}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, No, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.FullIncomeSource
@@ -45,20 +43,14 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
                                            val languageUtils: LanguageUtils,
                                            val appConfig: AppConfig)
                                           (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter with FeatureSwitching {
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter {
 
   def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
-        fetchBusiness(reference, id) map { streamlineBusiness =>
-          val form: Form[_] = StreamlineIncomeSourceForm.fullIncomeSourceForm
+        populateFormFromSavedDetails(reference, id) map { form =>
           Ok(view(
-            fullIncomeSourceForm = form.bind(StreamlineIncomeSourceForm.createIncomeSourceData(
-              maybeTradeName = streamlineBusiness.trade,
-              maybeBusinessName = streamlineBusiness.name,
-              maybeStartDate = streamlineBusiness.startDate,
-              maybeStartDateBeforeLimit = streamlineBusiness.startDateBeforeLimit
-            )).discardingErrors,
+            fullIncomeSourceForm = form,
             id = id,
             isEditMode = isEditMode,
             isGlobalEdit = isGlobalEdit
@@ -74,28 +66,37 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
         StreamlineIncomeSourceForm.fullIncomeSourceForm.bindFromRequest().fold(
           formWithErrors => {
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
-          },
-          {
+          }, {
             case (trade, name, startDateBeforeLimit) =>
-              multipleSelfEmploymentsService.saveStreamlinedIncomeSource(
-                reference = reference,
-                businessId = id,
-                trade = trade,
-                name = name,
-                startDateBeforeLimit = startDateBeforeLimit match {
-                  case Yes => true
-                  case No => false
-                }
-              ) map {
-                case Right(_) =>
-                  if (startDateBeforeLimit == No) {
-                    Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
-                  } else if (isEditMode || isGlobalEdit) {
-                    Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
-                  } else {
-                    Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode))
-                  }
-                case Left(_) => throw new InternalServerException("[FullIncomeSourceController][submit] - Could not save sole trader full income source")
+              isDuplicateBusiness(reference, name, trade) flatMap {
+                case true =>
+                  saveDuplicateDetailsAndContinue(
+                    id = id,
+                    duplicateDetails = DuplicateDetails(
+                      id = id,
+                      name = name,
+                      trade = trade,
+                      startDateBeforeLimit = startDateBeforeLimit match {
+                        case Yes => true
+                        case No => false
+                      }
+                    ),
+                    isEditMode = isEditMode,
+                    isGlobalEdit = isGlobalEdit
+                  )
+                case false =>
+                  saveValidDetailsAndContinue(
+                    reference = reference,
+                    id = id,
+                    trade = trade,
+                    name = name,
+                    startDateBeforeLimit = startDateBeforeLimit match {
+                      case Yes => true
+                      case No => false
+                    },
+                    isEditMode = isEditMode,
+                    isGlobalEdit = isGlobalEdit
+                  )
               }
           }
         )
@@ -103,11 +104,74 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
     }
   }
 
-  private def fetchBusiness(reference: String, id: String)(implicit hc: HeaderCarrier): Future[StreamlineBusiness] = {
-    multipleSelfEmploymentsService.fetchStreamlineBusiness(reference, id) map {
-      case Right(streamlineBusiness) => streamlineBusiness
-      case Left(_) =>
-        throw new InternalServerException("[FullIncomeSourceController][fetchBusiness] - Could not fetch streamline business details")
+  private def populateFormFromSavedDetails(reference: String, id: String)(implicit hc: HeaderCarrier): Future[Form[_]] = {
+    multipleSelfEmploymentsService.fetchStreamlineData(reference, id) flatMap {
+      case Some(streamlineBusiness) =>
+        Future.successful(StreamlineIncomeSourceForm.fullIncomeSourceForm.bind(
+          StreamlineIncomeSourceForm.createIncomeSourceData(
+            maybeTradeName = streamlineBusiness.trade,
+            maybeBusinessName = streamlineBusiness.name,
+            maybeStartDate = streamlineBusiness.startDate,
+            maybeStartDateBeforeLimit = streamlineBusiness.startDateBeforeLimit
+          )
+        ).discardingErrors)
+      case None =>
+        sessionDataService.getDuplicateDetails(id) map {
+          case Some(duplicateDetails) =>
+            StreamlineIncomeSourceForm.fullIncomeSourceForm.bind(
+              StreamlineIncomeSourceForm.createIncomeSourceData(
+                maybeTradeName = Some(duplicateDetails.trade),
+                maybeBusinessName = Some(duplicateDetails.name),
+                maybeStartDate = None,
+                maybeStartDateBeforeLimit = Some(duplicateDetails.startDateBeforeLimit)
+              )
+            ).discardingErrors
+          case None =>
+            StreamlineIncomeSourceForm.fullIncomeSourceForm
+        }
+    }
+  }
+
+  private def saveValidDetailsAndContinue(reference: String,
+                                          id: String,
+                                          trade: String,
+                                          name: String,
+                                          startDateBeforeLimit: Boolean,
+                                          isEditMode: Boolean,
+                                          isGlobalEdit: Boolean)
+                                         (implicit hc: HeaderCarrier): Future[Result] = {
+    multipleSelfEmploymentsService.saveStreamlinedIncomeSource(
+      reference = reference,
+      businessId = id,
+      trade = trade,
+      name = name,
+      startDateBeforeLimit = startDateBeforeLimit
+    ) map {
+      case Right(_) =>
+        if (!startDateBeforeLimit) {
+          Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
+        } else if (isEditMode || isGlobalEdit) {
+          Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
+        } else {
+          Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode))
+        }
+      case Left(_) => throw new InternalServerException("[FullIncomeSourceController][submit] - Could not save sole trader full income source")
+    }
+  }
+
+  private def saveDuplicateDetailsAndContinue(id: String, duplicateDetails: DuplicateDetails, isEditMode: Boolean, isGlobalEdit: Boolean)
+                                             (implicit hc: HeaderCarrier): Future[Result] = {
+    sessionDataService.saveDuplicateDetails(duplicateDetails) map { _ =>
+      Redirect(routes.DuplicateDetailsController.show(id, isEditMode, isGlobalEdit))
+    }
+  }
+
+  private def isDuplicateBusiness(reference: String, name: String, trade: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+    multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
+      case Right(Some(soleTraderBusinesses)) =>
+        soleTraderBusinesses.businesses.exists(business => business.name.contains(name) && business.trade.contains(trade))
+      case Right(None) => false
+      case Left(error) => throw new InternalServerException(s"[FullIncomeSourceController][isDuplicateBusiness] - Unable to fetch all businesses - $error")
     }
   }
 

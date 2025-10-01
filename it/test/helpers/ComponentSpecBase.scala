@@ -230,15 +230,18 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def submitClientFullIncomeSource(trade: Option[String],
                                    name: Option[String],
-                                   startDate: Option[DateModel],
                                    startDateBeforeLimit: Option[Boolean],
                                    id: String,
                                    isEditMode: Boolean,
                                    isGlobalEdit: Boolean): WSResponse = {
     post(s"/client/details/sole-trader-business?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
-      StreamlineIncomeSourceForm.createIncomeSourceData(trade, name, startDate, startDateBeforeLimit)
+      StreamlineIncomeSourceForm.createIncomeSourceData(trade, name, None, startDateBeforeLimit)
         .map { case (k, v) => (k, Seq(v)) }
     )
+  }
+
+  def getClientDuplicateDetails(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
+    get(s"/client/details/error/duplicate-details?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
   }
 
   def getFullIncomeSource(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
@@ -255,7 +258,10 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
       IndividualStreamlineIncomeSourceForm.createIncomeSourceData(trade, name, None, startDateBeforeLimit)
         .map { case (k, v) => (k, Seq(v)) }
     )
+  }
 
+  def getDuplicateDetails(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
+    get(s"/details/error/duplicate-details?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
   }
 
   def removeHtmlMarkup(stringWithMarkup: String): String =
