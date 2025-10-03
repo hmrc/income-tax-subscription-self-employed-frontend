@@ -244,7 +244,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
             stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
               responseStatus = OK,
               responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
-                id = id,
+                id = s"$id-two",
                 startDateBeforeLimit = Some(true),
                 name = Some("test duplicate name"),
                 trade = Some("test other trade")
@@ -253,12 +253,20 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
             stubSaveSubscriptionData(
               reference = reference,
               id = soleTraderBusinessesKey,
-              body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
-                id = id,
-                startDateBeforeLimit = Some(true),
-                name = Some("test duplicate name"),
-                trade = Some("test new trade")
-              ))))
+              body = Json.toJson(SoleTraderBusinesses(Seq(
+                SoleTraderBusiness(
+                  id = s"$id-two",
+                  startDateBeforeLimit = Some(true),
+                  name = Some("test duplicate name"),
+                  trade = Some("test other trade")
+                ),
+                SoleTraderBusiness(
+                  id = id,
+                  startDateBeforeLimit = Some(true),
+                  name = Some("test duplicate name"),
+                  trade = Some("test new trade")
+                )
+              )))
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -281,7 +289,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
             stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
               responseStatus = OK,
               responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
-                id = id,
+                id = s"$id-two",
                 startDateBeforeLimit = Some(true),
                 name = Some("test other name"),
                 trade = Some("test duplicate trade")
@@ -290,12 +298,20 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
             stubSaveSubscriptionData(
               reference = reference,
               id = soleTraderBusinessesKey,
-              body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
-                id = id,
-                startDateBeforeLimit = Some(true),
-                name = Some("test new name"),
-                trade = Some("test duplicate trade")
-              ))))
+              body = Json.toJson(SoleTraderBusinesses(Seq(
+                SoleTraderBusiness(
+                  id = s"$id-two",
+                  startDateBeforeLimit = Some(true),
+                  name = Some("test other name"),
+                  trade = Some("test duplicate trade")
+                ),
+                SoleTraderBusiness(
+                  id = id,
+                  startDateBeforeLimit = Some(true),
+                  name = Some("test new name"),
+                  trade = Some("test duplicate trade")
+                )
+              )))
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -318,7 +334,15 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
       "in edit mode" should {
         "save the result as a sole trader business and continue to the check your answers" in {
           AuthStub.stubAuthSuccess()
-          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+            responseStatus = OK,
+            responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+              id = id,
+              startDateBeforeLimit = Some(true),
+              name = Some("test name"),
+              trade = Some("test trade")
+            ))))
+          )
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
@@ -384,7 +408,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
           responseStatus = OK,
           responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
-            id = id,
+            id = s"$id-two",
             startDateBeforeLimit = Some(false),
             name = Some("test duplicate name"),
             trade = Some("test duplicate trade")

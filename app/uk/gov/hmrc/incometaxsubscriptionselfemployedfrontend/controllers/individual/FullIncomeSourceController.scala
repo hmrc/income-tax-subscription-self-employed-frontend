@@ -68,7 +68,7 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
           }, {
             case (trade, name, startDateBeforeLimit) =>
-              isDuplicateBusiness(reference, name, trade) flatMap {
+              isDuplicateBusiness(reference = reference, id = id, name = name, trade = trade) flatMap {
                 case true =>
                   saveDuplicateDetailsAndContinue(
                     id = id,
@@ -166,10 +166,10 @@ class FullIncomeSourceController @Inject()(fullIncomeSource: FullIncomeSource,
     }
   }
 
-  private def isDuplicateBusiness(reference: String, name: String, trade: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  private def isDuplicateBusiness(reference: String, id: String, name: String, trade: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
     multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
       case Right(Some(soleTraderBusinesses)) =>
-        soleTraderBusinesses.businesses.exists(business => business.name.contains(name) && business.trade.contains(trade))
+        soleTraderBusinesses.businesses.filterNot(_.id == id).exists(business => business.name.contains(name) && business.trade.contains(trade))
       case Right(None) => false
       case Left(error) => throw new InternalServerException(s"[FullIncomeSourceController][isDuplicateBusiness] - Unable to fetch all businesses - $error")
     }
