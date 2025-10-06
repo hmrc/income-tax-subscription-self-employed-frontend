@@ -83,6 +83,11 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
+    "have the correct paragraph" in {
+      val text = document().mainContent.selectHead(".govuk-body").text
+      text mustBe CheckYourAnswersMessages.para
+    }
+
     "have a summary of the self employment answers without accounting method" when {
       "in edit mode" when {
         "the answers are complete" in {
@@ -166,27 +171,29 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendProgressSavedUrl}?location=sole-trader-check-your-answers"
       }
     }
-
   }
 
-
-  def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
+  def simpleSummaryRow(key: String, hidden: Option[String] = None): (Option[String], Boolean) => SummaryListRowValues = {
     case (value, globalEditMode) =>
+      val text = hidden match {
+        case Some(value) => value
+        case None => key
+      }
       SummaryListRowValues(
         key = key,
         value = value,
         actions = Seq(
           SummaryListActionValues(
             href = routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
-            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
-            visuallyHidden = key
+            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + text,
+            visuallyHidden = text
           )
         )
       )
   }
 
   private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessTrade)(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.businessTrade, Some(CheckYourAnswersMessages.businessTradeType))(value, globalEditMode)
   }
 
   private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {
@@ -213,6 +220,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     val captionVisual = "Sole trader"
     val heading = "Check your answers"
     val title = "Check your answers - sole trader business"
+    val para = "Add or change any missing or incorrect details, then confirm that the information is correct."
     val confirmAndContinue = "Confirm and continue"
     val saveAndBack = "Save and come back later"
     val change = "Change"
@@ -221,6 +229,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     val businessName = "Business name"
     val businessAddress = "Address"
     val businessTrade = "Trade"
+    val businessTradeType = "Trade type"
     val startDateBeforeLimitLabel = s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"
   }
 }

@@ -87,14 +87,15 @@ individual.duplicate-details.options.return-to-income-sources   = go to your inc
 
 #Self Employed CYA
 self-employed-cya.trading-start-date                            = Start date
-self-employed-cya.start-date-before-limit.label         = Before 6 April {0}
+self-employed-cya.start-date-before-limit.label                 = Before 6 April {0}
 self-employed-cya.business-name                                 = Business name
 self-employed-cya.business-trade                                = Trade
-self-employed-cya.business-trade.change-hidden                  = Trade
+self-employed-cya.business-trade.change-hidden                  = Trade type
 self-employed-cya.business-address                              = Address
 self-employed-cya.title                                         = Check your answers - sole trader business
 self-employed-cya.heading                                       = Check your answers
 self-employed-cya.caption                                       = Sole trader
+self-employed-cya.para                                          = Add or change any missing or incorrect details, then confirm that the information is correct.
 
 # Agent Business start date
 business.agent.start-date.title                                 = Start date for sole trader business
@@ -145,10 +146,11 @@ agent.self-employed-cya.business-address.add                    = Add address
 agent.self-employed-cya.title                                   = Check your answers - sole trader business
 agent.self-employed-cya.heading                                 = Check your answers
 agent.self-employed-cya.caption                                 = {0} | {1}
+agent.self-employed-cya.para                                    = Add or change any missing or incorrect details, then confirm that the information is correct.
 
 # Self Employed CYA
 agent.self-employed-cya.business-trade.streamline               = Trade
-agent.self-employed-cya.business-trade.change-hidden            = Trade
+agent.self-employed-cya.business-trade.change-hidden            = Trade type
 agent.self-employed-cya.trading-start-date.streamline           = Start date
 agent.self-employed-cya.start-date-before-limit.label           = Before 6 April {0}
 agent.self-employed-cya.trading-start-date.change.streamline    = Change start date

@@ -56,6 +56,11 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
+    "have the correct paragraph" in {
+      val text = document().mainContent.selectHead(".govuk-body").text
+      text mustBe CheckYourAnswersMessages.para
+    }
+
     "have a summary of the users answers" when {
       "start date is a date older than the limit" in {
         document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
@@ -165,6 +170,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   object CheckYourAnswersMessages {
     val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val heading = "Check your answers"
+    val para = "Add or change any missing or incorrect details, then confirm that the information is correct."
     val title = "Check your answers - sole trader business"
     val confirmAndContinue = "Confirm and continue"
     val saveAndBack = "Save and come back later"
@@ -174,6 +180,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     val yes = "Yes"
     val no = "No"
     val trade = "Trade"
+    val tradeType = "Trade type"
     val startDate = "Start date"
     val accountingMethod = "Accounting method"
     val address = "Address"
@@ -206,23 +213,27 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     Jsoup.parse(page(answers, isGlobalEdit).body)
   }
 
-  def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
+  def simpleSummaryRow(key: String, hidden: Option[String] = None): (Option[String], Boolean) => SummaryListRowValues = {
     case (value, globalEditMode) =>
+      val text = hidden match {
+        case Some(value) => value
+        case None => key
+      }
       SummaryListRowValues(
         key = key,
         value = value,
         actions = Seq(
           SummaryListActionValues(
             href = routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
-            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
-            visuallyHidden = key
+            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + text,
+            visuallyHidden = text
           )
         )
       )
   }
 
   private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.trade)(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.trade, Some(CheckYourAnswersMessages.tradeType))(value, globalEditMode)
   }
 
   private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {
@@ -244,6 +255,4 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     )
   )
-
-
 }
