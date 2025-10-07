@@ -90,8 +90,7 @@ individual.duplicate-details.options.return-to-income-sources   = ewch i’r rhe
 self-employed-cya.trading-start-date                            = Dyddiad dechrau
 self-employed-cya.start-date-before-limit.label                 = Cyn 6 Ebrill {0}
 self-employed-cya.business-name                                 = Enw’r busnes
-self-employed-cya.business-trade                                = Masnach
-self-employed-cya.business-trade.change-hidden                  = y fasnach
+self-employed-cya.business-trade                                = Gwaith masnach
 self-employed-cya.business-address                              = Cyfeiriad
 self-employed-cya.title                                         = Gwiriwch eich atebion - busnes unig fasnachwr
 self-employed-cya.heading                                       = Gwiriwch eich atebion
@@ -150,8 +149,7 @@ agent.self-employed-cya.caption                                 = Y busnes unig 
 agent.self-employed-cya.para                                    = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu'n anghywir.
 
 #Enable AgentStreamline Self Employed CYA
-agent.self-employed-cya.business-trade.streamline               = Masnach
-agent.self-employed-cya.business-trade.change-hidden            =
+agent.self-employed-cya.business-trade.streamline               = Gwaith masnach
 agent.self-employed-cya.trading-start-date.streamline           = Dyddiad dechrau
 agent.self-employed-cya.start-date-before-limit.label           = Cyn 6 Ebrill {0}
 agent.self-employed-cya.trading-start-date.change.streamline    = Newid y dyddiad dechrau

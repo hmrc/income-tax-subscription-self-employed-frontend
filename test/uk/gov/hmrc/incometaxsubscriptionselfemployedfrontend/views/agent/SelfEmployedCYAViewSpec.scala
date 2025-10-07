@@ -180,7 +180,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     val yes = "Yes"
     val no = "No"
     val trade = "Trade"
-    val tradeType = "Trade type"
     val startDate = "Start date"
     val accountingMethod = "Accounting method"
     val address = "Address"
@@ -213,27 +212,23 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     Jsoup.parse(page(answers, isGlobalEdit).body)
   }
 
-  def simpleSummaryRow(key: String, hidden: Option[String] = None): (Option[String], Boolean) => SummaryListRowValues = {
+  def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
     case (value, globalEditMode) =>
-      val text = hidden match {
-        case Some(value) => value
-        case None => key
-      }
       SummaryListRowValues(
         key = key,
         value = value,
         actions = Seq(
           SummaryListActionValues(
             href = routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
-            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + text,
-            visuallyHidden = text
+            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
+            visuallyHidden = key
           )
         )
       )
   }
 
   private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.trade, Some(CheckYourAnswersMessages.tradeType))(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.trade)(value, globalEditMode)
   }
 
   private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {

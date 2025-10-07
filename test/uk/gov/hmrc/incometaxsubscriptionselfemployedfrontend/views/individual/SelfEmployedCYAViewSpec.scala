@@ -173,27 +173,23 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     }
   }
 
-  def simpleSummaryRow(key: String, hidden: Option[String] = None): (Option[String], Boolean) => SummaryListRowValues = {
+  def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
     case (value, globalEditMode) =>
-      val text = hidden match {
-        case Some(value) => value
-        case None => key
-      }
       SummaryListRowValues(
         key = key,
         value = value,
         actions = Seq(
           SummaryListActionValues(
             href = routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
-            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + text,
-            visuallyHidden = text
+            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
+            visuallyHidden = key
           )
         )
       )
   }
 
   private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessTrade, Some(CheckYourAnswersMessages.businessTradeType))(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.businessTrade)(value, globalEditMode)
   }
 
   private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {
@@ -229,7 +225,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     val businessName = "Business name"
     val businessAddress = "Address"
     val businessTrade = "Trade"
-    val businessTradeType = "Trade type"
     val startDateBeforeLimitLabel = s"Before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"
   }
 }

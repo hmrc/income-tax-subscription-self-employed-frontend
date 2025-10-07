@@ -90,7 +90,6 @@ self-employed-cya.trading-start-date                            = Start date
 self-employed-cya.start-date-before-limit.label                 = Before 6 April {0}
 self-employed-cya.business-name                                 = Business name
 self-employed-cya.business-trade                                = Trade
-self-employed-cya.business-trade.change-hidden                  = Trade type
 self-employed-cya.business-address                              = Address
 self-employed-cya.title                                         = Check your answers - sole trader business
 self-employed-cya.heading                                       = Check your answers
@@ -150,7 +149,6 @@ agent.self-employed-cya.para                                    = Add or change 
 
 # Self Employed CYA
 agent.self-employed-cya.business-trade.streamline               = Trade
-agent.self-employed-cya.business-trade.change-hidden            = Trade type
 agent.self-employed-cya.trading-start-date.streamline           = Start date
 agent.self-employed-cya.start-date-before-limit.label           = Before 6 April {0}
 agent.self-employed-cya.trading-start-date.change.streamline    = Change start date

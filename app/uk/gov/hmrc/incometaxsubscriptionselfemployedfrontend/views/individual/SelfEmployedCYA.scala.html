@@ -110,8 +110,7 @@
         key = messages("self-employed-cya.business-trade"),
         value = businessTrade,
         changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
-        id = businessId,
-        hiddenText = Some(messages("self-employed-cya.business-trade.change-hidden"))
+        id = businessId
     )
 }
 
