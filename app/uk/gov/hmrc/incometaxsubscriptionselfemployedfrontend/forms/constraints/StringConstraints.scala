@@ -59,26 +59,25 @@ object StringConstraints {
 
 
   def isAfter(
-               minDate: LocalDate,
-               errorContext: String,
-               convert: LocalDate => String,
-               prefix: Option[String] = None
-             ): Constraint[DateModel] =
+    minDate: LocalDate,
+    errorContext: String,
+    convert: LocalDate => String,
+    prefix: Option[String] = None
+  ): Constraint[DateModel] =
     constraint[DateModel] { dateModel =>
-      val date = minDate.minusDays(1)
-      if (dateModel.toLocalDate.isAfter(date)) {
+      if (dateModel.toLocalDate.isAfter(minDate.minusDays(1))) {
         Valid
       } else {
-        Invalid(s"${prefix.getOrElse("")}error.$errorContext.day-month-year.min-date", convert(date))
+        Invalid(s"${prefix.getOrElse("")}error.$errorContext.day-month-year.min-date", convert(minDate))
       }
     }
 
   def isBefore(
-                maxDate: LocalDate,
-                errorContext: String,
-                convert: LocalDate => String,
-                prefix: Option[String] = None
-              ): Constraint[DateModel] =
+    maxDate: LocalDate,
+    errorContext: String,
+    convert: LocalDate => String,
+    prefix: Option[String] = None
+  ): Constraint[DateModel] =
     constraint[DateModel] { dateModel =>
       val date = maxDate.plusDays(1)
       if (dateModel.toLocalDate.isBefore(date)) {

@@ -63,7 +63,7 @@ class BusinessStartDateFormSpec extends PlaySpec with UnitTestTrait {
 
       "it is before 1900" in {
         val minTest = form.bind(DataMap.date(startDate)("31", "12", "1899"))
-        minTest.errors must contain(FormError(startDate, beforeMin, Seq(BusinessStartDateForm.minStartDate.minusDays(1).toString)))
+        minTest.errors must contain(FormError(startDate, beforeMin, Seq(BusinessStartDateForm.minStartDate.toString)))
       }
       "it is missing the day" in {
         form.bind(DataMap.date(startDate)("", "4", "2017")).errors must contain(FormError(dayKeyError, required, Seq("day")))
