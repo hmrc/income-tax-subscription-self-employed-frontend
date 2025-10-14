@@ -56,6 +56,11 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
+    "have the correct paragraph" in {
+      val text = document().mainContent.selectHead(".govuk-body").text
+      text mustBe CheckYourAnswersMessages.para
+    }
+
     "have a summary of the users answers" when {
       "start date is a date older than the limit" in {
         document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
@@ -165,6 +170,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   object CheckYourAnswersMessages {
     val caption = "FirstName LastName | ZZ 11 11 11 Z"
     val heading = "Check your answers"
+    val para = "Add or change any missing or incorrect details, then confirm that the information is correct."
     val title = "Check your answers - sole trader business"
     val confirmAndContinue = "Confirm and continue"
     val saveAndBack = "Save and come back later"
@@ -244,6 +250,4 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     )
   )
-
-
 }

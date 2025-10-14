@@ -46,6 +46,10 @@
         isSection = false
     )
 
+    <p class="govuk-body">
+        @messages("agent.self-employed-cya.para")
+    </p>
+
     @govukSummaryList(SummaryList(
         rows = Seq(
             businessTrade(answers.businessTradeName, answers.id),
@@ -110,7 +114,7 @@
         value = businessTrade,
         changeHref = routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId,
-        hiddenText = Some(messages("agent.self-employed-cya.business-trade.change-hidden"))
+        hiddenText = Some(messages("agent.self-employed-cya.business-trade.streamline"))
     )
 }
 

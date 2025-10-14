@@ -83,6 +83,11 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
+    "have the correct paragraph" in {
+      val text = document().mainContent.selectHead(".govuk-body").text
+      text mustBe CheckYourAnswersMessages.para
+    }
+
     "have a summary of the self employment answers without accounting method" when {
       "in edit mode" when {
         "the answers are complete" in {
@@ -166,9 +171,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendProgressSavedUrl}?location=sole-trader-check-your-answers"
       }
     }
-
   }
-
 
   def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
     case (value, globalEditMode) =>
@@ -213,6 +216,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     val captionVisual = "Sole trader"
     val heading = "Check your answers"
     val title = "Check your answers - sole trader business"
+    val para = "Add or change any missing or incorrect details, then confirm that the information is correct."
     val confirmAndContinue = "Confirm and continue"
     val saveAndBack = "Save and come back later"
     val change = "Change"

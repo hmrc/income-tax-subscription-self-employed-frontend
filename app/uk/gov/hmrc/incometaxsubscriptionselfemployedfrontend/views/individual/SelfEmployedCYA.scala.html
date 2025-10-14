@@ -43,6 +43,10 @@
         isSection = true
     )
 
+    <p class="govuk-body">
+        @messages("self-employed-cya.para")
+    </p>
+
     @govukSummaryList(SummaryList(
         rows = Seq(
             businessTrade(answers.businessTradeName, answers.id),
@@ -59,7 +63,6 @@
             saveAndReturnReference = Some("sole-trader-check-your-answers")
         )
     }
-
 }
 
 @simpleSummaryListRow(key: String, value: Option[String], changeHref: String, id: String, htmlValue: Boolean = false, hiddenText: Option[String] = None) = @{
@@ -107,8 +110,7 @@
         key = messages("self-employed-cya.business-trade"),
         value = businessTrade,
         changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.FullIncomeSourceController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
-        id = businessId,
-        hiddenText = Some(messages("self-employed-cya.business-trade.change-hidden"))
+        id = businessId
     )
 }
 
