@@ -51,8 +51,8 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   implicit def ws(implicit app: Application): WSClient = app.injector.instanceOf[WSClient]
 
-  val titleSuffix = " - Use software to send Income Tax updates - GOV.UK"
-  val agentTitleSuffix = " - Use software to report your client’s Income Tax - GOV.UK"
+  val titleSuffix = " - Sign up for Making Tax Digital for Income Tax - GOV.UK"
+  val agentTitleSuffix = " - Sign up your clients for Making Tax Digital for Income Tax - GOV.UK"
   val reference: String = "test-reference"
 
   val mockHost: String = WiremockHelper.wiremockHost

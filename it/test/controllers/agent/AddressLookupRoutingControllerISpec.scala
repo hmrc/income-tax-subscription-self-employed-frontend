@@ -54,8 +54,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
     "the Connector receives NO_CONTENT and location details in headers" should {
       "with location details in headers" in {
         Given("I setup the Wiremock stubs")
-        val continueUrl = s"http://localhost:9563$baseUrl$clientOrIndividual/details/address-lookup/" + id
         stubAuthSuccess()
+        val continueUrl = s"http://localhost:9563$baseUrl$clientOrIndividual/details/address-lookup/" + id
         val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id", "UTF8")
         stubInitializeAddressLookup(Json.parse(
           testConfig(continueUrl, Some(referrerUrl))
