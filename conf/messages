@@ -1,5 +1,5 @@
 ## Base ##
-base.service-name                                               = Use software to send Income Tax updates
+base.service-name                                               = Sign up for Making Tax Digital for Income Tax
 base.continue                                                   = Continue
 base.update                                                     = Update
 base.day                                                        = Day
@@ -18,13 +18,13 @@ save-and-come-back-later                                        = Save and come 
 confirm-and-continue                                            = Confirm and continue
 
 ## Title pattern
-title-pattern.service-name.gov-uk                                 = {0} - Use software to send Income Tax updates - GOV.UK
-agent-title-pattern.service-name.gov-uk                           = {0} - Use software to report your client’s Income Tax - GOV.UK
-base.title.error                                                = Error: {0} - Use software to send Income Tax updates - GOV.UK
-agent-base.title.error                                          = Error: {0} - Use software to report your client’s Income Tax - GOV.UK
+title-pattern.service-name.gov-uk                               = {0} - Sign up for Making Tax Digital for Income Tax - GOV.UK
+agent-title-pattern.service-name.gov-uk                         = {0} - Sign up your clients for Making Tax Digital for Income Tax - GOV.UK
+base.title.error                                                = Error: {0} - Sign up for Making Tax Digital for Income Tax - GOV.UK
+agent-base.title.error                                          = Error: {0} - Sign up your clients for Making Tax Digital for Income Tax - GOV.UK
 
 ## Service Name
-base.agent.service-name                                         = Use software to report your client’s Income Tax
+base.agent.service-name                                         = Sign up your clients for Making Tax Digital for Income Tax
 
 # Business start date
 business.start-date.title                                       = Start date for sole trader business

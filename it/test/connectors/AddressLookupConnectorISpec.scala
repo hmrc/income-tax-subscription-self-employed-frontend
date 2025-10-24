@@ -82,6 +82,7 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
     implicit val mockRequestHeader: RequestHeader = mock[RequestHeader]
     Mockito.when(mockRequestHeader.rawQueryString).thenReturn(IntegrationTestConstants.referrerQueryString)
     Mockito.when(mockRequestHeader.path).thenReturn(IntegrationTestConstants.referrerPath)
+
     "the user is an agent" should {
       "Return PostSubscriptionDetailsSuccessResponse" in {
         stubInitializeAddressLookup(Json.parse(testAddressLookupConfigClient("testUrl")))("testLocation", ACCEPTED)

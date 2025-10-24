@@ -118,7 +118,7 @@ object IntegrationTestConstants {
        |  "labels": {
        |    "en": {
        |      "appLevelLabels": {
-       |        "navTitle": "Use software to send Income Tax updates"
+       |        "navTitle": "Sign up for Making Tax Digital for Income Tax"
        |      },
        |      "selectPageLabels": {
        |        "title": "Select business address",
@@ -140,7 +140,7 @@ object IntegrationTestConstants {
        |    },
        |    "cy": {
        |      "appLevelLabels": {
-       |        "navTitle": "Defnyddio meddalwedd i anfon diweddariadau Treth Incwm"
+       |        "navTitle": "Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm"
        |      },
        |      "selectPageLabels": {
        |        "title": "Dewiswch gyfeiriad busnes",
@@ -194,7 +194,7 @@ object IntegrationTestConstants {
        |  "labels": {
        |    "en": {
        |      "appLevelLabels": {
-       |        "navTitle": "Use software to report your client’s Income Tax"
+       |        "navTitle": "Sign up your clients for Making Tax Digital for Income Tax"
        |      },
        |      "selectPageLabels": {
        |        "title": "Select client’s business address",
@@ -216,7 +216,7 @@ object IntegrationTestConstants {
        |    },
        |    "cy": {
        |      "appLevelLabels": {
-       |        "navTitle": "Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient"
+       |        "navTitle": "Cofrestrwch eich cleientiaid ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm"
        |       },
        |      "selectPageLabels": {
        |        "title": "dewis cyfeiriad busnes y cleient",

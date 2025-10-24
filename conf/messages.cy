@@ -1,5 +1,5 @@
 ## Base ##
-base.service-name                                               = Defnyddio meddalwedd i anfon diweddariadau Treth Incwm
+base.service-name                                               = Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm
 base.continue                                                   = Yn eich blaen
 base.update                                                     = Diweddaru
 base.day                                                        = Diwrnod
@@ -18,13 +18,13 @@ save-and-come-back-later                                        = Cadw a dod yn 
 confirm-and-continue                                            = Cadarnhau ac yn eich blaen
 
 ## Title pattern
-title-pattern.service-name.gov-uk                               = {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
-agent-title-pattern.service-name.gov-uk                         = {0} - Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient - GOV.UK
-base.title.error                                                = Gwall: {0} - Defnyddio meddalwedd i anfon diweddariadau Treth Incwm - GOV.UK
-agent-base.title.error                                          = Gwall: {0} - Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient - GOV.UK
+title-pattern.service-name.gov-uk                               = {0} - Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm - GOV.UK
+agent-title-pattern.service-name.gov-uk                         = {0} - Cofrestrwch eich cleientiaid ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm - GOV.UK
+base.title.error                                                = Gwall: {0} - Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm - GOV.UK
+agent-base.title.error                                          = Gwall: {0} - Cofrestrwch eich cleientiaid ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm - GOV.UK
 
 ## Service name
-base.agent.service-name                                         = Defnyddiwch feddalwedd i roi gwybod am Dreth Incwm eich cleient
+base.agent.service-name                                         = Cofrestrwch eich cleientiaid ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm
 
 # Business start date
 business.start-date.title                                       = PDyddiad dechrau’r busnes fel unig fasnachwr
@@ -39,7 +39,6 @@ error.business.start-date.invalid                               = Mae’n rhaid 
 error.business.start-date.day-month-year.max-date               = Ni all y dyddiad fod yn fwy na 7 diwrnod yn y dyfodol
 error.business.start-date.day-month-year.min-date               = Mae’n rhaid i’r dyddiad fod ar neu ar ôl {0}
 error.business.start-date.year.length                           = Mae’n rhaid i’r flwyddyn gynnwys 4 rhif
-###
 
 # Business address confirmation
 individual.business-address-confirmation.heading                = Cadarnhau cyfeiriad busnes
