@@ -17,45 +17,47 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
 import play.api.libs.json._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.DeleteSubscriptionDetailsHttpParser.DeleteSubscriptionDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.GetSelfEmploymentsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.RetrieveReferenceHttpParser.RetrieveReferenceResponse
 
+import java.net.URL
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
-                                               http: HttpClient)
+                                               http: HttpClientV2)
                                               (implicit ec: ExecutionContext) {
 
-  def subscriptionURL(reference: String, id: String): String = {
-    appConfig.protectedMicroServiceUrl + s"/income-tax-subscription/subscription-data/$reference/id/$id"
+  def subscriptionURL(reference: String, id: String): URL = {
+      url"${appConfig.protectedMicroServiceUrl}/income-tax-subscription/subscription-data/$reference/id/$id"
   }
 
-  def retrieveReferenceUrl: String = {
-    appConfig.protectedMicroServiceUrl + "/income-tax-subscription/subscription-data"
+  def retrieveReferenceUrl: URL = {
+    url"${appConfig.protectedMicroServiceUrl}/income-tax-subscription/subscription-data"
   }
 
   def saveSubscriptionDetails[T](reference: String, id: String, data: T)
                                 (implicit hc: HeaderCarrier, writes: Writes[T]): Future[PostSubscriptionDetailsResponse] = {
-    http.POST[JsValue, PostSubscriptionDetailsResponse](subscriptionURL(reference, id), Json.toJson(data))
+    http.post(url"${subscriptionURL(reference, id)}").withBody(Json.toJson(data)).execute[PostSubscriptionDetailsResponse]
   }
 
   def getSubscriptionDetails[T](reference: String, id: String)(implicit hc: HeaderCarrier, reads: Reads[T]): Future[GetSelfEmploymentsResponse[T]] = {
-    http.GET[GetSelfEmploymentsResponse[T]](subscriptionURL(reference, id))
+    http.get(url"${subscriptionURL(reference, id)}").execute[GetSelfEmploymentsResponse[T]]
   }
 
   def retrieveReference(utr: String)(implicit hc: HeaderCarrier): Future[RetrieveReferenceResponse] = {
-    http.POST[JsObject, RetrieveReferenceResponse](retrieveReferenceUrl, Json.obj("utr" -> utr))
+    http.post(url"${retrieveReferenceUrl}").withBody(Json.toJson(Json.obj("utr" -> utr))).execute[RetrieveReferenceResponse]
   }
 
   def deleteSubscriptionDetails(reference: String, key: String)
                                (implicit hc: HeaderCarrier): Future[DeleteSubscriptionDetailsResponse] = {
-    http.DELETE[DeleteSubscriptionDetailsResponse](subscriptionURL(reference, key))
+    http.delete(url"${subscriptionURL(reference, key)}").execute[DeleteSubscriptionDetailsResponse]
   }
 
 }
