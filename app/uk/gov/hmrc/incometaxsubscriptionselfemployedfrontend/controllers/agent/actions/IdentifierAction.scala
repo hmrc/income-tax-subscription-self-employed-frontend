@@ -16,25 +16,22 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions
 
+import play.api.Logging
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
-import play.api.{Configuration, Environment, Logging}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrievalInj
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.ClientDetailsRetrieval
-import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IdentifierAction @Inject()(val authConnector: AuthConnector,
-                                 val parser: BodyParsers.Default,
-                                 val config: Configuration,
-                                 val env: Environment)
+                                 val parser: BodyParsers.Default)
                                 (referenceRetrieval: ReferenceRetrievalInj,
                                  clientDetailsRetrieval: ClientDetailsRetrieval,
                                  appConfig: AppConfig)
@@ -42,7 +39,6 @@ class IdentifierAction @Inject()(val authConnector: AuthConnector,
   extends ActionBuilder[IdentifierRequest, AnyContent]
     with ActionFunction[Request, IdentifierRequest]
     with AuthorisedFunctions
-    with AuthRedirects
     with Logging {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
@@ -60,7 +56,7 @@ class IdentifierAction @Inject()(val authConnector: AuthConnector,
     } recover {
       case _: AuthorisationException =>
         logger.info(s"[Agent][IdentifierAction] - Authorisation exception from auth caught. Redirecting user to login.")
-        toGGLogin(request.path)
+        appConfig.redirectToLogin(request.path)
     }
   }
 }

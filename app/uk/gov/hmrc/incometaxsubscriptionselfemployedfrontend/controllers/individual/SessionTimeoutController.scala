@@ -17,23 +17,18 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual
 
 import play.api.mvc._
-import play.api.{Configuration, Environment}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
 
 @Singleton
-class SessionTimeoutController @Inject()(mcc: MessagesControllerComponents, appConfig: AppConfig)
-                                        (val config: Configuration, val env: Environment) extends FrontendController(mcc) with AuthRedirects {
+class SessionTimeoutController @Inject()(mcc: MessagesControllerComponents, appConfig: AppConfig) extends FrontendController(mcc) {
 
-  val keepAlive: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok.withSession(request.session))
+  val keepAlive: Action[AnyContent] = Action { _ => Ok }
+
+  val timeout: Action[AnyContent] = Action { _ =>
+    appConfig.redirectToLogin(appConfig.incomeTaxSubscriptionFrontendBaseUrl)
   }
 
-  val timeout: Action[AnyContent] = Action.async { _ =>
-    Future.successful(toGGLogin(appConfig.incomeTaxSubscriptionFrontendBaseUrl).withNewSession)
-  }
 }

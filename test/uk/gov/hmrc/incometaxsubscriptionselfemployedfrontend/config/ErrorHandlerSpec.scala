@@ -20,13 +20,15 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.{RequestHeader, Result}
+import play.api.mvc.RequestHeader
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.auth.core.InvalidBearerToken
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.ErrorTemplate
-import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
+
   private val anAgentPath = "/x/y/client/z"
   private val anIndividualPath = "/x/y/z"
   private val individualLoginAddress = "http://a.com/b/c"
@@ -68,21 +70,11 @@ class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
     val config: AppConfig = mock[AppConfig]
     when(config.incomeTaxSubscriptionFrontendBaseUrl).thenReturn("http://a.com/b/c")
 
-    trait AuthRedirectsMock {
-      this: AuthRedirects =>
-      override def toGGLogin(continueUrl: String): Result = {
-        assert(continueUrl === expected)
-        null
-      }
-    }
-
     val errorHandler = new ErrorHandler(
       errorTemplate = view,
       appConfig = config,
       messagesApi = null,
-      config = null,
-      env = null
-    ) with AuthRedirectsMock
+    )
 
     testCode(errorHandler)
   }

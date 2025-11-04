@@ -17,6 +17,8 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
 import play.api.Configuration
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -60,5 +62,19 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   private val govukGuidanceLink: String = servicesConfig.getString("govuk-guidance.url")
   val govukGuidanceITSASignUpIndivLink: String = s"$govukGuidanceLink/sign-up-your-business-for-making-tax-digital-for-income-tax"
   val govukGuidanceITSASignUpAgentLink: String = s"$govukGuidanceLink/sign-up-your-client-for-making-tax-digital-for-income-tax"
+
+  def redirectToLogin(continueUrl: String): Result = {
+    val basGatewayBaseUrl = servicesConfig.getString("bas-gateway-frontend.url")
+    val basGatewaySignInURI = "/bas-gateway/sign-in"
+    val origin = servicesConfig.getString("appName")
+
+    Redirect(
+      url = basGatewayBaseUrl + basGatewaySignInURI,
+      queryStringParams = Map(
+        "continue_url" -> Seq(continueUrl),
+        "origin" -> Seq(origin)
+      )
+    )
+  }
 
 }
