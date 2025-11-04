@@ -63,7 +63,7 @@ class AddressLookupConnector @Inject()(val appConfig: AppConfig,
     if (isEnabled(EnableUseRealAddressLookup)) {
       http.get(url"${getAddressDetailsUrl(id)}").execute[GetAddressLookupDetailsResponse]
     } else {
-      http.get(url"${getAddressDetailsUrl(id)}").execute[GetAddressLookupDetailsResponse]
+      http.get(url"${getStubbedAddressDetailsUrl(id)}").execute[GetAddressLookupDetailsResponse]
     }
 
   }
