@@ -23,7 +23,7 @@
         govukWrapper: GovUkWrapper
 )
 
-@(pageTitle: String, heading: String, message: String, scriptElem: Option[Html] = None)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, heading: String, message: String, scriptElem: Option[Html] = None)(implicit request: RequestHeader, messages: Messages)
 
 @isAgent = @{request.path.contains("/client")}
 
