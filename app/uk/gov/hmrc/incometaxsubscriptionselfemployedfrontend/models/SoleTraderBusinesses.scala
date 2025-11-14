@@ -27,7 +27,7 @@ object SoleTraderBusinesses {
   def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[SoleTraderBusinesses] = {
     implicit val soleTraderBusinessFormat: OFormat[SoleTraderBusiness] = SoleTraderBusiness.encryptedFormat
 
-    (__ \ "businesses").format[Seq[SoleTraderBusiness]].bimap(SoleTraderBusinesses.apply, unlift(SoleTraderBusinesses.unapply))
+    (__ \ "businesses").format[Seq[SoleTraderBusiness]].bimap(SoleTraderBusinesses.apply, _.businesses)
   }
 
 }
