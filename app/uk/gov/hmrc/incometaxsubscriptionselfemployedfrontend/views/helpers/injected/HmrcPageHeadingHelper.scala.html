@@ -19,15 +19,15 @@
 @(params: PageHeading, isSection: Boolean)(implicit messages: Messages)
 @import params._
 
-@visuallyHiddenText =@{
-    if(isSection){
-        <span class="govuk-visually-hidden">{messages("base.section-caption.hidden")}</span>
+@visuallyHiddenText ={
+    @if(isSection){
+        <span class="govuk-visually-hidden">@messages("base.section-caption.hidden")</span>
     }
 }
 
 
-@{section.map{ caption =>
-<h2 class="govuk-caption-l hmrc-caption-l">{visuallyHiddenText}{caption}</h2>
-}}
+@section.map{ caption =>
+    <h2 class="govuk-caption-l hmrc-caption-l">@visuallyHiddenText @caption</h2>
+}
 
 <h1 class=@{headingClasses.getOrElse("govuk-heading-l")}>@text</h1>
