@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import play.api.libs.functional.syntax.unlift
 import play.api.libs.json.{OFormat, __}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 

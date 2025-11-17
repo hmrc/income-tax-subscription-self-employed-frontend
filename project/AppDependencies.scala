@@ -1,6 +1,6 @@
 
 import sbt.*
-import play.sbt.PlayImport._
+import play.sbt.PlayImport.*
 
 object AppDependencies {
 
@@ -12,7 +12,6 @@ object AppDependencies {
   private val cryptoJsonVersion = "8.4.0"
 
   val compile: Seq[ModuleID] = Seq(
-    ws,
     "uk.gov.hmrc" %% "bootstrap-frontend-play-30" % bootstrapVersion,
     "uk.gov.hmrc" %% "play-frontend-hmrc-play-30" % playHmrcFrontendVersion,
     "uk.gov.hmrc" %% "crypto-json-play-30" % cryptoJsonVersion,
