@@ -27,13 +27,15 @@ import play.api.libs.crypto.DefaultCookieSigner
 import play.api.libs.json.{JsString, OFormat}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{StreamlineIncomeSourceForm => IndividualStreamlineIncomeSourceForm, _}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{StreamlineIncomeSourceForm as IndividualStreamlineIncomeSourceForm, *}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_urlEncodedForm
+
 
 import java.time.LocalDate
 
@@ -61,7 +63,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  override lazy val cookieSigner: DefaultCookieSigner = app.injector.instanceOf[DefaultCookieSigner]
+  val cookieSigner: DefaultCookieSigner = app.injector.instanceOf[DefaultCookieSigner]
 
   def config: Map[String, String] = Map(
     "auditing.enabled" -> "false",

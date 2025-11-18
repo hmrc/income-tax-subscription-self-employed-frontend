@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
-import play.api.libs.functional.syntax.unlift
 import play.api.libs.json.{OFormat, __}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
@@ -27,7 +26,7 @@ object SoleTraderBusinesses {
   def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[SoleTraderBusinesses] = {
     implicit val soleTraderBusinessFormat: OFormat[SoleTraderBusiness] = SoleTraderBusiness.encryptedFormat
 
-    (__ \ "businesses").format[Seq[SoleTraderBusiness]].bimap(SoleTraderBusinesses.apply, unlift(SoleTraderBusinesses.unapply))
+    (__ \ "businesses").format[Seq[SoleTraderBusiness]].bimap(SoleTraderBusinesses.apply, _.businesses)
   }
 
 }
