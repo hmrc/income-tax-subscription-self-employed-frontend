@@ -168,7 +168,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   }
 
   object CheckYourAnswersMessages {
-    val caption = "FirstName LastName | ZZ 11 11 11 Z"
+    val caption = "FirstName LastName – ZZ 11 11 11 Z"
     val heading = "Check your answers"
     val para = "Add or change any missing or incorrect details, then confirm that the information is correct."
     val title = "Check your answers - sole trader business"

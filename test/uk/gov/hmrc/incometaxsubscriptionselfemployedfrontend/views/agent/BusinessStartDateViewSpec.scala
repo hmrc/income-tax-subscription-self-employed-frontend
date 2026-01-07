@@ -30,7 +30,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
     val title: String = "Start date for sole trader business"
-    val caption = "FirstName LastName | ZZ 11 11 11 Z"
+    val caption = "FirstName LastName – ZZ 11 11 11 Z"
 
     def heading(trade: String): String = s"Start date for $trade"
 

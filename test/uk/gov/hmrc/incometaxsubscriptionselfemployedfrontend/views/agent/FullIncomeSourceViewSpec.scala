@@ -151,7 +151,7 @@ class FullIncomeSourceViewSpec extends ViewSpec {
 
   object FullIncomeSourceMessages {
 
-    def caption(name: String, nino: String): String = s"$name | $nino"
+    def caption(name: String, nino: String): String = s"$name – $nino"
 
     val heading = "Your client’s sole trader business"
 
