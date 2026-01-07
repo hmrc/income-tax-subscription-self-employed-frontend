@@ -99,7 +99,7 @@ self-employed-cya.para                                          = Add or change 
 # Agent Business start date
 business.agent.start-date.title                                 = Start date for sole trader business
 business.agent.start-date.heading                               = Start date for {0}
-business.agent.start-date.caption                               = {0} | {1}
+business.agent.start-date.caption                               = {0} – {1}
 business.agent.start-date.para                                  = We need to know the exact start date.
 business.agent.start-date.hint                                  = For example, 27 9 {0}
 agent.error.business-start-date.empty                           = Enter the date your client’s business started trading
@@ -112,7 +112,7 @@ agent.error.business-start-date.year.length                     = Year must incl
 
 #Agent Business Address Confirmation
 agent.business-address-confirmation.heading                     = Confirm business address
-agent.business-address-confirmation.heading.caption             = {0} | {1}
+agent.business-address-confirmation.heading.caption             = {0} – {1}
 agent.business-address-confirmation.para                        = Does this business have the same address as the first one you added?
 agent.business-address-confirmation.summary.address             = Address
 agent.business-address-confirmation.form.heading                = Is this address correct?
@@ -144,7 +144,7 @@ agent.self-employed-cya.business-address.change                 = Change address
 agent.self-employed-cya.business-address.add                    = Add address
 agent.self-employed-cya.title                                   = Check your answers - sole trader business
 agent.self-employed-cya.heading                                 = Check your answers
-agent.self-employed-cya.caption                                 = {0} | {1}
+agent.self-employed-cya.caption                                 = {0} – {1}
 agent.self-employed-cya.para                                    = Add or change any missing or incorrect details, then confirm that the information is correct.
 
 # Self Employed CYA
@@ -155,7 +155,7 @@ agent.self-employed-cya.trading-start-date.change.streamline    = Change start d
 agent.self-employed-cya.business-address.streamline             = Address
 
 agent.full-income-source.heading                                     = Your client’s sole trader business
-agent.full-income-source.caption                                     = {0} | {1}
+agent.full-income-source.caption                                     = {0} – {1}
 agent.full-income-source.trade.label                                 = What is the trade of your client’s business?
 agent.full-income-source.trade.hint                                  = For example plumbing, electrical work or hairdressing.
 agent.full-income-source.name.label                                  = What is the name of your client’s business?
