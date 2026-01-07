@@ -64,7 +64,7 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
 
   object BusinessAddressConfirmationMessages {
     val heading: String = "Confirm business address"
-    val caption: String = "FirstName LastName | ZZ 11 11 11 Z"
+    val caption: String = "FirstName LastName – ZZ 11 11 11 Z"
     val para: String = "Does this business have the same address as the first one you added?"
 
     object Summary {

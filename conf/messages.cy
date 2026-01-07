@@ -99,7 +99,7 @@ self-employed-cya.para                                          = Ychwanegu neu 
 # Agent Business start date
 business.agent.start-date.title                                 = Dyddiad dechrau’r busnes fel unig fasnachwr
 business.agent.start-date.heading                               = Dyddiad dechrau ar gyfer {0}
-business.agent.start-date.caption                               = {0} | {1}
+business.agent.start-date.caption                               = {0} – {1}
 business.agent.start-date.para                                  = Mae angen i ni wybod yr union ddyddiad dechrau.
 business.agent.start-date.hint                                  = Er enghraifft, 27 9 {0}
 agent.error.business-start-date.empty                           = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
@@ -112,7 +112,7 @@ agent.error.business-start-date.year.length                     = Mae’n rhaid 
 
 #Agent Business Address Confirmation
 agent.business-address-confirmation.heading                     = adarnhau cyfeiriad busnes
-agent.business-address-confirmation.heading.caption             = {0} | {1}
+agent.business-address-confirmation.heading.caption             = {0} – {1}
 agent.business-address-confirmation.para                        = A yw enw masnachu busnes eich cleient yr un peth â’r enw cyntaf i chi ei ychwanegu?
 agent.business-address-confirmation.summary.address             = Cyfeiriad
 agent.business-address-confirmation.form.heading                = A yw’r cyfeiriad hwn yn gywir?
@@ -155,7 +155,7 @@ agent.self-employed-cya.trading-start-date.change.streamline    = Newid y dyddia
 agent.self-employed-cya.business-address.streamline             = Cyfeiriad
 
 agent.full-income-source.heading                                     = Busnes unig fasnachwr eich cleient
-agent.full-income-source.caption                                     = {0} | {1}
+agent.full-income-source.caption                                     = {0} – {1}
 agent.full-income-source.trade.label                                 = Beth yw masnach busnes eich cleient?
 agent.full-income-source.trade.hint                                  = Er enghraifft plymio, gwaith trydanol neu drin gwallt
 agent.full-income-source.name.label                                  = Beth yw enw busnes eich cleient?
