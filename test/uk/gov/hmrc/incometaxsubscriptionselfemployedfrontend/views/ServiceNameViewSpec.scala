@@ -50,8 +50,8 @@ class ServiceNameViewSpec extends ViewSpec {
       ) {
         val serviceName = "Sign up for Making Tax Digital for Income Tax"
         val serviceUrl: String = appConfig.govukGuidanceITSASignUpIndivLink
-        document.getElementsByClass("govuk-header__service-name").text() mustBe serviceName
-        document.getElementsByClass("govuk-header__service-name").attr("href") mustBe serviceUrl
+        document.getElementsByClass("govuk-service-navigation__link").text().startsWith(serviceName) mustBe true
+        document.getElementsByClass("govuk-service-navigation__link").attr("href") mustBe serviceUrl
       }
 
       "passing in an agent service name" in new Setup(
@@ -60,8 +60,8 @@ class ServiceNameViewSpec extends ViewSpec {
       ) {
         val serviceName = "Sign up your clients for Making Tax Digital for Income Tax"
         val serviceUrl: String = appConfig.govukGuidanceITSASignUpAgentLink
-        document.getElementsByClass("govuk-header__service-name").text() mustBe serviceName
-        document.getElementsByClass("govuk-header__service-name").attr("href") mustBe serviceUrl
+        document.getElementsByClass("govuk-service-navigation__link").text().startsWith(serviceName) mustBe true
+        document.getElementsByClass("govuk-service-navigation__link").attr("href") mustBe serviceUrl
       }
     }
   }
