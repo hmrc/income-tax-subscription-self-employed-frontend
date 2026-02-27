@@ -99,14 +99,8 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       selectSeq(selector).headOption
     }
 
-
     def selectSeq(selector: String): Seq[Element] = {
-      val seq = element.select(selector).asScala.toSeq
-      seq.headOption.map(_.id()) match {
-        case Some("_back1") => seq.tail
-        case Some("_back2") => seq.tail
-        case _ => seq
-      }
+      element.select(selector).asScala.toSeq
     }
 
     def selectNth(selector: String, nth: Int): Element = {
