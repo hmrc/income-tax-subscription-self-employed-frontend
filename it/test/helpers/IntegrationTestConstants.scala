@@ -88,6 +88,7 @@ object IntegrationTestConstants {
     )
   )
 
+  //scalastyle:off
   def testAddressLookupConfig(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
     val referrerUrl = referrerUrlMaybe.getOrElse(referrerPath + "%3F" + referrerQueryString)
     val accessibilityFooterUrl = s"http://localhost:12346/accessibility-statement/income-tax-sign-up?referrerUrl=$referrerUrl"
@@ -171,6 +172,7 @@ object IntegrationTestConstants {
        |}""".stripMargin
   }
 
+  //scalastyle:off
   def testAddressLookupConfigClient(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
     val referrerUrl = referrerUrlMaybe.getOrElse(referrerPath + "%3F" + referrerQueryString)
     val accessibilityFooterUrl = s"http://localhost:12346/accessibility-statement/income-tax-sign-up?referrerUrl=$referrerUrl"
