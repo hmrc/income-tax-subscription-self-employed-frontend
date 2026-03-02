@@ -34,6 +34,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
     Json.obj(
       "version" -> 2,
       "options" -> Json.obj(
+        "manualAddressEntryConfig" -> manualAddressEntryConfig,
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
         "includeHMRCBranding" -> true,
@@ -112,6 +113,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
     Json.obj(
       "version" -> 2,
       "options" -> Json.obj(
+        "manualAddressEntryConfig" -> manualAddressEntryConfig,
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
         "includeHMRCBranding" -> true,
@@ -181,4 +183,14 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       )
     )
   }
+
+  private val maxLength = 35
+
+  private val manualAddressEntryConfig = Json.obj(
+    "line1MaxLength" -> maxLength,
+    "line2MaxLength" -> maxLength,
+    "line3MaxLength" -> maxLength,
+    "townMaxLength" -> maxLength,
+    "showOrganisationName" -> false
+  )
 }

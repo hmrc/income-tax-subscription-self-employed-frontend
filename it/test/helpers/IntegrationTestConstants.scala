@@ -94,6 +94,13 @@ object IntegrationTestConstants {
     s"""{
        |  "version": 2,
        |  "options": {
+       |    "manualAddressEntryConfig": {
+       |      "line1MaxLength": 35,
+       |      "line2MaxLength": 35,
+       |      "line3MaxLength": 35,
+       |      "townMaxLength": 35,
+       |      "showOrganisationName": false
+       |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
@@ -170,6 +177,13 @@ object IntegrationTestConstants {
     s"""{
        |  "version": 2,
        |  "options": {
+       |    "manualAddressEntryConfig": {
+       |      "line1MaxLength": 35,
+       |      "line2MaxLength": 35,
+       |      "line3MaxLength": 35,
+       |      "townMaxLength": 35,
+       |      "showOrganisationName": false
+       |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
