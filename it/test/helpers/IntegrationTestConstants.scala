@@ -99,8 +99,7 @@ object IntegrationTestConstants {
        |      "line1MaxLength": 35,
        |      "line2MaxLength": 35,
        |      "line3MaxLength": 35,
-       |      "townMaxLength": 35,
-       |      "showOrganisationName": false
+       |      "townMaxLength": 35
        |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
@@ -183,8 +182,7 @@ object IntegrationTestConstants {
        |      "line1MaxLength": 35,
        |      "line2MaxLength": 35,
        |      "line3MaxLength": 35,
-       |      "townMaxLength": 35,
-       |      "showOrganisationName": false
+       |      "townMaxLength": 35
        |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,

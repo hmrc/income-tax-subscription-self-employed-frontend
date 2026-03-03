@@ -190,7 +190,6 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
     "line1MaxLength" -> maxLength,
     "line2MaxLength" -> maxLength,
     "line3MaxLength" -> maxLength,
-    "townMaxLength" -> maxLength,
-    "showOrganisationName" -> false
+    "townMaxLength" -> maxLength
   )
 }
