@@ -138,7 +138,7 @@ object IntegrationTestConstants {
        |      "editPageLabels": {
        |        "title": "Enter business address",
        |        "heading": "Enter business address",
-       |        "postcodeLabel":"Postcode (optional)"
+       |        "postcodeLabel":"Postcode"
        |      },
        |      "confirmPageLabels": {
        |        "title": "Confirm business address",
@@ -160,7 +160,7 @@ object IntegrationTestConstants {
        |      "editPageLabels": {
        |        "title": "Rhowch gyfeiriad busnes",
        |        "heading": "Rhowch gyfeiriad busnes",
-       |        "postcodeLabel":"Cod post (dewisol)"
+       |        "postcodeLabel":"Cod post"
        |      },
        |      "confirmPageLabels": {
        |        "title": "Cadarnhau cyfeiriad busnes",

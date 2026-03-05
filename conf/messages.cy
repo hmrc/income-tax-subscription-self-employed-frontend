@@ -55,7 +55,7 @@ address-lookup.lookup-page.title                                = Beth yw cyfeir
 address-lookup.lookup-page.heading                              = Beth yw cyfeiriad eich busnes?
 address-lookup.edit-page.title                                  = Rhowch gyfeiriad busnes
 address-lookup.edit-page.heading                                = Rhowch gyfeiriad busnes
-address-lookup.edit-page.postcode-label                         = Cod post (dewisol)
+address-lookup.edit-page.postcode-label                         = Cod post
 address-lookup.confirm-page.title                               = Cadarnhau cyfeiriad busnes
 address-lookup.confirm-page.heading                             = Cadarnhau cyfeiriad busnes
 
