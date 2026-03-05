@@ -1,4 +1,5 @@
 ## Base ##
+base.back                                                       = Yn ôl
 base.service-name                                               = Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm
 base.continue                                                   = Yn eich blaen
 base.update                                                     = Diweddaru

@@ -1,4 +1,5 @@
 ## Base ##
+base.back                                                       = Back
 base.service-name                                               = Sign up for Making Tax Digital for Income Tax
 base.continue                                                   = Continue
 base.update                                                     = Update
