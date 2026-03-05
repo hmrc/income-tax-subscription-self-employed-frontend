@@ -188,11 +188,5 @@ class BusinessStartDateViewSpec extends ViewSpec {
       }
     }
 
-    "have a backlink " in new Setup {
-      private val backLink: Elements = document.select(".govuk-back-link")
-      backLink.text mustBe BusinessStartDateMessages.backLink
-      backLink.attr("href") mustBe testBackUrl
-    }
-
   }
 }

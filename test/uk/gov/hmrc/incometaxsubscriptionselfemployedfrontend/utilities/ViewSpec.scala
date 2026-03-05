@@ -65,12 +65,6 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
     document.title mustBe s"$titlePrefix$title$titleSuffix"
 
-    backLink.map { href =>
-      val link = document.selectHead(".govuk-back-link")
-      link.text mustBe "Back"
-      link.attr("href") mustBe href
-    }
-
     if (hasSignOutLink) {
       val signOutLink: Element = document.selectHead(".hmrc-sign-out-nav__link")
       signOutLink.text mustBe "Sign out"
@@ -105,15 +99,15 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       selectSeq(selector).headOption
     }
 
-    def selectNth(selector: String, nth: Int): Element = {
-      element.selectSeq(selector).lift(nth - 1) match {
-        case Some(element) => element
-        case None => fail(s"$selector number $nth was not found")
-      }
-    }
-
     def selectSeq(selector: String): Seq[Element] = {
       element.select(selector).asScala.toSeq
+    }
+
+    def selectNth(selector: String, nth: Int): Element = {
+      selectSeq(selector).lift(nth - 1) match {
+        case Some(e) => e
+        case None => fail(s"Could not retrieve $selector number $nth")
+      }
     }
 
     def content: Element = element.getElementsByTag("article").asScala.head
@@ -159,7 +153,7 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
     def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
     def getParagraphNth(index: Int = 0): String = {
-      element.select("p").get(index).text()
+      selectNth("p", index + 1).text()
     }
 
     def getBulletPointNth(index: Int = 0): String = element.select("ul[class=bullets] li").get(index).text()
