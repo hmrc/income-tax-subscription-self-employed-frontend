@@ -56,7 +56,7 @@ address-lookup.lookup-page.title                                = What is your b
 address-lookup.lookup-page.heading                              = What is your business address?
 address-lookup.edit-page.title                                  = Enter business address
 address-lookup.edit-page.heading                                = Enter business address
-address-lookup.edit-page.postcode-label                         = Postcode (optional)
+address-lookup.edit-page.postcode-label                         = Postcode
 address-lookup.confirm-page.title                               = Confirm business address
 address-lookup.confirm-page.heading                             = Confirm business address
 
