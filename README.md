@@ -50,7 +50,15 @@ Scala/Play frontend web UI that provides screens for an existing SA Individual t
 * Run unit tests: `sbt clean test`
 * Run integration tests: `sbt clean it/test`
 * Run performance tests: provided in the repo [income-tax-subscription-performance-tests](https://github.com/hmrc/income-tax-subscription-performance-tests)
-* Run acceptance tests: provided in the repo [income-tax-subscription-acceptance-tests](https://github.com/hmrc/income-tax-subscription-acceptance-tests)
+* Run acceptance tests: provided in the repo [income-tax-subscription-journey-tests](https://github.com/hmrc/income-tax-subscription-journey-tests)
++ Manual test with address lookup service
+  - In `application.conf`, set the following feature switch to `true`:\
+    `enable-use-real-AL`\
+    (Do not commit this change)
+  - Run Address Lookup:\
+    `sm2 --start ADDRESS_LOOKUP_SERVICES`
+  - Start the service:\
+    `./scripts/start`
 
 # Persistence
 
