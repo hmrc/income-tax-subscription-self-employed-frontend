@@ -27,6 +27,6 @@ object TestModels {
 
   val mockBusinessNameModel: String = "ITSA me, Mario"
 
-  val testValidBusinessAddressModel: Address = Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
+  val testValidBusinessAddressModel: Address = Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"), country = Country.UK)
 
 }

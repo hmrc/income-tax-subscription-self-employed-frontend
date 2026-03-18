@@ -19,8 +19,8 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.address
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.*
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestTrait
 
 class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
@@ -30,7 +30,14 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
   val testUri = "/"
 
   val testValidJson: JsObject = Json.obj(
-    "address" -> Json.obj("lines" -> Seq("line1", "line2", "line3"), "postcode" -> Some("TF3 4NT"))
+    "address" -> Json.obj(
+      "lines" -> Seq("line1", "line2", "line3"),
+      "postcode" -> Some("TF3 4NT"),
+      "country" -> Json.obj(
+        "code" -> Country.UK.code,
+        "name" -> Country.UK.name
+      )
+    )
   )
 
   "GetAddressLookupDetailsHttpReads" when {
@@ -41,7 +48,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
         res mustBe Right(Some(
-          Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"))
+          Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"), country = Country.UK)
         ))
       }
       "parse an incorrectly formatted Ok response as an invalid Json" in {

@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
@@ -49,7 +49,8 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       "1 Long Road",
       "Lonely town"
     ),
-    Some("ZZ11ZZ")
+    Some("ZZ11ZZ"),
+    Country.UK
   )
   val fakeRequestWithName: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(ITSASessionKeys.FullNameSessionKey -> name)
 

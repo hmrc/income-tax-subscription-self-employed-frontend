@@ -22,9 +22,9 @@ import play.api.data.FormError
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessAddressConfirmation
 
@@ -37,7 +37,8 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
       "1 Long Road",
       "Lonely Town"
     ),
-    Some("ZZ11ZZ")
+    Some("ZZ11ZZ"),
+    Country.UK
   )
 
   def page(hasFormError: Boolean = false): Html = {

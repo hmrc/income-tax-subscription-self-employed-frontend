@@ -19,15 +19,15 @@ package controllers.agent
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
+import helpers.IntegrationTestConstants.*
 import helpers.servicemocks.AuthStub.stubAuthSuccess
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, No, SoleTraderBusiness, Yes}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country, No, SoleTraderBusiness, Yes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with FeatureSwitching {
@@ -39,7 +39,8 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "1 Long Road",
       "Lonely Town"
     ),
-    Some("ZZ1 1ZZ")
+    Some("ZZ1 1ZZ"),
+    Country.UK
   )
   val testNino: String = "test-nino"
 

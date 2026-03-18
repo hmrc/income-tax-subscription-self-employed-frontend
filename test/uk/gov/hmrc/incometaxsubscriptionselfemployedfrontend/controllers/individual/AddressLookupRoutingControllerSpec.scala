@@ -17,16 +17,16 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual
 
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks.MockAddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.{PostAddressLookupSuccessResponse, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.*
 
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
@@ -58,7 +58,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   private val redirectUrl = "http://testLocation?id=" + addressId
 
   val testAddress: Address = Address(
-    lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ")
+    lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"), country = Country.UK
   )
 
   "checkAddressLookupJourney" when {

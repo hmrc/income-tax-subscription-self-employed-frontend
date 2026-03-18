@@ -41,7 +41,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     businessStartDate = Some(DateModel("1", "1", "2018")),
     businessName = Some(s"ABC Limited"),
     businessTradeName = Some(s"Plumbing"),
-    businessAddress = Some(Address(Seq(s"line 1"), Some("TF3 4NT")))
+    businessAddress = Some(Address(Seq(s"line 1"), Some("TF3 4NT"), Country.UK))
   )
 
   val emptySelfEmploymentsCYAModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(
@@ -96,7 +96,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
               tradeRow(Some("Plumbing")),
               nameRow(Some("ABC Limited")),
               startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-              addressRow(Some("line 1 TF3 4NT"))
+              addressRow(Some("line 1 TF3 4NT United Kingdom"))
             )
           )
         }
@@ -118,7 +118,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
               tradeRow(Some("Plumbing"), globalEditMode = true),
               nameRow(Some("ABC Limited"), globalEditMode = true),
               startDateRow(Some(CheckYourAnswersMessages.startDateBeforeLimitLabel), globalEditMode = true),
-              addressRow(Some("line 1 TF3 4NT"), globalEditMode = true)
+              addressRow(Some("line 1 TF3 4NT United Kingdom"), globalEditMode = true)
             )
           )
         }
@@ -139,7 +139,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             tradeRow(Some("Plumbing")),
             nameRow(Some("ABC Limited")),
             startDateRow(value = Some(CheckYourAnswersMessages.startDateBeforeLimitLabel)),
-            addressRow(Some("line 1 TF3 4NT"))
+            addressRow(Some("line 1 TF3 4NT United Kingdom"))
           )
         )
       }
@@ -149,7 +149,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
             tradeRow(Some("Plumbing")),
             nameRow(Some("ABC Limited")),
             startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyy")))),
-            addressRow(Some("line 1 TF3 4NT"))
+            addressRow(Some("line 1 TF3 4NT United Kingdom"))
           )
         )
       }
