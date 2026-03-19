@@ -62,7 +62,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
     authService.authorised() {
       handleForm(id)(
         onYes = Redirect(routes.SelfEmployedCYAController.show(id)),
-        onNo = Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id))
+        onNo = Redirect(routes.UkAddressConfirmationController.show(id))
       )
     }
   }
@@ -113,7 +113,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
         throw new InternalServerException("[BusinessAddressConfirmationController][withFirstBusiness] - Unable to retrieve businesses")
       ) match {
         case Some(address) => onSuccessfulRetrieval(address)
-        case None => Future.successful(Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)))
+        case None => Future.successful(Redirect(routes.UkAddressConfirmationController.show(id)))
       }
     }
   }

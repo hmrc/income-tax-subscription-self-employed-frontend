@@ -58,7 +58,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       addressLookupConnector.initialiseAddressLookup(
         continueUrl = addressLookupContinueUrl(businessId, isEditMode, isGlobalEdit),

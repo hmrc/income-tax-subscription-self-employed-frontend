@@ -1,0 +1,92 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
+
+import play.api.data.Form
+import play.api.i18n.I18nSupport
+import play.api.mvc.*
+import play.twirl.api.Html
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.UkAddressConfirmationForm
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
+@Singleton
+class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponents,
+                                                clientDetailsRetrieval: ClientDetailsRetrieval,
+                                                authService: AuthService,
+                                                multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
+                                                ukAddressConfirmation: UkAddressConfirmation)
+                                               (val sessionDataService: SessionDataService,
+                                                val appConfig: AppConfig)
+                                               (implicit val ec: ExecutionContext)
+  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
+
+  val confirmationForm: Form[YesNo] = UkAddressConfirmationForm.businessAddressConfirmationForm
+
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
+    authService.authorised() {
+      withAgentReference { reference =>
+        clientDetailsRetrieval.getClientDetails flatMap { clientDetails =>
+          multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
+            case Right(business) => Ok(view(confirmationForm, id, business.map(_.name.getOrElse("")).getOrElse(""), clientDetails, isEditMode, isGlobalEdit))
+            case _ => throw new Exception("Cannot get business name")
+          }
+        }
+      }
+    }
+  }
+
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
+    authService.authorised() {
+      clientDetailsRetrieval.getClientDetails flatMap { clientDetails =>
+        handleForm(id, clientDetails, isEditMode, isGlobalEdit)
+      }
+    }
+  }
+
+  private def view(form: Form[YesNo], id: String, name: String, clientDetails: ClientDetails, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[AnyContent]): Html = {
+    ukAddressConfirmation(
+      confirmationForm = form,
+      name = name,
+      postAction = routes.UkAddressConfirmationController.submit(id, isEditMode, isGlobalEdit),
+      clientDetails = clientDetails
+    )
+  }
+
+  private def handleForm(id: String, clientDetails: ClientDetails, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[AnyContent]): Future[Result] = {
+    confirmationForm.bindFromRequest().fold(
+      hasError =>
+        withAgentReference { reference =>
+          multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
+            case Right(business) => BadRequest(view(hasError, id, business.map(_.name.getOrElse("")).getOrElse(""), clientDetails, isEditMode, isGlobalEdit))
+            case _ => throw new Exception("Cannot get business name")
+          }
+        },
+      answer => Future.successful(
+        Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, answer.equals(Yes), isEditMode, isGlobalEdit))
+      )
+    )
+  }
+}

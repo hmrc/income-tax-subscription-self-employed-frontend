@@ -2,30 +2,34 @@
 ->         /hmrc-frontend                                                                hmrcfrontend.Routes
 
 # Initialiser
-GET         /details                                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.InitialiseController.initialise
+GET         /details                                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.InitialiseController.initialise
 
 # Date Of Commencement Page
-GET         /details/business-start-date               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST        /details/business-start-date               uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET         /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+POST        /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
 # Full Income Source
-GET         /details/sole-trader-business              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FullIncomeSourceController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST        /details/sole-trader-business              uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FullIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET         /details/sole-trader-business                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FullIncomeSourceController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+POST        /details/sole-trader-business                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.FullIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
 # Duplicate details page
-GET         /details/error/duplicate-details           uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DuplicateDetailsController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET         /details/error/duplicate-details             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.DuplicateDetailsController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
 #Address Lookup routing
-GET         /address-lookup-check/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.checkAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
-GET         /address-lookup-initialise/:businessId     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-GET         /details/address-lookup/:businessId        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET         /address-lookup-check/:businessId            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.checkAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
+GET         /address-lookup-initialise/:businessId/:isUk uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET         /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
-GET         /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit:Boolean ?= false)
-POST        /details/business-check-your-answers       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.submit(id: String, isGlobalEdit:Boolean ?= false)
+GET         /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit:Boolean ?= false)
+POST        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.submit(id: String, isGlobalEdit:Boolean ?= false)
 
-GET        /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.show(id: String)
-POST       /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.submit(id: String)
+GET         /details/confirm-business-address             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.show(id: String)
+POST        /details/confirm-business-address             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.submit(id: String)
 
 #Session timeout
-GET         /keep-alive                                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.keepAlive
-GET         /timeout                                   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.timeout
+GET         /keep-alive                                  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.keepAlive
+GET         /timeout                                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.timeout
+
+#UK Address
+GET         /UK-foreign-business                         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.UkAddressConfirmationController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+POST        /UK-foreign-business                         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.UkAddressConfirmationController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)

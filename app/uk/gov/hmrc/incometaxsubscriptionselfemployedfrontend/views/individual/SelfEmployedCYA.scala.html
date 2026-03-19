@@ -118,7 +118,7 @@
     simpleSummaryListRow(
         key = messages("self-employed-cya.business-address"),
         value = businessAddress.map(_.toString),
-        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.UkAddressConfirmationController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
         id = businessId,
         htmlValue = true
     )

@@ -17,7 +17,7 @@ GET        /details/confirm-business-address            uk.gov.hmrc.incometaxsub
 POST       /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAddressConfirmationController.submit(id: String)
 
 GET        /address-lookup-check/:businessId            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.checkAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
-GET        /address-lookup-initialise/:businessId       uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET        /address-lookup-initialise/:businessId/:isUk uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 GET        /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
 GET        /details/sole-trader-business                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.FullIncomeSourceController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
@@ -29,3 +29,7 @@ GET        /logout                                      uk.gov.hmrc.incometaxsub
 
 GET        /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.keepAlive
 GET        /timeout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.timeout
+
+#UK Address
+GET        /UK-foreign-business                        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.UkAddressConfirmationController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+POST       /UK-foreign-business                        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.UkAddressConfirmationController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)

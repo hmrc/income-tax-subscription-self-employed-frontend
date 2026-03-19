@@ -197,3 +197,17 @@ agent.duplicate-details.options.lead-in                    = Gallwch wneud y can
 agent.duplicate-details.options.change-original-entry      = newid y cofnod gwreiddiol
 agent.duplicate-details.options.add-different-business     = ychwanegu busnes unig fasnachwr gwahanol
 agent.duplicate-details.options.return-to-income-sources   = ewch i’r rhestr o ffynonellau incwm eich cleient
+
+# Individual UK Address Confirmation
+individual.uk-address-confirmation.heading                 =
+individual.uk-address-confirmation.heading.caption         = Sole trader
+individual.uk-address-confirmation.para                    = Is the address for your business, {0} in the UK?
+individual.uk-address-confirmation.form.heading            =
+error.individual.uk-address-confirmation.empty             = Select if business address is in the UK
+
+# Agent UK Address Confirmation
+agent.uk-address-confirmation.heading                      =
+agent.uk-address-confirmation.heading.caption              = {0} – {1}
+agent.uk-address-confirmation.para                         = Is the address for your client’s business, {0} in the UK?
+agent.uk-address-confirmation.form.heading                 =
+error.agent.uk-address-confirmation.empty                  = Select if business address is in the UK

@@ -1,0 +1,70 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.YesNo
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper, PageHeadingHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
+
+@this(
+    mainTemplate: PrincipalMainTemplate,
+    form: FormWithCSRF,
+    continueButton: ContinueButton,
+    saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
+    radioHelper: RadioHelper,
+    pageHeadingHelper: PageHeadingHelper
+)
+
+@(confirmationForm: Form[YesNo], postAction: Call, name: String)(implicit request: Request[_], messages: Messages)
+
+@mainTemplate(title = messages("individual.uk-address-confirmation.heading"), optForm = Some(confirmationForm)) {
+
+    @pageHeadingHelper(
+        heading = messages("individual.uk-address-confirmation.heading"),
+        caption = messages("individual.uk-address-confirmation.heading.caption"),
+        isSection = true
+    )
+
+    <p class="govuk-body">@messages("individual.uk-address-confirmation.para", name)</p>
+
+    @yesNoFormAndButtons()
+
+}
+
+@yesNoFormAndButtons() = {
+    @form(action = postAction) {
+        @radioHelper(
+            field = confirmationForm(BusinessAddressConfirmationForm.fieldName),
+            legend = messages("individual.uk-address-confirmation.form.heading"),
+            isPageHeading = false,
+            customHeadingClass = Some("govuk-!-font-weight-bold"),
+            radioItems = Seq(
+                RadioItem(
+                    content = Text(messages("base.yes")),
+                    value = Some(YesNoMapping.option_yes)
+                ),
+                RadioItem(
+                    content = Text(messages("base.no")),
+                    value = Some(YesNoMapping.option_no)
+                )
+            ),
+            inline = true
+        )
+
+        @saveAndContinueButtonHelper(individual = true, saveAndReturnReference = Some("uk-address-confirmation"))
+    }
+}
