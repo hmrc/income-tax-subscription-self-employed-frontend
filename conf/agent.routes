@@ -23,8 +23,8 @@ GET         /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsu
 GET         /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit:Boolean ?= false)
 POST        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.submit(id: String, isGlobalEdit:Boolean ?= false)
 
-GET         /details/confirm-business-address             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.show(id: String)
-POST        /details/confirm-business-address             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.submit(id: String)
+GET         /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.show(id: String)
+POST        /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.submit(id: String)
 
 #Session timeout
 GET         /keep-alive                                  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.keepAlive
