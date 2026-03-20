@@ -78,7 +78,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
 
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(ClientBusinessAddressInitialiseUri)
+          redirectURI(clientUkAddressConfirmation(id))
         )
       }
     }
@@ -146,7 +146,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
 
           res must have(
             httpStatus(SEE_OTHER),
-            redirectURI(ClientBusinessAddressInitialiseUri)
+            redirectURI(clientUkAddressConfirmation(id))
           )
         }
       }

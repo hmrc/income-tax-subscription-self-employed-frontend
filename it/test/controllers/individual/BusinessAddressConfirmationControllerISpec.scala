@@ -58,7 +58,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
 
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(businessAddressInitialiseUri(id))
+          redirectURI(ukAddressConfirmation(id))
         )
       }
     }
@@ -105,7 +105,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
 
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(businessAddressInitialiseUri(id))
+          redirectURI(ukAddressConfirmation(id))
         )
       }
       "the user selects their business address is not the same as presented" in {
@@ -118,7 +118,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
 
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(businessAddressInitialiseUri(id))
+          redirectURI(ukAddressConfirmation(id))
         )
       }
     }

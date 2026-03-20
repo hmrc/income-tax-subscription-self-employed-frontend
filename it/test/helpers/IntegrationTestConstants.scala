@@ -52,6 +52,10 @@ object IntegrationTestConstants {
   val ggSignOutURI = s"/bas-gateway/sign-out-without-state"
 
   def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
+  
+  def ukAddressConfirmation(id: String): String = s"$baseURI/UK-foreign-business?id=$id"
+
+  def clientUkAddressConfirmation(id: String): String = s"$baseURI/client/UK-foreign-business?id=$id"
 
   def businessAddressCheckUri(itsaId: String): String = s"$baseURI/address-lookup-check/$itsaId"
 

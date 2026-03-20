@@ -51,7 +51,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         case Right(Some(_)) =>
           Redirect(routes.BusinessAddressConfirmationController.show(businessId))
         case Right(_) =>
-          Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode))
+          Redirect(routes.UkAddressConfirmationController.show(businessId, isEditMode))
         case Left(_) =>
           throw new InternalServerException("[AddressLookupRoutingController][checkAddressLookupJourney] - Error when retrieving any address")
       }

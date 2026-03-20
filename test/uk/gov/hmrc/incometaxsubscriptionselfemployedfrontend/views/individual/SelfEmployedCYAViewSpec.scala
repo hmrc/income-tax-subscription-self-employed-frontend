@@ -205,7 +205,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     value = value,
     actions = Seq(
       SummaryListActionValues(
-        href = routes.AddressLookupRoutingController.initialiseAddressLookupJourney(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
+        href = routes.UkAddressConfirmationController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
         text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + CheckYourAnswersMessages.businessAddress,
         visuallyHidden = CheckYourAnswersMessages.businessAddress
       )

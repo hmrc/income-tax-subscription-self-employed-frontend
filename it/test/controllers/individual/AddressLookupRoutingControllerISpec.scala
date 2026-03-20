@@ -47,7 +47,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
 
   private val clientOrIndividual = "" // if this were the client version, we would have /client here, but individual gets nothing.
 
-  def getAddressLookupInitialiseResponse(itsaId: String): WSResponse = getAddressLookupInitialise(itsaId): WSResponse
+  def getAddressLookupInitialiseResponse(itsaId: String, isUk: Boolean): WSResponse = getAddressLookupInitialise(itsaId, isUk): WSResponse
 
   def getAddressLookupResponse(itsaId: String, id: String, isEditMode: Boolean): WSResponse = getAddressLookup(itsaId, id, isEditMode)
 
@@ -64,19 +64,22 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           Given("I setup the Wiremock stubs")
           val continueUrl = s"http://localhost:9563$baseUrl$clientOrIndividual/details/address-lookup/" + id
           stubAuthSuccess()
-          val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id", "UTF8")
-          stubInitializeAddressLookup(Json.parse(
-            testConfig(continueUrl, Some(referrerUrl))
-          ))(s"$continueUrl?id=$id", ACCEPTED)
 
-          When(s"GET $clientOrIndividual$addressLookupInitialise/$id is called")
-          val res = getAddressLookupInitialiseResponse(id)
+          Seq(false, true).foreach { isUk =>
+            val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id/$isUk", "UTF8")
+            stubInitializeAddressLookup(Json.parse(
+              testConfig(continueUrl, Some(referrerUrl))
+            ))(s"$continueUrl?id=$id", ACCEPTED)
+            
+            When(s"GET $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
+            val res = getAddressLookupInitialiseResponse(id, isUk)
 
-          Then("should return an SEE_OTHER with Address lookup location")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(s"$continueUrl?id=$id")
-          )
+            Then("should return an SEE_OTHER with Address lookup location")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(s"$continueUrl?id=$id")
+            )
+          }
         }
       }
     }
@@ -115,19 +118,22 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           Given("I setup the Wiremock stubs")
           val continueUrl = s"http://localhost:9563$baseUrl$clientOrIndividual/details/address-lookup/" + id
           stubAuthSuccess()
-          val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id", "UTF8")
-          stubInitializeAddressLookup(Json.parse(
-            testConfig(continueUrl, Some(referrerUrl))
-          ))(s"$continueUrl?id=$id", ACCEPTED)
 
-          When(s"Post $clientOrIndividual$addressLookupInitialise/$id is called")
-          val res = getAddressLookupInitialiseResponse(id)
+          Seq(false, true).foreach { isUk =>
+            val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id/$isUk", "UTF8")
+            stubInitializeAddressLookup(Json.parse(
+              testConfig(continueUrl, Some(referrerUrl))
+            ))(s"$continueUrl?id=$id", ACCEPTED)
 
-          Then("should return an SEE_OTHER with Address lookup location")
-          res must have(
-            httpStatus(SEE_OTHER),
-            redirectURI(s"$continueUrl?id=$id")
-          )
+            When(s"Post $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
+            val res = getAddressLookupInitialiseResponse(id, isUk)
+
+            Then("should return an SEE_OTHER with Address lookup location")
+            res must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(s"$continueUrl?id=$id")
+            )
+          }
         }
       }
 
@@ -140,13 +146,15 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
             testConfig("http://localhost/continueUrl", None)
           ))("http://localhost/testLocation", ACCEPTED)
 
-          When(s"Post $clientOrIndividual$addressLookupInitialise/$id is called")
-          val res = getAddressLookupInitialiseResponse(id)
+          Seq(false, true).foreach { isUk =>
+            When(s"Post $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
+            val res = getAddressLookupInitialiseResponse(id, isUk)
 
-          Then("should return an Internal server page")
-          res must have(
-            httpStatus(INTERNAL_SERVER_ERROR)
-          )
+            Then("should return an Internal server page")
+            res must have(
+              httpStatus(INTERNAL_SERVER_ERROR)
+            )
+          }
         }
       }
     }
