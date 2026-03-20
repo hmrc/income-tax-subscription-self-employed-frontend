@@ -48,7 +48,16 @@ class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponent
     withIndividualReference { reference =>
       authService.authorised() {
         multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
-          case Right(business) => Ok(view(confirmationForm, id, business.map(_.name.getOrElse("")).getOrElse(""), isEditMode, isGlobalEdit))
+          case Right(business) =>
+            val form = business match {
+              case Some(value) => value.hasUkAddress match {
+                case Some(true) => confirmationForm.fill(Yes)
+                case Some(false) => confirmationForm.fill(No)
+                case None => confirmationForm
+              }
+              case None => confirmationForm
+            }
+            Ok(view(form, id, business.map(_.name.getOrElse("")).getOrElse(""), isEditMode, isGlobalEdit))
           case _ => throw new Exception("Cannot get business name")
         }
       }

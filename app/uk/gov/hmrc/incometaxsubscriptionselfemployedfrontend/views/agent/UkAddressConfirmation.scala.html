@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.UkAddressConfirmationForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.YesNo
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper, PageHeadingHelper}
@@ -35,12 +35,10 @@
 @mainTemplate(title = messages("agent.uk-address-confirmation.heading"), optForm = Some(confirmationForm)) {
 
     @pageHeadingHelper(
-        heading = messages("agent.uk-address-confirmation.heading"),
+        heading = messages("agent.uk-address-confirmation.heading", name),
         caption = messages("agent.uk-address-confirmation.heading.caption", clientDetails.name, clientDetails.formattedNino),
         isSection = false
     )
-
-    <p class="govuk-body">@messages("agent.uk-address-confirmation.para", name)</p>
 
     @yesNoFormAndButtons()
 
@@ -49,10 +47,9 @@
 @yesNoFormAndButtons() = {
     @form(action = postAction) {
         @radioHelper(
-            field = confirmationForm(BusinessAddressConfirmationForm.fieldName),
-            legend = messages("agent.uk-address-confirmation.form.heading"),
+            field = confirmationForm(UkAddressConfirmationForm.fieldName),
+            legend = "",
             isPageHeading = false,
-            customHeadingClass = Some("govuk-!-font-weight-bold"),
             radioItems = Seq(
                 RadioItem(
                     content = Text(messages("base.yes")),

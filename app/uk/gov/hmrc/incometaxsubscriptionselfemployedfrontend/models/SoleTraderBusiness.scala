@@ -28,7 +28,11 @@ case class SoleTraderBusiness(id: String,
                               startDate: Option[DateModel] = None,
                               name: Option[String] = None,
                               trade: Option[String] = None,
-                              address: Option[Address] = None)
+                              address: Option[Address] = None) {
+  def hasUkAddress: Option[Boolean] = address map { address =>
+    address.country == Country.UK
+  }
+}
 
 object SoleTraderBusiness {
 

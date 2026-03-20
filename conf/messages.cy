@@ -199,15 +199,11 @@ agent.duplicate-details.options.add-different-business     = ychwanegu busnes un
 agent.duplicate-details.options.return-to-income-sources   = ewch i’r rhestr o ffynonellau incwm eich cleient
 
 # Individual UK Address Confirmation
-individual.uk-address-confirmation.heading                 =
-individual.uk-address-confirmation.heading.caption         = Sole trader
-individual.uk-address-confirmation.para                    = Is the address for your business, {0} in the UK?
-individual.uk-address-confirmation.form.heading            =
-error.individual.uk-address-confirmation.empty             = Select if business address is in the UK
+individual.uk-address-confirmation.heading                 = A yw’r cyfeiriad ar gyfer eich busnes, {0} yn y DU?
+individual.uk-address-confirmation.heading.caption         = Unig fasnachwr
+error.individual.uk-address-confirmation.empty             = Dewiswch os yw cyfeiriad y busnes yn y DU
 
 # Agent UK Address Confirmation
-agent.uk-address-confirmation.heading                      =
+agent.uk-address-confirmation.heading                      = A yw’r cyfeiriad ar gyfer busnes eich cleient, {0} yn y DU?
 agent.uk-address-confirmation.heading.caption              = {0} – {1}
-agent.uk-address-confirmation.para                         = Is the address for your client’s business, {0} in the UK?
-agent.uk-address-confirmation.form.heading                 =
-error.agent.uk-address-confirmation.empty                  = Select if business address is in the UK
+error.agent.uk-address-confirmation.empty                  = Dewiswch os yw cyfeiriad y busnes yn y DU
