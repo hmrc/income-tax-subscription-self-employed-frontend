@@ -26,7 +26,7 @@ object UkAddressConfirmationForm {
 
   val fieldName = "yes-no"
 
-  val businessAddressConfirmationForm: Form[YesNo] = Form[YesNo](
+  val ukAddressConfirmationForm: Form[YesNo] = Form[YesNo](
     single(
       fieldName -> YesNoMapping.yesNoMapping(
         yesNoInvalid = Invalid("error.individual.uk-address-confirmation.empty")

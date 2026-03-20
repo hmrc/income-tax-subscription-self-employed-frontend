@@ -42,7 +42,7 @@ class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponent
                                                (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
 
-  val confirmationForm: Form[YesNo] = UkAddressConfirmationForm.businessAddressConfirmationForm
+  val confirmationForm: Form[YesNo] = UkAddressConfirmationForm.ukAddressConfirmationForm
 
   def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     withIndividualReference { reference =>

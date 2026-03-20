@@ -31,7 +31,7 @@
 
 @(confirmationForm: Form[YesNo], postAction: Call, name: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.uk-address-confirmation.heading"), optForm = Some(confirmationForm)) {
+@mainTemplate(title = messages("individual.uk-address-confirmation.heading", name), optForm = Some(confirmationForm)) {
 
     @pageHeadingHelper(
         heading = messages("individual.uk-address-confirmation.heading", name),
@@ -47,7 +47,7 @@
     @form(action = postAction) {
         @radioHelper(
             field = confirmationForm(UkAddressConfirmationForm.fieldName),
-            legend = "",
+            legend = messages("individual.uk-address-confirmation.heading", name),
             isPageHeading = false,
             radioItems = Seq(
                 RadioItem(
