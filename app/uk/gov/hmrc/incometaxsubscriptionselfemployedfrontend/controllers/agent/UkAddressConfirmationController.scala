@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import play.twirl.api.Html
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
@@ -60,7 +61,7 @@ class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponent
                 case None => confirmationForm
               }
               Ok(view(form, id, business.map(_.name.getOrElse("")).getOrElse(""), clientDetails, isEditMode, isGlobalEdit))
-            case _ => throw new Exception("Cannot get business name")
+            case _ => throw new InternalServerException("Cannot get business name")
           }
         }
       }
@@ -90,11 +91,11 @@ class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponent
         withAgentReference { reference =>
           multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
             case Right(business) => BadRequest(view(hasError, id, business.map(_.name.getOrElse("")).getOrElse(""), clientDetails, isEditMode, isGlobalEdit))
-            case _ => throw new Exception("Cannot get business name")
+            case _ => throw new InternalServerException("Cannot get business name")
           }
         },
       answer => Future.successful(
-        Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, answer.equals(Yes), isEditMode, isGlobalEdit))
+        Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, answer == Yes, isEditMode, isGlobalEdit))
       )
     )
   }
