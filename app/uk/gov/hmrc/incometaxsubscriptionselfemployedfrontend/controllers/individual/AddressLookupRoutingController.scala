@@ -62,7 +62,8 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     authService.authorised() {
       addressLookupConnector.initialiseAddressLookup(
         continueUrl = addressLookupContinueUrl(businessId, None, isEditMode, isGlobalEdit),
-        isAgent = false
+        isAgent = false,
+        isUk = isUk
       ) map {
         case Right(PostAddressLookupSuccessResponse(Some(location))) =>
           Redirect(location)

@@ -52,13 +52,13 @@ class AddressLookupConnector @Inject()(val appConfig: AppConfig,
     url"${appConfig.stubAddressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
-  def initialiseAddressLookup(continueUrl: String, isAgent: Boolean)(implicit hc: HeaderCarrier, request: RequestHeader): Future[PostAddressLookupResponse] = {
+  def initialiseAddressLookup(continueUrl: String, isAgent: Boolean, isUk: Boolean)(implicit hc: HeaderCarrier, request: RequestHeader): Future[PostAddressLookupResponse] = {
     val url = if (isEnabled(EnableUseRealAddressLookup)) {
       addressLookupInitializeUrl
     } else {
       stubbedAddressLookupInitializeUrl
     }
-    http.post(url).withBody(addressLookupConfig.config(continueUrl, isAgent))
+    http.post(url).withBody(addressLookupConfig.config(continueUrl, isAgent, isUk))
       .execute[PostAddressLookupResponse]
   }
 

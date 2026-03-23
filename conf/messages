@@ -52,13 +52,26 @@ error.individual.business-address-confirmation.empty            = Select ‘Yes�
 # Business Address page
 address-lookup.select-page.title                                = Select business address
 address-lookup.select-page.heading                              = Select business address
-address-lookup.lookup-page.title                                = What is your business address?
-address-lookup.lookup-page.heading                              = What is your business address?
-address-lookup.edit-page.title                                  = Enter business address
-address-lookup.edit-page.heading                                = Enter business address
-address-lookup.edit-page.postcode-label                         = Postcode
-address-lookup.confirm-page.title                               = Confirm business address
-address-lookup.confirm-page.heading                             = Confirm business address
+address-lookup.lookup-page.title                                = Find your business address?
+address-lookup.lookup-page.heading                              = Find your business address?
+address-lookup.lookup-page.postcode-label                       = Postcode
+address-lookup.lookup-page.property-label                       = Property name or number
+address-lookup.edit-page.title                                  = Enter your business address
+address-lookup.edit-page.heading                                = Enter your business address
+address-lookup.edit-page.line1-label                            = Address line 1
+address-lookup.edit-page.line2-label                            = Address line 2
+address-lookup.edit-page.line3-label                            = Address line 3
+address-lookup.edit-page.town-label                             = Town or city
+address-lookup.edit-page.postcode-label                         = Postcode or zipcode
+address-lookup.edit-page.country-label                          = Country or territory
+address-lookup.confirm-page.title                               = Confirm your business address
+address-lookup.confirm-page.heading                             = Confirm your business address
+address-lookup.confirm-page.address-label                       = Your selected address:
+address-lookup.confirm-page.para                                = By confirming, you agree that the information you have given is complete and correct.
+address-lookup.confirm-page.confirm                             = Confirm and continue
+address-lookup.country-page.title                               = Select the country or territory for your business address
+address-lookup.country-page.heading                             = Select the country or territory for your business address
+address-lookup.country-page.country-label                       = Select country or territory
 
 # Sole trader streamline
 individual.full-income-source.heading                                     = Your sole trader business
@@ -122,13 +135,26 @@ error.agent.business-address-confirmation.empty                 = Select ‘Yes�
 #Agent Business Address page
 agent.address-lookup.select-page.title                          = Select client’s business address
 agent.address-lookup.select-page.heading                        = Select client’s business address
-agent.address-lookup.lookup-page.title                          = What is your client’s business address?
-agent.address-lookup.lookup-page.heading                        = What is your client’s business address?
-agent.address-lookup.edit-page.title                            = Enter client’s business address
-agent.address-lookup.edit-page.heading                          = Enter client’s business address
-agent.address-lookup.edit-page.postcode-label                   = Postcode
-agent.address-lookup.confirm-page.title                         = Confirm client’s business address
-agent.address-lookup.confirm-page.heading                       = Confirm client’s business address
+agent.address-lookup.lookup-page.title                          = Find your client’s business address?
+agent.address-lookup.lookup-page.heading                        = Find your client’s business address?
+agent.address-lookup.lookup-page.postcode-label                 = Postcode
+agent.address-lookup.lookup-page.property-label                 = Property name or number
+agent.address-lookup.edit-page.title                            = Enter your client’s business address
+agent.address-lookup.edit-page.heading                          = Enter your client’s business address
+agent.address-lookup.edit-page.line1-label                      = Address line 1
+agent.address-lookup.edit-page.line2-label                      = Address line 2
+agent.address-lookup.edit-page.line3-label                      = Address line 3
+agent.address-lookup.edit-page.town-label                       = Town or city
+agent.address-lookup.edit-page.postcode-label                   = Postcode or zipcode
+agent.address-lookup.edit-page.country-label                    = Country or territory
+agent.address-lookup.confirm-page.title                         = Confirm your client’s business address
+agent.address-lookup.confirm-page.heading                       = Confirm your client’s business address
+agent.address-lookup.confirm-page.address-label                 = Your selected address:
+agent.address-lookup.confirm-page.para                          = By confirming, you agree that the information you have given is complete and correct.
+agent.address-lookup.confirm-page.confirm                       = Confirm and continue
+agent.address-lookup.country-page.title                         = Select the country or territory for your client’s business address
+agent.address-lookup.country-page.heading                       = Select the country or territory for your client’s business address
+agent.address-lookup.country-page.country-label                 = Select country or territory
 
 #Self Employed CYA
 agent.self-employed-cya.trading-start-date                      = Trading start date
