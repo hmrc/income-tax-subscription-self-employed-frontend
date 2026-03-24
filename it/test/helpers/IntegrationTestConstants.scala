@@ -194,7 +194,7 @@ object IntegrationTestConstants {
        |      "confirmPageLabels": {
        |        "title": "Cadarnhau cyfeiriad eich busnes",
        |        "heading": "Cadarnhau cyfeiriad eich busnes",
-       |        "infoSubheading": "",
+       |        "infoSubheading": "Eich cyfeiriad",
        |        "infoMessage": "",
        |        "confirmChangeText": "Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.",
        |        "submitLabel": "Cadarnhau a pharhau"
@@ -310,7 +310,7 @@ object IntegrationTestConstants {
        |      "confirmPageLabels": {
        |        "title": "Cadarnhau cyfeiriad busnes eich cleient",
        |        "heading": "Cadarnhau cyfeiriad busnes eich cleient",
-       |        "infoSubheading": "",
+       |        "infoSubheading": "Eich cyfeiriad",
        |        "infoMessage": "",
        |        "confirmChangeText": "Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.",
        |        "submitLabel": "Cadarnhau a pharhau"
