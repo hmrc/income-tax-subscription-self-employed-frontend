@@ -17,6 +17,7 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks
 
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.isA
 import org.mockito.Mockito.{reset, when}
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.BeforeAndAfterEach
@@ -42,11 +43,12 @@ trait MockAddressLookupConnector extends UnitTestTrait with MockitoSugar with Be
       ArgumentMatchers.eq(id))(ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 
-  def mockInitialiseAddressLookup(continueUrl: String, isAgent: Boolean)
+  def mockInitialiseAddressLookup(continueUrl: String, isAgent: Boolean, isUk: Boolean)
                                  (response: PostAddressLookupResponse): OngoingStubbing[Future[PostAddressLookupResponse]] = {
     when(mockAddressLookupConnector.initialiseAddressLookup(
       ArgumentMatchers.eq(continueUrl),
-      ArgumentMatchers.eq(isAgent)
+      ArgumentMatchers.eq(isAgent),
+      ArgumentMatchers.eq(isUk)
     )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(response))
   }
 }

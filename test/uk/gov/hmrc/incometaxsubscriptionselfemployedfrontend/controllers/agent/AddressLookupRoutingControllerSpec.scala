@@ -126,11 +126,11 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
     "return ok (200)" when {
       "the connector returns data" in {
         mockAuthSuccess()
-        mockInitialiseAddressLookup(continueUrl, isAgent = isAgent)(
-          Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
-        )
-
         Seq(false, true).foreach { isUk =>
+          mockInitialiseAddressLookup(continueUrl, isAgent = isAgent, isUk = isUk)(
+            Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
+          )
+
           val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false, isUk = isUk)(fakeRequest)
 
           status(result) mustBe SEE_OTHER
@@ -141,11 +141,11 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
     "Throw an internal exception" when {
       "there is an unexpected status failure" in {
         mockAuthSuccess()
-        mockInitialiseAddressLookup(continueUrl, isAgent = isAgent)(
-          Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
-
         Seq(false, true).foreach { isUk =>
+          mockInitialiseAddressLookup(continueUrl, isAgent = isAgent, isUk = isUk)(
+            Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+          )
+
           val result = intercept[InternalServerException](
             await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false, isUk = isUk)(fakeRequest))
           )
