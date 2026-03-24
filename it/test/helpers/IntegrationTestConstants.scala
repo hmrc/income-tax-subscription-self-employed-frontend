@@ -52,7 +52,7 @@ object IntegrationTestConstants {
   val ggSignOutURI = s"/bas-gateway/sign-out-without-state"
 
   def businessAddressInitialiseUri(itsaId: String): String = s"$baseURI/address-lookup-initialise/$itsaId"
-  
+
   def ukAddressConfirmation(id: String): String = s"$baseURI/UK-foreign-business?id=$id"
 
   def clientUkAddressConfirmation(id: String): String = s"$baseURI/client/UK-foreign-business?id=$id"
@@ -111,7 +111,7 @@ object IntegrationTestConstants {
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
        |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-business-for-making-tax-digital-for-income-tax",
-       |    "ukMode": "$isUk",
+       |    "ukMode": $isUk,
        |    "selectPageConfig": {
        |      "proposalListLimit": 50,
        |      "showSearchLinkAgain": true
@@ -126,7 +126,7 @@ object IntegrationTestConstants {
        |      "timeoutAmount": 900,
        |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    },
-       |    "accessibilityFooterUrl":"$accessibilityFooterUrl"
+       |    "accessibilityFooterUrl": "$accessibilityFooterUrl"
        |  },
        |  "labels": {
        |    "en": {
@@ -138,17 +138,33 @@ object IntegrationTestConstants {
        |        "heading": "Select business address"
        |      },
        |      "lookupPageLabels": {
-       |        "title": "What is your business address?",
-       |        "heading": "What is your business address?"
+       |        "title": "Find your business address?",
+       |        "heading": "Find your business address?",
+       |        "filterLabel": "Property name or number",
+       |        "postcodeLabel": "Postcode"
        |      },
        |      "editPageLabels": {
-       |        "title": "Enter business address",
-       |        "heading": "Enter business address",
-       |        "postcodeLabel":"Postcode"
+       |        "title": "Enter your business address",
+       |        "heading": "Enter your business address",
+       |        "line1Label": "Address line 1",
+       |        "line2Label": "Address line 2",
+       |        "line3Label": "Address line 3",
+       |        "townLabel": "Town or city",
+       |        "postcodeLabel": "Postcode or zipcode",
+       |        "countryLabel": "Country or territory"
        |      },
        |      "confirmPageLabels": {
-       |        "title": "Confirm business address",
-       |        "heading": "Confirm business address"
+       |        "title": "Confirm your business address",
+       |        "heading": "Confirm your business address",
+       |        "infoSubheading": "Your selected address:",
+       |        "infoMessage": "",
+       |        "confirmChangeText": "By confirming, you agree that the information you have given is complete and correct.",
+       |        "submitLabel": "Confirm and continue"
+       |      },
+       |      "countryPickerLabels": {
+       |        "title": "Select the country or territory for your business address",
+       |        "heading": "Select the country or territory for your business address",
+       |        "countryLabel": "Select country or territory"
        |      }
        |    },
        |    "cy": {
@@ -160,17 +176,33 @@ object IntegrationTestConstants {
        |        "heading": "Dewiswch gyfeiriad busnes"
        |      },
        |      "lookupPageLabels": {
-       |        "title": "Beth yw cyfeiriad eich busnes?",
-       |        "heading": "Beth yw cyfeiriad eich busnes?"
+       |        "title": "Dewch o hyd i gyfeiriad eich busnes",
+       |        "heading": "Dewch o hyd i gyfeiriad eich busnes",
+       |        "filterLabel": "Enw neu rif yr eiddo",
+       |        "postcodeLabel": "Cod post"
        |      },
        |      "editPageLabels": {
        |        "title": "Rhowch gyfeiriad busnes",
        |        "heading": "Rhowch gyfeiriad busnes",
-       |        "postcodeLabel":"Cod post"
+       |        "line1Label": "Cyfeiriad – llinell 1",
+       |        "line2Label": "Cyfeiriad – llinell 2",
+       |        "line3Label": "Cyfeiriad – llinell 3",
+       |        "townLabel": "Tref neu ddinas",
+       |        "postcodeLabel": "Cod post neu god zip",
+       |        "countryLabel": "Gwlad neu diriogaeth"
        |      },
        |      "confirmPageLabels": {
-       |        "title": "Cadarnhau cyfeiriad busnes",
-       |        "heading": "Cadarnhau cyfeiriad busnes"
+       |        "title": "Cadarnhau cyfeiriad eich busnes",
+       |        "heading": "Cadarnhau cyfeiriad eich busnes",
+       |        "infoSubheading": "",
+       |        "infoMessage": "",
+       |        "confirmChangeText": "Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.",
+       |        "submitLabel": "Cadarnhau a pharhau"
+       |      },
+       |      "countryPickerLabels": {
+       |        "title": "Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes",
+       |        "heading": "Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes",
+       |        "countryLabel": "Dewiswch gwlad neu diriogaeth"
        |      }
        |    }
        |  }
@@ -195,7 +227,7 @@ object IntegrationTestConstants {
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
        |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-client-for-making-tax-digital-for-income-tax",
-       |    "ukMode": "$isUk",
+       |    "ukMode": $isUk,
        |    "selectPageConfig": {
        |      "proposalListLimit": 50,
        |      "showSearchLinkAgain": true
@@ -210,10 +242,10 @@ object IntegrationTestConstants {
        |      "timeoutAmount": 900,
        |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    },
-       |    "accessibilityFooterUrl":"$accessibilityFooterUrl"
+       |    "accessibilityFooterUrl": "$accessibilityFooterUrl"
        |  },
        |  "labels": {
-       |    "en" : {
+       |    "en": {
        |      "appLevelLabels": {
        |        "navTitle": "Sign up your clients for Making Tax Digital for Income Tax"
        |      },
@@ -263,7 +295,7 @@ object IntegrationTestConstants {
        |        "title": "Dewch o hyd i gyfeiriad busnes eich cleient",
        |        "heading": "Dewch o hyd i gyfeiriad busnes eich cleient",
        |        "filterLabel": "Enw neu rif yr eiddo",
-       |        "postcodeLabel":"Cod post"
+       |        "postcodeLabel": "Cod post"
        |      },
        |      "editPageLabels": {
        |        "title": "Nodwch gyfeiriad busnes eich cleien",
@@ -278,7 +310,7 @@ object IntegrationTestConstants {
        |      "confirmPageLabels": {
        |        "title": "Cadarnhau cyfeiriad busnes eich cleient",
        |        "heading": "Cadarnhau cyfeiriad busnes eich cleient",
-       |        "infoSubheading": "Your selected address:",
+       |        "infoSubheading": "",
        |        "infoMessage": "",
        |        "confirmChangeText": "Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.",
        |        "submitLabel": "Cadarnhau a pharhau"
@@ -291,3 +323,5 @@ object IntegrationTestConstants {
        |    }
        |  }
        |}""".stripMargin
+  }
+}

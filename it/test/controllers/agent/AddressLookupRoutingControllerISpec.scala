@@ -32,7 +32,6 @@ import java.net.URLEncoder
 
 class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
 
-
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   private val addressId = "testId1"

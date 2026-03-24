@@ -130,7 +130,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
           "confirmPageLabels" -> Json.obj(
             "title" -> messagesApi(s"${prefix}address-lookup.confirm-page.title")(cy),
             "heading" -> messagesApi(s"${prefix}address-lookup.confirm-page.heading")(cy),
-            "infoSubheading" -> messagesApi(s"${prefix}address-lookup.confirm-page.address-label")(en),
+            "infoSubheading" -> messagesApi(s"${prefix}address-lookup.confirm-page.address-label")(cy),
             "infoMessage" -> "",
             "confirmChangeText" -> messagesApi(s"${prefix}address-lookup.confirm-page.para")(cy),
             "submitLabel" -> messagesApi(s"${prefix}address-lookup.confirm-page.confirm")(cy)
