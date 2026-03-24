@@ -30,7 +30,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 
-
 class AddressLookupConnectorISpec extends ComponentSpecBase {
 
   lazy val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
@@ -92,36 +91,44 @@ class AddressLookupConnectorISpec extends ComponentSpecBase {
 
     "the user is an agent" should {
       "Return PostSubscriptionDetailsSuccessResponse" in {
-        stubInitializeAddressLookup(Json.parse(testAddressLookupConfigClient("testUrl")))("testLocation", ACCEPTED)
+        Seq(false, true).foreach { isUk =>
+          stubInitializeAddressLookup(Json.parse(testAddressLookupConfigClient(isUk, "testUrl")))("testLocation", ACCEPTED)
 
-        val res = connector.initialiseAddressLookup("testUrl", isAgent = true)
+          val res = connector.initialiseAddressLookup("testUrl", isAgent = true, isUk = isUk)
 
-        await(res) mustBe Right(PostAddressLookupSuccessResponse(Some("testLocation")))
+          await(res) mustBe Right(PostAddressLookupSuccessResponse(Some("testLocation")))
+        }
       }
 
       "Return UnexpectedStatusFailure(status)" in {
-        stubInitializeAddressLookup(Json.parse(testAddressLookupConfigClient("testUrl")))("testLocation", INTERNAL_SERVER_ERROR)
+        Seq(false, true).foreach { isUk =>
+          stubInitializeAddressLookup(Json.parse(testAddressLookupConfigClient(isUk, "testUrl")))("testLocation", INTERNAL_SERVER_ERROR)
 
-        val res = connector.initialiseAddressLookup("testUrl", isAgent = true)
+          val res = connector.initialiseAddressLookup("testUrl", isAgent = true, isUk = isUk)
 
-        await(res) mustBe Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+          await(res) mustBe Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        }
       }
     }
     "the user is individual" should {
       "Return PostSubscriptionDetailsSuccessResponse" in {
-        stubInitializeAddressLookup(Json.parse(testAddressLookupConfig("testUrl")))("testLocation", ACCEPTED)
+        Seq(false, true).foreach { isUk =>
+          stubInitializeAddressLookup(Json.parse(testAddressLookupConfig(isUk, "testUrl")))("testLocation", ACCEPTED)
 
-        val res = connector.initialiseAddressLookup("testUrl", isAgent = false)
+          val res = connector.initialiseAddressLookup("testUrl", isAgent = false, isUk = isUk)
 
-        await(res) mustBe Right(PostAddressLookupSuccessResponse(Some("testLocation")))
+          await(res) mustBe Right(PostAddressLookupSuccessResponse(Some("testLocation")))
+        }
       }
 
       "Return UnexpectedStatusFailure(status)" in {
-        stubInitializeAddressLookup(Json.parse(testAddressLookupConfig("testUrl")))("testLocation", INTERNAL_SERVER_ERROR)
+        Seq(false, true).foreach { isUk =>
+          stubInitializeAddressLookup(Json.parse(testAddressLookupConfig(isUk, "testUrl")))("testLocation", INTERNAL_SERVER_ERROR)
 
-        val res = connector.initialiseAddressLookup("testUrl", isAgent = false)
+          val res = connector.initialiseAddressLookup("testUrl", isAgent = false, isUk = isUk)
 
-        await(res) mustBe Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+          await(res) mustBe Left(PostAddressLookupHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+        }
       }
     }
   }

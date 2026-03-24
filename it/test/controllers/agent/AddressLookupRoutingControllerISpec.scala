@@ -37,7 +37,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
 
   private val addressId = "testId1"
 
-  private def testConfig(contineUrl: String, referrerUrlMaybe: Option[String]): String = testAddressLookupConfigClient(contineUrl, referrerUrlMaybe)
+  private def testConfig(isUk: Boolean, contineUrl: String, referrerUrlMaybe: Option[String]): String =
+    testAddressLookupConfigClient(isUk, contineUrl, referrerUrlMaybe)
 
   private val clientOrIndividual = "/client"
 
@@ -60,7 +61,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
         Seq(false, true).foreach { isUk =>
           val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id/$isUk", "UTF8")
           stubInitializeAddressLookup(Json.parse(
-            testConfig(continueUrl, Some(referrerUrl))
+            testConfig(isUk, continueUrl, Some(referrerUrl))
           ))(s"$continueUrl?id=$id", ACCEPTED)
 
           When(s"GET $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
@@ -79,11 +80,11 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
       "with location details in headers" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
-        stubInitializeAddressLookup(Json.parse(
-          testConfig("http://localhost/continueUrl", Some("not used"))
-        ))("http://localhost/testLocation", OK)
-
         Seq(false, true).foreach { isUk =>
+          stubInitializeAddressLookup(Json.parse(
+            testConfig(isUk, "http://localhost/continueUrl", Some("not used"))
+          ))("http://localhost/testLocation", OK)
+
           When(s"GET $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
           val res = getAddressLookupInitialiseResponse(id, isUk)
 

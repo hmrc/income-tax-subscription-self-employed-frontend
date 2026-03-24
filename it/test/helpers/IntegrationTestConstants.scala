@@ -94,7 +94,7 @@ object IntegrationTestConstants {
   )
 
   //scalastyle:off
-  def testAddressLookupConfig(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
+  def testAddressLookupConfig(isUk: Boolean, continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
     val referrerUrl = referrerUrlMaybe.getOrElse(referrerPath + "%3F" + referrerQueryString)
     val accessibilityFooterUrl = s"http://localhost:12346/accessibility-statement/income-tax-sign-up?referrerUrl=$referrerUrl"
     s"""{
@@ -104,13 +104,14 @@ object IntegrationTestConstants {
        |      "line1MaxLength": 35,
        |      "line2MaxLength": 35,
        |      "line3MaxLength": 35,
-       |      "townMaxLength": 35
+       |      "townMaxLength": 35,
+       |      "showOrganisationName": false
        |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
        |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-business-for-making-tax-digital-for-income-tax",
-       |    "ukMode": true,
+       |    "ukMode": "$isUk",
        |    "selectPageConfig": {
        |      "proposalListLimit": 50,
        |      "showSearchLinkAgain": true
@@ -177,7 +178,7 @@ object IntegrationTestConstants {
   }
 
   //scalastyle:off
-  def testAddressLookupConfigClient(continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
+  def testAddressLookupConfigClient(isUk: Boolean, continueUrl: String, referrerUrlMaybe: Option[String] = None): String = {
     val referrerUrl = referrerUrlMaybe.getOrElse(referrerPath + "%3F" + referrerQueryString)
     val accessibilityFooterUrl = s"http://localhost:12346/accessibility-statement/income-tax-sign-up?referrerUrl=$referrerUrl"
     s"""{
@@ -187,13 +188,14 @@ object IntegrationTestConstants {
        |      "line1MaxLength": 35,
        |      "line2MaxLength": 35,
        |      "line3MaxLength": 35,
-       |      "townMaxLength": 35
+       |      "townMaxLength": 35,
+       |      "showOrganisationName": false
        |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
        |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-client-for-making-tax-digital-for-income-tax",
-       |    "ukMode": true,
+       |    "ukMode": "$isUk",
        |    "selectPageConfig": {
        |      "proposalListLimit": 50,
        |      "showSearchLinkAgain": true
@@ -211,7 +213,7 @@ object IntegrationTestConstants {
        |    "accessibilityFooterUrl":"$accessibilityFooterUrl"
        |  },
        |  "labels": {
-       |    "en": {
+       |    "en" : {
        |      "appLevelLabels": {
        |        "navTitle": "Sign up your clients for Making Tax Digital for Income Tax"
        |      },
@@ -220,42 +222,72 @@ object IntegrationTestConstants {
        |        "heading": "Select client’s business address"
        |      },
        |      "lookupPageLabels": {
-       |        "title": "What is your client’s business address?",
-       |        "heading": "What is your client’s business address?"
+       |        "title": "Find your client’s business address?",
+       |        "heading": "Find your client’s business address?",
+       |        "filterLabel": "Property name or number",
+       |        "postcodeLabel": "Postcode"
        |      },
        |      "editPageLabels": {
-       |        "title": "Enter client’s business address",
-       |        "heading": "Enter client’s business address",
-       |        "postcodeLabel":"Postcode"
+       |        "title": "Enter your client’s business address",
+       |        "heading": "Enter your client’s business address",
+       |        "line1Label": "Address line 1",
+       |        "line2Label": "Address line 2",
+       |        "line3Label": "Address line 3",
+       |        "townLabel": "Town or city",
+       |        "postcodeLabel": "Postcode or zipcode",
+       |        "countryLabel": "Country or territory"
        |      },
        |      "confirmPageLabels": {
-       |        "title": "Confirm client’s business address",
-       |        "heading": "Confirm client’s business address"
+       |        "title": "Confirm your client’s business address",
+       |        "heading": "Confirm your client’s business address",
+       |        "infoSubheading": "Your selected address:",
+       |        "infoMessage": "",
+       |        "confirmChangeText": "By confirming, you agree that the information you have given is complete and correct.",
+       |        "submitLabel": "Confirm and continue"
+       |      },
+       |      "countryPickerLabels": {
+       |        "title": "Select the country or territory for your client’s business address",
+       |        "heading": "Select the country or territory for your client’s business address",
+       |        "countryLabel": "Select country or territory"
        |      }
        |    },
        |    "cy": {
        |      "appLevelLabels": {
        |        "navTitle": "Cofrestrwch eich cleientiaid ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm"
-       |       },
+       |      },
        |      "selectPageLabels": {
        |        "title": "dewis cyfeiriad busnes y cleient",
        |        "heading": "dewis cyfeiriad busnes y cleient"
        |      },
        |      "lookupPageLabels": {
-       |        "title": "Beth yw cyfeiriad busnes eich cleient?",
-       |        "heading": "Beth yw cyfeiriad busnes eich cleient?"
+       |        "title": "Dewch o hyd i gyfeiriad busnes eich cleient",
+       |        "heading": "Dewch o hyd i gyfeiriad busnes eich cleient",
+       |        "filterLabel": "Enw neu rif yr eiddo",
+       |        "postcodeLabel":"Cod post"
        |      },
        |      "editPageLabels": {
-       |        "title": "Rhowch gyfeiriad busnes y cleient",
-       |        "heading": "Rhowch gyfeiriad busnes y cleient",
-       |        "postcodeLabel":"Cod post y DU"
+       |        "title": "Nodwch gyfeiriad busnes eich cleien",
+       |        "heading": "Nodwch gyfeiriad busnes eich cleien",
+       |        "line1Label": "Cyfeiriad – llinell 1",
+       |        "line2Label": "Cyfeiriad – llinell 2",
+       |        "line3Label": "Cyfeiriad – llinell 3",
+       |        "townLabel": "Tref neu ddinas",
+       |        "postcodeLabel": "Cod post neu god zip",
+       |        "countryLabel": "Gwlad neu diriogaeth"
        |      },
        |      "confirmPageLabels": {
-       |        "title": "Cadarnhau cyfeiriad busnes y cleient",
-       |        "heading": "Cadarnhau cyfeiriad busnes y cleient"
+       |        "title": "Cadarnhau cyfeiriad busnes eich cleient",
+       |        "heading": "Cadarnhau cyfeiriad busnes eich cleient",
+       |        "infoSubheading": "Your selected address:",
+       |        "infoMessage": "",
+       |        "confirmChangeText": "Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.",
+       |        "submitLabel": "Cadarnhau a pharhau"
+       |      },
+       |      "countryPickerLabels": {
+       |        "title": "Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad busnes eich cleient",
+       |        "heading": "Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad busnes eich cleient",
+       |        "countryLabel": "Dewiswch gwlad neu diriogaeth"
        |      }
        |    }
        |  }
        |}""".stripMargin
-  }
-}

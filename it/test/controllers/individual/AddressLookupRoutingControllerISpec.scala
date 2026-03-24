@@ -43,7 +43,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
     super.beforeEach()
   }
 
-  private def testConfig(continueUrl: String, referrerUrlMaybe: Option[String]): String = testAddressLookupConfig(continueUrl, referrerUrlMaybe)
+  private def testConfig(isUk: Boolean, continueUrl: String, referrerUrlMaybe: Option[String]): String =
+    testAddressLookupConfig(isUk, continueUrl, referrerUrlMaybe)
 
   private val clientOrIndividual = "" // if this were the client version, we would have /client here, but individual gets nothing.
 
@@ -68,7 +69,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           Seq(false, true).foreach { isUk =>
             val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id/$isUk", "UTF8")
             stubInitializeAddressLookup(Json.parse(
-              testConfig(continueUrl, Some(referrerUrl))
+              testConfig(isUk, continueUrl, Some(referrerUrl))
             ))(s"$continueUrl?id=$id", ACCEPTED)
             
             When(s"GET $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
@@ -122,7 +123,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           Seq(false, true).foreach { isUk =>
             val referrerUrl = URLEncoder.encode(s"$baseUrl$clientOrIndividual$addressLookupInitialise/$id/$isUk", "UTF8")
             stubInitializeAddressLookup(Json.parse(
-              testConfig(continueUrl, Some(referrerUrl))
+              testConfig(isUk, continueUrl, Some(referrerUrl))
             ))(s"$continueUrl?id=$id", ACCEPTED)
 
             When(s"Post $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
@@ -142,11 +143,11 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase with Feature
           enable(EnableUseRealAddressLookup)
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
-          stubInitializeAddressLookup(Json.parse(
-            testConfig("http://localhost/continueUrl", None)
-          ))("http://localhost/testLocation", ACCEPTED)
-
           Seq(false, true).foreach { isUk =>
+            stubInitializeAddressLookup(Json.parse(
+              testConfig(isUk, "http://localhost/continueUrl", None)
+            ))("http://localhost/testLocation", ACCEPTED)
+
             When(s"Post $clientOrIndividual$addressLookupInitialise/$id/$isUk is called")
             val res = getAddressLookupInitialiseResponse(id, isUk)
 
