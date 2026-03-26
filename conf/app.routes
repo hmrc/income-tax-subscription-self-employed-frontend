@@ -31,5 +31,5 @@ GET        /keep-alive                                 uk.gov.hmrc.incometaxsubs
 GET        /timeout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.timeout
 
 #UK Address
-GET        /UK-foreign-business                        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.UkAddressConfirmationController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST       /UK-foreign-business                        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.UkAddressConfirmationController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET        /uk-foreign-business                        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.UkAddressConfirmationController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+POST       /uk-foreign-business                        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.UkAddressConfirmationController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
