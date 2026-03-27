@@ -147,7 +147,7 @@ object IntegrationTestConstants {
        |      "lookupPageLabels": {
        |        "title": "Find your business address",
        |        "heading": "Find your business address",
-       |        "filterLabel": "Property name or number",
+       |        "filterLabel": "Property name or number (optional)",
        |        "postcodeLabel": "Postcode"
        |      },
        |      "editPageLabels": {
@@ -185,7 +185,7 @@ object IntegrationTestConstants {
        |      "lookupPageLabels": {
        |        "title": "Dewch o hyd i gyfeiriad eich busnes",
        |        "heading": "Dewch o hyd i gyfeiriad eich busnes",
-       |        "filterLabel": "Enw neu rif yr eiddo",
+       |        "filterLabel": "Enw neu rif yr eiddo (dewisol)",
        |        "postcodeLabel": "Cod post"
        |      },
        |      "editPageLabels": {
@@ -270,7 +270,7 @@ object IntegrationTestConstants {
        |      "lookupPageLabels": {
        |        "title": "Find your client’s business address",
        |        "heading": "Find your client’s business address",
-       |        "filterLabel": "Property name or number",
+       |        "filterLabel": "Property name or number (optional)",
        |        "postcodeLabel": "Postcode"
        |      },
        |      "editPageLabels": {
@@ -308,7 +308,7 @@ object IntegrationTestConstants {
        |      "lookupPageLabels": {
        |        "title": "Dewch o hyd i gyfeiriad busnes eich cleient",
        |        "heading": "Dewch o hyd i gyfeiriad busnes eich cleient",
-       |        "filterLabel": "Enw neu rif yr eiddo",
+       |        "filterLabel": "Enw neu rif yr eiddo (dewisol)",
        |        "postcodeLabel": "Cod post"
        |      },
        |      "editPageLabels": {
