@@ -52,8 +52,8 @@ error.individual.business-address-confirmation.empty            = Select ‘Yes�
 # Business Address page
 address-lookup.select-page.title                                = Select business address
 address-lookup.select-page.heading                              = Select business address
-address-lookup.lookup-page.title                                = Find your business address?
-address-lookup.lookup-page.heading                              = Find your business address?
+address-lookup.lookup-page.title                                = Find your business address
+address-lookup.lookup-page.heading                              = Find your business address
 address-lookup.lookup-page.postcode-label                       = Postcode
 address-lookup.lookup-page.property-label                       = Property name or number
 address-lookup.edit-page.title                                  = Enter your business address
@@ -135,8 +135,8 @@ error.agent.business-address-confirmation.empty                 = Select ‘Yes�
 #Agent Business Address page
 agent.address-lookup.select-page.title                          = Select client’s business address
 agent.address-lookup.select-page.heading                        = Select client’s business address
-agent.address-lookup.lookup-page.title                          = Find your client’s business address?
-agent.address-lookup.lookup-page.heading                        = Find your client’s business address?
+agent.address-lookup.lookup-page.title                          = Find your client’s business address
+agent.address-lookup.lookup-page.heading                        = Find your client’s business address
 agent.address-lookup.lookup-page.postcode-label                 = Postcode
 agent.address-lookup.lookup-page.property-label                 = Property name or number
 agent.address-lookup.edit-page.title                            = Enter your client’s business address

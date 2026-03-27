@@ -145,8 +145,8 @@ object IntegrationTestConstants {
        |        "heading": "Select business address"
        |      },
        |      "lookupPageLabels": {
-       |        "title": "Find your business address?",
-       |        "heading": "Find your business address?",
+       |        "title": "Find your business address",
+       |        "heading": "Find your business address",
        |        "filterLabel": "Property name or number",
        |        "postcodeLabel": "Postcode"
        |      },
@@ -268,8 +268,8 @@ object IntegrationTestConstants {
        |        "heading": "Select client’s business address"
        |      },
        |      "lookupPageLabels": {
-       |        "title": "Find your client’s business address?",
-       |        "heading": "Find your client’s business address?",
+       |        "title": "Find your client’s business address",
+       |        "heading": "Find your client’s business address",
        |        "filterLabel": "Property name or number",
        |        "postcodeLabel": "Postcode"
        |      },
