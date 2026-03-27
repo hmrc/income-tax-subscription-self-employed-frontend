@@ -225,11 +225,13 @@ agent.duplicate-details.options.add-different-business     = ychwanegu busnes un
 agent.duplicate-details.options.return-to-income-sources   = ewch i’r rhestr o ffynonellau incwm eich cleient
 
 # Individual UK Address Confirmation
+individual.uk-address-confirmation.title                   =
 individual.uk-address-confirmation.heading                 = A yw’r cyfeiriad ar gyfer eich busnes, {0} yn y DU?
 individual.uk-address-confirmation.heading.caption         = Unig fasnachwr
 error.individual.uk-address-confirmation.empty             = Dewiswch os yw cyfeiriad y busnes yn y DU
 
 # Agent UK Address Confirmation
+agent.uk-address-confirmation.title                        =
 agent.uk-address-confirmation.heading                      = A yw’r cyfeiriad ar gyfer busnes eich cleient, {0} yn y DU?
 agent.uk-address-confirmation.heading.caption              = {0} – {1}
 error.agent.uk-address-confirmation.empty                  = Dewiswch os yw cyfeiriad y busnes yn y DU

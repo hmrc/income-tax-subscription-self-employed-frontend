@@ -105,7 +105,14 @@ object IntegrationTestConstants {
        |      "line2MaxLength": 35,
        |      "line3MaxLength": 35,
        |      "townMaxLength": 35,
-       |      "showOrganisationName": false
+       |      "showOrganisationName": false,
+       |      "mandatoryFields": {
+       |        "addressLine1": true,
+       |        "addressLine2": false,
+       |        "addressLine3": false,
+       |        "town": true,
+       |        "postcode": false
+       |      }
        |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
@@ -221,7 +228,14 @@ object IntegrationTestConstants {
        |      "line2MaxLength": 35,
        |      "line3MaxLength": 35,
        |      "townMaxLength": 35,
-       |      "showOrganisationName": false
+       |      "showOrganisationName": false,
+       |      "mandatoryFields": {
+       |        "addressLine1": true,
+       |        "addressLine2": false,
+       |        "addressLine3": false,
+       |        "town": true,
+       |        "postcode": false
+       |      }
        |    },
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,

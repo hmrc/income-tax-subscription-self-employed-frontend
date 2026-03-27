@@ -31,7 +31,7 @@
 
 @(confirmationForm: Form[YesNo], postAction: Call, name: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.uk-address-confirmation.heading", name), optForm = Some(confirmationForm)) {
+@mainTemplate(title = messages("individual.uk-address-confirmation.title"), optForm = Some(confirmationForm)) {
 
     @pageHeadingHelper(
         heading = messages("individual.uk-address-confirmation.heading", name),

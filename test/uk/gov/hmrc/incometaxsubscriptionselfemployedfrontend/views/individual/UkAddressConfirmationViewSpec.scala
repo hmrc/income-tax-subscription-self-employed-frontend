@@ -52,6 +52,7 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
   }
 
   object UkAddressConfirmationMessages {
+    val title = "Is the business in the UK?"
     val heading = s"Is the address for your business, $testName in the UK?"
     val caption = "Sole trader"
 
@@ -68,13 +69,13 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
     "use the correct page template" when {
       "there is no error on the page" in new TemplateViewTest(
         page(),
-        title = UkAddressConfirmationMessages.heading,
+        title = UkAddressConfirmationMessages.title,
         isAgent = false,
         hasSignOutLink = true
       )
       "there is an error on the page" in new TemplateViewTest(
         page(hasFormError = true),
-        title = UkAddressConfirmationMessages.heading,
+        title = UkAddressConfirmationMessages.title,
         isAgent = false,
         hasSignOutLink = true,
         errors = Some(Seq(testFormError.key -> UkAddressConfirmationMessages.Form.emptyError))
