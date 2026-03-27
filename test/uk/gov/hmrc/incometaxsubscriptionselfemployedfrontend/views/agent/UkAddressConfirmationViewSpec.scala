@@ -54,7 +54,7 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
   }
 
   object UkAddressConfirmationMessages {
-    val title = "Is the business in the UK?"
+    val title = "Is the business address in the UK?"
     val heading = s"Is the address for your client’s business, $testName in the UK?"
     val caption = s"${testDetails.name} – ${testDetails.nino.grouped(2).mkString(" ")}"
 

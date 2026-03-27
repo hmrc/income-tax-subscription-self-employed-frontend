@@ -52,7 +52,7 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
   }
 
   object UkAddressConfirmationMessages {
-    val title = "Is the business in the UK?"
+    val title = "Is the business address in the UK?"
     val heading = s"Is the address for your business, $testName in the UK?"
     val caption = "Sole trader"
 
