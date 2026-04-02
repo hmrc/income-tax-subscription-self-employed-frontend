@@ -217,12 +217,12 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     post(s"/client/details/business-check-your-answers?id=$id&isGlobalEdit=$isGlobalEdit")(Map.empty)
   }
 
-  def getAddressLookupInitialise(businessId: String): WSResponse = get(s"/address-lookup-initialise/$businessId")
+  def getAddressLookupInitialise(businessId: String, isUk: Boolean): WSResponse = get(s"/address-lookup-initialise/$businessId/$isUk")
 
   def getAddressLookup(businessId: String, id: String, isEditMode: Boolean = false): WSResponse =
     get(s"/details/address-lookup/$businessId?id=$id&isEditMode=$isEditMode")
 
-  def getClientAddressLookupInitialise(itsaId: String): WSResponse = get(s"/client/address-lookup-initialise/$itsaId")
+  def getClientAddressLookupInitialise(itsaId: String, isUk: Boolean): WSResponse = get(s"/client/address-lookup-initialise/$itsaId/$isUk")
 
   def getClientAddressLookup(itsaId: String, id: String, isEditMode: Boolean = false): WSResponse = get(s"/client/details/address-lookup/$itsaId?id=$id")
 

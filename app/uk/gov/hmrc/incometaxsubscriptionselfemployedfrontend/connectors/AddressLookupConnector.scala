@@ -37,37 +37,37 @@ class AddressLookupConnector @Inject()(val appConfig: AppConfig,
                                        addressLookupConfig: AddressLookupConfig,
                                        http: HttpClientV2)(implicit ec: ExecutionContext) extends FeatureSwitching {
 
-  def addressLookupInitializeUrl: URL =
+  private def addressLookupInitializeUrl: URL =
     url"${appConfig.addressLookupUrl}/api/v2/init"
 
-  def stubbedAddressLookupInitializeUrl: URL = {
+  private def stubbedAddressLookupInitializeUrl: URL = {
     url"${appConfig.stubAddressLookupUrl}/api/v2/init"
   }
 
-  def getAddressDetailsUrl(id: String): URL = {
+  private def getAddressDetailsUrl(id: String): URL = {
     url"${appConfig.addressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
-  def getStubbedAddressDetailsUrl(id: String): URL = {
+  private def getStubbedAddressDetailsUrl(id: String): URL = {
     url"${appConfig.stubAddressLookupUrl}/api/v2/confirmed?id=$id"
   }
 
-  def initialiseAddressLookup(continueUrl: String, isAgent: Boolean)(implicit hc: HeaderCarrier, request: RequestHeader): Future[PostAddressLookupResponse] = {
-    if (isEnabled(EnableUseRealAddressLookup)) {
-      http.post(addressLookupInitializeUrl).withBody(if (isAgent) addressLookupConfig.agentConfig(continueUrl) else addressLookupConfig.config(continueUrl))
-        .execute[PostAddressLookupResponse]
+  def initialiseAddressLookup(continueUrl: String, isAgent: Boolean, isUk: Boolean)(implicit hc: HeaderCarrier, request: RequestHeader): Future[PostAddressLookupResponse] = {
+    val url = if (isEnabled(EnableUseRealAddressLookup)) {
+      addressLookupInitializeUrl
     } else {
-      http.post(stubbedAddressLookupInitializeUrl).withBody(if (isAgent) addressLookupConfig.agentConfig(continueUrl) else addressLookupConfig.config(continueUrl))
-        .execute[PostAddressLookupResponse]
+      stubbedAddressLookupInitializeUrl
     }
+    http.post(url).withBody(addressLookupConfig.config(continueUrl, isAgent, isUk))
+      .execute[PostAddressLookupResponse]
   }
 
   def getAddressDetails(id: String)(implicit hc: HeaderCarrier): Future[GetAddressLookupDetailsResponse] = {
-    if (isEnabled(EnableUseRealAddressLookup)) {
-      http.get(url"${getAddressDetailsUrl(id)}").execute[GetAddressLookupDetailsResponse]
+    val url = if (isEnabled(EnableUseRealAddressLookup)) {
+      getAddressDetailsUrl(id)
     } else {
-      http.get(url"${getStubbedAddressDetailsUrl(id)}").execute[GetAddressLookupDetailsResponse]
+      getStubbedAddressDetailsUrl(id)
     }
-
+    http.get(url).execute[GetAddressLookupDetailsResponse]
   }
 }

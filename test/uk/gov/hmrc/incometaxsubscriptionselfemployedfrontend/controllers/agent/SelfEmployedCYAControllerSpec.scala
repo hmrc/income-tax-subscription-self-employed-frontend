@@ -59,7 +59,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         startDate = Some(DateModel("1", "1", "1980")),
         name = Some("testBusinessName"),
         trade = Some("testBusinessTrade"),
-        address = Some(Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ")))
+        address = Some(Address(lines = Seq("line 1"), postcode = Some("ZZ1 1ZZ"), country = Country.UK))
       )
     )
   )

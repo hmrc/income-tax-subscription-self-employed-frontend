@@ -24,7 +24,8 @@ class SelfEmploymentsCYAModelSpec extends PlaySpec {
 
   val address: Address = Address(
     lines = Seq("1 long road"),
-    postcode = Some("ZZ1 1ZZ")
+    postcode = Some("ZZ1 1ZZ"),
+    country = Country.UK
   )
 
   val fullModel: SelfEmploymentsCYAModel = SelfEmploymentsCYAModel(

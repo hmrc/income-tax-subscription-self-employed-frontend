@@ -18,7 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
@@ -26,7 +26,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAddressConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -67,7 +67,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
     authService.authorised() {
       handleForm(id)(
         onYes = Redirect(controllers.agent.routes.SelfEmployedCYAController.show(id)),
-        onNo = Redirect(controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id))
+        onNo = Redirect(controllers.agent.routes.UkAddressConfirmationController.show(id))
       )
     }
   }
@@ -121,7 +121,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
         throw new InternalServerException("[BusinessAddressConfirmationController][withFirstBusiness] - Unable to retrieve businesses")
       ) match {
         case Some(address) => onSuccessfulRetrieval(address)
-        case None => Future.successful(Redirect(controllers.agent.routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id)))
+        case None => Future.successful(Redirect(routes.UkAddressConfirmationController.show(id)))
       }
     }
   }

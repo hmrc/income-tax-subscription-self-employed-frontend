@@ -30,7 +30,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
@@ -49,7 +49,8 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       "1 Long Road",
       "Lonely town"
     ),
-    Some("ZZ11ZZ")
+    Some("ZZ11ZZ"),
+    Country.UK
   )
   val fakeRequestWithName: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(ITSASessionKeys.FullNameSessionKey -> name)
 
@@ -103,7 +104,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         val response: Future[Result] = controller.show(id)(fakeRequest)
 
         status(response) mustBe SEE_OTHER
-        redirectLocation(response) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        redirectLocation(response) mustBe Some(routes.UkAddressConfirmationController.show(id).url)
       }
     }
     "return OK with the page content" when {
@@ -156,7 +157,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         val response: Future[Result] = controller.submit(id)(fakeRequest)
 
         status(response) mustBe SEE_OTHER
-        redirectLocation(response) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        redirectLocation(response) mustBe Some(routes.UkAddressConfirmationController.show(id).url)
       }
       "the user selects 'No' that their address is not the same" in new Setup {
         mockAuthSuccess()
@@ -167,7 +168,7 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         )
 
         status(response) mustBe SEE_OTHER
-        redirectLocation(response) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id).url)
+        redirectLocation(response) mustBe Some(routes.UkAddressConfirmationController.show(id).url)
       }
     }
     "save the business address and redirect the user to the check your answers" when {

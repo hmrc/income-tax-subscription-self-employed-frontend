@@ -35,18 +35,26 @@ class AddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
     crypto.encrypt(PlainText("text")).value mustBe crypto.encrypt(PlainText("text")).value
   }
 
-  val fullAddress: Address = Address(lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"))
+  val fullAddress: Address = Address(lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"), country = Country.UK)
   val fullJson: JsObject = Json.obj(
     "lines" -> Json.arr(
       jsonSensitiveEncrypter("1 Long Road"),
       jsonSensitiveEncrypter("Lonely Town")
     ),
-    "postcode" -> jsonSensitiveEncrypter("ZZ1 1ZZ")
+    "postcode" -> jsonSensitiveEncrypter("ZZ1 1ZZ"),
+    "country" -> Json.obj(
+      "code" -> jsonSensitiveEncrypter(Country.UK.code),
+      "name" -> jsonSensitiveEncrypter(Country.UK.name)
+    )
   )
 
-  val minAddress: Address = Address(Seq.empty[String], None)
+  val minAddress: Address = Address(Seq.empty[String], None, Country.UK)
   val minJson: JsObject = Json.obj(
-    "lines" -> Json.arr()
+    "lines" -> Json.arr(),
+    "country" -> Json.obj(
+      "code" -> jsonSensitiveEncrypter(Country.UK.code),
+      "name" -> jsonSensitiveEncrypter(Country.UK.name)
+    )
   )
 
   "Address" when {

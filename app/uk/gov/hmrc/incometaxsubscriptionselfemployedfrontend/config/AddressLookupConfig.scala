@@ -27,88 +27,17 @@ import javax.inject.{Inject, Singleton}
 class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesApi, accessibilityStatementConfig: AccessibilityStatementConfig){
 
   //scalastyle:off
-  def config(continueUrl: String)(implicit request: RequestHeader): JsObject = {
+  def config(continueUrl: String, isAgent: Boolean, isUk: Boolean)(implicit request: RequestHeader): JsObject = {
     val en = Lang("EN")
     val cy = Lang("CY")
-
-    Json.obj(
-      "version" -> 2,
-      "options" -> Json.obj(
-        "manualAddressEntryConfig" -> manualAddressEntryConfig,
-        "continueUrl" -> continueUrl,
-        "showBackButtons" -> true,
-        "includeHMRCBranding" -> true,
-        "serviceHref" -> Some(appConfig.govukGuidanceITSASignUpIndivLink),
-        "ukMode" -> true,
-        "selectPageConfig" -> Json.obj(
-          "proposalListLimit" -> 50,
-          "showSearchLinkAgain" -> true
-        ),
-        "confirmPageConfig" -> Json.obj(
-          "showChangeLink" -> true,
-          "showSubHeadingAndInfo" -> true,
-          "showSearchAgainLink" -> false,
-          "showConfirmChangeText" -> true
-        ),
-        "timeoutConfig" -> Json.obj(
-          "timeoutAmount" -> 900,
-          "timeoutUrl" -> s"${appConfig.incomeTaxSubscriptionFrontendBaseUrl}/session-timeout"
-        ),
-        "accessibilityFooterUrl" -> accessibilityStatementConfig.url
-      ),
-      "labels" -> Json.obj(
-        "en" -> Json.obj(
-          "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("base.service-name")(en)
-          ),
-          "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.select-page.title")(en),
-            "heading" -> messagesApi("address-lookup.select-page.heading")(en)
-          ),
-          "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.lookup-page.title")(en),
-            "heading" -> messagesApi("address-lookup.lookup-page.heading")(en)
-          ),
-          "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.edit-page.title")(en),
-            "heading" -> messagesApi("address-lookup.edit-page.heading")(en),
-            "postcodeLabel" -> messagesApi("address-lookup.edit-page.postcode-label")(en)
-          ),
-          "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.confirm-page.title")(en),
-            "heading" -> messagesApi("address-lookup.confirm-page.heading")(en)
-          )
-        ),
-        "cy" -> Json.obj(
-          "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("base.service-name")(cy)
-          ),
-          "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.select-page.title")(cy),
-            "heading" -> messagesApi("address-lookup.select-page.heading")(cy)
-          ),
-          "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.lookup-page.title")(cy),
-            "heading" -> messagesApi("address-lookup.lookup-page.heading")(cy)
-          ),
-          "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.edit-page.title")(cy),
-            "heading" -> messagesApi("address-lookup.edit-page.heading")(cy),
-            "postcodeLabel" -> messagesApi("address-lookup.edit-page.postcode-label")(cy)
-          ),
-          "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("address-lookup.confirm-page.title")(cy),
-            "heading" -> messagesApi("address-lookup.confirm-page.heading")(cy)
-          )
-        )
-      )
+    
+    val (prefix, serviceUrl) = if (isAgent) (
+      "agent.",
+      appConfig.govukGuidanceITSASignUpAgentLink
+    ) else (
+      "",
+      appConfig.govukGuidanceITSASignUpIndivLink
     )
-  }
-
-  //scalastyle:off
-  def agentConfig(continueUrl: String)(implicit request: RequestHeader): JsObject = {
-    val en = Lang("EN")
-    val cy = Lang("CY")
 
     Json.obj(
       "version" -> 2,
@@ -117,8 +46,8 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
         "includeHMRCBranding" -> true,
-        "serviceHref" -> Some(appConfig.govukGuidanceITSASignUpAgentLink),
-        "ukMode" -> true,
+        "serviceHref" -> Some(serviceUrl),
+        "ukMode" -> isUk,
         "selectPageConfig" -> Json.obj(
           "proposalListLimit" -> 50,
           "showSearchLinkAgain" -> true
@@ -136,48 +65,80 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "accessibilityFooterUrl" -> accessibilityStatementConfig.url
       ),
       "labels" -> Json.obj(
-        "en" -> Json.obj(
+        en.language -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("base.agent.service-name")(en)
+            "navTitle" -> messagesApi(s"base.${prefix}service-name")(en)
           ),
           "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.select-page.title")(en),
-            "heading" -> messagesApi("agent.address-lookup.select-page.heading")(en)
+            "title" -> messagesApi(s"${prefix}address-lookup.select-page.title")(en),
+            "heading" -> messagesApi(s"${prefix}address-lookup.select-page.heading")(en)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.lookup-page.title")(en),
-            "heading" -> messagesApi("agent.address-lookup.lookup-page.heading")(en)
+            "title" -> messagesApi(s"${prefix}address-lookup.lookup-page.title")(en),
+            "heading" -> messagesApi(s"${prefix}address-lookup.lookup-page.heading")(en),
+            "filterLabel" -> messagesApi(s"${prefix}address-lookup.lookup-page.property-label")(en),
+            "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.lookup-page.postcode-label")(en)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.edit-page.title")(en),
-            "heading" -> messagesApi("agent.address-lookup.edit-page.heading")(en),
-            "postcodeLabel" -> messagesApi("agent.address-lookup.edit-page.postcode-label")(en)
+            "title" -> messagesApi(s"${prefix}address-lookup.edit-page.title")(en),
+            "heading" -> messagesApi(s"${prefix}address-lookup.edit-page.heading")(en),
+            "line1Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line1-label")(en),
+            "line2Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line2-label")(en),
+            "line3Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line3-label")(en),
+            "townLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.town-label")(en),
+            "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.postcode-label")(en),
+            "countryLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.country-label")(en)
           ),
           "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.confirm-page.title")(en),
-            "heading" -> messagesApi("agent.address-lookup.confirm-page.heading")(en)
+            "title" -> messagesApi(s"${prefix}address-lookup.confirm-page.title")(en),
+            "heading" -> messagesApi(s"${prefix}address-lookup.confirm-page.heading")(en),
+            "infoSubheading" -> messagesApi(s"${prefix}address-lookup.confirm-page.address-label")(en),
+            "infoMessage" -> "",
+            "confirmChangeText" -> messagesApi(s"${prefix}address-lookup.confirm-page.para")(en),
+            "submitLabel" -> messagesApi(s"${prefix}address-lookup.confirm-page.confirm")(en)
+          ),
+          "countryPickerLabels" -> Json.obj(
+            "title" -> messagesApi(s"${prefix}address-lookup.country-page.title")(en),
+            "heading" -> messagesApi(s"${prefix}address-lookup.country-page.heading")(en),
+            "countryLabel" -> messagesApi(s"${prefix}address-lookup.country-page.country-label")(en)
           )
         ),
-        "cy" -> Json.obj(
+        cy.language -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("base.agent.service-name")(cy)
+            "navTitle" -> messagesApi(s"base.${prefix}service-name")(cy)
           ),
           "selectPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.select-page.title")(cy),
-            "heading" -> messagesApi("agent.address-lookup.select-page.heading")(cy)
+            "title" -> messagesApi(s"${prefix}address-lookup.select-page.title")(cy),
+            "heading" -> messagesApi(s"${prefix}address-lookup.select-page.heading")(cy)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.lookup-page.title")(cy),
-            "heading" -> messagesApi("agent.address-lookup.lookup-page.heading")(cy)
+            "title" -> messagesApi(s"${prefix}address-lookup.lookup-page.title")(cy),
+            "heading" -> messagesApi(s"${prefix}address-lookup.lookup-page.heading")(cy),
+            "filterLabel" -> messagesApi(s"${prefix}address-lookup.lookup-page.property-label")(cy),
+            "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.lookup-page.postcode-label")(cy)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.edit-page.title")(cy),
-            "heading" -> messagesApi("agent.address-lookup.edit-page.heading")(cy),
-            "postcodeLabel" -> messagesApi("agent.address-lookup.edit-page.postcode-label")(cy)
+            "title" -> messagesApi(s"${prefix}address-lookup.edit-page.title")(cy),
+            "heading" -> messagesApi(s"${prefix}address-lookup.edit-page.heading")(cy),
+            "line1Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line1-label")(cy),
+            "line2Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line2-label")(cy),
+            "line3Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line3-label")(cy),
+            "townLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.town-label")(cy),
+            "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.postcode-label")(cy),
+            "countryLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.country-label")(cy)
           ),
           "confirmPageLabels" -> Json.obj(
-            "title" -> messagesApi("agent.address-lookup.confirm-page.title")(cy),
-            "heading" -> messagesApi("agent.address-lookup.confirm-page.heading")(cy)
+            "title" -> messagesApi(s"${prefix}address-lookup.confirm-page.title")(cy),
+            "heading" -> messagesApi(s"${prefix}address-lookup.confirm-page.heading")(cy),
+            "infoSubheading" -> messagesApi(s"${prefix}address-lookup.confirm-page.address-label")(cy),
+            "infoMessage" -> "",
+            "confirmChangeText" -> messagesApi(s"${prefix}address-lookup.confirm-page.para")(cy),
+            "submitLabel" -> messagesApi(s"${prefix}address-lookup.confirm-page.confirm")(cy)
+          ),
+          "countryPickerLabels" -> Json.obj(
+            "title" -> messagesApi(s"${prefix}address-lookup.country-page.title")(cy),
+            "heading" -> messagesApi(s"${prefix}address-lookup.country-page.heading")(cy),
+            "countryLabel" -> messagesApi(s"${prefix}address-lookup.country-page.country-label")(cy)
           )
         )
       )
@@ -190,6 +151,14 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
     "line1MaxLength" -> maxLength,
     "line2MaxLength" -> maxLength,
     "line3MaxLength" -> maxLength,
-    "townMaxLength" -> maxLength
+    "townMaxLength" -> maxLength,
+    "showOrganisationName" -> false,
+    "mandatoryFields" -> Json.obj(
+      "addressLine1" -> true,
+      "addressLine2" -> false,
+      "addressLine3" -> false,
+      "town" -> true,
+      "postcode" -> false
+    )
   )
 }

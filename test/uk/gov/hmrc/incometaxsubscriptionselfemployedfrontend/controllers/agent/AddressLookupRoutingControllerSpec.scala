@@ -17,20 +17,22 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks.MockAddressLookupConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.{PostAddressLookupSuccessResponse, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.*
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
 
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
   with MockSessionDataService
+  with MockClientDetailsRetrieval
   with MockMultipleSelfEmploymentsService {
 
   val isAgent = true
@@ -39,7 +41,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "AddressLookupRoutingController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "initialiseAddressLookupJourney" -> TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false),
+    "initialiseAddressLookupJourney" -> TestUkAddressConfirmationController.show(businessId, isEditMode = false, isGlobalEdit = false),
     "addressLookupRedirect" -> TestAddressLookupRoutingController.addressLookupRedirect(businessId, None, isEditMode = false, isGlobalEdit = false)
   )
 
@@ -52,13 +54,24 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
     mockSessionDataService,
     appConfig
   )
+  
+  object TestUkAddressConfirmationController extends UkAddressConfirmationController(
+    mockMessagesControllerComponents,
+    mockClientDetailsRetrieval,
+    mockAuthService,
+    mockMultipleSelfEmploymentsService,
+    mock[UkAddressConfirmation]
+  )(
+    mockSessionDataService,
+    appConfig
+  )
 
   val continueUrl = s"http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/client/details/address-lookup/$businessId"
   private val addressId = "12345"
   private val redirectUrl = "http://testLocation?id=" + addressId
 
   val testAddress: Address = Address(
-    lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ")
+    lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"), country = Country.UK
   )
 
   "checkAddressLookupJourney" when {
@@ -71,7 +84,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = false)(fakeRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId).url)
+          redirectLocation(result) mustBe Some(routes.UkAddressConfirmationController.show(businessId).url)
         }
         "edit mode is true" in {
           mockAuthSuccess()
@@ -80,7 +93,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           val result = TestAddressLookupRoutingController.checkAddressLookupJourney(businessId, isEditMode = true)(fakeRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = true).url)
+          redirectLocation(result) mustBe Some(routes.UkAddressConfirmationController.show(businessId, isEditMode = true).url)
         }
       }
     }
@@ -113,27 +126,31 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
     "return ok (200)" when {
       "the connector returns data" in {
         mockAuthSuccess()
-        mockInitialiseAddressLookup(continueUrl, isAgent = isAgent)(
-          Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
-        )
+        Seq(false, true).foreach { isUk =>
+          mockInitialiseAddressLookup(continueUrl, isAgent = isAgent, isUk = isUk)(
+            Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
+          )
 
-        val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false)(fakeRequest)
+          val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false, isUk = isUk)(fakeRequest)
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(redirectUrl)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(redirectUrl)
+        }
       }
     }
     "Throw an internal exception" when {
       "there is an unexpected status failure" in {
         mockAuthSuccess()
-        mockInitialiseAddressLookup(continueUrl, isAgent = isAgent)(
-          Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
-        )
+        Seq(false, true).foreach { isUk =>
+          mockInitialiseAddressLookup(continueUrl, isAgent = isAgent, isUk = isUk)(
+            Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+          )
 
-        val result = intercept[InternalServerException](
-          await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false)(fakeRequest))
-        )
-        result.message mustBe "[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: 500"
+          val result = intercept[InternalServerException](
+            await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false, isUk = isUk)(fakeRequest))
+          )
+          result.message mustBe "[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: 500"
+        }
       }
     }
   }

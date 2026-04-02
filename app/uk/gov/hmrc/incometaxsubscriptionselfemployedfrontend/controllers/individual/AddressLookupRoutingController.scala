@@ -51,18 +51,19 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
         case Right(Some(_)) =>
           Redirect(routes.BusinessAddressConfirmationController.show(businessId))
         case Right(_) =>
-          Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode))
+          Redirect(routes.UkAddressConfirmationController.show(businessId, isEditMode))
         case Left(_) =>
           throw new InternalServerException("[AddressLookupRoutingController][checkAddressLookupJourney] - Error when retrieving any address")
       }
     }
   }
 
-  def initialiseAddressLookupJourney(businessId: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
+  def initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       addressLookupConnector.initialiseAddressLookup(
         continueUrl = addressLookupContinueUrl(businessId, None, isEditMode, isGlobalEdit),
-        isAgent = false
+        isAgent = false,
+        isUk = isUk
       ) map {
         case Right(PostAddressLookupSuccessResponse(Some(location))) =>
           Redirect(location)

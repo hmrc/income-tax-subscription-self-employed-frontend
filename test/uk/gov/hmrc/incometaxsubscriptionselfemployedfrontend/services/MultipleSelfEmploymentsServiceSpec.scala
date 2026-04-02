@@ -48,7 +48,8 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
   val trade: String = "test trade"
   val address: Address = Address(
     lines = Seq("1 Long Road", "Lonely Town"),
-    postcode = Some("ZZ1 1ZZ")
+    postcode = Some("ZZ1 1ZZ"),
+    country = Country.UK
   )
 
   val soleTraderBusiness: SoleTraderBusiness = SoleTraderBusiness(
@@ -392,7 +393,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
   "saveAddress" must {
     "return a save successful response" when {
       "there was an already existing business which had its start date updated" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(confirmed = true)))
         val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
 
@@ -410,7 +411,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "there was an already existing business which had its start date added" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = None)))
         val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
 
@@ -428,7 +429,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "there is an already existing business which does not match the saved data id" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
         val newBusinesses: SoleTraderBusinesses = multipleSoleTraderBusinesses(soleTraderBusinessTwo(address = Some(saveData)))
 
@@ -446,7 +447,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "there was no existing business matching the id, one was created with the id and start date" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq.empty[SoleTraderBusiness])
         val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(SoleTraderBusiness(id, address = Some(saveData))))
 
@@ -464,7 +465,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Right(PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse)
       }
       "no sole trader businesses were returned" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
         val newBusinesses: SoleTraderBusinesses = SoleTraderBusinesses(businesses = Seq(SoleTraderBusiness(id, address = Some(saveData))))
 
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
@@ -483,7 +484,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
     }
     "return an error" when {
       "there was an error fetching the sole trader businesses" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
 
         mockGetSubscriptionDetails(testReference, soleTraderBusinessesKey)(
           Left(GetSelfEmploymentsHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
@@ -493,7 +494,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
       "there was an error saving the sole trader businesses" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
         val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
 
@@ -508,7 +509,7 @@ class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubs
           Left(MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure)
       }
       "there was an error deleting the income source completed field" in new Setup {
-        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"))
+        val saveData: Address = Address(lines = Seq("2 Big Street"), postcode = Some("ZZ2 2ZZ"), country = Country.UK)
         val oldBusinesses: SoleTraderBusinesses = soleTraderBusinesses
         val newBusinesses: SoleTraderBusinesses = soleTraderBusinesses.copy(businesses = Seq(soleTraderBusiness.copy(address = Some(saveData))))
 
