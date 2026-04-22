@@ -160,6 +160,18 @@ object IntegrationTestConstants {
        |        "postcodeLabel": "Postcode or zipcode",
        |        "countryLabel": "Country or territory"
        |      },
+       |      "international": {
+       |        "editPageLabels": {
+       |          "title": "Enter your business address",
+       |          "heading": "Enter your business address",
+       |          "line1Label": "Address line 1",
+       |          "line2Label": "Address line 2",
+       |          "line3Label": "Address line 3",
+       |          "townLabel": "Town or city",
+       |          "postcodeLabel": "Postcode or zipcode",
+       |          "countryLabel": "Country or territory"
+       |        }
+       |      },
        |      "confirmPageLabels": {
        |        "title": "Confirm your business address",
        |        "heading": "Confirm your business address",
@@ -197,6 +209,18 @@ object IntegrationTestConstants {
        |        "townLabel": "Tref neu ddinas",
        |        "postcodeLabel": "Cod post neu god zip",
        |        "countryLabel": "Gwlad neu diriogaeth"
+       |      },
+       |      "international": {
+       |        "editPageLabels": {
+       |          "title": "Rhowch gyfeiriad busnes",
+       |          "heading": "Rhowch gyfeiriad busnes",
+       |          "line1Label": "Cyfeiriad – llinell 1",
+       |          "line2Label": "Cyfeiriad – llinell 2",
+       |          "line3Label": "Cyfeiriad – llinell 3",
+       |          "townLabel": "Tref neu ddinas",
+       |          "postcodeLabel": "Cod post neu god zip",
+       |          "countryLabel": "Gwlad neu diriogaeth"
+       |        }
        |      },
        |      "confirmPageLabels": {
        |        "title": "Cadarnhau cyfeiriad eich busnes",
@@ -283,6 +307,18 @@ object IntegrationTestConstants {
        |        "postcodeLabel": "Postcode or zipcode",
        |        "countryLabel": "Country or territory"
        |      },
+       |      "international": {
+       |        "editPageLabels": {
+       |          "title": "Enter your client’s business address",
+       |          "heading": "Enter your client’s business address",
+       |          "line1Label": "Address line 1",
+       |          "line2Label": "Address line 2",
+       |          "line3Label": "Address line 3",
+       |          "townLabel": "Town or city",
+       |          "postcodeLabel": "Postcode or zipcode",
+       |          "countryLabel": "Country or territory"
+       |        }
+       |      },
        |      "confirmPageLabels": {
        |        "title": "Confirm your client’s business address",
        |        "heading": "Confirm your client’s business address",
@@ -320,6 +356,18 @@ object IntegrationTestConstants {
        |        "townLabel": "Tref neu ddinas",
        |        "postcodeLabel": "Cod post neu god zip",
        |        "countryLabel": "Gwlad neu diriogaeth"
+       |      },
+       |      "international": {
+       |        "editPageLabels": {
+       |          "title": "Nodwch gyfeiriad busnes eich cleien",
+       |          "heading": "Nodwch gyfeiriad busnes eich cleien",
+       |          "line1Label": "Cyfeiriad – llinell 1",
+       |          "line2Label": "Cyfeiriad – llinell 2",
+       |          "line3Label": "Cyfeiriad – llinell 3",
+       |          "townLabel": "Tref neu ddinas",
+       |          "postcodeLabel": "Cod post neu god zip",
+       |          "countryLabel": "Gwlad neu diriogaeth"
+       |        }
        |      },
        |      "confirmPageLabels": {
        |        "title": "Cadarnhau cyfeiriad busnes eich cleient",

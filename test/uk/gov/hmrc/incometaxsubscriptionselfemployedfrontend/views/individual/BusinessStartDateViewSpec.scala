@@ -24,10 +24,12 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessStartDate
 
 class BusinessStartDateViewSpec extends ViewSpec {
+
+  val year = AccountingPeriodUtil.getStartDateLimit.getYear.toString
 
   object BusinessStartDateMessages {
     val title = "Start date for sole trader business"
@@ -35,7 +37,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val heading: String = "Start date"
     val captionVisual = "Your sole trader business"
     val paragraph: String = "We need to know the exact start date."
-    val hint = "For example, 27 9 2023"
+    val hint = s"For example, 27 9 $year"
     val backLink = "Back"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
