@@ -89,6 +89,18 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
             "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.postcode-label")(en),
             "countryLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.country-label")(en)
           ),
+          "international" -> Json.obj(
+            "editPageLabels" -> Json.obj(
+              "title" -> messagesApi(s"${prefix}address-lookup.edit-page.title")(en),
+              "heading" -> messagesApi(s"${prefix}address-lookup.edit-page.heading")(en),
+              "line1Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line1-label")(en),
+              "line2Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line2-label")(en),
+              "line3Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line3-label")(en),
+              "townLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.town-label")(en),
+              "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.postcode-label")(en),
+              "countryLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.country-label")(en)
+            )
+          ),
           "confirmPageLabels" -> Json.obj(
             "title" -> messagesApi(s"${prefix}address-lookup.confirm-page.title")(en),
             "heading" -> messagesApi(s"${prefix}address-lookup.confirm-page.heading")(en),
@@ -126,6 +138,18 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
             "townLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.town-label")(cy),
             "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.postcode-label")(cy),
             "countryLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.country-label")(cy)
+          ),
+          "international" -> Json.obj(
+            "editPageLabels" -> Json.obj(
+              "title" -> messagesApi(s"${prefix}address-lookup.edit-page.title")(cy),
+              "heading" -> messagesApi(s"${prefix}address-lookup.edit-page.heading")(cy),
+              "line1Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line1-label")(cy),
+              "line2Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line2-label")(cy),
+              "line3Label" -> messagesApi(s"${prefix}address-lookup.edit-page.line3-label")(cy),
+              "townLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.town-label")(cy),
+              "postcodeLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.postcode-label")(cy),
+              "countryLabel" -> messagesApi(s"${prefix}address-lookup.edit-page.country-label")(cy)
+            )
           ),
           "confirmPageLabels" -> Json.obj(
             "title" -> messagesApi(s"${prefix}address-lookup.confirm-page.title")(cy),
