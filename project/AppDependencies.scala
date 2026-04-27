@@ -6,8 +6,8 @@ object AppDependencies {
 
   val appName = "income-tax-subscription-self-employed-frontend"
 
-  private val bootstrapVersion = "10.6.0"
-  private val playHmrcFrontendVersion = "12.32.0"
+  private val bootstrapVersion = "10.7.0"
+  private val playHmrcFrontendVersion = "12.32.1"
   private val catsVersion = "2.13.0"
   private val cryptoJsonVersion = "8.4.0"
 
