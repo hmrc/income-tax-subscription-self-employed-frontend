@@ -33,7 +33,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach {
 
@@ -364,13 +364,15 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       }
     }
 
-    def mustHaveTextInput(selector: String = ".govuk-form-group")(name: String,
-                          label: String,
-                          isLabelHidden: Boolean,
-                          isPageHeading: Boolean,
-                          hint: Option[String] = None,
-                          error: Option[String] = None,
-                          autoComplete: Option[String] = None): Assertion = {
+    def mustHaveTextInput(selector: String)(name: String,
+                                            label: String,
+                                            isLabelHidden: Boolean,
+                                            isPageHeading: Boolean,
+                                            hint: Option[String] = None,
+                                            error: Option[String] = None,
+                                            autoComplete: Option[String] = None,
+                                            spellcheck: Option[Boolean] = None,
+                                            inputType: String = "text"): Assertion = {
       val checkpoint: Checkpoint = new Checkpoint
       val formGroup: Element = element.selectHead(selector)
       val textInput: Element = formGroup.selectHead(s"input[name=$name]")
@@ -378,27 +380,51 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       validateTextInputLabel(name, label, isPageHeading, isLabelHidden, checkpoint)
 
       checkpoint {
-        textInput.attr("type") mustBe "text"
+        textInput.attr("type") mustBe inputType
       }
+
       checkpoint {
         textInput.attr("name") mustBe name
       }
 
-      autoComplete.foreach(value =>
+      autoComplete.fold(
+        checkpoint {
+          textInput.hasAttr("autocomplete") mustBe false
+        }
+      ) { value =>
         checkpoint {
           textInput.attr("autocomplete") mustBe value
-        })
+        }
+      }
 
-      hint.foreach { value =>
+      spellcheck.fold(
         checkpoint {
-          element.selectHead(s"#$name-hint").text mustBe value
+          textInput.hasAttr("spellcheck") mustBe false
+        }
+      ) { value =>
+        checkpoint {
+          textInput.attr("spellcheck") mustBe value.toString
+        }
+      }
+
+      hint.fold(
+        checkpoint {
+          element.selectOptionally(s"#$name-hint") mustBe None
+        }
+      ) { hintText =>
+        checkpoint {
+          element.selectHead(s"#$name-hint").text mustBe hintText
         }
         checkpoint {
           textInput.attr("aria-describedby") must include(s"$name-hint")
         }
       }
 
-      error.foreach { errorMessage =>
+      error.fold(
+        checkpoint {
+          element.selectOptionally(s"#$name-error") mustBe None
+        }
+      ) { errorMessage =>
         checkpoint {
           element.selectHead(s"#$name-error").text mustBe s"Error: $errorMessage"
         }

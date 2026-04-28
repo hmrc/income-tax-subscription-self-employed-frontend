@@ -50,7 +50,8 @@
             label = messages("individual.full-income-source.business-name.label"),
             hint = Some(Html(messages("individual.full-income-source.business-name.hint"))),
             isPageHeading = false,
-            classes = Some("govuk-!-width-one-half")
+            classes = Some("govuk-!-width-one-half"),
+            autoComplete = Some("organization")
         )
 
         @radioHelper(

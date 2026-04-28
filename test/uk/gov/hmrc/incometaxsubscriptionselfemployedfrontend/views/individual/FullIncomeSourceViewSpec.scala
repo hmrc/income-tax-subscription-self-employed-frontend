@@ -97,7 +97,8 @@ class FullIncomeSourceViewSpec extends ViewSpec {
           label = businessNameLabel,
           isLabelHidden = false,
           isPageHeading = false,
-          hint = Some(businessNameHint)
+          hint = Some(businessNameHint),
+          autoComplete = Some("organization")
         )
       }
 
