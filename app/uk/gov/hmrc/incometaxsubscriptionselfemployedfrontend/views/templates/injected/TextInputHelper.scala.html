@@ -18,12 +18,14 @@
         govukInput: GovukInput
 )
 
-@(      field: Field,
-        label: String,
-        isLabelHidden: Boolean = false,
-        isPageHeading: Boolean = true,
-        hint: Option[Html] = None,
-        classes: Option[String] = None
+@(
+    field: Field,
+    label: String,
+    isLabelHidden: Boolean = false,
+    isPageHeading: Boolean = true,
+    hint: Option[Html] = None,
+    classes: Option[String] = None,
+    autoComplete: Option[String] = None
 )(implicit messages: Messages)
 
 
@@ -42,6 +44,7 @@
                 content = HtmlContent(text)
             )
         },
-        classes = classes.getOrElse("")
+        classes = classes.getOrElse(""),
+        autocomplete = autoComplete
     ).withFormField(field)
 )
