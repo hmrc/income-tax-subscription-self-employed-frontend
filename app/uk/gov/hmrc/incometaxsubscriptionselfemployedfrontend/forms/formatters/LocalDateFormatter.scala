@@ -24,14 +24,13 @@ import java.time.{LocalDate, Month}
 import scala.util.control.Exception.nonFatalCatch
 import scala.util.{Failure, Success, Try}
 
-private[formatters] class LocalDateFormatter(
-                                              invalidKey: String,
-                                              allRequiredKey: String,
-                                              twoRequiredKey: String,
-                                              requiredKey: String,
-                                              invalidYearKey: String,
-                                              args: Seq[String] = Seq.empty
-                                            )(implicit messages: Messages) extends Formatter[LocalDate] with Formatters {
+private[formatters] class LocalDateFormatter(invalidKey: String,
+                                             allRequiredKey: String,
+                                             twoRequiredKey: String,
+                                             requiredKey: String,
+                                             invalidYearKey: String,
+                                             args: Seq[String] = Seq.empty)
+                                            (implicit messages: Messages) extends Formatter[LocalDate] with Formatters {
 
   private val fieldKeys: Seq[String] = Seq("Day", "Month", "Year")
 
