@@ -114,6 +114,7 @@ object IntegrationTestConstants {
        |        "postcode": false
        |      }
        |    },
+       |    "useNewGovUkServiceNavigation": true,
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
@@ -261,6 +262,7 @@ object IntegrationTestConstants {
        |        "postcode": false
        |      }
        |    },
+       |    "useNewGovUkServiceNavigation": true,
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
