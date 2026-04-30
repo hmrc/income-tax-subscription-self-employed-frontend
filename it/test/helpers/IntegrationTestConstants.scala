@@ -115,6 +115,7 @@ object IntegrationTestConstants {
        |      }
        |    },
        |    "useNewGovUkServiceNavigation": true,
+       |    "includeHMRCBranding": false,
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
@@ -263,6 +264,7 @@ object IntegrationTestConstants {
        |      }
        |    },
        |    "useNewGovUkServiceNavigation": true,
+       |    "includeHMRCBranding": false,
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
        |    "includeHMRCBranding": true,
