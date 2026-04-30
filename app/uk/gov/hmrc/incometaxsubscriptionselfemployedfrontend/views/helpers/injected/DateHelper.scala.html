@@ -45,7 +45,7 @@
     def maybeErrorClass: String = {
             error.map(_.args) match {
                 case Some(Seq()) => "govuk-input--error"
-                case Some(args) if args.contains(key) => s"govuk-input--error"
+                case Some(args) if args.contains(messages(s"base.$key").toLowerCase()) => s"govuk-input--error"
                 case _ => ""
             }
     }
@@ -79,7 +79,7 @@
     InputItem(
       name = "dateYear",
       autocomplete = if(isDateOfBirth) Some("bday-year") else None ,
-      classes = inputClass("day", 4),
+      classes = inputClass("year", 4),
       label =  Some(messages("base.year")),
       value = parentForm(s"${field.name}-dateYear").value
     )
