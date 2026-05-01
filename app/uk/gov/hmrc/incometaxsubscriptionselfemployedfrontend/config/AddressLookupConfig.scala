@@ -44,6 +44,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
       "options" -> Json.obj(
         "manualAddressEntryConfig" -> manualAddressEntryConfig,
         "useNewGovUkServiceNavigation" -> true,
+        "includeHMRCBranding" -> false,
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
         "includeHMRCBranding" -> true,
