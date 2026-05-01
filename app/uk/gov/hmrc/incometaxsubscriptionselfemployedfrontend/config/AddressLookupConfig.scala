@@ -47,7 +47,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "includeHMRCBranding" -> false,
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
-        "includeHMRCBranding" -> true,
+        "includeHMRCBranding" -> false,
         "serviceHref" -> Some(serviceUrl),
         "ukMode" -> isUk,
         "selectPageConfig" -> Json.obj(
