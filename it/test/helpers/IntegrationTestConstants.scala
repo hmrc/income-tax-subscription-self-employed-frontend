@@ -118,7 +118,6 @@ object IntegrationTestConstants {
        |    "includeHMRCBranding": false,
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
-       |    "includeHMRCBranding": false,
        |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-business-for-making-tax-digital-for-income-tax",
        |    "ukMode": $isUk,
        |    "selectPageConfig": {
@@ -267,7 +266,6 @@ object IntegrationTestConstants {
        |    "includeHMRCBranding": false,
        |    "continueUrl": "$continueUrl",
        |    "showBackButtons": true,
-       |    "includeHMRCBranding": false,
        |    "serviceHref": "https://www.gov.uk/guidance/sign-up-your-client-for-making-tax-digital-for-income-tax",
        |    "ukMode": $isUk,
        |    "selectPageConfig": {
