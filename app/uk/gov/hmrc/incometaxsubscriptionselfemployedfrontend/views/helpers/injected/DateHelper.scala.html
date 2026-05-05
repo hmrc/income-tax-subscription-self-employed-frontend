@@ -38,7 +38,7 @@
 
 @errorMessage = @{
   error map { error =>
-      ErrorMessage(content = HtmlContent(messages(error.message, error.args: _*)))
+      ErrorMessage.errorMessageWithDefaultStringsTranslated(content = HtmlContent(messages(error.message, error.args: _*)))
   }
 }
 
