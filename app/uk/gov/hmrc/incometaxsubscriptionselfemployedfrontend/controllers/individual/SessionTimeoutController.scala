@@ -25,10 +25,13 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class SessionTimeoutController @Inject()(mcc: MessagesControllerComponents, appConfig: AppConfig) extends FrontendController(mcc) {
 
+  val show: Action[AnyContent] = Action { _ =>
+    Redirect(appConfig.individualSessionTimeoutUrl)
+  }
+
   val keepAlive: Action[AnyContent] = Action { _ => Ok }
 
   val timeout: Action[AnyContent] = Action { _ =>
     appConfig.redirectToLogin(appConfig.incomeTaxSubscriptionFrontendBaseUrl)
   }
-
 }

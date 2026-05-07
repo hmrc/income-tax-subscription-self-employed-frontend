@@ -29,6 +29,7 @@ POST        /details/confirm-business-address            uk.gov.hmrc.incometaxsu
 #Session timeout
 GET         /keep-alive                                  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.keepAlive
 GET         /timeout                                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.timeout
+GET         /session-timeout                             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SessionTimeoutController.show
 
 #UK Address
 GET         /uk-foreign-business                         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.UkAddressConfirmationController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)

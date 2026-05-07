@@ -36,7 +36,8 @@ class ServiceNameViewSpec extends ViewSpec {
       serviceUrl = serviceUrl,
       optForm = None,
       backLink = Some(BackLink("backUrl")),
-      showSignOutLink = false
+      showSignOutLink = false,
+      timeoutUrl = Some("timeoutUrl")
     )(Html(""))(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)

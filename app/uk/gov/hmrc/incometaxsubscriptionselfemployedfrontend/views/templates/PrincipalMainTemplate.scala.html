@@ -37,5 +37,6 @@
     serviceUrl = appConfig.govukGuidanceITSASignUpIndivLink,
     optForm = optForm,
     backLink = backLink,
-    showSignOutLink = showSignOutLink
+    showSignOutLink = showSignOutLink,
+    timeoutUrl = Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.SessionTimeoutController.show.url)
 )(contentBlock)
