@@ -22,6 +22,18 @@ import play.api.http.Status.{OK, SEE_OTHER}
 
 class SessionTimeoutControllerISpec extends ComponentSpecBase with CustomMatchers {
 
+  "GET /session-timeout" should {
+    "show the session timeout page" in {
+      Given("I setup the Wiremock stubs")
+      AuthStub.stubAuthSuccess()
+      val res = clientSessionTimeout()
+      res must have(
+        httpStatus(SEE_OTHER),
+        redirectURI("http://localhost:9561/report-quarterly/income-and-expenses/sign-up/client/session-timeout")
+      )
+    }
+  }
+
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/keep-alive" when {
     "an agent chooses to not time out" should {
       "return an OK and keep the session" in {

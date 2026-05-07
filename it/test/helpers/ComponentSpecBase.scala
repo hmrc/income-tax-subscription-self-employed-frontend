@@ -201,6 +201,9 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   def getClientTimeout: WSResponse = get(uri = "/client/timeout")
 
+  def sessionTimeout(): WSResponse = get("/session-timeout")
+  def clientSessionTimeout(): WSResponse = get("/client/session-timeout")
+
   def getKeepAlive: WSResponse = get(uri = "/keep-alive")
 
   def getClientKeepAlive: WSResponse = get(uri = "/client/keep-alive")

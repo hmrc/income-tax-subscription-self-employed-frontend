@@ -29,6 +29,7 @@ GET        /logout                                      uk.gov.hmrc.incometaxsub
 
 GET        /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.keepAlive
 GET        /timeout                                    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.timeout
+GET        /session-timeout                            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.show
 
 #UK Address
 GET        /uk-foreign-business                        uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.UkAddressConfirmationController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)

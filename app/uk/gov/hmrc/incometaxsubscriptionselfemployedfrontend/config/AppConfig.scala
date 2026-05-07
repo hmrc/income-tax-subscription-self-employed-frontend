@@ -48,6 +48,10 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   lazy val timeoutWarningInSeconds: String = servicesConfig.getString("session-timeout.warning")
   lazy val timeoutInSeconds: String = servicesConfig.getString("session-timeout.seconds")
 
+  // Session timeout pages
+  lazy val individualSessionTimeoutUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/session-timeout"
+  lazy val agentSessionTimeoutUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/session-timeout"
+
   private val contactFormServiceIdentifier = "MTDIT"
 
   val feedbackFrontendRedirectUrl: String = servicesConfig.getString("feedback-frontend.url")
