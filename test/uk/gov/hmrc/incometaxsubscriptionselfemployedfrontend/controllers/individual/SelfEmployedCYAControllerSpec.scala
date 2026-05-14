@@ -129,26 +129,5 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
       }
     }
   }
-
-  "backUrl" when {
-    "in global edit mode" should {
-      "redirect to Global CYA when business is confirmed" in {
-        TestSelfEmployedCYAController.backUrl(isEditMode = true, isGlobalEdit = true, isConfirmed = true) mustBe Some(appConfig.individualGlobalCYAUrl)
-      }
-      "redirect to Your Income Sources when business is not confirmed" in {
-        TestSelfEmployedCYAController.backUrl(isEditMode = true, isGlobalEdit = true, isConfirmed = false) mustBe Some(appConfig.yourIncomeSourcesUrl)
-      }
-    }
-    "in edit mode" should {
-      "return the your income source page" in {
-        TestSelfEmployedCYAController.backUrl(isEditMode = true, isGlobalEdit = false, isConfirmed = true) mustBe Some(appConfig.yourIncomeSourcesUrl)
-      }
-    }
-    "not in edit mode" should {
-      "return no back url" in {
-        TestSelfEmployedCYAController.backUrl(isEditMode = false, isGlobalEdit = false, isConfirmed = false) mustBe None
-      }
-    }
-  }
-
+  
 }

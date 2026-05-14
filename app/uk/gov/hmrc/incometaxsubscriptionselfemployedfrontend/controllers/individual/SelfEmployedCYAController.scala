@@ -92,13 +92,4 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
     "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
   )
 
-  def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean, isConfirmed: Boolean): Option[String] = {
-    if (isGlobalEdit && isConfirmed) {
-      Some(appConfig.individualGlobalCYAUrl)
-    } else if (isEditMode || isGlobalEdit) {
-      Some(appConfig.yourIncomeSourcesUrl)
-    } else
-      None
-  }
-
 }
