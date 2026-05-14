@@ -1,7 +1,7 @@
 ## Base ##
 base.back                                                       = Yn ôl
 base.service-name                                               = Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm
-base.continue                                                   = Yn eich blaen
+base.continue                                                   = Parhau
 base.update                                                     = Diweddaru
 base.day                                                        = Diwrnod
 base.month                                                      = Mis
@@ -14,9 +14,9 @@ base.add                                                        = Ychwanegu
 base.section-caption.hidden                                     = Teitl yr adran hon yw
 
 # Save and retrieve
-save-and-continue-button                                        = Cadw ac yn eich blaen
+save-and-continue-button                                        = Cadw a pharhau
 save-and-come-back-later                                        = Cadw a dod yn ôl yn nes ymlaen
-confirm-and-continue                                            = Cadarnhau ac yn eich blaen
+confirm-and-continue                                            = Cadarnhau a pharhau
 
 ## Title pattern
 title-pattern.service-name.gov-uk                               = {0} - Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm - GOV.UK
