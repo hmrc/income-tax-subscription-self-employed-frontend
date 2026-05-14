@@ -32,7 +32,7 @@
 
 @(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, address: Address)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.business-address-confirmation.heading"), optForm = Some(confirmationForm), backLink = Some(BackLink(href = backUrl))) {
+@mainTemplate(title = messages("individual.business-address-confirmation.heading"), optForm = Some(confirmationForm)) {
 
     @pageHeadingHelper(
         heading = messages("individual.business-address-confirmation.heading"),

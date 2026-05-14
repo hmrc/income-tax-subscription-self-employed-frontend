@@ -33,7 +33,7 @@
 
 @(confirmationForm: Form[YesNo], postAction: Call, backUrl: String, address: Address, clientDetails:ClientDetails)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("agent.business-address-confirmation.heading"), optForm = Some(confirmationForm), backLink = Some(BackLink(href = backUrl))) {
+@mainTemplate(title = messages("agent.business-address-confirmation.heading"), optForm = Some(confirmationForm)) {
 
 
 @pageHeadingHelper(

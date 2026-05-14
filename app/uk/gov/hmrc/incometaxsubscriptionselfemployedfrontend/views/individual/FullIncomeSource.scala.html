@@ -31,7 +31,7 @@
 
 @(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.full-income-source.heading"), optForm = Some(fullIncomeSourceForm), backLink = Some(BackLink(href = backUrl))) {
+@mainTemplate(title = messages("individual.full-income-source.heading"), optForm = Some(fullIncomeSourceForm)) {
 
     <h1 class="govuk-heading-l">@messages("individual.full-income-source.heading")</h1>
 
