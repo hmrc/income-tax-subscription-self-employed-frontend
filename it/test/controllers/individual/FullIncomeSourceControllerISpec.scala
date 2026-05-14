@@ -433,27 +433,4 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
     }
   }
 
-  "backUrl" when {
-    def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean): String =
-      fullIncomeSourceController.backUrl(id, isEditMode, isGlobalEdit)
-
-    "not in edit mode" should {
-      "redirect to your income sources page when it is not the first business" in {
-        backUrl(isEditMode = false, isGlobalEdit = false) mustBe appConfig.yourIncomeSourcesUrl
-      }
-    }
-
-    "in edit mode" should {
-      "redirect to sole trader CYA" in {
-        backUrl(isEditMode = true, isGlobalEdit = false) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true).url
-      }
-    }
-
-    "in global edit mode" should {
-      "redirect to sole trader CYA" in {
-        backUrl(isEditMode = true, isGlobalEdit = true) mustBe routes.SelfEmployedCYAController.show(id, isEditMode = true, isGlobalEdit = true).url
-      }
-    }
-  }
 }
-

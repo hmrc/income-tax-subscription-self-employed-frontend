@@ -31,9 +31,9 @@
         form: FormWithCSRF,
         pageHeadingHelper: PageHeadingHelper,
 )
-@(businessStartDateForm: Form[DateModel], postAction: Call, backUrl: String, clientDetails: ClientDetails, businessTrade: String)(implicit request: Request[_], messages: Messages)
+@(businessStartDateForm: Form[DateModel], postAction: Call, clientDetails: ClientDetails, businessTrade: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("business.agent.start-date.title"), optForm = Some(businessStartDateForm), backLink = Some(BackLink(href = backUrl))) {
+@mainTemplate(title = messages("business.agent.start-date.title"), optForm = Some(businessStartDateForm)) {
 
     @form(action = postAction) {
 

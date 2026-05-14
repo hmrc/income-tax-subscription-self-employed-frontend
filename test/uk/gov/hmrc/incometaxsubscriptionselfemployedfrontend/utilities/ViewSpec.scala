@@ -43,14 +43,12 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
   implicit lazy val wrappedMessages: Messages = MessagesWrapper(Lang("en"), messagesApi)
 
-  val testBackUrl = "/test-back-url"
   val testCall: Call = Call("POST", "/test-url")
   val fakeTestRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("POST", "/test-url")
 
   class TemplateViewTest(view: Html,
                          title: String,
                          isAgent: Boolean = false,
-                         backLink: Option[String] = None,
                          hasSignOutLink: Boolean = false,
                          errors: Option[Seq[(String, String)]] = None) {
 
@@ -147,10 +145,6 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
     def getFieldset: Element = element.selectHead("fieldset")
 
     def getForm: Element = element.selectHead("form")
-
-    def getBackLink: Elements = element.select(s"a[class=link-back]")
-
-    def getBackLinkByClass: Elements = element.select(s"a[class=govuk-back-link]")
 
     def getParagraphNth(index: Int = 0): String = {
       selectNth("p", index + 1).text()

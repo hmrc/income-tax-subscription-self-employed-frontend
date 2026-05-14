@@ -36,8 +36,7 @@ class DuplicateDetailsViewSpec extends ViewSpec {
     trade = testTrade,
     name = testName,
     isEditMode = isEditMode,
-    isGlobalEdit = isGlobalEdit,
-    backUrl = testBackUrl
+    isGlobalEdit = isGlobalEdit
   )(fakeTestRequest, implicitly)
 
   def document(isEditMode: Boolean = false, isGlobalEdit: Boolean = false): Document = {
@@ -51,7 +50,6 @@ class DuplicateDetailsViewSpec extends ViewSpec {
       view = view(isEditMode = false, isGlobalEdit = false),
       title = DuplicateDetailsMessages.heading,
       isAgent = true,
-      backLink = Some(testBackUrl),
       hasSignOutLink = true
     )
 
@@ -107,7 +105,8 @@ class DuplicateDetailsViewSpec extends ViewSpec {
   object DuplicateDetailsMessages {
     val heading = "There is a problem"
 
-    def para(trade: String, name: String) = s"You cannot enter the trade ($trade) twice for the business named $name."
+    def para(trade: String, name: String): String =
+      s"You cannot enter the trade ($trade) twice for the business named $name."
 
     object Options {
       val leadInLine: String = "You can:"

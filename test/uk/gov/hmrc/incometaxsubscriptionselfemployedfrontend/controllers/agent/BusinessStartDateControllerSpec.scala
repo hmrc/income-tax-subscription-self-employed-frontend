@@ -62,11 +62,10 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     reset(businessStartDate)
   }
 
-  def mockBusinessStartDate(backUrl: String, trade: String): Unit = {
+  def mockBusinessStartDate(trade: String): Unit = {
     when(businessStartDate(
       ArgumentMatchers.any(),
       ArgumentMatchers.any(),
-      ArgumentMatchers.eq(backUrl),
       ArgumentMatchers.eq(clientDetails),
       ArgumentMatchers.eq(trade)
     )(any(), any())) thenReturn HtmlFormat.empty
@@ -109,7 +108,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
             mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, startDate = Some(DateModel.dateConvert(LocalDate.now)), trade = Some("test trade")))))
             mockGetClientDetails()
             mockBusinessStartDate(
-              backUrl = routes.FullIncomeSourceController.show(id).url,
               trade = "test trade"
             )
 
@@ -123,7 +121,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
             mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, trade = Some("test trade")))))
             mockGetClientDetails()
             mockBusinessStartDate(
-              backUrl = routes.FullIncomeSourceController.show(id).url,
               trade = "test trade"
             )
 
@@ -173,7 +170,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, startDate = Some(DateModel.dateConvert(LocalDate.now)), trade = Some("test trade")))))
         mockGetClientDetails()
         mockBusinessStartDate(
-          backUrl = routes.FullIncomeSourceController.show(id).url,
           trade = "test trade"
         )
 

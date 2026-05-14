@@ -29,7 +29,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individu
 
 class BusinessStartDateViewSpec extends ViewSpec {
 
-  val year = AccountingPeriodUtil.getStartDateLimit.getYear.toString
+  val year: String = AccountingPeriodUtil.getStartDateLimit.getYear.toString
 
   object BusinessStartDateMessages {
     val title = "Start date for sole trader business"
@@ -38,7 +38,6 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val captionVisual = "Your sole trader business"
     val paragraph: String = "We need to know the exact start date."
     val hint = s"For example, 27 9 $year"
-    val backLink = "Back"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
     val empty = "Enter the date your business started trading"
@@ -63,8 +62,7 @@ class BusinessStartDateViewSpec extends ViewSpec {
     val page: HtmlFormat.Appendable = businessStartDateView(
       form,
       testCall,
-      isEditMode,
-      testBackUrl
+      isEditMode
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)

@@ -46,7 +46,6 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
           Future.successful(Ok(checkYourAnswersView(
             answers = selfEmploymentCYAModel,
             postAction = routes.SelfEmployedCYAController.submit(id, isGlobalEdit),
-            backUrl = backUrl(isEditMode, isGlobalEdit, selfEmploymentCYAModel.confirmed),
             isGlobalEdit = isGlobalEdit
           )))
         }
@@ -92,14 +91,5 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   private class FetchSoleTraderBusinessesException extends InternalServerException(
     "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
   )
-
-  def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean, isConfirmed: Boolean): Option[String] = {
-    if (isGlobalEdit && isConfirmed) {
-      Some(appConfig.individualGlobalCYAUrl)
-    } else if (isEditMode || isGlobalEdit) {
-      Some(appConfig.yourIncomeSourcesUrl)
-    } else
-      None
-  }
 
 }

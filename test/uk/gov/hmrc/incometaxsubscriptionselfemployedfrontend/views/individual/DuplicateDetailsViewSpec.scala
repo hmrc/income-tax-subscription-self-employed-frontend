@@ -36,8 +36,7 @@ class DuplicateDetailsViewSpec extends ViewSpec {
     trade = testTrade,
     name = testName,
     isEditMode = isEditMode,
-    isGlobalEdit = isGlobalEdit,
-    backUrl = testBackUrl
+    isGlobalEdit = isGlobalEdit
   )(fakeTestRequest, implicitly)
 
   def document(isEditMode: Boolean = false, isGlobalEdit: Boolean = false): Document = {
@@ -51,7 +50,6 @@ class DuplicateDetailsViewSpec extends ViewSpec {
       view = view(isEditMode = false, isGlobalEdit = false),
       title = DuplicateDetailsMessages.heading,
       isAgent = false,
-      backLink = Some(testBackUrl),
       hasSignOutLink = true
     )
 

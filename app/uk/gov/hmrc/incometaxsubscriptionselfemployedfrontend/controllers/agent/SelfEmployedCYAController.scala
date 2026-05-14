@@ -47,7 +47,6 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
             Ok(checkYourAnswersView(
               answers = selfEmploymentCYAModel,
               postAction = routes.SelfEmployedCYAController.submit(id, isGlobalEdit),
-              backUrl = backUrl(isEditMode, isGlobalEdit, selfEmploymentCYAModel.confirmed),
               clientDetails = clientDetails,
               isGlobalEdit = isGlobalEdit
             ))
@@ -95,14 +94,5 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   private class FetchSoleTraderBusinessesException extends InternalServerException(
     "[SelfEmployedCYAController][fetchBusinessList] - Failed to retrieve sole trader businesses"
   )
-
-  def backUrl(isEditMode: Boolean, isGlobalEdit: Boolean, isConfirmed: Boolean): Option[String] = {
-    if (isGlobalEdit && isConfirmed) {
-      Some(appConfig.globalCYAUrl)
-    } else if (isEditMode || isGlobalEdit) {
-      Some(appConfig.clientYourIncomeSourcesUrl)
-    } else
-      None
-  }
 
 }

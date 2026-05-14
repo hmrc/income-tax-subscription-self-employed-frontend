@@ -35,7 +35,6 @@ class ServiceNameViewSpec extends ViewSpec {
       serviceName = serviceName,
       serviceUrl = serviceUrl,
       optForm = None,
-      backLink = Some(BackLink("backUrl")),
       showSignOutLink = false,
       timeoutUrl = Some("timeoutUrl")
     )(Html(""))(FakeRequest(), implicitly)

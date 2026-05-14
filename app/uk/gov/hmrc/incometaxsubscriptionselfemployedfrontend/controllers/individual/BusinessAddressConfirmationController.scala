@@ -44,10 +44,6 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
 
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 
-  def backUrl(id: String): String = {
-    routes.FullIncomeSourceController.show(id).url
-  }
-
   def show(id: String): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
@@ -71,7 +67,6 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
     businessAddressConfirmation(
       confirmationForm = form,
       postAction = routes.BusinessAddressConfirmationController.submit(id),
-      backUrl = backUrl(id),
       address = address
     )
   }

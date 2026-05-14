@@ -28,9 +28,9 @@
     appConfig: AppConfig
 )
 
-@(id: String, trade: String, name: String, isEditMode: Boolean, isGlobalEdit: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+@(id: String, trade: String, name: String, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.duplicate-details.heading"), backLink = Some(BackLink(href = backUrl))) {
+@mainTemplate(title = messages("individual.duplicate-details.heading")) {
 
     <h1 class="govuk-heading-l">@messages("individual.duplicate-details.heading")</h1>
 

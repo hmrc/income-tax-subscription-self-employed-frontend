@@ -53,7 +53,6 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
         businessAddressConfirmationForm
       },
       testCall,
-      backUrl = testBackUrl,
       address = testAddress,
       clientDetails = testClientDetails
     )(fakeTestRequest, implicitly)
@@ -88,14 +87,12 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
         page(),
         title = BusinessAddressConfirmationMessages.heading,
         isAgent = true,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true
       )
       "there is an error on the page" in new TemplateViewTest(
         page(hasFormError = true),
         title = BusinessAddressConfirmationMessages.heading,
         isAgent = true,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true,
         errors = Some(Seq(testFormError.key -> BusinessAddressConfirmationMessages.Form.emptyError))
       )

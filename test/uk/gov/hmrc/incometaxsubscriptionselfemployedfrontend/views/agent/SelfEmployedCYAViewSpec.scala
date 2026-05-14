@@ -43,8 +43,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         view = page(fullSelfEmploymentsCYAModel, isGlobalEdit = false),
         title = CheckYourAnswersMessages.title,
         isAgent = true,
-        hasSignOutLink = true,
-        backLink = Some(testBackUrl)
+        hasSignOutLink = true
       )
     }
 
@@ -203,7 +202,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   def page(answers: SelfEmploymentsCYAModel, isGlobalEdit: Boolean): HtmlFormat.Appendable = checkYourAnswers(
     answers,
     testCall,
-    backUrl = Some(testBackUrl),
     ClientDetails("FirstName LastName", "ZZ111111Z"),
     isGlobalEdit = isGlobalEdit
   )(FakeRequest(), implicitly)
