@@ -88,7 +88,7 @@ individual.error.full-income-source.business-trade.invalid                = Your
 individual.error.full-income-source.business-name.empty                   = Enter your name or the name of your business
 individual.error.full-income-source.business-name.max-length              = Business name must be 105 characters or less
 individual.error.full-income-source.business-name.min-length              = Business name must have at least 2 letters (upper or lower case)
-individual.error.full-income-source.business-name.invalid                 = Business name can only include characters listed
+individual.error.full-income-source.business-name.invalid                 = Your business name may only include the following characters: upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
 individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
 
 # Duplicate details page
@@ -196,7 +196,7 @@ agent.error.full-income-source.business-trade.min-length             = Your busi
 agent.error.full-income-source.business-trade.invalid                = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
 agent.error.full-income-source.business-name.empty                   = Enter your client’s name or the name of their business
 agent.error.full-income-source.business-name.max-length              = Business name must be between 1 and 105 characters
-agent.error.full-income-source.business-name.invalid-character       = Business name can only include characters listed
+agent.error.full-income-source.business-name.invalid-character       = Your business name may only include the following characters: upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
 agent.error.full-income-source.start-date.day-month-year.empty       = Enter the date your client’s business started trading
 agent.error.full-income-source.start-date.day.empty                  = The date must include a day
 agent.error.full-income-source.start-date.month.empty                = The date must include a month
