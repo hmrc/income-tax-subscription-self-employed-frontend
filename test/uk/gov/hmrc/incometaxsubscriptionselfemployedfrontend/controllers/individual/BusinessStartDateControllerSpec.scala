@@ -37,7 +37,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   val id: String = "testId"
 
   private val businessStartDate = mock[BusinessStartDate]
-  when(businessStartDate(any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
+  when(businessStartDate(any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
 
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
@@ -139,19 +139,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     }
   }
 
-  "The back url" when {
-    "redirect to full income source page" when {
-      "in global edit mode" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = true) mustBe routes.FullIncomeSourceController.show(id, isEditMode = true, isGlobalEdit = true).url
-      }
-      "in edit mode" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = true, isGlobalEdit = false) mustBe routes.FullIncomeSourceController.show(id, isEditMode = true).url
-      }
-      "not in edit mode" in {
-        TestBusinessStartDateController.backUrl(id, isEditMode = false, isGlobalEdit = false) mustBe routes.FullIncomeSourceController.show(id).url
-      }
-    }
-  }
 
   authorisationTests()
 

@@ -53,7 +53,6 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         case None => form
       },
       postAction = testCall,
-      backUrl = testBackUrl,
       clientDetails = ClientDetails("FirstName LastName", "ZZ111111Z"),
       businessTrade = "test trade"
     )(fakeTestRequest, implicitly)
@@ -72,14 +71,12 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         view = page(),
         title = BusinessStartDateMessages.title,
         isAgent = true,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true
       )
       "there is an error on the page" in new TemplateViewTest(
         view = page(error = Some(emptyFormError)),
         title = BusinessStartDateMessages.title,
         isAgent = true,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true,
         errors = Some(Seq(emptyFormError.key -> BusinessStartDateMessages.emptyError))
       )

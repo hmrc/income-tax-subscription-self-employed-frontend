@@ -28,7 +28,7 @@
         pageHeadingHelper: PageHeadingHelper,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
-@(businessStartDateForm: Form[DateModel], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+@(businessStartDateForm: Form[DateModel], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("business.start-date.title"), optForm = Some(businessStartDateForm)) {
 

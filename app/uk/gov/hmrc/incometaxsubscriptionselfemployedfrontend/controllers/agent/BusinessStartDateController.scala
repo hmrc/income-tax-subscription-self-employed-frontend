@@ -54,7 +54,6 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     businessStartDate(
       businessStartDateForm = businessStartDateForm,
       postAction = routes.BusinessStartDateController.submit(id, isEditMode, isGlobalEdit),
-      backUrl = backUrl(id, isEditMode, isGlobalEdit),
       clientDetails = clientDetails,
       businessTrade = businessTrade
     )
@@ -118,10 +117,6 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
       routes.AddressLookupRoutingController.checkAddressLookupJourney(id)
     }
   )
-
-  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
-    routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit).url
-  }
 
   def form(implicit request: Request[_]): Form[DateModel] = {
     businessStartDateForm(

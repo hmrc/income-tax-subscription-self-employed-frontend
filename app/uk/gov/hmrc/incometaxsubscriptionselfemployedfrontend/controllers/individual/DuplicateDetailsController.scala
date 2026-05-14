@@ -40,8 +40,7 @@ class DuplicateDetailsController @Inject()(mcc: MessagesControllerComponents,
             trade = duplicateDetails.trade,
             name = duplicateDetails.name,
             isEditMode = isEditMode,
-            isGlobalEdit = isGlobalEdit,
-            backUrl = routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit).url
+            isGlobalEdit = isGlobalEdit
           ))
         case _ =>
           Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit))

@@ -172,18 +172,8 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
     fullIncomeSource(
       fullIncomeSourceForm = fullIncomeSourceForm,
       postAction = routes.FullIncomeSourceController.submit(id, isEditMode, isGlobalEdit),
-      backUrl = backUrl(id, isEditMode, isGlobalEdit),
       isEditMode = isEditMode,
       clientDetails = request.clientDetails
     )
   }
-
-  def backUrl(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): String = {
-    if (isEditMode || isGlobalEdit) {
-      routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit).url
-    } else {
-      appConfig.clientYourIncomeSourcesUrl
-    }
-  }
-
 }

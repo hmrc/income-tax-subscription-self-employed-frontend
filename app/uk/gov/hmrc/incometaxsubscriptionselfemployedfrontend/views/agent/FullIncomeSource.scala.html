@@ -32,7 +32,7 @@
     pageHeadingHelper: PageHeadingHelper
 )
 
-@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
+@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(fullIncomeSourceForm)) {
 

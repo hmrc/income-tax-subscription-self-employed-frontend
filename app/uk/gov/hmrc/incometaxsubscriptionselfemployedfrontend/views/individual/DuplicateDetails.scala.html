@@ -28,7 +28,7 @@
     appConfig: AppConfig
 )
 
-@(id: String, trade: String, name: String, isEditMode: Boolean, isGlobalEdit: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+@(id: String, trade: String, name: String, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("individual.duplicate-details.heading")) {
 

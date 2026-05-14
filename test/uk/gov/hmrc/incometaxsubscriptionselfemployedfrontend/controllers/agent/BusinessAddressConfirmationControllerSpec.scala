@@ -116,7 +116,6 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
           when(mockBusinessAddressConfirmation(
             ArgumentMatchers.any(),
             ArgumentMatchers.eq(routes.BusinessAddressConfirmationController.submit(id)),
-            ArgumentMatchers.eq(routes.FullIncomeSourceController.show(id).url),
             ArgumentMatchers.eq(address),
             ArgumentMatchers.any()
           )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
@@ -193,7 +192,6 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         when(mockBusinessAddressConfirmation(
           ArgumentMatchers.any(),
           ArgumentMatchers.eq(routes.BusinessAddressConfirmationController.submit(id)),
-          ArgumentMatchers.eq(routes.FullIncomeSourceController.show(id).url),
           ArgumentMatchers.eq(address),
           ArgumentMatchers.any()
         )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)

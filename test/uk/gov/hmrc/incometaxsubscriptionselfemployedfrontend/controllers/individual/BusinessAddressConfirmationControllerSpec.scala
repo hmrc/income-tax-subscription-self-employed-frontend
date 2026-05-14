@@ -111,7 +111,6 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         when(mockBusinessAddressConfirmation(
           ArgumentMatchers.any(),
           ArgumentMatchers.eq(routes.BusinessAddressConfirmationController.submit(id)),
-          ArgumentMatchers.eq(routes.FullIncomeSourceController.show(id).url),
           ArgumentMatchers.eq(address)
         )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
 
@@ -186,7 +185,6 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         when(mockBusinessAddressConfirmation(
           ArgumentMatchers.any(),
           ArgumentMatchers.eq(routes.BusinessAddressConfirmationController.submit(id)),
-          ArgumentMatchers.eq(routes.FullIncomeSourceController.show(id).url),
           ArgumentMatchers.eq(address)
         )(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(HtmlFormat.empty)
 
@@ -197,12 +195,6 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
         status(response) mustBe BAD_REQUEST
         contentType(response) mustBe Some(HTML)
       }
-    }
-  }
-
-  "backUrl" when {
-    "redirect back to the full income source page" in {
-      TestBusinessAddressConfirmationController.backUrl(id) mustBe routes.FullIncomeSourceController.show(id).url
     }
   }
 

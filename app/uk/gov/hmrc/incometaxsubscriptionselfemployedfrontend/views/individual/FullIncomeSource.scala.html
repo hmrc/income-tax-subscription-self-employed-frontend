@@ -29,7 +29,7 @@
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
 )
 
-@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, backUrl: String)(implicit request: Request[_], messages: Messages)
+@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("individual.full-income-source.heading"), optForm = Some(fullIncomeSourceForm)) {
 

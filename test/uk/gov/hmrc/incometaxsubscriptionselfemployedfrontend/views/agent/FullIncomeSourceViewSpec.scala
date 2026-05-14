@@ -43,7 +43,6 @@ class FullIncomeSourceViewSpec extends ViewSpec {
     },
     postAction = testCall,
     isEditMode = false,
-    backUrl = testBackUrl,
     clientDetails = testClientDetails
   )(fakeTestRequest, implicitly)
 
@@ -57,14 +56,12 @@ class FullIncomeSourceViewSpec extends ViewSpec {
         view = view(),
         title = FullIncomeSourceMessages.heading,
         isAgent = true,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true
       )
       "there are errors" in new TemplateViewTest(
         view = view(errors = true),
         title = FullIncomeSourceMessages.heading,
         isAgent = true,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true,
         errors = Some(Seq(
           StreamlineIncomeSourceForm.businessTradeName -> "Enter the trade of your client’s business",

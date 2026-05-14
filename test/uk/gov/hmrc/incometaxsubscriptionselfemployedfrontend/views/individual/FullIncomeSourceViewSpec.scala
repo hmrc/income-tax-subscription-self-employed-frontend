@@ -36,8 +36,7 @@ class FullIncomeSourceViewSpec extends ViewSpec {
   def view(errors: Boolean = false): HtmlFormat.Appendable = fullIncomeSourceView(
     fullIncomeSourceForm = if (errors) form.bind(Map.empty[String, String]) else form,
     postAction = testCall,
-    isEditMode = false,
-    backUrl = testBackUrl
+    isEditMode = false
   )(fakeTestRequest, implicitly)
 
   val document: Document = Jsoup.parse(view().body)
@@ -52,14 +51,12 @@ class FullIncomeSourceViewSpec extends ViewSpec {
         view = view(),
         title = FullIncomeSourceMessages.heading,
         isAgent = false,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true
       )
       "there are errors" in new TemplateViewTest(
         view = view(errors = true),
         title = FullIncomeSourceMessages.heading,
         isAgent = false,
-        backLink = Some(testBackUrl),
         hasSignOutLink = true,
         errors = Some(Seq(
           StreamlineIncomeSourceForm.businessTradeName -> "Enter the trade of this business",

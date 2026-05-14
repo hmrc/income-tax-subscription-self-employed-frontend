@@ -52,7 +52,6 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     checkYourAnswers(
       answers,
       testCall,
-      Some(testBackUrl),
       isGlobalEdit = isGlobalEdit
     )(FakeRequest(), implicitly)
   }
@@ -67,12 +66,10 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       view = checkYourAnswers(
         answers = fullSelfEmploymentsCYAModel,
         postAction = testCall,
-        Some(testBackUrl),
         isGlobalEdit = true
       )(FakeRequest(), implicitly),
       title = CheckYourAnswersMessages.title,
-      hasSignOutLink = true,
-      backLink = Some(testBackUrl)
+      hasSignOutLink = true
     )
 
     "have the correct heading and caption" in {

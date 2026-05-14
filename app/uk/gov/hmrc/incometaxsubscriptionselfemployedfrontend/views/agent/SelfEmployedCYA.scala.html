@@ -33,7 +33,7 @@
         pageHeadingHelper: PageHeadingHelper
 )
 
-@(answers: SelfEmploymentsCYAModel, postAction: Call, backUrl: Option[String], clientDetails: ClientDetails, isGlobalEdit: Boolean)(implicit request: Request[_], messages: Messages)
+@(answers: SelfEmploymentsCYAModel, postAction: Call, clientDetails: ClientDetails, isGlobalEdit: Boolean)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(
     title = messages("agent.self-employed-cya.title")
