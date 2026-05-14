@@ -229,7 +229,7 @@ object IntegrationTestConstants {
        |        "infoSubheading": "Eich cyfeiriad",
        |        "infoMessage": "",
        |        "confirmChangeText": "Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.",
-       |        "submitLabel": "Cadarnhau a pharhau"
+       |        "submitLabel": "Cadarnhau a parhau"
        |      },
        |      "countryPickerLabels": {
        |        "title": "Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes",
@@ -377,7 +377,7 @@ object IntegrationTestConstants {
        |        "infoSubheading": "Eich cyfeiriad",
        |        "infoMessage": "",
        |        "confirmChangeText": "Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.",
-       |        "submitLabel": "Cadarnhau a pharhau"
+       |        "submitLabel": "Cadarnhau a parhau"
        |      },
        |      "countryPickerLabels": {
        |        "title": "Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad busnes eich cleient",
