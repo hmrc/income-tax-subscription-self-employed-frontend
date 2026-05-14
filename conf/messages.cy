@@ -14,9 +14,9 @@ base.add                                                        = Ychwanegu
 base.section-caption.hidden                                     = Teitl yr adran hon yw
 
 # Save and retrieve
-save-and-continue-button                                        = Cadw a pharhau
+save-and-continue-button                                        = Cadw a parhau
 save-and-come-back-later                                        = Cadw a dod yn ôl yn nes ymlaen
-confirm-and-continue                                            = Cadarnhau a pharhau
+confirm-and-continue                                            = Cadarnhau a parhau
 
 ## Title pattern
 title-pattern.service-name.gov-uk                               = {0} - Cofrestru ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm - GOV.UK
@@ -68,7 +68,7 @@ address-lookup.confirm-page.title                               = Cadarnhau cyfe
 address-lookup.confirm-page.heading                             = Cadarnhau cyfeiriad eich busnes
 address-lookup.confirm-page.address-label                       = Eich cyfeiriad
 address-lookup.confirm-page.para                                = Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.
-address-lookup.confirm-page.confirm                             = Cadarnhau a pharhau
+address-lookup.confirm-page.confirm                             = Cadarnhau a parhau
 address-lookup.country-page.title                               = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
 address-lookup.country-page.heading                             = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
 address-lookup.country-page.country-label                       = Dewiswch gwlad neu diriogaeth
@@ -151,7 +151,7 @@ agent.address-lookup.confirm-page.title                         = Cadarnhau cyfe
 agent.address-lookup.confirm-page.heading                       = Cadarnhau cyfeiriad busnes eich cleient
 agent.address-lookup.confirm-page.address-label                 = Eich cyfeiriad
 agent.address-lookup.confirm-page.para                          = Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.
-agent.address-lookup.confirm-page.confirm                       = Cadarnhau a pharhau
+agent.address-lookup.confirm-page.confirm                       = Cadarnhau a parhau
 agent.address-lookup.country-page.title                         = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad busnes eich cleient
 agent.address-lookup.country-page.heading                       = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad busnes eich cleient
 agent.address-lookup.country-page.country-label                 = Dewiswch gwlad neu diriogaeth
