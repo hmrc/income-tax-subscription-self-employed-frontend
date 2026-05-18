@@ -42,9 +42,8 @@ error.business.start-date.day-month-year.min-date               = The date must 
 error.business.start-date.year.length                           = Year must include 4 numbers
 
 # Business address confirmation
-individual.business-address-confirmation.heading                = Confirm business address
-individual.business-address-confirmation.heading.caption        = Sole trader
-individual.business-address-confirmation.para                   = Does this business have the same address as the first one you added?
+individual.business-address-confirmation.heading                = Confirm your business address
+individual.business-address-confirmation.heading.caption        = Sole trader business
 individual.business-address-confirmation.summary.address        = Address
 individual.business-address-confirmation.form.heading           = Is this address correct?
 error.individual.business-address-confirmation.empty            = Select ‘Yes’ if this is your business address
