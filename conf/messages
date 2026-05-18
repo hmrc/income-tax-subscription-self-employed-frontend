@@ -127,7 +127,6 @@ agent.error.business-start-date.year.length                     = Year must incl
 #Agent Business Address Confirmation
 agent.business-address-confirmation.heading                     = Confirm business address
 agent.business-address-confirmation.heading.caption             = {0} – {1}
-agent.business-address-confirmation.para                        = Does this business have the same address as the first one you added?
 agent.business-address-confirmation.summary.address             = Address
 agent.business-address-confirmation.form.heading                = Is this address correct?
 error.agent.business-address-confirmation.empty                 = Select ‘Yes’ if this is your client’s business address

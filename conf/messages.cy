@@ -127,7 +127,6 @@ agent.error.business-start-date.year.length                     = Mae’n rhaid 
 #Agent Business Address Confirmation
 agent.business-address-confirmation.heading                     = adarnhau cyfeiriad busnes
 agent.business-address-confirmation.heading.caption             = {0} – {1}
-agent.business-address-confirmation.para                        = A yw enw masnachu busnes eich cleient yr un peth â’r enw cyntaf i chi ei ychwanegu?
 agent.business-address-confirmation.summary.address             = Cyfeiriad
 agent.business-address-confirmation.form.heading                = A yw’r cyfeiriad hwn yn gywir?
 error.agent.business-address-confirmation.empty                 = Dewiswch ‘Iawn’ os mai dyma gyfeiriad busnes eich cleient
