@@ -34,13 +34,11 @@
 
     @form(action = postAction) {
 
-        @pageHeadingHelper(
-            heading = messages("business.start-date.heading"),
-            caption = messages("business.start-date.caption"),
-            isSection = true
-        )
+        <h1 class="govuk-heading-l">@messages("business.start-date.heading")</h1>
 
-        <p class="govuk-body" id="business-start-date.line-1">@messages("business.start-date.paragraph")</p>
+        <p class="govuk-body">@messages("business.start-date.caption")</p>
+
+        <h2 class="govuk-heading-m" id="business-start-date.line-1">@messages("business.start-date.paragraph")</h2>
 
         @dateHelper(
             field = businessStartDateForm(startDate),
