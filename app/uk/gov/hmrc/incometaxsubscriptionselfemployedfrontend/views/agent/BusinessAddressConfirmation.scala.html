@@ -36,13 +36,11 @@
 @mainTemplate(title = messages("agent.business-address-confirmation.heading"), optForm = Some(confirmationForm)) {
 
 
-@pageHeadingHelper(
+    @pageHeadingHelper(
         heading = messages("agent.business-address-confirmation.heading"),
         caption = messages("agent.business-address-confirmation.heading.caption", clientDetails.name, clientDetails.formattedNino),
         isSection = false
     )
-
-    <p class="govuk-body">@messages("agent.business-address-confirmation.para")</p>
 
     @govukSummaryList(SummaryList(
         rows = Seq(
