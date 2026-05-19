@@ -28,10 +28,10 @@ agent-base.title.error                                          = Gwall: {0} - C
 base.agent.service-name                                         = Cofrestrwch eich cleientiaid ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm
 
 # Business start date
-business.start-date.title                                       = PDyddiad dechrau’r busnes fel unig fasnachwr
-business.start-date.heading                                     = Dyddiad dechrau
-business.start-date.caption                                     = Eich busnes fel unig fasnachwr
-business.start-date.paragraph                                   = Mae angen i ni wybod yr union ddyddiad dechrau.
+business.start-date.title                                       = Unig fasnachwr
+business.start-date.heading                                     = Dyddiad dechrau’r busnes
+business.start-date.caption                                     = Gall y dyddiad y dechreuodd eich busnes fasnachu fod heddiw, yn y gorffennol neu hyd at 7 diwrnod yn y dyfodol.
+business.start-date.paragraph                                   = Pryd y dechreuodd eich busnes fasnachu?
 business.start-date.hint                                        = Er enghraifft, 27 9 {0}
 error.business.start-date.empty                                 = Nodwch y dyddiad y dechreuodd eich busnes fasnachu
 error.business.start-date.required                              = Mae’n rhaid i’r dyddiad gynnwys {0}
@@ -111,10 +111,11 @@ self-employed-cya.caption                                       = Unig fasnachwr
 self-employed-cya.para                                          = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu'n anghywir.
 
 # Agent Business start date
-business.agent.start-date.title                                 = Dyddiad dechrau’r busnes fel unig fasnachwr
-business.agent.start-date.heading                               = Dyddiad dechrau ar gyfer {0}
+business.agent.start-date.title                                 = Unig fasnachwr
+business.agent.start-date.heading                               = Dyddiad dechrau’r busnes
 business.agent.start-date.caption                               = {0} – {1}
-business.agent.start-date.para                                  = Mae angen i ni wybod yr union ddyddiad dechrau.
+business.agent.start-date.para                                  = Gall y dyddiad y dechreuodd busnes eich cleient fasnachu fod heddiw, yn y gorffennol neu hyd at 7 diwrnod yn y dyfodol.
+business.agent.start-date.question                              = Pryd y dechreuodd busnes eich cleient fasnachu?
 business.agent.start-date.hint                                  = Er enghraifft, 27 9 {0}
 agent.error.business-start-date.empty                           = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
 agent.error.business-start-date.required                        = Mae’n rhaid i’r dyddiad gynnwys {0}

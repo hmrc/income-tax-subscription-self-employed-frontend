@@ -29,12 +29,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.Bu
 class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
   object BusinessStartDateMessages {
-    val title: String = "Start date for sole trader business"
-    val caption = "FirstName LastName – ZZ 11 11 11 Z"
-
-    def heading(trade: String): String = s"Start date for $trade"
-
-    val para: String = "We need to know the exact start date."
+    val title: String = "Sole trader"
+    val caption: String = "FirstName LastName – ZZ 11 11 11 Z"
+    val heading: String = "Business start date"
+    val para: String = "The date your client’s business started trading can be today, in the past or up to 7 days in the future."
+    val question: String = "When did your client’s business start trading?"
     val hint: String = s"For example, 27 9 ${AccountingPeriodUtil.getCurrentTaxYearStartDate.getYear}"
     val saveAndContinue = "Save and continue"
     val saveAndComeBackLater = "Save and come back later"
@@ -84,7 +83,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
     "have the correct heading and caption" in {
       document().mainContent.mustHaveHeadingAndCaption(
-        heading = BusinessStartDateMessages.heading("test trade"),
+        heading = BusinessStartDateMessages.heading,
         caption = BusinessStartDateMessages.caption,
         isSection = false
       )
@@ -94,6 +93,10 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
       document().mainContent.selectHead("p").text mustBe BusinessStartDateMessages.para
     }
 
+    "have a question" in {
+      document().mainContent.selectNth("h2", 2).text mustBe BusinessStartDateMessages.question
+    }
+
     "have a form" which {
       "has the correct action and method assigned" in {
         val form: Element = document().getForm
@@ -101,12 +104,11 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
         form.attr("action") mustBe testCall.url
       }
 
-
       "has a correct date input field with the legend as the page heading" when {
         "there is no error on the page" in {
           document().getForm.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading("test trade"),
+            legend = BusinessStartDateMessages.heading,
             exampleDate = BusinessStartDateMessages.hint,
             isHeading = false,
             isLegendHidden = true,
@@ -123,7 +125,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
           doc.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading("test trade"),
+            legend = BusinessStartDateMessages.heading,
             exampleDate = BusinessStartDateMessages.hint,
             errorMessage = Some(BusinessStartDateMessages.emptyError),
             isHeading = false,
@@ -141,7 +143,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
           doc.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading("test trade"),
+            legend = BusinessStartDateMessages.heading,
             exampleDate = BusinessStartDateMessages.hint,
             errorMessage = Some(BusinessStartDateMessages.dateTooLateError),
             isHeading = false,
@@ -159,7 +161,7 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
 
           doc.mustHaveDateInput(
             id = "startDate",
-            legend = BusinessStartDateMessages.heading("test trade"),
+            legend = BusinessStartDateMessages.heading,
             exampleDate = BusinessStartDateMessages.hint,
             errorMessage = Some(BusinessStartDateMessages.dateTooEarlyError),
             isHeading = false,

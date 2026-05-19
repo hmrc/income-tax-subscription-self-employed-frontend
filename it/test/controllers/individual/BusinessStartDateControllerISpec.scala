@@ -33,7 +33,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   private val testStartDate: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
-  private val pageTitle = "Start date for sole trader business"
+  private val pageTitle = "Sole trader"
 
   val soleTraderBusinessesWithoutStartDate: SoleTraderBusinesses = soleTraderBusinesses.copy(
     businesses = soleTraderBusinesses.businesses.map(_.copy(startDate = None))

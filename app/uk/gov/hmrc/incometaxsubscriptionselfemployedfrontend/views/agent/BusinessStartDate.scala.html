@@ -38,14 +38,14 @@
     @form(action = postAction) {
 
         @pageHeadingHelper(
-            heading = messages("business.agent.start-date.heading", businessTrade),
+            heading = messages("business.agent.start-date.heading"),
             caption = messages("business.agent.start-date.caption", clientDetails.name, clientDetails.formattedNino),
             isSection = false
         )
 
-        <p class="govuk-body">
-            @messages("business.agent.start-date.para")
-        </p>
+        <p class="govuk-body">@messages("business.agent.start-date.para")</p>
+
+        <h2 class="govuk-heading-m">@messages("business.agent.start-date.question")</h2>
 
         @dateHelper(
             field = businessStartDateForm(startDate),

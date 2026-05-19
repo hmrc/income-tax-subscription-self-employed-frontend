@@ -28,10 +28,10 @@ agent-base.title.error                                          = Error: {0} - S
 base.agent.service-name                                         = Sign up your clients for Making Tax Digital for Income Tax
 
 # Business start date
-business.start-date.title                                       = Start date for sole trader business
-business.start-date.heading                                     = Start date
-business.start-date.caption                                     = Your sole trader business
-business.start-date.paragraph                                   = We need to know the exact start date.
+business.start-date.title                                       = Sole trader
+business.start-date.heading                                     = Business start date
+business.start-date.caption                                     = The date your business started trading can be today, in the past or up to 7 days in the future.
+business.start-date.paragraph                                   = When did your business start trading?
 business.start-date.hint                                        = For example, 27 9 {0}
 error.business.start-date.empty                                 = Enter the date your business started trading
 error.business.start-date.required                              = The date must include a {0}
@@ -111,10 +111,11 @@ self-employed-cya.caption                                       = Sole trader
 self-employed-cya.para                                          = Add or change any missing or incorrect details, then confirm that the information is correct.
 
 # Agent Business start date
-business.agent.start-date.title                                 = Start date for sole trader business
-business.agent.start-date.heading                               = Start date for {0}
+business.agent.start-date.title                                 = Sole trader
+business.agent.start-date.heading                               = Business start date
 business.agent.start-date.caption                               = {0} – {1}
-business.agent.start-date.para                                  = We need to know the exact start date.
+business.agent.start-date.para                                  = The date your client’s business started trading can be today, in the past or up to 7 days in the future.
+business.agent.start-date.question                              = When did your client’s business start trading?
 business.agent.start-date.hint                                  = For example, 27 9 {0}
 agent.error.business-start-date.empty                           = Enter the date your client’s business started trading
 agent.error.business-start-date.required                        = The date must include a {0}

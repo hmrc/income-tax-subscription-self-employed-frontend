@@ -32,17 +32,17 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val year: String = AccountingPeriodUtil.getStartDateLimit.getYear.toString
 
   object BusinessStartDateMessages {
-    val title = "Start date for sole trader business"
+    val title = "Sole trader"
     val titleSuffix = " - Sign up for Making Tax Digital for Income Tax - GOV.UK"
-    val heading: String = "Start date"
-    val captionVisual = "Your sole trader business"
-    val paragraph: String = "We need to know the exact start date."
+    val heading: String = "Business start date"
+    val Paragraph = "The date your business started trading can be today, in the past or up to 7 days in the future."
+    val question: String = "When did your business start trading?"
     val hint = s"For example, 27 9 $year"
     val saveAndContinue = "Save and continue"
     val saveAndComeBack = "Save and come back later"
     val empty = "Enter the date your business started trading"
 
-    val maxDate = s"The date cannot be more than 7 days in the future"
+    val maxDate = "The date cannot be more than 7 days in the future"
     val minDate = "The date must be on or after 6 April 2021"
   }
 
@@ -75,16 +75,12 @@ class BusinessStartDateViewSpec extends ViewSpec {
       document.title mustBe BusinessStartDateMessages.title + BusinessStartDateMessages.titleSuffix
     }
 
-    "have the correct heading and caption" in new Setup {
-      document.mainContent.mustHaveHeadingAndCaption(
-        heading = BusinessStartDateMessages.heading,
-        caption = BusinessStartDateMessages.captionVisual,
-        isSection = true
-      )
+    "have a paragraph" in new Setup {
+      document.mainContent.getParagraphNth() mustBe BusinessStartDateMessages.Paragraph
     }
 
-    "have a paragraph" in new Setup {
-      document.mainContent.getParagraphNth() mustBe BusinessStartDateMessages.paragraph
+    "have a question" in new Setup {
+      document.mainContent.selectHead("h2").text() mustBe BusinessStartDateMessages.question
     }
 
     "have a Form" in new Setup {
@@ -187,6 +183,5 @@ class BusinessStartDateViewSpec extends ViewSpec {
           appConfig.subscriptionFrontendProgressSavedUrl + "?location=sole-trader-trading-start-date"
       }
     }
-
   }
 }
