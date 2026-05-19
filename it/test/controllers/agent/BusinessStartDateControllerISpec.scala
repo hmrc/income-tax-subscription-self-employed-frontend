@@ -28,7 +28,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.r
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusinesses}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ITSASessionKeys}
 
-
 class BusinessStartDateControllerISpec extends ComponentSpecBase {
 
   val testNino: String = "test-nino"
@@ -56,7 +55,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the business start date page")
         res must have(
           httpStatus(OK),
-          pageTitle("Start date for sole trader business" + agentTitleSuffix),
+          pageTitle("Sole trader" + agentTitleSuffix),
           dateField("startDate", DateModel("", "", ""))
         )
       }
@@ -75,7 +74,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("should return an OK with the business start date page")
         res must have(
           httpStatus(OK),
-          pageTitle("Start date for sole trader business" + agentTitleSuffix),
+          pageTitle("Sole trader" + agentTitleSuffix),
           dateField("startDate", date)
         )
       }

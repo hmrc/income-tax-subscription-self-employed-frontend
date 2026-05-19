@@ -25,7 +25,6 @@
         mainTemplate: PrincipalMainTemplate,
         dateHelper: DateHelper,
         form: FormWithCSRF,
-        pageHeadingHelper: PageHeadingHelper,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
 @(businessStartDateForm: Form[DateModel], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
