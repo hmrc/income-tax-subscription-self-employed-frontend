@@ -73,7 +73,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
 
         res must have(
           httpStatus(OK),
-          pageTitle("Confirm business address" + titleSuffix)
+          pageTitle("Confirm your business address" + titleSuffix)
         )
       }
     }

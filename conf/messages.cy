@@ -42,9 +42,8 @@ error.business.start-date.day-month-year.min-date               = Mae’n rhaid 
 error.business.start-date.year.length                           = Mae’n rhaid i’r flwyddyn gynnwys 4 rhif
 
 # Business address confirmation
-individual.business-address-confirmation.heading                = Cadarnhau cyfeiriad busnes
-individual.business-address-confirmation.heading.caption        = Unig fasnachwr
-individual.business-address-confirmation.para                   = A oes gan y busnes hwn yr un cyfeiriad â’r un cyntaf i chi ei ychwanegu?
+individual.business-address-confirmation.heading                = Cadarnhau cyfeiriad eich busnes
+individual.business-address-confirmation.heading.caption        = Busnes unig fasnachwr
 individual.business-address-confirmation.summary.address        = Cyfeiriad
 individual.business-address-confirmation.form.heading           = A yw’r cyfeiriad hwn yn gywir?
 error.individual.business-address-confirmation.empty            = Dewiswch ‘Iawn’ os mai dyma gyfeiriad eich busnes

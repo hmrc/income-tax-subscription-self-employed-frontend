@@ -58,10 +58,9 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
   }
 
   object BusinessAddressConfirmationMessages {
-    val heading: String = "Confirm business address"
+    val heading: String = "Confirm your business address"
     val captionHidden: String = "This section is"
-    val captionVisible: String = "Sole trader"
-    val para: String = "Does this business have the same address as the first one you added?"
+    val captionVisible: String = "Sole trader business"
 
     object Summary {
       val businessAddress: String = "Address"
@@ -100,10 +99,6 @@ class BusinessAddressConfirmationViewSpec extends ViewSpec {
         caption = BusinessAddressConfirmationMessages.captionVisible,
         isSection = true
       )
-    }
-
-    "have a page with a paragraph" in {
-      document().mainContent.selectNth("p", 1).text mustBe BusinessAddressConfirmationMessages.para
     }
 
     "have a summary list detailing the previous address" in {
