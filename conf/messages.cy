@@ -53,24 +53,12 @@ address-lookup.select-page.title                                = Dewiswch gyfei
 address-lookup.select-page.heading                              = Dewiswch gyfeiriad busnes
 address-lookup.lookup-page.title                                = Dewch o hyd i gyfeiriad eich busnes
 address-lookup.lookup-page.heading                              = Dewch o hyd i gyfeiriad eich busnes
-address-lookup.lookup-page.postcode-label                       = Cod post
-address-lookup.lookup-page.property-label                       = Enw neu rif yr eiddo (dewisol)
 address-lookup.edit-page.title                                  = Rhowch gyfeiriad busnes
 address-lookup.edit-page.heading                                = Rhowch gyfeiriad busnes
-address-lookup.edit-page.line1-label                            = Cyfeiriad – llinell 1
-address-lookup.edit-page.line2-label                            = Cyfeiriad – llinell 2
-address-lookup.edit-page.line3-label                            = Cyfeiriad – llinell 3
-address-lookup.edit-page.town-label                             = Tref neu ddinas
-address-lookup.edit-page.postcode-label                         = Cod post neu god 'zip'
-address-lookup.edit-page.country-label                          = Gwlad neu diriogaeth
 address-lookup.confirm-page.title                               = Cadarnhau cyfeiriad eich busnes
 address-lookup.confirm-page.heading                             = Cadarnhau cyfeiriad eich busnes
-address-lookup.confirm-page.address-label                       = Eich cyfeiriad
-address-lookup.confirm-page.para                                = Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.
-address-lookup.confirm-page.confirm                             = Cadarnhau a parhau
 address-lookup.country-page.title                               = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
 address-lookup.country-page.heading                             = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
-address-lookup.country-page.country-label                       = Dewiswch gwlad neu diriogaeth
 
 # Sole trader streamline
 individual.full-income-source.heading                                   = Eich busnes fel unig fasnachwr
@@ -136,24 +124,12 @@ agent.address-lookup.select-page.title                          = dewis cyfeiria
 agent.address-lookup.select-page.heading                        = dewis cyfeiriad busnes y cleient
 agent.address-lookup.lookup-page.title                          = Dewch o hyd i gyfeiriad busnes eich cleient
 agent.address-lookup.lookup-page.heading                        = Dewch o hyd i gyfeiriad busnes eich cleient
-agent.address-lookup.lookup-page.postcode-label                 = Cod post
-agent.address-lookup.lookup-page.property-label                 = Enw neu rif yr eiddo (dewisol)
 agent.address-lookup.edit-page.title                            = Nodwch gyfeiriad busnes eich cleien
 agent.address-lookup.edit-page.heading                          = Nodwch gyfeiriad busnes eich cleien
-agent.address-lookup.edit-page.line1-label                      = Cyfeiriad – llinell 1
-agent.address-lookup.edit-page.line2-label                      = Cyfeiriad – llinell 2
-agent.address-lookup.edit-page.line3-label                      = Cyfeiriad – llinell 3
-agent.address-lookup.edit-page.town-label                       = Tref neu ddinas
-agent.address-lookup.edit-page.postcode-label                   = Cod post neu god 'zip'
-agent.address-lookup.edit-page.country-label                    = Gwlad neu diriogaeth
 agent.address-lookup.confirm-page.title                         = Cadarnhau cyfeiriad busnes eich cleient
 agent.address-lookup.confirm-page.heading                       = Cadarnhau cyfeiriad busnes eich cleient
-agent.address-lookup.confirm-page.address-label                 = Eich cyfeiriad
-agent.address-lookup.confirm-page.para                          = Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.
-agent.address-lookup.confirm-page.confirm                       = Cadarnhau a parhau
 agent.address-lookup.country-page.title                         = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad busnes eich cleient
 agent.address-lookup.country-page.heading                       = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad busnes eich cleient
-agent.address-lookup.country-page.country-label                 = Dewiswch gwlad neu diriogaeth
 
 # Self Employed CYA
 agent.self-employed-cya.trading-start-date                      = Dyddiad dechrau masnachu
@@ -234,3 +210,17 @@ agent.uk-address-confirmation.title                        = A yw cyfeiriad eich
 agent.uk-address-confirmation.heading                      = A yw’r cyfeiriad ar gyfer busnes eich cleient, {0} yn y DU?
 agent.uk-address-confirmation.heading.caption              = {0} – {1}
 error.agent.uk-address-confirmation.empty                  = Dewiswch os yw cyfeiriad y busnes yn y DU
+
+# Address lookup labels
+address-lookup.lookup-page.postcode-label                       = Cod post
+address-lookup.lookup-page.property-label                       = Enw neu rif yr eiddo (dewisol)
+address-lookup.edit-page.line1-label                            = Cyfeiriad – llinell 1
+address-lookup.edit-page.line2-label                            = Cyfeiriad – llinell 2
+address-lookup.edit-page.line3-label                            = Cyfeiriad – llinell 3
+address-lookup.edit-page.town-label                             = Tref neu ddinas
+address-lookup.edit-page.postcode-label                         = Cod post neu god 'zip'
+address-lookup.edit-page.country-label                          = Gwlad neu diriogaeth
+address-lookup.confirm-page.address-label                       = Eich cyfeiriad
+address-lookup.confirm-page.para                                = Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.
+address-lookup.confirm-page.confirm                             = Cadarnhau a parhau
+address-lookup.country-page.country-label                       = Dewiswch gwlad neu diriogaeth
