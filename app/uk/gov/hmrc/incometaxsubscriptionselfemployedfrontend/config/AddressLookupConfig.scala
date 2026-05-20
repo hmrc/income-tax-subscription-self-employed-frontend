@@ -29,9 +29,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
 
   //scalastyle:off
   def config(continueUrl: String, isAgent: Boolean, isUk: Boolean)(implicit request: RequestHeader): JsObject = {
-    val en = Lang("EN")
-    val cy = Lang("CY")
-    
+    val langs = Seq(Lang("EN"), Lang("CY"))
     val (prefix, serviceUrl) = if (isAgent) (
       "agent.",
       appConfig.govukGuidanceITSASignUpAgentLink
@@ -67,7 +65,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messagesApi: MessagesA
         "accessibilityFooterUrl" -> accessibilityStatementConfig.url
       ),
       "labels" -> Json.obj(
-        Seq(en, cy).map { lang => labels(lang, prefix) }:_*
+        langs.map { lang => labels(lang, prefix) }:_*
       )
     )
   }
