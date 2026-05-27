@@ -234,3 +234,8 @@ agent.uk-address-confirmation.title                        = A yw cyfeiriad eich
 agent.uk-address-confirmation.heading                      = A yw’r cyfeiriad ar gyfer busnes eich cleient, {0} yn y DU?
 agent.uk-address-confirmation.heading.caption              = {0} – {1}
 error.agent.uk-address-confirmation.empty                  = Dewiswch os yw cyfeiriad y busnes yn y DU
+
+error.generic.p1                                                        = Gwnaethom gadw’ch atebion. Byddant ar gael am 30 diwrnod.
+error.generic.p2.link.text                                              = Cysylltwch â Gwasanaeth Cwsmeriaid Cymraeg CThEM
+error.generic.p2.link.href                                              = #
+error.generic.p2                                                        = os oes angen i chi wneud newidiadau i’ch cais neu siarad â rhywun am eich credydau treth.

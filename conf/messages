@@ -234,3 +234,8 @@ agent.uk-address-confirmation.title                        = Is the business add
 agent.uk-address-confirmation.heading                      = Is the address for your client’s business, {0} in the UK?
 agent.uk-address-confirmation.heading.caption              = {0} – {1}
 error.agent.uk-address-confirmation.empty                  = Select if business address is in the UK
+
+error.generic.p1                                                        = We saved your answers. They will be available for 30 days.
+error.generic.p2.link.text                                              = Contact the Tax Credits Helpline
+error.generic.p2.link.href                                              = #
+error.generic.p2                                                        = if you need to make changes to your claim or speak to someone about your tax credits.

@@ -18,19 +18,19 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
 import play.api.Logging
 import play.api.i18n.MessagesApi
-import play.api.mvc.Results._
+import play.api.mvc.Results.*
 import play.api.mvc.{RequestHeader, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthorisationException, InsufficientEnrolments}
 import uk.gov.hmrc.http.NotFoundException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.ErrorTemplate
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.errors.GenericError
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ErrorHandler @Inject()(val errorTemplate: ErrorTemplate,
+class ErrorHandler @Inject()(val errorTemplate: GenericError,
                              val appConfig: AppConfig,
                              val messagesApi: MessagesApi
                             )(implicit val ec: ExecutionContext) extends FrontendErrorHandler with UrlHelpers with Logging {
@@ -49,7 +49,8 @@ class ErrorHandler @Inject()(val errorTemplate: ErrorTemplate,
   }
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader): Future[Html] = {
-    Future.successful(errorTemplate(pageTitle, heading, message))
+    val isAgent = request.path.contains("/client")
+    Future.successful(errorTemplate(pageTitle, heading, message, isAgent))
   }
 
   override def resolveError(rh: RequestHeader, ex: Throwable): Future[Result] = {
