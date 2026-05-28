@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.RequestHeader
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.auth.core.InvalidBearerToken
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.ErrorTemplate
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.errors.GenericError
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -65,7 +65,7 @@ class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
 
 
   private def withErrorHandler(expected: String)(testCode: ErrorHandler => Any): Unit = {
-    val view = mock[ErrorTemplate]
+    val view = mock[GenericError]
     when(view(any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
     val config: AppConfig = mock[AppConfig]
     when(config.incomeTaxSubscriptionFrontendBaseUrl).thenReturn("http://a.com/b/c")

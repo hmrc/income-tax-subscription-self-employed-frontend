@@ -224,3 +224,5 @@ address-lookup.confirm-page.address-label                       = Eich cyfeiriad
 address-lookup.confirm-page.para                                = Drwy gadarnhau, rydych yn cytuno bod yr wybodaeth a roddwyd gennych yn gyflawn ac yn gywir.
 address-lookup.confirm-page.confirm                             = Cadarnhau a parhau
 address-lookup.country-page.country-label                       = Dewiswch gwlad neu diriogaeth
+
+error.generic.p1                                                        = Gwnaethom gadw’ch atebion. Byddant ar gael am 30 diwrnod.

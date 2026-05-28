@@ -123,7 +123,8 @@ class DuplicateDetailsControllerISpec extends ComponentSpecBase {
         val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
 
         res must have(
-          httpStatus(INTERNAL_SERVER_ERROR)
+          httpStatus(INTERNAL_SERVER_ERROR),
+          pageTitle("Sorry, there is a problem with the service" + agentTitleSuffix)
         )
       }
     }

@@ -224,3 +224,5 @@ address-lookup.confirm-page.address-label                       = Your selected 
 address-lookup.confirm-page.para                                = By confirming, you agree that the information you have given is complete and correct.
 address-lookup.confirm-page.confirm                             = Confirm and continue
 address-lookup.country-page.country-label                       = Select country or territory
+
+error.generic.p1                                                        = We saved your answers. They will be available for 30 days.
