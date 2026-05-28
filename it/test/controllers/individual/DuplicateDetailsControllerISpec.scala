@@ -98,7 +98,11 @@ class DuplicateDetailsControllerISpec extends ComponentSpecBase {
       "the user is not authenticated" in {
         stubUnauthorised()
 
-        val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
+        val res = getDuplicateDetails(
+          id = id,
+          isEditMode = false,
+          isGlobalEdit = false
+        )
 
         res must have(
           httpStatus(SEE_OTHER),
@@ -112,10 +116,15 @@ class DuplicateDetailsControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(INTERNAL_SERVER_ERROR)
 
-        val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
+        val res = getDuplicateDetails(
+          id = id,
+          isEditMode = false,
+          isGlobalEdit = false
+        )
 
         res must have(
-          httpStatus(INTERNAL_SERVER_ERROR)
+          httpStatus(INTERNAL_SERVER_ERROR),
+          pageTitle("Sorry, there is a problem with the service" + titleSuffix)
         )
       }
     }
