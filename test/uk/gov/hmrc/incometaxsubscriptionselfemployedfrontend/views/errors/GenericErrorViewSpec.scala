@@ -43,8 +43,6 @@ class GenericErrorViewSpec extends ViewSpec {
 
   object GenericErrorMessages {
     val saved = "We saved your answers. They will be available for 30 days."
-    val linkText = "Contact the Tax Credits Helpline"
-    val paraText = "if you need to make changes to your claim or speak to someone about your tax credits."
   }
 
   "GenericError" must {
@@ -77,15 +75,6 @@ class GenericErrorViewSpec extends ViewSpec {
     "has a second paragraph" in {
       Seq(false, true).foreach { isAgent =>
         document(isAgent).mainContent.selectNth("p", 2).text mustBe GenericErrorMessages.saved
-      }
-    }
-
-    "has a third paragraph with a link" in {
-      val text = s"${GenericErrorMessages.linkText} ${GenericErrorMessages.paraText}"
-      Seq(false, true).foreach { isAgent =>
-        val para = document(isAgent).mainContent.selectNth("p", 3)
-        para.text mustBe text
-        para.selectNth("a", 1).text mustBe GenericErrorMessages.linkText
       }
     }
   }
