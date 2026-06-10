@@ -57,7 +57,7 @@ class AddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
     )
   )
 
-  val fullAddressWithUrpn: Address = Address(lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"), country = Country.UK, urpn = Some("1234"))
+  val fullAddressWithUrpn: Address = Address(lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"), country = Country.UK, uprn = Some("1234"))
   val fullJsonWithUrpn: JsObject = Json.obj(
     "lines" -> Json.arr(
       jsonSensitiveEncrypter("1 Long Road"),
@@ -68,16 +68,16 @@ class AddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
       "code" -> jsonSensitiveEncrypter(Country.UK.code),
       "name" -> jsonSensitiveEncrypter(Country.UK.name)
     ),
-    "urpn" -> jsonSensitiveEncrypter("1234")
+    "uprn" -> jsonSensitiveEncrypter("1234")
   )
 
   "Address" when {
     "reading from encrypted json" should {
       "read successfully" when {
-        "all information except urpn is present in json" in {
+        "all information except uprn is present in json" in {
           Json.fromJson[Address](fullJson)(Address.encryptedFormat) mustBe JsSuccess(fullAddress)
         }
-        "all information including urpn is present in json" in {
+        "all information including uprn is present in json" in {
           Json.fromJson[Address](fullJsonWithUrpn)(Address.encryptedFormat) mustBe JsSuccess(fullAddressWithUrpn)
         }
         "lines is empty and postcode is missing" in {
@@ -92,10 +92,10 @@ class AddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
     }
     "writing to encrypted json" should {
       "write successfully" when {
-        "all information except urpn is present in the model" in {
+        "all information except uprn is present in the model" in {
           Json.toJson(fullAddress)(Address.encryptedFormat) mustBe fullJson
         }
-        "all information including urpn is present in the model" in {
+        "all information including uprn is present in the model" in {
           Json.toJson(fullAddressWithUrpn)(Address.encryptedFormat) mustBe fullJsonWithUrpn
         }
         "lines is empty and postcode is missing" in {

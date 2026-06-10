@@ -30,7 +30,7 @@ object GetAddressLookupDetailsHttpParser {
     response.status match {
       case OK => (response.json \ "address").validate[Address](Address.format) match {
         case JsSuccess(value, _) => Right(Some(value.copy(
-          urpn = (response.json \ "id").validate[String] match {
+          uprn = (response.json \ "id").validate[String] match {
             case JsSuccess(id, _) => Some(id)
             case _ => None
           }

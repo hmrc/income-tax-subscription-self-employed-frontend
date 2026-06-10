@@ -68,7 +68,7 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
         res mustBe Right(Some(
-          Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"), country = Country.UK, urpn = Some("1234"))
+          Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"), country = Country.UK, uprn = Some("1234"))
         ))
       }
       "parse an incorrectly formatted Ok response as an invalid Json" in {
