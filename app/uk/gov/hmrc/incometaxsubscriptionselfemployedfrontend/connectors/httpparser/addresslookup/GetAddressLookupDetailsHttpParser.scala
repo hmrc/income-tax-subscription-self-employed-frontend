@@ -29,7 +29,12 @@ object GetAddressLookupDetailsHttpParser {
   implicit def getAddressLookupDetailsHttpReads: HttpReads[GetAddressLookupDetailsResponse] = HttpReads { (_, _, response) =>
     response.status match {
       case OK => (response.json \ "address").validate[Address](Address.format) match {
-        case JsSuccess(value, _) => Right(Some(value))
+        case JsSuccess(value, _) => Right(Some(value.copy(
+          uprn = (response.json \ "id").validate[String] match {
+            case JsSuccess(id, _) => Some(id)
+            case _ => None
+          }
+        )))
         case _ => Left(InvalidJson)
       }
       case NOT_FOUND => Right(None)

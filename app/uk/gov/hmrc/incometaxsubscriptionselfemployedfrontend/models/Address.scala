@@ -23,7 +23,7 @@ import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Country.UK
 
-case class Address(lines: Seq[String], postcode: Option[String], country: Country) {
+case class Address(lines: Seq[String], postcode: Option[String], country: Country, uprn: Option[String] = None) {
   override def toString: String = s"${lines.mkString("<br>")}${postcode.map(t => s"<br>$t").getOrElse("")}$country"
 }
 
@@ -35,27 +35,29 @@ object Address {
     val reads: Reads[Address] = (
       (__ \ "lines").read[Seq[SensitiveString]] and
         (__ \ "postcode").readNullable[SensitiveString] and
-        (__ \ "country").readNullable[Country](Country.encryptedFormat)
+        (__ \ "country").readNullable[Country](Country.encryptedFormat) and
+        (__ \ "uprn").readNullable[SensitiveString]
       )(
-      (lines, postcode, country) =>
-        Address.apply(lines.map(_.decryptedValue), postcode.map(_.decryptedValue), country.getOrElse(UK))
+      (lines, postcode, country, uprn) =>
+        Address.apply(lines.map(_.decryptedValue), postcode.map(_.decryptedValue), country.getOrElse(UK), uprn.map(_.decryptedValue))
     )
 
     val writes: OWrites[Address] = (
       (__ \ "lines").write[Seq[SensitiveString]] and
         (__ \ "postcode").writeNullable[SensitiveString] and
-        (__ \ "country").write[Country](Country.encryptedFormat)
+        (__ \ "country").write[Country](Country.encryptedFormat) and
+        (__ \ "uprn").writeNullable[SensitiveString]
       )(
       address =>
         (
           address.lines.map(SensitiveString.apply),
           address.postcode.map(SensitiveString.apply),
-          address.country
+          address.country,
+          address.uprn.map(SensitiveString.apply)
         )
     )
 
     OFormat(reads, writes)
-
   }
 
   val format: OFormat[Address] = Json.format[Address]

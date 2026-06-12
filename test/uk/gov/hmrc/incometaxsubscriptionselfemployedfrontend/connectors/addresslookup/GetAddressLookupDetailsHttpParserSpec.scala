@@ -25,7 +25,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UnitTestT
 
 class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
 
-
   val testHttpVerb = "GET"
   val testUri = "/"
 
@@ -40,15 +39,36 @@ class GetAddressLookupDetailsHttpParserSpec extends UnitTestTrait {
     )
   )
 
+  val testValidJsonWithUrpn: JsObject = Json.obj(
+    "id" -> "1234",
+    "address" -> Json.obj(
+      "lines" -> Seq("line1", "line2", "line3"),
+      "postcode" -> Some("TF3 4NT"),
+      "country" -> Json.obj(
+        "code" -> Country.UK.code,
+        "name" -> Country.UK.name
+      )
+    )
+  )
+
   "GetAddressLookupDetailsHttpReads" when {
     "read" should {
-      "parse a correctly formatted OK response and return the data in a model" in {
+      "parse a correctly formatted OK response (no uprn) and return the data in a model" in {
         val httpResponse = HttpResponse(OK, json = testValidJson, headers = Map.empty)
 
         lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
 
         res mustBe Right(Some(
           Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"), country = Country.UK)
+        ))
+      }
+      "parse a correctly formatted OK response (with uprn) and return the data in a model" in {
+        val httpResponse = HttpResponse(OK, json = testValidJsonWithUrpn, headers = Map.empty)
+
+        lazy val res = getAddressLookupDetailsHttpReads.read(testHttpVerb, testUri, httpResponse)
+
+        res mustBe Right(Some(
+          Address(lines = Seq("line1", "line2", "line3"), postcode = Some("TF3 4NT"), country = Country.UK, uprn = Some("1234"))
         ))
       }
       "parse an incorrectly formatted Ok response as an invalid Json" in {
