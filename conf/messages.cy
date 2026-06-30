@@ -103,6 +103,14 @@ self-employed-cya.heading                                       = Gwiriwch eich 
 self-employed-cya.caption                                       = Unig fasnachwr
 self-employed-cya.para                                          = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu'n anghywir.
 
+#Self Employed Business Name page
+individual.business-name.title                              = Eich busnes fel unig fasnachwr
+individual.business-name.heading                            = Enw’r busnes
+individual.business-name.caption                            = Unig fasnachwr
+individual.business-name.para-one                           = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes gan eich busnes enw, nodwch eich enw llawn.
+individual.business-name.heading-two                        = What is your business name?
+individual.business-name.para-two                           = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
+
 # Agent Business start date
 business.agent.start-date.title                                 = Unig fasnachwr
 business.agent.start-date.heading                               = Dyddiad dechrau’r busnes
@@ -175,9 +183,9 @@ agent.error.full-income-source.business-trade.empty                  = Nodwch fa
 agent.error.full-income-source.business-trade.max-length             = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai
 agent.error.full-income-source.business-trade.min-length             = Mae’n rhaid i enw masnachu’ch busnes gynnwys o leiaf dwy lythyren (llythrennau mawr neu lythrennau bach)
 agent.error.full-income-source.business-trade.invalid                = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, '', \, /, -
-agent.error.full-income-source.business-name.empty                   = Nodwch enw’ch cleient neu enw busnes eich cleient
+agent.error.full-income-source.business-name.empty                   = Ychwanegwch enw’ch busnes
 agent.error.full-income-source.business-name.max-length              = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau
-agent.error.full-income-source.business-name.invalid-character       = Gall enw’r busnes gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &,’,/,\,- yn unig
+agent.error.full-income-source.business-name.invalid-character       = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
 agent.error.full-income-source.start-date.day-month-year.empty       = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
 agent.error.full-income-source.start-date.day.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod
 agent.error.full-income-source.start-date.month.empty                = Mae’n rhaid i’r dyddiad gynnwys mis
