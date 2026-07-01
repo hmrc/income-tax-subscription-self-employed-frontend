@@ -31,7 +31,12 @@ class BusinessNameViewSpec extends ViewSpec {
   val form: Form[(String, String, YesNo)] = StreamlineIncomeSourceForm.fullIncomeSourceForm
 
   def view(errors: Boolean = false): HtmlFormat.Appendable = businessNameView(
-    fullIncomeSourceForm = if (errors) form.bind(Map.empty[String, String]) else form,
+    fullIncomeSourceForm = if (errors)
+      form.bind(Map(
+        StreamlineIncomeSourceForm.businessTradeName -> "Plumbing",
+        StreamlineIncomeSourceForm.startDateBeforeLimit -> "No"
+      ))
+    else form,
     postAction = testCall,
     isEditMode = false
   )(fakeTestRequest, implicitly)
@@ -55,7 +60,7 @@ class BusinessNameViewSpec extends ViewSpec {
         title = BusinessNameMessages.title,
         isAgent = false,
         hasSignOutLink = true,
-        errors = Some(Seq(StreamlineIncomeSourceForm.businessName -> "Enter your name or the name of your business"))
+        errors = Some(Seq(StreamlineIncomeSourceForm.businessName -> "Add your business name"))
       )
     }
 
@@ -81,7 +86,7 @@ class BusinessNameViewSpec extends ViewSpec {
       }
 
       "have a text input to capture a business name" in {
-        form.mustHaveTextInput(".govuk-form-group:nth-of-type(2)")(
+        form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
           name = StreamlineIncomeSourceForm.businessName,
           label = businessNameLabel,
           isLabelHidden = false,

@@ -78,10 +78,10 @@ individual.error.full-income-source.business-trade.empty                = Nodwch
 individual.error.full-income-source.business-trade.max-length           = Mae’n rhaid i’r fasnach fod yn 35 o gymeriadau neu lai
 individual.error.full-income-source.business-trade.min-length           = Mae’n rhaid i’r fasnach gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
 individual.error.full-income-source.business-trade.invalid              = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, '', \, /, -
-individual.error.full-income-source.business-name.empty                 = Nodwch eich enw neu enw’ch busnes
+individual.error.full-income-source.business-name.empty                 = Ychwanegwch enw’ch busnes
 individual.error.full-income-source.business-name.max-length            = Mae’n rhaid i enw’r busnes fod yn 105 o gymeriadau neu lai
 individual.error.full-income-source.business-name.min-length            = Mae’n rhaid i enw’r busnes gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
-individual.error.full-income-source.business-name.invalid               = Gall enw’r busnes gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &,’,/,\,- yn unig
+individual.error.full-income-source.business-name.invalid               = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
 individual.error.full-income-source.start-date-before-limit.empty       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
 
 # Duplicate details page
@@ -183,9 +183,9 @@ agent.error.full-income-source.business-trade.empty                  = Nodwch fa
 agent.error.full-income-source.business-trade.max-length             = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai
 agent.error.full-income-source.business-trade.min-length             = Mae’n rhaid i enw masnachu’ch busnes gynnwys o leiaf dwy lythyren (llythrennau mawr neu lythrennau bach)
 agent.error.full-income-source.business-trade.invalid                = Gall enw masnachu’ch busnes gynnwys y cymeriadau canlynol yn unig:  llythrennau mawr, llythrennau bach, atalnodau llawn, comas, digidau, &, '', \, /, -
-agent.error.full-income-source.business-name.empty                   = Ychwanegwch enw’ch busnes
+agent.error.full-income-source.business-name.empty                   = Nodwch enw’ch cleient neu enw busnes eich cleient
 agent.error.full-income-source.business-name.max-length              = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau
-agent.error.full-income-source.business-name.invalid-character       = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
+agent.error.full-income-source.business-name.invalid-character       = Gall enw’r busnes gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &,’,/,\,- yn
 agent.error.full-income-source.start-date.day-month-year.empty       = Nodwch y dyddiad y dechreuodd busnes eich cleient fasnachu
 agent.error.full-income-source.start-date.day.empty                  = Mae’n rhaid i’r dyddiad gynnwys diwrnod
 agent.error.full-income-source.start-date.month.empty                = Mae’n rhaid i’r dyddiad gynnwys mis
