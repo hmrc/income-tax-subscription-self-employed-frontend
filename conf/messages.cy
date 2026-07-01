@@ -108,7 +108,7 @@ individual.business-name.title                              = Eich busnes fel un
 individual.business-name.heading                            = Enw’r busnes
 individual.business-name.caption                            = Unig fasnachwr
 individual.business-name.para-one                           = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes gan eich busnes enw, nodwch eich enw llawn.
-individual.business-name.heading-two                        = What is your business name?
+individual.business-name.heading-two                        = Beth yw enw'r eich busnes?
 individual.business-name.para-two                           = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
 
 # Agent Business start date
