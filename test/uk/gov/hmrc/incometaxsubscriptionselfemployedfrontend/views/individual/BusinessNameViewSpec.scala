@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +20,17 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.YesNo
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessName as BusinessNameView
 
 class BusinessNameViewSpec extends ViewSpec {
 
   val businessNameView: BusinessNameView = app.injector.instanceOf[BusinessNameView]
-  val form: Form[(String, String, YesNo)] = StreamlineIncomeSourceForm.fullIncomeSourceForm
+  val form: Form[String] = BusinessNameForm.businessNameForm
 
   def view(errors: Boolean = false): HtmlFormat.Appendable = businessNameView(
-    fullIncomeSourceForm = if (errors)
-      form.bind(Map(
-        StreamlineIncomeSourceForm.businessTradeName -> "Plumbing",
-        StreamlineIncomeSourceForm.startDateBeforeLimit -> "No"
-      ))
-    else form,
+    businessNameForm = if (errors) form.bind(Map.empty[String, String]) else form,
     postAction = testCall,
     isEditMode = false
   )(fakeTestRequest, implicitly)
@@ -45,36 +39,35 @@ class BusinessNameViewSpec extends ViewSpec {
 
   def mainContent: Element = document.mainContent
 
-  "FullIncomeSource" must {
+  "BusinessName" must {
     import BusinessNameMessages.*
 
     "use the correct template" when {
       "there are no errors" in new TemplateViewTest(
         view = view(),
-        title = BusinessNameMessages.title,
+        title = title,
         isAgent = false,
         hasSignOutLink = true
       )
       "there are errors" in new TemplateViewTest(
         view = view(errors = true),
-        title = BusinessNameMessages.title,
+        title = title,
         isAgent = false,
         hasSignOutLink = true,
-        errors = Some(Seq(StreamlineIncomeSourceForm.businessName -> "Add your business name"))
+        errors = Some(Seq(BusinessNameForm.businessName -> "Add your business name"))
       )
     }
 
     "have the correct heading and caption" in {
       mainContent.mustHaveHeadingAndCaption(
-        heading = BusinessNameMessages.heading,
-        caption = BusinessNameMessages.caption,
+        heading = heading,
+        caption = caption,
         isSection = true
       )
     }
 
     "have the correct paragraph" in {
-      val text = mainContent.selectHead(".govuk-body").text
-      text mustBe BusinessNameMessages.paragraph
+      mainContent.selectHead(".govuk-body").text mustBe paragraph
     }
 
     "have a form" which {
@@ -85,9 +78,9 @@ class BusinessNameViewSpec extends ViewSpec {
         document.getForm.attr("action") mustBe testCall.url
       }
 
-      "have a text input to capture a business name" in {
-        form.mustHaveTextInput(".govuk-form-group:nth-of-type(1)")(
-          name = StreamlineIncomeSourceForm.businessName,
+      "has a text input to capture a business name" in {
+        form.mustHaveTextInput(".govuk-form-group")(
+          name = BusinessNameForm.businessName,
           label = businessNameLabel,
           isLabelHidden = false,
           isPageHeading = false,
@@ -96,16 +89,15 @@ class BusinessNameViewSpec extends ViewSpec {
         )
       }
 
-      "have a save and continue button" in {
+      "has a save and continue button" in {
         form.selectNth(".govuk-button", 1).text mustBe Buttons.saveAndContinue
       }
 
-      "have a save and come back later button" in {
+      "has a save and come back later button" in {
         form.selectNth(".govuk-button", 2).text mustBe Buttons.saveAndComeBackLater
       }
     }
   }
-
 
   object BusinessNameMessages {
     val heading = "Business name"

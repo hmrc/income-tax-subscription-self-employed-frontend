@@ -25,7 +25,6 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.crypto.DefaultCookieSigner
 import play.api.libs.json.{JsString, OFormat}
-import play.api.libs.ws.DefaultBodyWritables.writeableOf_urlEncodedForm
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -35,6 +34,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Streaml
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{StreamlineIncomeSourceForm as IndividualStreamlineIncomeSourceForm, *}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_urlEncodedForm
+
 
 import java.time.LocalDate
 
@@ -166,6 +167,14 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getBusinessName(id: String, isEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse =
+    get(s"/business/sole-trader-business-name?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
+
+  def submitBusinessName(name: Option[String], id: String, isEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse =
+    post(s"/business/sole-trader-business-name?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
+      name.fold(Map.empty[String, Seq[String]])(n => Map(BusinessNameForm.businessName -> Seq(n)))
+    )
+
   def getBusinessStartDateBeforeLimit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
     get(s"/details/business-start-date-before-limit?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
   }
@@ -216,7 +225,6 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getClientTimeout: WSResponse = get(uri = "/client/timeout")
 
   def sessionTimeout(): WSResponse = get("/session-timeout")
-
   def clientSessionTimeout(): WSResponse = get("/client/session-timeout")
 
   def getKeepAlive: WSResponse = get(uri = "/keep-alive")

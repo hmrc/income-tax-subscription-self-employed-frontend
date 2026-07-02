@@ -14,9 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.StreamlineIncomeSourceForm
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ RadioHelper, SaveAndContinueButtonHelper, PageHeadingHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ SaveAndContinueButtonHelper, PageHeadingHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
 
@@ -28,9 +27,9 @@
     pageHeadingHelper: PageHeadingHelper
 )
 
-@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
+@(businessNameForm: Form[String], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.business-name.title"), optForm = Some(fullIncomeSourceForm)) {
+@mainTemplate(title = messages("individual.business-name.title"), optForm = Some(businessNameForm)) {
 
     @pageHeadingHelper(
         heading = messages("individual.business-name.heading"),
@@ -42,7 +41,7 @@
 
     @form(action = postAction) {
         @textInputHelper(
-            field = fullIncomeSourceForm(StreamlineIncomeSourceForm.businessName),
+            field = businessNameForm(BusinessNameForm.businessName),
             label = messages("individual.business-name.heading-two"),
             hint = Some(Html(messages("individual.business-name.para-two"))),
             isPageHeading = false,
