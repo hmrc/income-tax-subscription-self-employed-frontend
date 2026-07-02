@@ -31,9 +31,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individu
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class BusinessStartDateBeforeLimitController @Inject()(businessStartDateBeforeLimit: BusinessStartDateBeforeLimit,
                                                        mcc: MessagesControllerComponents,
                                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
@@ -135,7 +136,7 @@ class BusinessStartDateBeforeLimitController @Inject()(businessStartDateBeforeLi
     businessStartDateBeforeLimit(
       businessStartDateBeforeLimitForm = businessStartDateBeforeLimitForm,
       postAction = routes.BusinessStartDateBeforeLimitController.submit(id, isEditMode, isGlobalEdit),
-      isEditMode = isEditMode
+      isEditMode = isEditMode || isGlobalEdit
     )
   }
 }
