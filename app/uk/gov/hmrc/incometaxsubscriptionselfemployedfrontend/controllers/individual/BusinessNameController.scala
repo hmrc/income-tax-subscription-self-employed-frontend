@@ -89,7 +89,6 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
         if (isEditMode || isGlobalEdit) {
           Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
         } else {
-          // TODO: confirm next page in journey with Alex
           Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit))
         }
       case Left(_) =>
