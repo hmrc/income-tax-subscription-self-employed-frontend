@@ -12,6 +12,8 @@ base.yes                                                        = Iawn
 base.no                                                         = Na
 base.add                                                        = Ychwanegu
 base.section-caption.hidden                                     = Teitl yr adran hon yw
+base.sole-trader-caption                                        = Unig fasnachwr
+
 
 # Save and retrieve
 save-and-continue-button                                        = Cadw a parhau
@@ -26,6 +28,10 @@ agent-base.title.error                                          = Gwall: {0} - C
 
 ## Service name
 base.agent.service-name                                         = Cofrestrwch eich cleientiaid ar gyfer y cynllun Troi Treth yn Ddigidol ar gyfer Treth Incwm
+
+#Start Date Before Limit
+individual.start-date-before-limit.heading                      = A ddechreuodd y busnes cyn 6 Ebrill {0}?
+individual.error.start-date-before-limit.empty                  = A ddechreuodd y busnes cyn 6 Ebrill {0}
 
 # Business start date
 business.start-date.title                                       = Unig fasnachwr

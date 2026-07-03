@@ -139,6 +139,11 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
                     (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[DateModel]]] = {
     findData[DateModel](reference, businessId, _.startDate)
   }
+  
+  def saveStartDateBeforeLimit(reference: String, businessId: String, startDateBeforeLimit: Boolean)
+                              (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
+    saveData(reference, businessId, _.copy(startDateBeforeLimit = Some(startDateBeforeLimit), confirmed = false))
+  }
 
   def saveStartDate(reference: String, businessId: String, startDate: DateModel)
                    (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {

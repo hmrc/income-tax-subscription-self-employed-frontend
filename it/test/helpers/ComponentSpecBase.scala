@@ -25,6 +25,7 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.crypto.DefaultCookieSigner
 import play.api.libs.json.{JsString, OFormat}
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_urlEncodedForm
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -34,8 +35,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Streaml
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.{StreamlineIncomeSourceForm as IndividualStreamlineIncomeSourceForm, *}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys.REFERENCE
-import play.api.libs.ws.DefaultBodyWritables.writeableOf_urlEncodedForm
-
 
 import java.time.LocalDate
 
@@ -167,6 +166,21 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
   }
 
+  def getBusinessStartDateBeforeLimit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
+    get(s"/details/business-start-date-before-limit?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
+  }
+
+  def submitBusinessStartDateBeforeLimit(startDateBeforeLimit: Option[Boolean],
+                                         id: String,
+                                         isEditMode: Boolean,
+                                         isGlobalEdit: Boolean,
+                                         maybeStartDate: Option[DateModel] = None): WSResponse = {
+    post(s"/details/business-start-date-before-limit?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
+      BusinessStartDateBeforeLimitForm.createStartDateBeforeLimitData(maybeStartDate, startDateBeforeLimit)
+        .map { case (k, v) => (k, Seq(v)) }
+    )
+  }
+
   def getInitialise: WSResponse = get(s"/details")
 
   def getClientInitialise: WSResponse = get(s"/client/details")
@@ -202,6 +216,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
   def getClientTimeout: WSResponse = get(uri = "/client/timeout")
 
   def sessionTimeout(): WSResponse = get("/session-timeout")
+
   def clientSessionTimeout(): WSResponse = get("/client/session-timeout")
 
   def getKeepAlive: WSResponse = get(uri = "/keep-alive")

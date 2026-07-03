@@ -12,6 +12,7 @@ base.yes                                                        = Yes
 base.no                                                         = No
 base.add                                                        = Add
 base.section-caption.hidden                                     = This section is
+base.sole-trader-caption                                        = Sole trader
 
 # Save and retrieve
 save-and-continue-button                                        = Save and continue
@@ -26,6 +27,10 @@ agent-base.title.error                                          = Error: {0} - S
 
 ## Service Name
 base.agent.service-name                                         = Sign up your clients for Making Tax Digital for Income Tax
+
+#Start Date Before Limit
+individual.start-date-before-limit.heading                      = Did the business start before 6 April {0}?
+individual.error.start-date-before-limit.empty                  = Select if the business started before {0}
 
 # Business start date
 business.start-date.title                                       = Sole trader

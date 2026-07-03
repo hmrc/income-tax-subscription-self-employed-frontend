@@ -1,0 +1,61 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateBeforeLimitForm
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{RadioHelper, SaveAndContinueButtonHelper, PageHeadingHelper}
+
+@this(
+        mainTemplate: PrincipalMainTemplate,
+        form: FormWithCSRF,
+        radioHelper: RadioHelper,
+        pageHeadingHelper: PageHeadingHelper,
+        saveAndContinueButtonHelper: SaveAndContinueButtonHelper
+)
+@(businessStartDateBeforeLimitForm: Form[_], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
+
+@mainTemplate(title = messages("individual.start-date-before-limit.heading", AccountingPeriodUtil.getStartDateLimit.getYear.toString),optForm = Some(businessStartDateBeforeLimitForm)) {
+
+    @form(action = postAction) {
+
+        <span class="govuk-caption-l">@messages("base.sole-trader-caption")</span>
+        @radioHelper(
+            field = businessStartDateBeforeLimitForm(BusinessStartDateBeforeLimitForm.startDateBeforeLimit),
+            legend = messages("individual.start-date-before-limit.heading", AccountingPeriodUtil.getStartDateLimit.getYear.toString),
+            isPageHeading = true,
+            customHeadingClass = Some("govuk-!-font-weight-bold"),
+            radioItems = Seq(
+                RadioItem(
+                    content = Text(messages("base.yes")),
+                    value = Some(YesNoMapping.option_yes)
+                ),
+                RadioItem(
+                    content = Text(messages("base.no")),
+                    value = Some(YesNoMapping.option_no)
+                )
+            ),
+            inline = true
+        )
+
+        @saveAndContinueButtonHelper(
+            individual = true,
+            saveAndReturnReference = Some("sole-trader-income-source")
+        )
+
+    }
+}
