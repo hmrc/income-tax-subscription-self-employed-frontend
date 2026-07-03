@@ -23,6 +23,9 @@ GET        /address-lookup-check/:businessId            uk.gov.hmrc.incometaxsub
 GET        /address-lookup-initialise/:businessId/:isUk uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 GET        /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
+GET        /business/sole-trader-business-name          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+POST       /business/sole-trader-business-name          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+
 GET        /details/sole-trader-business                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.FullIncomeSourceController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST       /details/sole-trader-business                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.FullIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 

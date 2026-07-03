@@ -77,10 +77,10 @@ individual.error.full-income-source.business-trade.empty                  = Ente
 individual.error.full-income-source.business-trade.max-length             = Trade must be 35 characters or less
 individual.error.full-income-source.business-trade.min-length             = Trade must have at least 2 letters (upper or lower case)
 individual.error.full-income-source.business-trade.invalid                = Your business trade name may only include the following characters:  upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
-individual.error.full-income-source.business-name.empty                   = Enter your name or the name of your business
+individual.error.full-income-source.business-name.empty                   = Add your business name
 individual.error.full-income-source.business-name.max-length              = Business name must be 105 characters or less
 individual.error.full-income-source.business-name.min-length              = Business name must have at least 2 letters (upper or lower case)
-individual.error.full-income-source.business-name.invalid                 = Your business name may only include the following characters: upper case letters, lower case letters, full stops, commas, digits, &, '', \, /, -
+individual.error.full-income-source.business-name.invalid                 = The business name can only include upper case or lower case letters, full stops, commas, digits, &,’,/,\,-.
 individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
 
 # Duplicate details page
@@ -101,6 +101,14 @@ self-employed-cya.title                                         = Check your ans
 self-employed-cya.heading                                       = Check your answers
 self-employed-cya.caption                                       = Sole trader
 self-employed-cya.para                                          = Add or change any missing or incorrect details, then confirm that the information is correct.
+
+#Self Employed Business Name page
+individual.business-name.title                              = Your sole trader business name
+individual.business-name.heading                            = Business name
+individual.business-name.caption                            = Sole trader
+individual.business-name.para-one                           = This is the business name you used to register for Self Assessment. If your business does not have a name, enter your own first and last name.
+individual.business-name.heading-two                        = What is your business name?
+individual.business-name.para-two                           = The business name you enter can only include upper case or lower case letters, full stops, commas, digits, &, ’, /, \, -.
 
 # Agent Business start date
 business.agent.start-date.title                                 = Sole trader
