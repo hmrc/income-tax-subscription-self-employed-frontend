@@ -166,10 +166,18 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
       )
     )
   }
+  
+  def getBusinessTradeName(id: String, isEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse =
+    get(s"/business/sole-trader-trade?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
+
+  def submitBusinessTradeName(trade: Option[String], id: String, isEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse =
+    post(s"/business/sole-trader-trade?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
+      trade.fold(Map.empty[String, Seq[String]])(t => Map(BusinessTradeNameForm.businessTradeName -> Seq(t)))
+    )
 
   def getBusinessName(id: String, isEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse =
     get(s"/business/sole-trader-business-name?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
-
+  
   def submitBusinessName(name: Option[String], id: String, isEditMode: Boolean = false, isGlobalEdit: Boolean = false): WSResponse =
     post(s"/business/sole-trader-business-name?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
       name.fold(Map.empty[String, Seq[String]])(n => Map(BusinessNameForm.businessName -> Seq(n)))
