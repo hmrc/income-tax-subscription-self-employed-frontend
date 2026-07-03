@@ -35,7 +35,7 @@ object BusinessNameForm {
   val nameNotEmpty: Constraint[String] = nonEmpty(s"individual.error.$pageIdentifier.$businessName.empty")
   val nameMaxLength: Constraint[String] = maxLength(businessNameMaxLength, s"individual.error.$pageIdentifier.$businessName.max-length")
   val nameMinLength: Constraint[String] = minLettersLength(businessNameMinLength, s"individual.error.$pageIdentifier.$businessName.min-length")
-  val nameValidChars: Constraint[String] = validateCharAgainst(businessNameAndTradeAllowedCharacters, s"individual.error.$pageIdentifier.$businessName.invalid-character")
+  val nameValidChars: Constraint[String] = validateCharAgainst(businessNameAndTradeAllowedCharacters, s"individual.error.$pageIdentifier.$businessName.invalid")
 
   val businessNameForm: Form[String] = Form(
     single(

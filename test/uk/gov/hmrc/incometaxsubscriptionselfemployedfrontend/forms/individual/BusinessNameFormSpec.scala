@@ -83,7 +83,7 @@ class BusinessNameFormSpec extends PlaySpec {
         val result = form.bind(testInput)
         result.value mustBe None
 
-        result.errors must contain(FormError(businessName, s"individual.error.$pageIdentifier.$businessName.invalid-character"))
+        result.errors must contain(FormError(businessName, s"individual.error.$pageIdentifier.$businessName.invalid"))
       }
     }
   }
