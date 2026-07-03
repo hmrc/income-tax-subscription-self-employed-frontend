@@ -89,7 +89,7 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
         if (isEditMode || isGlobalEdit) {
           Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
         } else {
-          Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit))
+          Redirect(routes.BusinessStartDateBeforeLimitController.show(id, isEditMode, isGlobalEdit))
         }
       case Left(_) =>
         throw new InternalServerException("[BusinessNameController][submit] - Could not save business name")

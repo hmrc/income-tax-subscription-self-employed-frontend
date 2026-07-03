@@ -117,8 +117,7 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
 
         result must have(
           httpStatus(SEE_OTHER),
-          // TODO: update redirect once BusinessTradeNameController is created
-          redirectURI(routes.FullIncomeSourceController.show(id).url)
+          redirectURI(routes.BusinessStartDateBeforeLimitController.show(id).url)
         )
       }
     }
