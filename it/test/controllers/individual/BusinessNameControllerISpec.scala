@@ -171,5 +171,25 @@ class BusinessNameControllerISpec extends ComponentSpecBase {
         )
       }
     }
+
+    "the user submits a duplicate business name" should {
+      "return a bad request with the page content" in {
+        AuthStub.stubAuthSuccess()
+        stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+          responseStatus = OK,
+          responseBody = Json.toJson(SoleTraderBusinesses(Seq(
+            SoleTraderBusiness(id = id, trade = Some("Plumbing")),
+            SoleTraderBusiness(id = s"$id-two", trade = Some("Plumbing"), name = Some("test name"))
+          )))
+        )
+
+        val result = submitBusinessName(name = Some("test name"), id = id)
+
+        result must have(
+          httpStatus(BAD_REQUEST),
+          pageTitle("Error: " + messages("individual.business-name.title") + titleSuffix)
+        )
+      }
+    }
   }
 }

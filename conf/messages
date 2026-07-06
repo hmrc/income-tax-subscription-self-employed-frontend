@@ -65,6 +65,17 @@ address-lookup.confirm-page.heading                             = Confirm your b
 address-lookup.country-page.title                               = Select the country or territory for your business address
 address-lookup.country-page.heading                             = Select the country or territory for your business address
 
+individual.error.full-income-source.business-trade.empty                  = Add your trade
+individual.error.full-income-source.business-trade.max-length             = Trade must be 35 characters or less
+individual.error.full-income-source.business-trade.min-length             = Trade must have at least 2 letters (upper or lower case)
+individual.error.full-income-source.business-trade.invalid                = The trade can only include upper case or lower case letters, full stops, commas, digits, & ,’ , /, \ , - .
+individual.error.full-income-source.business-name.empty                   = Add your business name
+individual.error.full-income-source.business-name.max-length              = Business name must be 105 characters or less
+individual.error.full-income-source.business-name.min-length              = Business name must have at least 2 letters (upper or lower case)
+individual.error.full-income-source.business-name.invalid                 = The business name can only include upper case or lower case letters, full stops, commas, digits, &,’,/,\,-.
+individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
+individual.error.duplicate-business                                       = You cannot enter the same trade and same business name
+
 #Self Employed CYA
 self-employed-cya.trading-start-date                            = Start date
 self-employed-cya.start-date-before-limit.label                 = Before 6 April {0}

@@ -66,6 +66,17 @@ address-lookup.confirm-page.heading                             = Cadarnhau cyfe
 address-lookup.country-page.title                               = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
 address-lookup.country-page.heading                             = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
 
+individual.error.full-income-source.business-trade.empty                = Ychwanegwch eich masnach unig fasnachwr
+individual.error.full-income-source.business-trade.max-length           = Mae’n rhaid i’r fasnach fod yn 35 o gymeriadau neu lai
+individual.error.full-income-source.business-trade.min-length           = Mae’n rhaid i’r fasnach gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
+individual.error.full-income-source.business-trade.invalid              = Gall masnach y busnes gynnwys llythrennau mawr neu fach,atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
+individual.error.full-income-source.business-name.empty                 = Ychwanegwch enw’ch busnes
+individual.error.full-income-source.business-name.max-length            = Mae’n rhaid i enw’r busnes fod yn 105 o gymeriadau neu lai
+individual.error.full-income-source.business-name.min-length            = Mae’n rhaid i enw’r busnes gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
+individual.error.full-income-source.business-name.invalid               = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
+individual.error.full-income-source.start-date-before-limit.empty       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
+individual.error.duplicate-business                                     = Ni allwch nodi'r un peth ar gyfer masnach busnes ac enw'r busnes
+
 # Self Employed CYA
 self-employed-cya.trading-start-date                            = Dyddiad dechrau
 self-employed-cya.start-date-before-limit.label                 = Cyn 6 Ebrill {0}
