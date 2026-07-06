@@ -83,6 +83,7 @@ individual.error.full-income-source.business-name.max-length            = Mae’
 individual.error.full-income-source.business-name.min-length            = Mae’n rhaid i enw’r busnes gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
 individual.error.full-income-source.business-name.invalid               = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
 individual.error.full-income-source.start-date-before-limit.empty       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
+individual.error.duplicate-business                                     = Ni allwch nodi'r un peth ar gyfer masnach busnes ac enw'r busnes
 
 # Duplicate details page
 individual.duplicate-details.heading                            = Mae problem wedi codi

@@ -65,7 +65,17 @@ class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTrade
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
           trade =>
-            saveAndContinue(reference, id, trade, isEditMode, isGlobalEdit)
+            multipleSelfEmploymentsService.isDuplicateBusinessTrade(reference, id, trade) flatMap {
+              case true =>
+                Future.successful(BadRequest(view(
+                  BusinessTradeNameForm.businessTradeNameForm
+                    .fill(trade)
+                    .withError(BusinessTradeNameForm.businessTradeName, "individual.error.duplicate-business"),
+                  id, isEditMode, isGlobalEdit
+                )))
+              case false =>
+                saveAndContinue(reference, id, trade, isEditMode, isGlobalEdit)
+            }
         )
       }
     }

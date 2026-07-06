@@ -65,7 +65,17 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
           name =>
-            saveAndContinue(reference, id, name, isEditMode, isGlobalEdit)
+            multipleSelfEmploymentsService.isDuplicateBusinessName(reference, id, name) flatMap {
+              case true =>
+                Future.successful(BadRequest(view(
+                  BusinessNameForm.businessNameForm
+                    .fill(name)
+                    .withError(BusinessNameForm.businessName, "individual.error.duplicate-business"),
+                  id, isEditMode, isGlobalEdit
+                )))
+              case false =>
+                saveAndContinue(reference, id, name, isEditMode, isGlobalEdit)
+            }
         )
       }
     }
