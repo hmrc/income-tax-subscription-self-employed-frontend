@@ -29,21 +29,22 @@
 
 @(businessTradeNameForm: Form[String], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("individual.business-name.title"), optForm = Some(businessTradeNameForm)) {
+@mainTemplate(title = messages("individual.business-trade-name.title"), optForm = Some(businessTradeNameForm)) {
 
     @pageHeadingHelper(
-        heading = messages("individual.business-name.heading"),
-        caption = messages("individual.business-name.caption"),
+        heading = messages("individual.business-trade-name.heading"),
+        caption = messages("individual.business-trade-name.caption"),
         isSection = true
     )
 
-    <p class="govuk-body">@messages("individual.business-name.para-one")</p>
+    <p class="govuk-body">@messages("individual.business-trade-name.para-one")</p>
 
     @form(action = postAction) {
         @textInputHelper(
             field = businessTradeNameForm(BusinessTradeNameForm.businessTradeName),
-            label = messages("individual.business-name.heading-two"),
-            hint = Some(Html(messages("individual.business-name.para-two"))),
+            label = messages("individual.business-trade-name.heading-two"),
+            isLabelHidden = true,
+            hint = Some(Html(messages("individual.business-trade-name.para-two"))),
             isPageHeading = false,
             classes = Some("govuk-!-width-one-half"),
             autoComplete = Some("organization")

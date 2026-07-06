@@ -117,7 +117,7 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectURI(routes.BusinessStartDateBeforeLimitController.show(id).url)
+          redirectURI(routes.BusinessNameController.show(id).url)
         )
       }
     }
