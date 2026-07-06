@@ -58,23 +58,6 @@ class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTrade
     }
   }
 
-  private def isDuplicateBusiness(reference: String, id: String, trade: String)
-                                 (implicit hc: HeaderCarrier): Future[Boolean] =
-    multipleSelfEmploymentsService.fetchStreamlineData(reference, id) flatMap {
-      case Some(streamlineBusiness) if streamlineBusiness.name.isDefined =>
-        multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
-          case Right(Some(soleTraderBusinesses)) =>
-            soleTraderBusinesses.businesses.filterNot(_.id == id).exists(b =>
-              b.name == streamlineBusiness.name && b.trade.contains(trade)
-            )
-          case Right(None) => false
-          case Left(error) => throw new InternalServerException(
-            s"[BusinessTradeNameController][isDuplicateBusiness] - Unable to fetch businesses - $error"
-          )
-        }
-      case _ => Future.successful(false)
-    }
-
   def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
@@ -82,12 +65,12 @@ class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTrade
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
           trade =>
-            isDuplicateBusiness(reference, id, trade) flatMap {
+            multipleSelfEmploymentsService.isDuplicateBusinessTrade(reference, id, trade) flatMap {
               case true =>
                 Future.successful(BadRequest(view(
                   BusinessTradeNameForm.businessTradeNameForm
                     .fill(trade)
-                    .withError(BusinessTradeNameForm.businessTradeName, "individual.error.full-income-source.business-trade.duplicate"),
+                    .withError(BusinessTradeNameForm.businessTradeName, "individual.error.duplicate-business"),
                   id, isEditMode, isGlobalEdit
                 )))
               case false =>

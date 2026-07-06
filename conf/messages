@@ -82,7 +82,7 @@ individual.error.full-income-source.business-name.max-length              = Busi
 individual.error.full-income-source.business-name.min-length              = Business name must have at least 2 letters (upper or lower case)
 individual.error.full-income-source.business-name.invalid                 = The business name can only include upper case or lower case letters, full stops, commas, digits, &,’,/,\,-.
 individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
-individual.error.full-income-source.business-trade.duplicate              = You cannot enter the same trade and same business name
+individual.error.duplicate-business                                       = You cannot enter the same trade and same business name
 
 # Duplicate details page
 individual.duplicate-details.heading                            = There is a problem

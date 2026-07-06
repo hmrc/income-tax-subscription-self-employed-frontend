@@ -192,6 +192,43 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
     }
   }
 
+  private def normalise(value: String): String = value.trim.toLowerCase
+
+  private def isDuplicateBusiness(reference: String,
+                                  id: String,
+                                  nameOverride: Option[String],
+                                  tradeOverride: Option[String])
+                                 (implicit hc: HeaderCarrier): Future[Boolean] =
+    fetchSoleTraderBusinesses(reference) map {
+      case Right(Some(soleTraderBusinesses)) =>
+        val maybeCurrentBusiness = soleTraderBusinesses.businesses.find(_.id == id)
+        val maybeName = nameOverride.orElse(maybeCurrentBusiness.flatMap(_.name))
+        val maybeTrade = tradeOverride.orElse(maybeCurrentBusiness.flatMap(_.trade))
+
+        (maybeName, maybeTrade) match {
+          case (Some(name), Some(trade)) =>
+            soleTraderBusinesses.businesses.exists { business =>
+              business.id != id &&
+                business.name.exists(existingName => normalise(existingName) == normalise(name)) &&
+                business.trade.exists(existingTrade => normalise(existingTrade) == normalise(trade))
+            }
+          case _ => false
+        }
+      case Right(None) => false
+      case Left(error) =>
+        throw new InternalServerException(
+          s"[MultipleSelfEmploymentsService][isDuplicateBusiness] - Unable to fetch sole trader businesses - $error"
+        )
+    }
+
+  def isDuplicateBusinessName(reference: String, id: String, name: String)
+                             (implicit hc: HeaderCarrier): Future[Boolean] =
+    isDuplicateBusiness(reference, id, nameOverride = Some(name), tradeOverride = None)
+
+  def isDuplicateBusinessTrade(reference: String, id: String, trade: String)
+                              (implicit hc: HeaderCarrier): Future[Boolean] =
+    isDuplicateBusiness(reference, id, nameOverride = None, tradeOverride = Some(trade))
+
 }
 
 object MultipleSelfEmploymentsService {

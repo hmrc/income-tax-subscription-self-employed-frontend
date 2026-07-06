@@ -58,23 +58,6 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
     }
   }
 
-  private def isDuplicateBusiness(reference: String, id: String, name: String)
-                                 (implicit hc: HeaderCarrier): Future[Boolean] =
-    multipleSelfEmploymentsService.fetchStreamlineData(reference, id) flatMap {
-      case Some(streamlineBusiness) if streamlineBusiness.trade.isDefined =>
-        multipleSelfEmploymentsService.fetchSoleTraderBusinesses(reference) map {
-          case Right(Some(soleTraderBusinesses)) =>
-            soleTraderBusinesses.businesses.filterNot(_.id == id).exists(b =>
-              b.trade == streamlineBusiness.trade && b.name.contains(name)
-            )
-          case Right(None) => false
-          case Left(error) => throw new InternalServerException(
-            s"[BusinessNameController][isDuplicateBusiness] - Unable to fetch businesses - $error"
-          )
-        }
-      case _ => Future.successful(false)
-    }
-
   def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
     authService.authorised() {
       withIndividualReference { reference =>
@@ -82,12 +65,12 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
           name =>
-            isDuplicateBusiness(reference, id, name) flatMap {
+            multipleSelfEmploymentsService.isDuplicateBusinessName(reference, id, name) flatMap {
               case true =>
                 Future.successful(BadRequest(view(
                   BusinessNameForm.businessNameForm
                     .fill(name)
-                    .withError(BusinessNameForm.businessName, "individual.error.full-income-source.business-trade.duplicate"),
+                    .withError(BusinessNameForm.businessName, "individual.error.duplicate-business"),
                   id, isEditMode, isGlobalEdit
                 )))
               case false =>
