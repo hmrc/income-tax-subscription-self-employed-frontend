@@ -59,7 +59,7 @@ class FullIncomeSourceViewSpec extends ViewSpec {
         isAgent = false,
         hasSignOutLink = true,
         errors = Some(Seq(
-          StreamlineIncomeSourceForm.businessTradeName -> "Enter the trade of this business",
+          StreamlineIncomeSourceForm.businessTradeName -> "Add your trade",
           StreamlineIncomeSourceForm.businessName -> "Add your business name",
           StreamlineIncomeSourceForm.startDateBeforeLimit -> s"Select ‘Yes’ if this business started before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"
         ))
