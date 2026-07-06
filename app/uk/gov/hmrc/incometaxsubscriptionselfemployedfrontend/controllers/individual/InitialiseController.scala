@@ -37,7 +37,7 @@ class InitialiseController @Inject()(mcc: MessagesControllerComponents,
   def initialise: Action[AnyContent] = Action.async { implicit request =>
     val id = uuidGen.generateId
     authService.authorised() {
-      Future.successful(Redirect(routes.FullIncomeSourceController.show(id)))
+      Future.successful(Redirect(routes.BusinessTradeNameController.show(id)))
     }
   }
 }
