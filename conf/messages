@@ -65,32 +65,6 @@ address-lookup.confirm-page.heading                             = Confirm your b
 address-lookup.country-page.title                               = Select the country or territory for your business address
 address-lookup.country-page.heading                             = Select the country or territory for your business address
 
-# Sole trader streamline
-individual.full-income-source.heading                                     = Your sole trader business
-individual.full-income-source.business-trade.label                        = Trade
-individual.full-income-source.business-trade.hint                         = For example plumbing, electrical work or hairdressing
-individual.full-income-source.business-name.label                         = Business name
-individual.full-income-source.business-name.hint                          = This is the business name you used to register for Self Assessment. If your business does not have a name, enter your full name.
-individual.full-income-source.start-date-before-limit.label               = Did this business start before 6 April {0}?
-
-individual.error.full-income-source.business-trade.empty                  = Add your trade
-individual.error.full-income-source.business-trade.max-length             = Trade must be 35 characters or less
-individual.error.full-income-source.business-trade.min-length             = Trade must have at least 2 letters (upper or lower case)
-individual.error.full-income-source.business-trade.invalid                = The trade can only include upper case or lower case letters, full stops, commas, digits, & ,’ , /, \ , - .
-individual.error.full-income-source.business-name.empty                   = Add your business name
-individual.error.full-income-source.business-name.max-length              = Business name must be 105 characters or less
-individual.error.full-income-source.business-name.min-length              = Business name must have at least 2 letters (upper or lower case)
-individual.error.full-income-source.business-name.invalid                 = The business name can only include upper case or lower case letters, full stops, commas, digits, &,’,/,\,-.
-individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
-
-# Duplicate details page
-individual.duplicate-details.heading                            = There is a problem
-individual.duplicate-details.para-one                           = You cannot enter the trade ({0}) twice for the business named {1}.
-individual.duplicate-details.options.lead-in                    = You can:
-individual.duplicate-details.options.change-original-entry      = change the original entry
-individual.duplicate-details.options.add-different-business     = add a different sole trader business
-individual.duplicate-details.options.return-to-income-sources   = go to your income sources
-
 #Self Employed CYA
 self-employed-cya.trading-start-date                            = Start date
 self-employed-cya.start-date-before-limit.label                 = Before 6 April {0}

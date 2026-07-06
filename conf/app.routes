@@ -29,11 +29,6 @@ POST       /business/sole-trader-trade                  uk.gov.hmrc.incometaxsub
 GET        /business/sole-trader-business-name          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST       /business/sole-trader-business-name          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessNameController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
-GET        /details/sole-trader-business                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.FullIncomeSourceController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST       /details/sole-trader-business                uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.FullIncomeSourceController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-
-GET        /details/error/duplicate-details             uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.DuplicateDetailsController.show(id: String, isEditMOde: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-
 GET        /logout                                      uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.SignOutController.signOut
 
 GET        /keep-alive                                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SessionTimeoutController.keepAlive
