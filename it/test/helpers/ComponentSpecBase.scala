@@ -184,7 +184,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     )
 
   def getBusinessStartDateBeforeLimit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): WSResponse = {
-    get(s"/details/business-start-date-before-limit?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
+    get(s"/business-start-date-before-limit?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")
   }
 
   def submitBusinessStartDateBeforeLimit(startDateBeforeLimit: Option[Boolean],
@@ -192,7 +192,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
                                          isEditMode: Boolean,
                                          isGlobalEdit: Boolean,
                                          maybeStartDate: Option[DateModel] = None): WSResponse = {
-    post(s"/details/business-start-date-before-limit?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
+    post(s"/business-start-date-before-limit?id=$id&isEditMode=$isEditMode&isGlobalEdit=$isGlobalEdit")(
       BusinessStartDateBeforeLimitForm.createStartDateBeforeLimitData(maybeStartDate, startDateBeforeLimit)
         .map { case (k, v) => (k, Seq(v)) }
     )
