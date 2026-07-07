@@ -7,8 +7,8 @@ GET        /assets/*file                                controllers.Assets.versi
 
 GET        /details                                     uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.InitialiseController.initialise
 
-GET        /details/business-start-date-before-limit    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateBeforeLimitController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-POST       /details/business-start-date-before-limit    uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateBeforeLimitController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET        /business/business-start-date-before-limit   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateBeforeLimitController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+POST       /business/business-start-date-before-limit   uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateBeforeLimitController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
 GET        /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST       /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
