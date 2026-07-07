@@ -101,6 +101,10 @@ class BusinessStartDateBeforeLimitController @Inject()(businessStartDateBeforeLi
         ).discardingErrors
       case Right(None) =>
         BusinessStartDateBeforeLimitForm.businessStartDateBeforeLimitForm
+      case Left(_) =>
+        throw new InternalServerException(
+          s"[BusinessStartDateBeforeLimitController][populateFormFromSavedDetails] Cannot retrieve business (ref = $reference, id = $id).)"
+        )
     }
   }
 

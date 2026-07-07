@@ -48,7 +48,7 @@ class InitialiseControllerSpec extends ControllerBaseSpec with MockSessionDataSe
       val result = TestInitialiseController.initialise(fakeRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.FullIncomeSourceController.show(id = "testId").url)
+      redirectLocation(result) mustBe Some(routes.BusinessTradeNameController.show(id = "testId").url)
     }
   }
 

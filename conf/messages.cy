@@ -66,14 +66,6 @@ address-lookup.confirm-page.heading                             = Cadarnhau cyfe
 address-lookup.country-page.title                               = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
 address-lookup.country-page.heading                             = Dewiswch y wlad neu’r diriogaeth ar gyfer cyfeiriad eich busnes
 
-# Sole trader streamline
-individual.full-income-source.heading                                   = Eich busnes fel unig fasnachwr
-individual.full-income-source.business-trade.label                      = Masnach
-individual.full-income-source.business-trade.hint                       = Er enghraifft plymio, gwaith trydanol neu drin gwallt
-individual.full-income-source.business-name.label                       = Enw’r busnes
-individual.full-income-source.business-name.hint                        = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes enw ar eich busnes, nodwch eich enw llawn.
-individual.full-income-source.start-date-before-limit.label             = A oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}?
-
 individual.error.full-income-source.business-trade.empty                = Ychwanegwch eich masnach unig fasnachwr
 individual.error.full-income-source.business-trade.max-length           = Mae’n rhaid i’r fasnach fod yn 35 o gymeriadau neu lai
 individual.error.full-income-source.business-trade.min-length           = Mae’n rhaid i’r fasnach gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
@@ -84,14 +76,6 @@ individual.error.full-income-source.business-name.min-length            = Mae’
 individual.error.full-income-source.business-name.invalid               = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
 individual.error.full-income-source.start-date-before-limit.empty       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
 individual.error.duplicate-business                                     = Ni allwch nodi'r un peth ar gyfer masnach busnes ac enw'r busnes
-
-# Duplicate details page
-individual.duplicate-details.heading                            = Mae problem wedi codi
-individual.duplicate-details.para-one                           = Ni allwch nodi ({0}) fel masnach ddwywaith ar gyfer {1}.
-individual.duplicate-details.options.lead-in                    = Gallwch wneud y canlynol:
-individual.duplicate-details.options.change-original-entry      = newid y cofnod gwreiddiol
-individual.duplicate-details.options.add-different-business     = ychwanegu busnes unig fasnachwr gwahanol
-individual.duplicate-details.options.return-to-income-sources   = ewch i’r rhestr o’ch ffynonellau incwm
 
 # Self Employed CYA
 self-employed-cya.trading-start-date                            = Dyddiad dechrau

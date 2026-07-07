@@ -42,7 +42,7 @@ class InitialiseControllerISpec extends ComponentSpecBase with FeatureSwitching 
       Then("I should redirect to full income source page")
       res must have(
         httpStatus(SEE_OTHER),
-        redirectURI("/details/sole-trader-business"))
+        redirectURI("/business/sole-trader-trade"))
     }
   }
 }

@@ -18,11 +18,12 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ImplicitDateFormatter, ImplicitDateFormatterImpl, ViewSpec}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.SelfEmployedCYA
 
@@ -170,14 +171,14 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     }
   }
 
-  def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
+  def simpleSummaryRow(key: String, href: Call): (Option[String], Boolean) => SummaryListRowValues = {
     case (value, globalEditMode) =>
       SummaryListRowValues(
         key = key,
         value = value,
         actions = Seq(
           SummaryListActionValues(
-            href = routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
+            href = href.url,
             text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
             visuallyHidden = key
           )
@@ -186,15 +187,15 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   }
 
   private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessTrade)(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.businessTrade, routes.BusinessTradeNameController.show(testId, true, globalEditMode))(value, globalEditMode)
   }
 
   private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessName)(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.businessName, routes.BusinessNameController.show(testId, true, globalEditMode))(value, globalEditMode)
   }
 
   private def startDateRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.tradingStartDate)(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.tradingStartDate, routes.BusinessStartDateBeforeLimitController.show(testId, true, globalEditMode))(value, globalEditMode)
   }
 
   private def addressRow(value: Option[String], globalEditMode: Boolean = false) = SummaryListRowValues(
