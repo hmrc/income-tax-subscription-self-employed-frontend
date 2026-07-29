@@ -28,31 +28,29 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Co
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
   with MockSessionDataService
   with MockClientDetailsRetrieval
-  with MockMultipleSelfEmploymentsService {
+  with MockMultipleSelfEmploymentsService
+  with MockIdentifierAction {
 
   val isAgent = true
 
   val businessId = "testId1"
 
   override val controllerName: String = "AddressLookupRoutingController"
-  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "initialiseAddressLookupJourney" -> TestUkAddressConfirmationController.show(businessId, isEditMode = false, isGlobalEdit = false),
-    "addressLookupRedirect" -> TestAddressLookupRoutingController.addressLookupRedirect(businessId, None, isEditMode = false, isGlobalEdit = false)
-  )
+  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map.empty
 
   object TestAddressLookupRoutingController extends AddressLookupRoutingController(
     mockMessagesControllerComponents,
-    mockAuthService,
     mockAddressLookupConnector,
     mockMultipleSelfEmploymentsService
   )(
-    mockSessionDataService,
-    appConfig
+    appConfig,
+    fakeIdentifierAction
   )
   
   object TestUkAddressConfirmationController extends UkAddressConfirmationController(
@@ -201,7 +199,5 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         }
       }
     }
-
-    authorisationTests()
   }
 }

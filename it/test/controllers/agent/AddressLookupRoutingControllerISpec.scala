@@ -23,10 +23,13 @@ import helpers.IntegrationTestConstants._
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.Json
+import play.api.libs.json.JsString
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, SoleTraderBusinesses}
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 import java.net.URLEncoder
 
@@ -55,6 +58,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
       "with location details in headers" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         val continueUrl = s"http://localhost:9563$baseUrl$clientOrIndividual/details/address-lookup/" + id
 
         Seq(false, true).foreach { isUk =>
@@ -94,6 +98,40 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
         }
       }
     }
+
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the Wiremock stubs")
+        stubUnauthorised()
+
+        When(s"GET $clientOrIndividual$addressLookupInitialise/$id/true is called")
+        val res = getAddressLookupInitialiseResponse(id, isUk = true)
+
+        Then("should redirect to the login page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
+        )
+      }
+    }
+  }
+
+  s"GET $baseUrl$clientOrIndividual/address-lookup-check/$id" when {
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the Wiremock stubs")
+        stubUnauthorised()
+
+        When(s"GET $clientOrIndividual/address-lookup-check/$id is called")
+        val res = get(s"$clientOrIndividual/address-lookup-check/$id")
+
+        Then("should redirect to the login page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
+        )
+      }
+    }
   }
 
   s"GET $baseUrl$clientOrIndividual/details/address-lookup/$id" when {
@@ -103,6 +141,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
 
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
           stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
@@ -165,12 +204,29 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
           httpStatus(INTERNAL_SERVER_ERROR)
         )
       }
+
+      "the user is unauthorised" should {
+        "redirect to the login page" in {
+          Given("I setup the Wiremock stubs")
+          stubUnauthorised()
+
+          When(s"GET $clientOrIndividual/details/address-lookup/$id is called")
+          val res = getAddressLookupResponse(id, addressId, isEditMode = false)
+
+          Then("should redirect to the login page")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(ggSignInURI)
+          )
+        }
+      }
     }
     "it is in edit mode" when {
       "the address lookup service return successful JSON details" should {
         "redirect to sole trader check your answers page" in {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
           stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
@@ -184,6 +240,22 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
           res must have(
             httpStatus(SEE_OTHER),
             redirectURI(ClientBusinessCYAUri)
+          )
+        }
+      }
+
+      "the user is unauthorised" should {
+        "redirect to the login page" in {
+          Given("I setup the Wiremock stubs")
+          stubUnauthorised()
+
+          When(s"GET $clientOrIndividual/details/address-lookup/$id is called")
+          val res = getAddressLookupResponse(id, addressId, isEditMode = true)
+
+          Then("should redirect to the login page")
+          res must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(ggSignInURI)
           )
         }
       }
