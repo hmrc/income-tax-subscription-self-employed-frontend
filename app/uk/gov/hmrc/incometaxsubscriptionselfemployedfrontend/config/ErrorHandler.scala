@@ -56,10 +56,10 @@ class ErrorHandler @Inject()(val errorTemplate: GenericError,
   override def resolveError(rh: RequestHeader, ex: Throwable): Future[Result] = {
     ex match {
       case _: InsufficientEnrolments =>
-        logger.debug("[AuthenticationPredicate][async] No HMRC-MTD-IT Enrolment and/or No NINO.")
+        logger.debug("[ErrorHandler][resolveError] No HMRC-MTD-IT Enrolment and/or No NINO.")
         super.resolveError(rh, ex)
       case _: AuthorisationException =>
-        logger.debug("[AuthenticationPredicate][async] Unauthorised request. Redirect to Sign In.")
+        logger.debug("[ErrorHandler][resolveError] Unauthorised request. Redirect to Sign In.")
         Future.successful(appConfig.redirectToLogin(redirectUrlOf(appConfig.incomeTaxSubscriptionFrontendBaseUrl, rh.path)))
       case _: NotFoundException =>
         notFoundTemplate(rh) map { html =>
