@@ -18,14 +18,15 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.SessionRetrievals
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.individual.IdentifierRequest
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessAddressConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -34,33 +35,25 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerComponents,
-                                                      authService: AuthService,
                                                       multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                                      businessAddressConfirmation: BusinessAddressConfirmation)
-                                                     (val sessionDataService: SessionDataService,
-                                                      val appConfig: AppConfig)
+                                                      businessAddressConfirmation: BusinessAddressConfirmation,
+                                                      identify: IdentifierAction)
                                                      (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with SessionRetrievals with I18nSupport {
+  extends FrontendController(mcc) with SessionRetrievals with I18nSupport {
 
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 
-  def show(id: String): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
-        withFirstAddress(reference, id) { address =>
+  def show(id: String): Action[AnyContent] = identify.async { implicit request =>
+        withFirstAddress(request.reference, id) { address =>
           Future.successful(Ok(view(confirmationForm, id, address)))
         }
-      }
-    }
   }
 
-  def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
+  def submit(id: String): Action[AnyContent] = identify.async { implicit request =>
       handleForm(id)(
         onYes = Redirect(routes.SelfEmployedCYAController.show(id)),
         onNo = Redirect(routes.UkAddressConfirmationController.show(id))
       )
-    }
   }
 
   private def view(form: Form[YesNo], id: String, address: Address)(implicit request: Request[AnyContent]): Html = {
@@ -72,14 +65,13 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
   }
 
   private def handleForm(id: String)(onYes: Result, onNo: Result)
-                        (implicit request: Request[AnyContent]): Future[Result] = {
-    withIndividualReference { reference =>
-      withFirstAddress(reference, id) { address =>
+                        (implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
+      withFirstAddress(request.reference, id) { address =>
         confirmationForm.bindFromRequest().fold(
           hasError => Future.successful(BadRequest(view(hasError, id, address))),
           {
             case Yes =>
-              saveBusinessAddress(reference, id, address) {
+              saveBusinessAddress(request.reference, id, address) {
                 onYes
               }
             case No =>
@@ -87,8 +79,6 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
           }
         )
       }
-    }
-
   }
 
   private def saveBusinessAddress(reference: String, id: String, address: Address)

@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
@@ -38,7 +39,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individu
 import scala.concurrent.Future
 
 class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService with MockMultipleSelfEmploymentsService {
+  with MockSessionDataService with MockMultipleSelfEmploymentsService with MockIdentifierAction {
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -54,12 +55,9 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
 
   object TestBusinessAddressConfirmationController extends BusinessAddressConfirmationController(
     mockMessagesControllerComponents,
-    mockAuthService,
     mockMultipleSelfEmploymentsService,
-    mock[BusinessAddressConfirmation]
-  )(
-    mockSessionDataService,
-    appConfig
+    mock[BusinessAddressConfirmation],
+    fakeIdentifierAction
   )
 
   override val controllerName: String = "BusinessNameConfirmationController"
@@ -73,12 +71,9 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
 
     val controller: BusinessAddressConfirmationController = new BusinessAddressConfirmationController(
       mockMessagesControllerComponents,
-      mockAuthService,
       mockMultipleSelfEmploymentsService,
-      mockBusinessAddressConfirmation
-    )(
-      mockSessionDataService,
-      appConfig
+      mockBusinessAddressConfirmation,
+      fakeIdentifierAction
     )
   }
 
@@ -197,7 +192,4 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       }
     }
   }
-
-  authorisationTests()
-
 }

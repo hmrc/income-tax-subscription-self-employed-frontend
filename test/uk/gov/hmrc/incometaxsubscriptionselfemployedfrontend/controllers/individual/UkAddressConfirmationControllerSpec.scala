@@ -26,6 +26,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.UkAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusiness}
@@ -36,7 +37,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individu
 import scala.concurrent.Future
 
 class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService with MockMultipleSelfEmploymentsService {
+  with MockSessionDataService with MockMultipleSelfEmploymentsService with MockIdentifierAction {
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -53,12 +54,9 @@ class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
 
   object TestUkAddressConfirmationController extends UkAddressConfirmationController(
     mockMessagesControllerComponents,
-    mockAuthService,
     mockMultipleSelfEmploymentsService,
-    mock[UkAddressConfirmation]
-  )(
-    mockSessionDataService,
-    appConfig
+    mock[UkAddressConfirmation],
+    fakeIdentifierAction
   )
 
   override val controllerName: String = "UkNameConfirmationController"
@@ -72,12 +70,9 @@ class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
 
     val controller: UkAddressConfirmationController = new UkAddressConfirmationController(
       mockMessagesControllerComponents,
-      mockAuthService,
       mockMultipleSelfEmploymentsService,
-      mockUkAddressConfirmation
-    )(
-      mockSessionDataService,
-      appConfig
+      mockUkAddressConfirmation,
+      fakeIdentifierAction
     )
   }
 

@@ -18,13 +18,12 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
@@ -36,17 +35,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessNameController @Inject()(businessNameView: BusinessName,
                                        mcc: MessagesControllerComponents,
                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                       authService: AuthService)
-                                      (val sessionDataService: SessionDataService,
-                                       val languageUtils: LanguageUtils,
-                                       val appConfig: AppConfig)
+                                       identify: IdentifierAction)
+                                      (val languageUtils: LanguageUtils)
                                       (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport {
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
-        populateFormFromSavedDetails(reference, id) map { form =>
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+        populateFormFromSavedDetails(request.reference, id) map { form =>
           Ok(view(
             businessNameForm = form,
             id = id,
@@ -54,18 +49,14 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
             isGlobalEdit = isGlobalEdit
           ))
         }
-      }
-    }
   }
 
-  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
         BusinessNameForm.businessNameForm.bindFromRequest().fold(
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
           name =>
-            multipleSelfEmploymentsService.isDuplicateBusinessName(reference, id, name) flatMap {
+            multipleSelfEmploymentsService.isDuplicateBusinessName(request.reference, id, name) flatMap {
               case true =>
                 Future.successful(BadRequest(view(
                   BusinessNameForm.businessNameForm
@@ -74,11 +65,9 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
                   id, isEditMode, isGlobalEdit
                 )))
               case false =>
-                saveAndContinue(reference, id, name, isEditMode, isGlobalEdit)
+                saveAndContinue(request.reference, id, name, isEditMode, isGlobalEdit)
             }
         )
-      }
-    }
   }
 
   private def populateFormFromSavedDetails(reference: String, id: String)

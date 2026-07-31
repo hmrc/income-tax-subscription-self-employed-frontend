@@ -18,9 +18,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 
 import _root_.uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -28,16 +26,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
-                                     authService: AuthService,
-                                     uuidGen: UUIDGenerator)
-                                    (val appConfig: AppConfig,
-                                     val sessionDataService: SessionDataService)
-                                    (implicit val ec: ExecutionContext) extends FrontendController(mcc) with ReferenceRetrieval {
+                                     uuidGen: UUIDGenerator,
+                                     identify: IdentifierAction)
+                                    (implicit val ec: ExecutionContext) extends FrontendController(mcc) {
 
-  def initialise: Action[AnyContent] = Action.async { implicit request =>
+  def initialise: Action[AnyContent] = identify.async { implicit request =>
     val id = uuidGen.generateId
-    authService.authorised() {
-      Future.successful(Redirect(routes.BusinessTradeNameController.show(id)))
-    }
+    Future.successful(Redirect(routes.BusinessTradeNameController.show(id)))
   }
 }

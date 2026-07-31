@@ -17,20 +17,21 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual
 
 import play.api.mvc.{Action, AnyContent, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.MockIdentifierAction
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.individual.MockSelfEmployedCYA
 
 import scala.concurrent.Future
 
 class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockSessionDataService with MockSelfEmployedCYA with FeatureSwitching {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService with MockSelfEmployedCYA with MockIdentifierAction with FeatureSwitching {
 
   val id: String = "testId"
 
@@ -42,11 +43,10 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
   object TestSelfEmployedCYAController extends SelfEmployedCYAController(
     selfEmployedCYA,
-    mockAuthService,
     mockMultipleSelfEmploymentsService,
-    mockMessagesControllerComponents
+    mockMessagesControllerComponents,
+    fakeIdentifierAction
   )(
-    mockSessionDataService,
     appConfig
   )
 

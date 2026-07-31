@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual
 
-import play.api.mvc._
+import play.api.i18n.I18nSupport
+import play.api.mvc.*
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SelfEmploymentsCYAModel, SoleTraderBusiness}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.SelfEmployedCYA
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -30,43 +31,36 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
-                                          authService: AuthService,
                                           multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                          mcc: MessagesControllerComponents)
-                                         (val sessionDataService: SessionDataService,
-                                          val appConfig: AppConfig)
+                                          mcc: MessagesControllerComponents,
+                                          identify: IdentifierAction)
+                                         (val appConfig: AppConfig)
                                          (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
+  extends FrontendController(mcc) with I18nSupport with FeatureSwitching {
 
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
-        withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-          Future.successful(Ok(checkYourAnswersView(
-            answers = selfEmploymentCYAModel,
-            postAction = routes.SelfEmployedCYAController.submit(id, isGlobalEdit),
-            isGlobalEdit = isGlobalEdit
-          )))
-        }
-      }
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+    withSelfEmploymentCYAModel(request.reference, id) { selfEmploymentCYAModel =>
+      Future.successful(Ok(checkYourAnswersView(
+        answers = selfEmploymentCYAModel,
+        postAction = routes.SelfEmployedCYAController.submit(id, isGlobalEdit),
+        isGlobalEdit = isGlobalEdit
+      )))
     }
   }
 
-  def submit(id: String, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    withIndividualReference { reference =>
-      withSelfEmploymentCYAModel(reference, id) { selfEmploymentCYAModel =>
-        if (selfEmploymentCYAModel.isComplete) {
-          multipleSelfEmploymentsService.confirmBusiness(reference, id) map {
-            case Right(_) =>
-              if (isGlobalEdit) Redirect(appConfig.individualGlobalCYAUrl)
-              else Redirect(appConfig.yourIncomeSourcesUrl)
-            case Left(_) =>
-              throw new InternalServerException("[SelfEmployedCYAController][submit] - Could not confirm self employment business")
-          }
-        } else {
-          Future.successful(Redirect(appConfig.yourIncomeSourcesUrl))
+  def submit(id: String, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+    withSelfEmploymentCYAModel(request.reference, id) { selfEmploymentCYAModel =>
+      if (selfEmploymentCYAModel.isComplete) {
+        multipleSelfEmploymentsService.confirmBusiness(request.reference, id) map {
+          case Right(_) =>
+            if (isGlobalEdit) Redirect(appConfig.individualGlobalCYAUrl)
+            else Redirect(appConfig.yourIncomeSourcesUrl)
+          case Left(_) =>
+            throw new InternalServerException("[SelfEmployedCYAController][submit] - Could not confirm self employment business")
         }
+      } else {
+        Future.successful(Redirect(appConfig.yourIncomeSourcesUrl))
       }
     }
   }

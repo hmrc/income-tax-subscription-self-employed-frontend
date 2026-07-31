@@ -19,20 +19,21 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.testValidStartDateAfterLimit
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessStartDate
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
-  with MockMultipleSelfEmploymentsService with MockSessionDataService {
+  with MockMultipleSelfEmploymentsService with MockSessionDataService with MockIdentifierAction {
 
   val id: String = "testId"
 
@@ -48,10 +49,9 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
     mockMultipleSelfEmploymentsService,
-    mockAuthService,
-    businessStartDate
+    businessStartDate,
+    fakeIdentifierAction
   )(
-    mockSessionDataService,
     mockLanguageUtils,
     appConfig
   )
@@ -138,8 +138,4 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       }
     }
   }
-
-
-  authorisationTests()
-
 }
