@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
                                      uuidGen: UUIDGenerator)
                                     (val appConfig: AppConfig,
-                                     val identify: IdentifierAction)
+                                     identify: IdentifierAction)
                                     (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with FeatureSwitching {
 

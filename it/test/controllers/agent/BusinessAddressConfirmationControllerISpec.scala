@@ -20,7 +20,7 @@ import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscripti
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.*
-import helpers.servicemocks.AuthStub.stubAuthSuccess
+import helpers.servicemocks.AuthStub.{stubAuthSuccess, stubUnauthorised}
 import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
@@ -79,6 +79,21 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(clientUkAddressConfirmation(id))
+        )
+      }
+    }
+
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the wiremock stubs")
+        stubUnauthorised()
+
+        When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
+        val res = getClientBusinessAddressConfirmation(id)()
+
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
         )
       }
     }
@@ -149,6 +164,21 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
             redirectURI(clientUkAddressConfirmation(id))
           )
         }
+      }
+    }
+
+    "the user is unauthorised" must {
+      "redirect to the login page" in {
+        Given("I setup the wiremock stubs")
+        stubUnauthorised()
+
+        When(s"POST ${routes.BusinessAddressConfirmationController.submit(id).url} is called")
+        val res = submitClientBusinessAddressConfirmation(id, Some(Yes))()
+
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
+        )
       }
     }
   }

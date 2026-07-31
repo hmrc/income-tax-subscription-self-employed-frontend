@@ -56,12 +56,10 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   object TestUkAddressConfirmationController extends UkAddressConfirmationController(
     mockMessagesControllerComponents,
     mockClientDetailsRetrieval,
-    mockAuthService,
     mockMultipleSelfEmploymentsService,
     mock[UkAddressConfirmation]
   )(
-    mockSessionDataService,
-    appConfig
+    fakeIdentifierAction
   )
 
   val continueUrl = s"http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/client/details/address-lookup/$businessId"
