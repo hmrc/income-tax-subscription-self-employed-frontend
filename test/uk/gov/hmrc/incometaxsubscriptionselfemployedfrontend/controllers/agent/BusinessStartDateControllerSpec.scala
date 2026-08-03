@@ -32,18 +32,18 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.Control
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusiness}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ImplicitDateFormatter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 import uk.gov.hmrc.play.language.LanguageUtils
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
 class BusinessStartDateControllerSpec extends ControllerBaseSpec
   with MockMultipleSelfEmploymentsService
-  with MockSessionDataService
-  with MockClientDetailsRetrieval
+  with MockIdentifierAction
   with ImplicitDateFormatter
   with FeatureSwitching {
 
@@ -66,7 +66,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     when(businessStartDate(
       ArgumentMatchers.any(),
       ArgumentMatchers.any(),
-      ArgumentMatchers.eq(clientDetails),
+      ArgumentMatchers.eq(testClientDetails),
       ArgumentMatchers.eq(trade)
     )(any(), any())) thenReturn HtmlFormat.empty
   }
@@ -85,14 +85,12 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
 
   object TestBusinessStartDateController extends BusinessStartDateController(
     mockMessagesControllerComponents,
-    mockClientDetailsRetrieval,
     mockMultipleSelfEmploymentsService,
-    mockAuthService,
     businessStartDate
   )(
-    mockSessionDataService,
-    mockLanguageUtils,
-    appConfig
+    fakeIdentifierAction,
+    appConfig,
+    mockLanguageUtils
   )
 
   def modelToFormData(model: DateModel): Seq[(String, String)] = {
@@ -106,7 +104,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           "has a start date and a trade" in {
             mockAuthSuccess()
             mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, startDate = Some(DateModel.dateConvert(LocalDate.now)), trade = Some("test trade")))))
-            mockGetClientDetails()
             mockBusinessStartDate(
               trade = "test trade"
             )
@@ -119,7 +116,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           "has no start date but has a trade" in {
             mockAuthSuccess()
             mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, trade = Some("test trade")))))
-            mockGetClientDetails()
             mockBusinessStartDate(
               trade = "test trade"
             )
@@ -168,7 +164,6 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "an error is produced in the form" in {
         mockAuthSuccess()
         mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, startDate = Some(DateModel.dateConvert(LocalDate.now)), trade = Some("test trade")))))
-        mockGetClientDetails()
         mockBusinessStartDate(
           trade = "test trade"
         )
