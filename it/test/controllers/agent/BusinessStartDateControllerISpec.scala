@@ -19,7 +19,7 @@ package controllers.agent
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants.{id, soleTraderBusinesses}
+import helpers.IntegrationTestConstants.{ggSignInURI, id, soleTraderBusinesses}
 import helpers.servicemocks.AuthStub._
 import play.api.http.Status._
 import play.api.libs.json.{JsString, Json}
@@ -80,6 +80,21 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       }
     }
 
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the Wiremock stubs")
+        stubUnauthorised()
+
+        When("GET /client/details/business-start-date is called")
+        val res = getClientBusinessStartDate(id)
+
+        Then("should redirect to the login page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
+        )
+      }
+    }
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-start-date" when {
@@ -87,6 +102,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -121,6 +137,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -139,6 +156,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
       "the form data is valid and connector stores it successfully" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -150,6 +168,22 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         res must have(
           httpStatus(SEE_OTHER),
           redirectURI(routes.SelfEmployedCYAController.show(id, isGlobalEdit = true).url)
+        )
+      }
+    }
+
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the Wiremock stubs")
+        stubUnauthorised()
+
+        When("POST /client/details/business-start-date is called")
+        val res = submitClientBusinessStartDate(id, Some(date))
+
+        Then("should redirect to the login page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
         )
       }
     }

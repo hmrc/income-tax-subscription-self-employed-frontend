@@ -20,10 +20,10 @@ import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockSessionDataService
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 
-class InitialiseControllerSpec extends ControllerBaseSpec with MockSessionDataService {
+class InitialiseControllerSpec extends ControllerBaseSpec with MockIdentifierAction {
 
   override val controllerName: String = "InitialiseController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
@@ -34,9 +34,8 @@ class InitialiseControllerSpec extends ControllerBaseSpec with MockSessionDataSe
 
   object TestInitialiseController extends InitialiseController(
     mockMessagesControllerComponents,
-    mockAuthService,
     mockUuid
-  )(appConfig, mockSessionDataService)
+  )(appConfig, fakeIdentifierAction)
 
   "initialise" when {
     s"return $SEE_OTHER and redirect to the full income source page" in {

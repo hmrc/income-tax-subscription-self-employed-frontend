@@ -19,27 +19,23 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, SessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InitialiseController @Inject()(mcc: MessagesControllerComponents,
-                                     authService: AuthService,
                                      uuidGen: UUIDGenerator)
                                     (val appConfig: AppConfig,
-                                     val sessionDataService: SessionDataService)
+                                     identify: IdentifierAction)
                                     (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with FeatureSwitching {
+  extends FrontendController(mcc) with FeatureSwitching {
 
-  val initialise: Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      val id = uuidGen.generateId
-      Future.successful(Redirect(routes.FullIncomeSourceController.show(id)))
-    }
+  val initialise: Action[AnyContent] = identify.async { implicit request =>
+    val id = uuidGen.generateId
+    Future.successful(Redirect(routes.FullIncomeSourceController.show(id)))
   }
 }

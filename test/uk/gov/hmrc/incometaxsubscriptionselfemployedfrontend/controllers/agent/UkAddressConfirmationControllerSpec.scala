@@ -29,14 +29,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.Control
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.UkAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusiness}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 import scala.concurrent.Future
 
 class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockClientDetailsRetrieval with MockSessionDataService with MockMultipleSelfEmploymentsService {
+  with MockClientDetailsRetrieval with MockMultipleSelfEmploymentsService with MockIdentifierAction  {
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -54,12 +55,10 @@ class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
   object TestUkAddressConfirmationController extends UkAddressConfirmationController(
     mockMessagesControllerComponents,
     mockClientDetailsRetrieval,
-    mockAuthService,
     mockMultipleSelfEmploymentsService,
     mock[UkAddressConfirmation]
   )(
-    mockSessionDataService,
-    appConfig
+    fakeIdentifierAction
   )
 
   override val controllerName: String = "UkNameConfirmationController"
@@ -74,12 +73,10 @@ class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
     val controller: UkAddressConfirmationController = new UkAddressConfirmationController(
       mockMessagesControllerComponents,
       mockClientDetailsRetrieval,
-      mockAuthService,
       mockMultipleSelfEmploymentsService,
       mockUkAddressConfirmation
     )(
-      mockSessionDataService,
-      appConfig
+      fakeIdentifierAction
     )
   }
 

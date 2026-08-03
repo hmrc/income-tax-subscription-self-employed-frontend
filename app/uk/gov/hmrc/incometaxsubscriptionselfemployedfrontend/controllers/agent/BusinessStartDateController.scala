@@ -23,31 +23,29 @@ import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel, SoleTraderBusiness}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
-                                            clientDetailsRetrieval: ClientDetailsRetrieval,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                            authService: AuthService,
                                             businessStartDate: BusinessStartDateView)
-                                           (val sessionDataService: SessionDataService,
-                                            val languageUtils: LanguageUtils,
-                                            val appConfig: AppConfig)
+                                           (identify: IdentifierAction,
+                                            val appConfig: AppConfig,
+                                            val languageUtils: LanguageUtils)
                                            (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport with ImplicitDateFormatter with FeatureSwitching {
+  extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with FeatureSwitching {
 
   def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, isGlobalEdit: Boolean, clientDetails: ClientDetails, businessTrade: String)
           (implicit request: Request[AnyContent]): Html = {
@@ -59,55 +57,43 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     )
   }
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withAgentReference { reference =>
-        multipleSelfEmploymentsService.fetchBusiness(reference, id) flatMap {
-          case Right(Some(SoleTraderBusiness(_, _, _, maybeStartDate, _, Some(trade), _))) =>
-            clientDetailsRetrieval.getClientDetails map { clientDetails =>
-              Ok(view(
-                businessStartDateForm = form.fill(maybeStartDate),
-                id = id,
-                isEditMode = isEditMode,
-                isGlobalEdit = isGlobalEdit,
-                clientDetails = clientDetails,
-                businessTrade = trade
-              ))
-            }
-          case Right(_) =>
-            Future.successful(Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
-          case Left(error) =>
-            throw new InternalServerException(s"[BusinessStartDateController][show] - ${error.toString}")
-        }
-      }
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+    multipleSelfEmploymentsService.fetchBusiness(request.reference, id) flatMap {
+      case Right(Some(SoleTraderBusiness(_, _, _, maybeStartDate, _, Some(trade), _))) =>
+        Future.successful(Ok(view(
+          businessStartDateForm = form.fill(maybeStartDate),
+          id = id,
+          isEditMode = isEditMode,
+          isGlobalEdit = isGlobalEdit,
+          clientDetails = request.clientDetails,
+          businessTrade = trade
+        )))
+      case Right(_) =>
+        Future.successful(Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
+      case Left(error) =>
+        throw new InternalServerException(s"[BusinessStartDateController][show] - ${error.toString}")
     }
   }
 
-  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withAgentReference { reference =>
-        form.bindFromRequest().fold(
-          formWithErrors =>
-            multipleSelfEmploymentsService.fetchBusiness(reference, id) flatMap {
-              case Right(Some(SoleTraderBusiness(_, _, _, _, _, Some(trade), _))) =>
-                clientDetailsRetrieval.getClientDetails map { clientDetails =>
-                  BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit, clientDetails, trade))
-                }
-              case Right(_) =>
-                Future.successful(Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
-              case Left(error) =>
-                throw new InternalServerException(error.toString)
-            },
-          businessStartDateData =>
-            multipleSelfEmploymentsService.saveStartDate(reference, id, businessStartDateData) map {
-              case Right(_) =>
-                next(id, isEditMode, isGlobalEdit)
-              case Left(_) =>
-                throw new InternalServerException("[BusinessStartDateController][submit] - Could not save business start date")
-            }
-        )
-      }
-    }
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+    form.bindFromRequest().fold(
+      formWithErrors =>
+        multipleSelfEmploymentsService.fetchBusiness(request.reference, id) flatMap {
+          case Right(Some(SoleTraderBusiness(_, _, _, _, _, Some(trade), _))) =>
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit, request.clientDetails, trade)))
+          case Right(_) =>
+            Future.successful(Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
+          case Left(error) =>
+            throw new InternalServerException(error.toString)
+        },
+      businessStartDateData =>
+        multipleSelfEmploymentsService.saveStartDate(request.reference, id, businessStartDateData) map {
+          case Right(_) =>
+            next(id, isEditMode, isGlobalEdit)
+          case Left(_) =>
+            throw new InternalServerException("[BusinessStartDateController][submit] - Could not save business start date")
+        }
+    )
   }
 
   private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Result = Redirect(

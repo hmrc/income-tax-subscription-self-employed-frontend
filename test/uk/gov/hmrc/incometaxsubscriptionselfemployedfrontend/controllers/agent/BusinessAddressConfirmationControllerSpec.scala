@@ -32,15 +32,15 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.Busines
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAddressConfirmation
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 import scala.concurrent.Future
 
 class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockSessionDataService with MockMultipleSelfEmploymentsService
-  with MockClientDetailsRetrieval with FeatureSwitching {
+  with MockIdentifierAction with MockMultipleSelfEmploymentsService with FeatureSwitching {
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -56,32 +56,25 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
 
   object TestBusinessAddressConfirmationController extends BusinessAddressConfirmationController(
     mockMessagesControllerComponents,
-    mockClientDetailsRetrieval,
-    mockAuthService,
     mockMultipleSelfEmploymentsService,
     mock[BusinessAddressConfirmation]
   )(
-    mockSessionDataService,
+    fakeIdentifierAction,
     appConfig
   )
 
   override val controllerName: String = "BusinessNameConfirmationController"
-  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestBusinessAddressConfirmationController.show(id),
-    "submit" -> TestBusinessAddressConfirmationController.submit(id)
-  )
+  override val authorisedRoutes: Map[String, Action[AnyContent]] = Map.empty
 
   trait Setup {
     val mockBusinessAddressConfirmation: BusinessAddressConfirmation = mock[BusinessAddressConfirmation]
 
     val controller: BusinessAddressConfirmationController = new BusinessAddressConfirmationController(
       mockMessagesControllerComponents,
-      mockClientDetailsRetrieval,
-      mockAuthService,
       mockMultipleSelfEmploymentsService,
       mockBusinessAddressConfirmation
     )(
-      mockSessionDataService,
+      fakeIdentifierAction,
       appConfig
     )
   }
@@ -205,7 +198,5 @@ class BusinessAddressConfirmationControllerSpec extends ControllerBaseSpec
       }
     }
   }
-
-  authorisationTests()
 
 }

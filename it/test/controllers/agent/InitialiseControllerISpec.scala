@@ -17,7 +17,11 @@
 package controllers.agent
 
 import helpers.ComponentSpecBase
-import helpers.servicemocks.AuthStub.stubAuthSuccess
+import helpers.IntegrationTestConstants._
+import play.api.libs.json.JsString
+import helpers.servicemocks.AuthStub.{stubAuthSuccess, stubUnauthorised}
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import play.api.http.Status._
 
 class InitialiseControllerISpec extends ComponentSpecBase {
@@ -26,6 +30,7 @@ class InitialiseControllerISpec extends ComponentSpecBase {
     "redirect to the full sole trader income source page" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
+      stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
 
       When("GET /details is called")
       val res = getClientInitialise
@@ -35,6 +40,22 @@ class InitialiseControllerISpec extends ComponentSpecBase {
         httpStatus(SEE_OTHER),
         redirectURI("/client/details/sole-trader-business")
       )
+    }
+
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the Wiremock stubs")
+        stubUnauthorised()
+
+        When("GET /details is called")
+        val res = getClientInitialise
+
+        Then("should redirect to the login page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
+        )
+      }
     }
   }
 }
