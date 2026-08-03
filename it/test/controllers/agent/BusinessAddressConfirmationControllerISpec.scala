@@ -67,6 +67,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
       "there is no existing business address" in {
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
@@ -129,6 +130,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
 
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
           stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(expectedSave))(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -150,6 +152,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         "redirect to the business address look up page" in {
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
           When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")

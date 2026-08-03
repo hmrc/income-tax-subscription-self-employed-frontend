@@ -24,48 +24,40 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.{ReferenceRetrieval, SessionRetrievals}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.SessionRetrievals
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, ClientDetailsRetrieval, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessAddressConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerComponents,
-                                                      clientDetailsRetrieval: ClientDetailsRetrieval,
-                                                      authService: AuthService,
                                                       multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                       businessAddressConfirmation: BusinessAddressConfirmation)
-                                                     (val sessionDataService: SessionDataService,
+                                                     (identify: IdentifierAction,
                                                       val appConfig: AppConfig)
                                                      (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with SessionRetrievals with I18nSupport with FeatureSwitching {
+  extends FrontendController(mcc) with SessionRetrievals with I18nSupport with FeatureSwitching {
 
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 
-  def show(id: String): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withAgentReference { reference =>
-        withFirstAddress(reference, id) { address =>
-          clientDetailsRetrieval.getClientDetails map { clientDetails =>
-            Ok(view(confirmationForm, id, address, clientDetails = clientDetails))
-          }
-        }
-      }
+  def show(id: String): Action[AnyContent] = identify.async { implicit request =>
+    withFirstAddress(request.reference, id) { address =>
+      Future.successful(Ok(view(confirmationForm, id, address, clientDetails = request.clientDetails)))
     }
   }
 
-  def submit(id: String): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      handleForm(id)(
-        onYes = Redirect(controllers.agent.routes.SelfEmployedCYAController.show(id)),
-        onNo = Redirect(controllers.agent.routes.UkAddressConfirmationController.show(id))
-      )
-    }
+  def submit(id: String): Action[AnyContent] = identify.async { implicit request =>
+    handleForm(id)(
+      onYes = Redirect(controllers.agent.routes.SelfEmployedCYAController.show(id)),
+      onNo = Redirect(controllers.agent.routes.UkAddressConfirmationController.show(id))
+    )
   }
 
   private def view(form: Form[YesNo], id: String, address: Address, clientDetails: ClientDetails)(implicit request: Request[AnyContent]): Html = {
@@ -78,16 +70,13 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
   }
 
   private def handleForm(id: String)(onYes: Result, onNo: Result)
-                        (implicit request: Request[AnyContent]): Future[Result] = {
-    withAgentReference { reference =>
-      withFirstAddress(reference, id) { address =>
+                        (implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
+      withFirstAddress(request.reference, id) { address =>
         confirmationForm.bindFromRequest().fold(
-          hasError => clientDetailsRetrieval.getClientDetails map { clientDetails =>
-            BadRequest(view(hasError, id, address, clientDetails = clientDetails))
-          },
+          hasError => Future.successful(BadRequest(view(hasError, id, address, clientDetails = request.clientDetails))),
           {
             case Yes =>
-              saveBusinessAddress(reference, id, address) {
+              saveBusinessAddress(request.reference, id, address) {
                 onYes
               }
             case No =>
@@ -95,7 +84,6 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
           }
         )
       }
-    }
 
   }
 
