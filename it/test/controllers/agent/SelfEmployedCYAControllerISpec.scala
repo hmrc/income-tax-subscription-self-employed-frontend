@@ -75,6 +75,22 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         )
       }
     }
+
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the Wiremock stubs")
+        stubUnauthorised()
+
+        When("GET /client/details/business-check-your-answers is called")
+        val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
+
+        Then("should redirect to the login page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
+        )
+      }
+    }
   }
 
   "POST /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {
@@ -82,6 +98,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "the user submits valid full data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -99,6 +116,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "the user submits valid incomplete data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
 
         When("GET /client/details/business-check-your-answers is called")
@@ -116,6 +134,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "isGlobalEdit is true and the user submits valid full data" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -135,6 +154,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
       "the sole trader businesses could not be retrieved" in {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
+        stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When("GET /client/details/business-check-your-answers is called")
@@ -158,6 +178,22 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         Then("Should return INTERNAL_SERVER_ERROR")
         res must have(
           httpStatus(INTERNAL_SERVER_ERROR)
+        )
+      }
+    }
+
+    "the user is unauthorised" should {
+      "redirect to the login page" in {
+        Given("I setup the Wiremock stubs")
+        stubUnauthorised()
+
+        When("POST /client/details/business-check-your-answers is called")
+        val res = submitClientBusinessCheckYourAnswers(id, isGlobalEdit = false)
+
+        Then("should redirect to the login page")
+        res must have(
+          httpStatus(SEE_OTHER),
+          redirectURI(ggSignInURI)
         )
       }
     }
