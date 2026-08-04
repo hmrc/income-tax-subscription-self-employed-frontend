@@ -46,11 +46,10 @@ class IdentifierAction @Inject()(val authConnector: AuthConnector,
     authorised() {
       referenceRetrieval.getReference.flatMap {
         case Some(reference) =>
-          block(
-            IdentifierRequest(
-              request = request,
-              reference = reference
-            ))
+          block(IdentifierRequest(
+            request = request,
+            reference = reference
+          ))
         case None => Future.successful(Redirect(appConfig.yourIncomeSourcesUrl))
       }
     } recover {
