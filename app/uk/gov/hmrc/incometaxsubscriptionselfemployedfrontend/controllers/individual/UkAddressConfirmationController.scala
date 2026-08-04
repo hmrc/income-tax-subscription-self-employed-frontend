@@ -21,11 +21,11 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.UkAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.individual.IdentifierRequest
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.UkAddressConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -34,20 +34,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponents,
-                                                authService: AuthService,
                                                 multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                                ukAddressConfirmation: UkAddressConfirmation)
-                                               (val sessionDataService: SessionDataService,
-                                                val appConfig: AppConfig)
+                                                ukAddressConfirmation: UkAddressConfirmation,
+                                                identify: IdentifierAction)
                                                (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport {
 
   val confirmationForm: Form[YesNo] = UkAddressConfirmationForm.ukAddressConfirmationForm
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    withIndividualReference { reference =>
-      authService.authorised() {
-        multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+        multipleSelfEmploymentsService.fetchBusiness(request.reference, id) map {
           case Right(business) =>
             val form = business match {
               case Some(value) => value.hasUkAddress match {
@@ -60,14 +56,10 @@ class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponent
             Ok(view(form, id, business.map(_.name.getOrElse("")).getOrElse(""), isEditMode, isGlobalEdit))
           case _ => throw new InternalServerException("Cannot get business name")
         }
-      }
-    }
   }
 
-  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
       handleForm(id, isEditMode, isGlobalEdit)
-    }
   }
 
   private def view(form: Form[YesNo], id: String, name: String, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[AnyContent]): Html = {
@@ -78,15 +70,13 @@ class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponent
     )
   }
 
-  private def handleForm(id: String, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: Request[AnyContent]): Future[Result] = {
+  private def handleForm(id: String, isEditMode: Boolean, isGlobalEdit: Boolean)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     confirmationForm.bindFromRequest().fold(
       hasError =>
-        withIndividualReference { reference =>
-          multipleSelfEmploymentsService.fetchBusiness(reference, id) map {
+          multipleSelfEmploymentsService.fetchBusiness(request.reference, id) map {
             case Right(business) => BadRequest(view(hasError, id, business.map(_.name.getOrElse("")).getOrElse(""), isEditMode, isGlobalEdit))
             case _ => throw new InternalServerException("Cannot get business name")
-          }
-        },
+          },
       answer => Future.successful(
         Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, answer == Yes, isEditMode, isGlobalEdit))
       )

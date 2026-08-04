@@ -18,12 +18,13 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockSessionDataService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.UUIDGenerator
 
-class InitialiseControllerSpec extends ControllerBaseSpec with MockSessionDataService {
+class InitialiseControllerSpec extends ControllerBaseSpec with MockSessionDataService with MockIdentifierAction {
 
   override val controllerName: String = "InitialiseController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map()
@@ -34,11 +35,8 @@ class InitialiseControllerSpec extends ControllerBaseSpec with MockSessionDataSe
 
   object TestInitialiseController extends InitialiseController(
     mockMessagesControllerComponents,
-    mockAuthService,
-    mockUuid
-  )(
-    appConfig,
-    mockSessionDataService
+    mockUuid,
+    fakeIdentifierAction
   )
 
   "initialise" when {

@@ -23,12 +23,12 @@ import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateForm.businessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessStartDate
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -41,13 +41,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                            authService: AuthService,
-                                            businessStartDate: BusinessStartDate)
-                                           (val sessionDataService: SessionDataService,
-                                            val languageUtils: LanguageUtils,
+                                            businessStartDate: BusinessStartDate,
+                                            identify: IdentifierAction)
+                                           (val languageUtils: LanguageUtils,
                                             val appConfig: AppConfig)
                                            (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ImplicitDateFormatter with ReferenceRetrieval with I18nSupport with FeatureSwitching {
+  extends FrontendController(mcc) with ImplicitDateFormatter with I18nSupport with FeatureSwitching {
 
   def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, isGlobalEdit: Boolean)
           (implicit request: Request[AnyContent]): Html = {
@@ -58,36 +57,28 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     )
   }
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
-        multipleSelfEmploymentsService.fetchStartDate(reference, id).map {
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+        multipleSelfEmploymentsService.fetchStartDate(request.reference, id).map {
           case Right(businessStartDateData) =>
             Ok(view(form.fill(businessStartDateData), id, isEditMode, isGlobalEdit))
           case Left(error) =>
             throw new InternalServerException(error.toString)
         }
-      }
-    }
   }
 
-  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
         form.bindFromRequest().fold(
           formWithErrors => {
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
           },
           businessStartDateData =>
-            multipleSelfEmploymentsService.saveStartDate(reference, id, businessStartDateData) map {
+            multipleSelfEmploymentsService.saveStartDate(request.reference, id, businessStartDateData) map {
               case Right(_) =>
                 next(id, isEditMode, isGlobalEdit)
               case Left(_) =>
                 throw new InternalServerException("[BusinessStartDateController][submit] - Could not save business start date")
             }
         )
-      }
-    }
   }
 
   private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean) = Redirect(

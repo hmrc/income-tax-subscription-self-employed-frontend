@@ -21,11 +21,10 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessStartDateBeforeLimitForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, No, Yes, YesNo}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{No, Yes, YesNo}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessStartDateBeforeLimit
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -38,56 +37,45 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessStartDateBeforeLimitController @Inject()(businessStartDateBeforeLimit: BusinessStartDateBeforeLimit,
                                                        mcc: MessagesControllerComponents,
                                                        multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                                       authService: AuthService
+                                                       identify: IdentifierAction
                                                       )(
-                                                        val sessionDataService: SessionDataService,
-                                                        val languageUtils: LanguageUtils,
-                                                        val appConfig: AppConfig
+                                                        val languageUtils: LanguageUtils
                                                       )(
                                                         implicit val ec: ExecutionContext
                                                       ) extends FrontendController(mcc)
-  with ReferenceRetrieval
   with I18nSupport
   with ImplicitDateFormatter {
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async {
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async {
     implicit request =>
-      authService.authorised() {
-        withIndividualReference { reference =>
-          populateFormFromSavedDetails(reference, id).map { form =>
-            Ok(view(
-              businessStartDateBeforeLimitForm = form,
-              id = id,
-              isEditMode = isEditMode,
-              isGlobalEdit = isGlobalEdit
-            ))
-          }
-        }
+      populateFormFromSavedDetails(request.reference, id).map { form =>
+        Ok(view(
+          businessStartDateBeforeLimitForm = form,
+          id = id,
+          isEditMode = isEditMode,
+          isGlobalEdit = isGlobalEdit
+        ))
       }
   }
 
-  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
-        BusinessStartDateBeforeLimitForm.businessStartDateBeforeLimitForm.bindFromRequest().fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))
-            ),
-          startDateBeforeLimit =>
-            saveAndContinue(
-              reference = reference,
-              id = id,
-              startDateBeforeLimit = startDateBeforeLimit match {
-                case Yes => true
-                case No => false
-              },
-              isEditMode = isEditMode,
-              isGlobalEdit = isGlobalEdit
-            )
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+    BusinessStartDateBeforeLimitForm.businessStartDateBeforeLimitForm.bindFromRequest().fold(
+      formWithErrors =>
+        Future.successful(
+          BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))
+        ),
+      startDateBeforeLimit =>
+        saveAndContinue(
+          reference = request.reference,
+          id = id,
+          startDateBeforeLimit = startDateBeforeLimit match {
+            case Yes => true
+            case No => false
+          },
+          isEditMode = isEditMode,
+          isGlobalEdit = isGlobalEdit
         )
-      }
-    }
+    )
   }
 
   private def populateFormFromSavedDetails(reference: String, id: String)(implicit hc: HeaderCarrier): Future[Form[YesNo]] = {

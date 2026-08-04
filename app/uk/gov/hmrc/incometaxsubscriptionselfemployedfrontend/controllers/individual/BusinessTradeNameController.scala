@@ -18,13 +18,12 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.indivi
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrieval
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{AuthService, MultipleSelfEmploymentsService, SessionDataService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individual.BusinessTradeName
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
@@ -36,49 +35,39 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTradeName,
                                             mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                            authService: AuthService)
-                                           (val sessionDataService: SessionDataService,
-                                            val languageUtils: LanguageUtils,
-                                            val appConfig: AppConfig)
+                                            identify: IdentifierAction)
+                                           (val languageUtils: LanguageUtils)
                                            (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with ReferenceRetrieval with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport {
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
-        populateFormFromSavedDetails(reference, id) map { form =>
-          Ok(view(
-            businessTradeNameForm = form,
-            id = id,
-            isEditMode = isEditMode,
-            isGlobalEdit = isGlobalEdit
-          ))
-        }
-      }
+  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+    populateFormFromSavedDetails(request.reference, id) map { form =>
+      Ok(view(
+        businessTradeNameForm = form,
+        id = id,
+        isEditMode = isEditMode,
+        isGlobalEdit = isGlobalEdit
+      ))
     }
   }
 
-  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    authService.authorised() {
-      withIndividualReference { reference =>
-        BusinessTradeNameForm.businessTradeNameForm.bindFromRequest().fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
-          trade =>
-            multipleSelfEmploymentsService.isDuplicateBusinessTrade(reference, id, trade) flatMap {
-              case true =>
-                Future.successful(BadRequest(view(
-                  BusinessTradeNameForm.businessTradeNameForm
-                    .fill(trade)
-                    .withError(BusinessTradeNameForm.businessTradeName, "individual.error.duplicate-business"),
-                  id, isEditMode, isGlobalEdit
-                )))
-              case false =>
-                saveAndContinue(reference, id, trade, isEditMode, isGlobalEdit)
-            }
-        )
-      }
-    }
+  def submit(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+    BusinessTradeNameForm.businessTradeNameForm.bindFromRequest().fold(
+      formWithErrors =>
+        Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
+      trade =>
+        multipleSelfEmploymentsService.isDuplicateBusinessTrade(request.reference, id, trade) flatMap {
+          case true =>
+            Future.successful(BadRequest(view(
+              BusinessTradeNameForm.businessTradeNameForm
+                .fill(trade)
+                .withError(BusinessTradeNameForm.businessTradeName, "individual.error.duplicate-business"),
+              id, isEditMode, isGlobalEdit
+            )))
+          case false =>
+            saveAndContinue(request.reference, id, trade, isEditMode, isGlobalEdit)
+        }
+    )
   }
 
   private def populateFormFromSavedDetails(reference: String, id: String)

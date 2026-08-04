@@ -24,6 +24,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.{PostAddressLookupSuccessResponse, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.*
@@ -31,8 +32,8 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.individu
 
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
-  with MockSessionDataService
-  with MockMultipleSelfEmploymentsService {
+  with MockMultipleSelfEmploymentsService
+  with MockIdentifierAction {
 
   val isAgent = false
 
@@ -46,22 +47,18 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
 
   object TestAddressLookupRoutingController extends AddressLookupRoutingController(
     mockMessagesControllerComponents,
-    mockAuthService,
     mockAddressLookupConnector,
-    mockMultipleSelfEmploymentsService
+    mockMultipleSelfEmploymentsService,
+    fakeIdentifierAction
   )(
-    mockSessionDataService,
     appConfig
   )
 
   object TestUkAddressConfirmationController extends UkAddressConfirmationController(
     mockMessagesControllerComponents,
-    mockAuthService,
     mockMultipleSelfEmploymentsService,
-    mock[UkAddressConfirmation]
-  )(
-    mockSessionDataService,
-    appConfig
+    mock[UkAddressConfirmation],
+    fakeIdentifierAction
   )
 
   val continueUrl = s"http://localhost:9563/report-quarterly/income-and-expenses/sign-up/self-employments/details/address-lookup/$businessId"
@@ -197,7 +194,5 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
         }
       }
     }
-
-    authorisationTests()
   }
 }
