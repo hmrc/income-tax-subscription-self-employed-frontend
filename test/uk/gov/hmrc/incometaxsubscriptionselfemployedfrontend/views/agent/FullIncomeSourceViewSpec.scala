@@ -159,7 +159,7 @@ class FullIncomeSourceViewSpec extends ViewSpec {
 
     object Name {
       val label = "What is the name of your client’s business?"
-      val hint = "This is the business name your client used to register for Self Assessment. If their business does not have a name, enter your client’s full name."
+      val hint = "This is the business name your client used to register for Self Assessment. If your client’s business does not have a name, enter your client’s first and last name."
     }
 
     object DateBeforeLimit {
