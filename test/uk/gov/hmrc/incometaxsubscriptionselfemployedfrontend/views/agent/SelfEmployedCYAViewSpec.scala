@@ -55,113 +55,206 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       )
     }
 
+    "have an inset note" in {
+      document().mainContent.selectHead(".govuk-inset-text").text mustBe CheckYourAnswersMessages.inset
+    }
+
     "have the correct paragraph" in {
       val text = document().mainContent.selectHead(".govuk-body").text
       text mustBe CheckYourAnswersMessages.para
     }
 
+    "have the first subheading" in {
+      document().mainContent.selectNth("h2", 2).text mustBe CheckYourAnswersMessages.subheadingOne
+    }
+
+    "have the second subheading" in {
+      document().mainContent.selectNth("h2", 3).text mustBe CheckYourAnswersMessages.subheadingTwo
+    }
+
+    "have the correct business details action" when {
+      "business details are present" in {
+        val link = businessDetailsAction(answers = fullSelfEmploymentsCYAModel)
+        link.ownText().trim mustBe CheckYourAnswersMessages.change
+        link.attr("href") mustBe routes.FullIncomeSourceController.show(testId, isEditMode = true).url
+        link.selectHead(".govuk-visually-hidden").text mustBe CheckYourAnswersMessages.subheadingOne
+      }
+
+      "business details are missing" in {
+        val link = businessDetailsAction(answers = emptySelfEmploymentsCYAModel)
+        link.ownText().trim mustBe CheckYourAnswersMessages.add
+        link.attr("href") mustBe routes.FullIncomeSourceController.show(testId, isEditMode = true).url
+        link.selectHead(".govuk-visually-hidden").text mustBe CheckYourAnswersMessages.subheadingOne
+      }
+
+      "only the business trade is present" in {
+        val answers = emptySelfEmploymentsCYAModel.copy(businessTradeName = Some("Plumbing"))
+        val link = businessDetailsAction(answers)
+        link.ownText().trim mustBe CheckYourAnswersMessages.change
+      }
+
+      "only the business name is present" in {
+        val answers = emptySelfEmploymentsCYAModel.copy(businessName = Some("ABC Limited"))
+        val link = businessDetailsAction(answers)
+        link.ownText().trim mustBe CheckYourAnswersMessages.change
+      }
+
+      "only the business start date is present" in {
+        val answers = emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))
+        val link = businessDetailsAction(answers)
+        link.ownText().trim mustBe CheckYourAnswersMessages.change
+      }
+
+      "in global edit mode" in {
+        val link = businessDetailsAction(answers = fullSelfEmploymentsCYAModel, isGlobalEdit = true)
+        link.ownText().trim mustBe CheckYourAnswersMessages.change
+        link.attr("href") mustBe routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = true).url
+      }
+    }
+
+    "have the correct business address action" when {
+      "a business address is present" in {
+        val link = businessAddressAction(answers = fullSelfEmploymentsCYAModel)
+        link.ownText().trim mustBe CheckYourAnswersMessages.change
+        link.attr("href") mustBe routes.UkAddressConfirmationController.show(testId, isEditMode = true).url
+
+        link.selectHead(".govuk-visually-hidden").text mustBe CheckYourAnswersMessages.subheadingTwo
+      }
+
+      "a business address is missing" in {
+        val link = businessAddressAction(answers = emptySelfEmploymentsCYAModel)
+        link.ownText().trim mustBe CheckYourAnswersMessages.add
+        link.attr("href") mustBe routes.UkAddressConfirmationController.show(testId, isEditMode = true).url
+        link.selectHead(".govuk-visually-hidden").text mustBe CheckYourAnswersMessages.subheadingTwo
+      }
+
+      "in global edit mode" in {
+        val link = businessAddressAction(answers = fullSelfEmploymentsCYAModel, isGlobalEdit = true)
+        link.ownText().trim mustBe CheckYourAnswersMessages.change
+        link.attr("href") mustBe routes.UkAddressConfirmationController.show(testId, isEditMode = true, isGlobalEdit = true).url
+      }
+    }
+
     "have a summary of the users answers" when {
       "start date is a date older than the limit" in {
-        document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-          tradeRow(value = None),
-          nameRow(value = None),
-          startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit)),
-          addressRow(value = None)
-        ))
+        val content = document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(olderThanLimitDate))).mainContent
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(1)")(
+          Seq(
+            tradeRow(value = None),
+            nameRow(value = None),
+            startDateRow(
+              value = Some(CheckYourAnswersMessages.beforeLimit)
+            )
+          )
+        )
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(2)")(Seq(addressRow(value = None)))
       }
+
       "start date is not older than the limit" in {
-        document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-          tradeRow(value = None),
-          nameRow(value = None),
-          startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy")))),
-          addressRow(value = None)
-        ))
+        val content = document(emptySelfEmploymentsCYAModel.copy(businessStartDate = Some(limitDate))).mainContent
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(1)")(
+          Seq(
+            tradeRow(value = None),
+            nameRow(value = None),
+            startDateRow(
+              value = Some(
+                limitDate.toLocalDate.format(
+                  DateTimeFormatter.ofPattern("d MMMM yyyy")
+                )
+              )
+            )
+          )
+        )
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(2)")(Seq(addressRow(value = None)))
       }
 
       "the business details are full" in {
-        document(answers = fullSelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-          tradeRow(value = Some("Plumbing")),
-          nameRow(value = Some("ABC Limited")),
-          startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit)),
-          addressRow(value = Some("line 1 TF3 4NT United Kingdom"))
-        ))
+        val content = document(answers = fullSelfEmploymentsCYAModel).mainContent
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(1)")(
+          Seq(
+            tradeRow(value = Some("Plumbing")),
+            nameRow(value = Some("ABC Limited")),
+            startDateRow(
+              value = Some(CheckYourAnswersMessages.beforeLimit)
+            )
+          )
+        )
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(2)")(Seq(addressRow(value = Some("line 1 TF3 4NT United Kingdom"))))
       }
 
       "the business details are empty" in {
-        document(answers = emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-          tradeRow(value = None),
-          nameRow(value = None),
-          startDateRow(value = None),
-          addressRow(value = None)
-        ))
-      }
+        val content = document(answers = emptySelfEmploymentsCYAModel).mainContent
 
-      "in edit mode" which {
-        "all data is complete" in {
-          document().mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-            tradeRow(value = Some("Plumbing")),
-            nameRow(value = Some("ABC Limited")),
-            startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit)),
-            addressRow(value = Some("line 1 TF3 4NT United Kingdom"))
-          ))
-        }
-        "all data is missing" in {
-          document(emptySelfEmploymentsCYAModel).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(1)")(
+          Seq(
             tradeRow(value = None),
             nameRow(value = None),
-            startDateRow(value = None),
-            addressRow(value = None)
-          ))
-        }
-        "start date is before limit field is present" which {
-          "is true" in {
-            document(fullSelfEmploymentsCYAModel.copy(startDateBeforeLimit = Some(true))).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              tradeRow(value = Some("Plumbing")),
-              nameRow(value = Some("ABC Limited")),
-              startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit)),
-              addressRow(value = Some("line 1 TF3 4NT United Kingdom"))
-            ))
-          }
-          "is false" in {
-            document(fullSelfEmploymentsCYAModel.copy(startDateBeforeLimit = Some(false), businessStartDate = Some(limitDate)))
-              .mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-                tradeRow(value = Some("Plumbing")),
-                nameRow(value = Some("ABC Limited")),
-                startDateRow(value = Some(limitDate.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy")))),
-                addressRow(value = Some("line 1 TF3 4NT United Kingdom"))
-              ))
-          }
-        }
+            startDateRow(value = None)
+          )
+        )
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(2)")(Seq(addressRow(value = None)))
+      }
+    }
+
+    "start date before limit field" when {
+      "is true" in {
+        val content = document(fullSelfEmploymentsCYAModel.copy(startDateBeforeLimit = Some(true))).mainContent
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(1)")(
+          Seq(
+            tradeRow(value = Some("Plumbing")),
+            nameRow(value = Some("ABC Limited")),
+            startDateRow(
+              value = Some(CheckYourAnswersMessages.beforeLimit)
+            )
+          )
+        )
       }
 
-      "in global edit mode" which {
-        "as the initial business" when {
-          "all data is complete" in {
-            document(isGlobalEdit = true).mainContent.mustHaveSummaryList(".govuk-summary-list")(Seq(
-              tradeRow(value = Some("Plumbing"), globalEditMode = true),
-              nameRow(value = Some("ABC Limited"), globalEditMode = true),
-              startDateRow(value = Some(CheckYourAnswersMessages.beforeLimit), globalEditMode = true),
-              addressRow(value = Some("line 1 TF3 4NT United Kingdom"), globalEditMode = true)
-            ))
-          }
-        }
+      "is false" in {
+        val content = document(
+          fullSelfEmploymentsCYAModel.copy(
+            startDateBeforeLimit = Some(false),
+            businessStartDate = Some(limitDate)
+          )
+        ).mainContent
+
+        content.mustHaveSummaryList("dl.govuk-summary-list:nth-of-type(1)")(
+          Seq(
+            tradeRow(value = Some("Plumbing")),
+            nameRow(value = Some("ABC Limited")),
+            startDateRow(
+              value = Some(
+                limitDate.toLocalDate.format(
+                  DateTimeFormatter.ofPattern("d MMMM yyyy")
+                )
+              )
+            )
+          )
+        )
       }
+    }
 
-      "have a form" which {
-        def form: Element = document().mainContent.getForm
+    "have a form" which {
+      def form: Element = document().mainContent.getForm
 
-        "has the correct attributes" in {
-          form.attr("method") mustBe testCall.method
-          form.attr("action") mustBe testCall.url
-        }
-        "has a confirm and continue button" in {
-          form.selectNth(".govuk-button", 1).text mustBe CheckYourAnswersMessages.confirmAndContinue
-        }
-        "has a save and come back later button" in {
-          val saveAndComeBackLater = form.selectNth(".govuk-button", 2)
-          saveAndComeBackLater.text mustBe CheckYourAnswersMessages.saveAndBack
-          saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-check-your-answers"
-        }
+      "has the correct attributes" in {
+        form.attr("method") mustBe testCall.method
+        form.attr("action") mustBe testCall.url
+      }
+      "has a confirm and continue button" in {
+        form.selectNth(".govuk-button", 1).text mustBe CheckYourAnswersMessages.confirmAndContinue
+      }
+      "has a save and come back later button" in {
+        val saveAndComeBackLater = form.selectNth(".govuk-button", 2)
+        saveAndComeBackLater.text mustBe CheckYourAnswersMessages.saveAndBack
+        saveAndComeBackLater.attr("href") mustBe s"${appConfig.subscriptionFrontendClientProgressSavedUrl}?location=sole-trader-check-your-answers"
       }
     }
   }
@@ -169,6 +262,9 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   object CheckYourAnswersMessages {
     val caption = "FirstName LastName – ZZ 11 11 11 Z"
     val heading = "Check your answers"
+    val inset = "Do not add limited companies or partnerships here."
+    val subheadingOne = "Business details"
+    val subheadingTwo = "Business address"
     val para = "Add or change any missing or incorrect details, then confirm that the information is correct."
     val title = "Check your answers - sole trader business"
     val confirmAndContinue = "Confirm and continue"
@@ -210,42 +306,24 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     Jsoup.parse(page(answers, isGlobalEdit).body)
   }
 
-  def simpleSummaryRow(key: String): (Option[String], Boolean) => SummaryListRowValues = {
-    case (value, globalEditMode) =>
-      SummaryListRowValues(
-        key = key,
-        value = value,
-        actions = Seq(
-          SummaryListActionValues(
-            href = routes.FullIncomeSourceController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
-            text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + key,
-            visuallyHidden = key
-          )
-        )
-      )
-  }
+  private def businessDetailsAction(answers: SelfEmploymentsCYAModel, isGlobalEdit: Boolean = false): Element =
+    document(answers = answers, isGlobalEdit = isGlobalEdit).mainContent.selectNth(".section-heading", 1).selectHead("a.govuk-link")
 
-  private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.trade)(value, globalEditMode)
-  }
+  private def businessAddressAction(answers: SelfEmploymentsCYAModel, isGlobalEdit: Boolean = false): Element =
+    document(answers = answers, isGlobalEdit = isGlobalEdit).mainContent.selectNth(".section-heading", 2).selectHead("a.govuk-link")
 
-  private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.name)(value, globalEditMode)
-  }
-
-  private def startDateRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.startDate)(value, globalEditMode)
-  }
-
-  private def addressRow(value: Option[String], globalEditMode: Boolean = false) = SummaryListRowValues(
-    key = CheckYourAnswersMessages.address,
-    value = value,
-    actions = Seq(
-      SummaryListActionValues(
-        href = routes.UkAddressConfirmationController.show(testId, isEditMode = true, isGlobalEdit = globalEditMode).url,
-        text = (if (value.isDefined) CheckYourAnswersMessages.change else CheckYourAnswersMessages.add) + " " + CheckYourAnswersMessages.address,
-        visuallyHidden = CheckYourAnswersMessages.address
-      )
+  def simpleSummaryRow(key: String, value: Option[String]): SummaryListRowValues =
+    SummaryListRowValues(
+      key = key,
+      value = value,
+      actions = Nil
     )
-  )
+
+  private def tradeRow(value: Option[String]) = simpleSummaryRow(CheckYourAnswersMessages.trade, value)
+
+  private def nameRow(value: Option[String]) = simpleSummaryRow(CheckYourAnswersMessages.name, value)
+
+  private def startDateRow(value: Option[String]) = simpleSummaryRow(CheckYourAnswersMessages.startDate, value)
+
+  private def addressRow(value: Option[String]) = simpleSummaryRow(CheckYourAnswersMessages.address, value)
 }
