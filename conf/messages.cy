@@ -154,7 +154,10 @@ agent.self-employed-cya.business-address.add                    = Ychwanegu cyfe
 agent.self-employed-cya.title                                   = Gwirio’ch atebion – busnes unig fasnachwr
 agent.self-employed-cya.heading                                 = Gwirio’ch atebion
 agent.self-employed-cya.caption                                 = Y busnes unig fasnachwr a nodwyd gennych
+agent.self-employed-cya.subheading-one                          = Manylion y busnes
+agent.self-employed-cya.subheading-two                          = Cyfeiriad y busnes
 agent.self-employed-cya.para                                    = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu'n anghywir.
+agent.self-employed-cya.inset                                   = Ni ddylech ychwanegu incwm o bartneriaethau na chwmnïau cyfyngedig.
 
 #Enable AgentStreamline Self Employed CYA
 agent.self-employed-cya.business-trade.streamline               = Gwaith masnach
