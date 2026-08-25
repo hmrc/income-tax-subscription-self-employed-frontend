@@ -26,8 +26,6 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configuration) {
 
-  private lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
-
   lazy val protectedMicroServiceUrl: String = servicesConfig.baseUrl("income-tax-subscription")
   lazy val incomeTaxSubscriptionFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-frontend.url")
   lazy val incomeTaxSubscriptionSelfEmployedFrontendBaseUrl: String = servicesConfig.getString("income-tax-subscription-self-employed-frontend.url")
@@ -52,16 +50,12 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, val config: Configurat
   lazy val individualSessionTimeoutUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/session-timeout"
   lazy val agentSessionTimeoutUrl: String = incomeTaxSubscriptionFrontendBaseUrl + "/client/session-timeout"
 
-  private val contactFormServiceIdentifier = "MTDIT"
-
-  val feedbackFrontendRedirectUrl: String = servicesConfig.getString("feedback-frontend.url")
-  val feedbackFrontendRedirectUrlAgent: String = servicesConfig.getString("feedback-frontend.agent.url")
+  val feedbackFrontendRedirectUrl: String = s"${servicesConfig.getString("feedback-frontend.url")}?useServiceNavigation"
+  val feedbackFrontendRedirectUrlAgent: String = s"${servicesConfig.getString("feedback-frontend.agent.url")}?useServiceNavigation"
   val urBannerUrl: String = servicesConfig.getString("urBannerUrl.url")
 
   def ggSignOutUrl(redirectionUrl: String = incomeTaxSubscriptionFrontendBaseUrl): String =
     s"$ggUrl/bas-gateway/sign-out-without-state?continue=$redirectionUrl"
-
-  def betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
 
   private val govukGuidanceLink: String = servicesConfig.getString("govuk-guidance.url")
   val govukGuidanceITSASignUpIndivLink: String = s"$govukGuidanceLink/sign-up-your-business-for-making-tax-digital-for-income-tax"

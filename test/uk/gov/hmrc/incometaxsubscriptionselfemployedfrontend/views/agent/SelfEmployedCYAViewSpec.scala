@@ -300,7 +300,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     testCall,
     ClientDetails("FirstName LastName", "ZZ111111Z"),
     isGlobalEdit = isGlobalEdit
-  )(FakeRequest(), implicitly)
+  )(fakeTestRequest, implicitly)
 
   def document(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel, isGlobalEdit: Boolean = false): Document = {
     Jsoup.parse(page(answers, isGlobalEdit).body)

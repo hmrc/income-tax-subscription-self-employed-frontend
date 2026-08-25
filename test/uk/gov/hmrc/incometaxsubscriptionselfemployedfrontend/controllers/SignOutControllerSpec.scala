@@ -40,7 +40,7 @@ class SignOutControllerSpec extends ControllerBaseSpec {
         val result = TestSignOutController.signOut(request)
         status(result) shouldBe SEE_OTHER
         val agentRedirectUrl = appConfig.feedbackFrontendRedirectUrlAgent
-        agentRedirectUrl should endWith("ITSU-A")
+        agentRedirectUrl should include("ITSU-A")
         redirectLocation(result).get should be(appConfig.ggSignOutUrl(agentRedirectUrl))
       }
     }
@@ -51,7 +51,7 @@ class SignOutControllerSpec extends ControllerBaseSpec {
         val result = TestSignOutController.signOut(request)
         status(result) shouldBe SEE_OTHER
         val individualRedirectUrl = appConfig.feedbackFrontendRedirectUrl
-        individualRedirectUrl should endWith("ITSU")
+        individualRedirectUrl should include("ITSU")
         redirectLocation(result).get should be(appConfig.ggSignOutUrl(individualRedirectUrl))
       }
 

@@ -33,6 +33,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes
 
+import java.net.URLEncoder
 import scala.jdk.CollectionConverters.*
 
 trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach {
@@ -49,7 +50,8 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
   class TemplateViewTest(view: Html,
                          title: String,
                          isAgent: Boolean = false,
-                         hasSignOutLink: Boolean = false,
+                         hasBackLink: Boolean = true,
+                         hasSignOutLink: Boolean = true,
                          errors: Option[Seq[(String, String)]] = None) {
 
     val document: Document = Jsoup.parse(view.body)
@@ -71,6 +73,28 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       document.selectOptionally(".hmrc-sign-out-nav__link") mustBe None
     }
 
+    val serviceNameLink: Element = document.selectHead(".govuk-service-navigation__service-name").selectHead("a")
+    if (isAgent) {
+      serviceNameLink.text mustBe "Sign up your clients for Making Tax Digital for Income Tax"
+      serviceNameLink.attr("href") mustBe appConfig.govukGuidanceITSASignUpAgentLink
+    } else {
+      serviceNameLink.text mustBe "Sign up for Making Tax Digital for Income Tax"
+      serviceNameLink.attr("href") mustBe appConfig.govukGuidanceITSASignUpIndivLink
+    }
+
+    val betaBannerElement: Element = document.selectHead(".govuk-phase-banner__content")
+    betaBannerElement.selectHead(".govuk-tag").text mustBe "Beta"
+    betaBannerElement.selectHead(".govuk-link").attr("href") mustBe s"http://localhost:9250/contact/beta-feedback?service=MTDIT&referrerUrl=${URLEncoder.encode(testCall.url, "UTF-8")}&useServiceNavigation"
+
+    if (hasBackLink) {
+      val backLink = document.selectHead(".govuk-back-link")
+      backLink.text mustBe "Back"
+      backLink.attr("href") mustBe "#"
+      backLink.attr("data-module") mustBe "hmrc-back-link"
+    } else {
+      document.selectOptionally(".govuk-back-link") mustBe None
+    }
+
     errors.map { errorList =>
       val errorSummary: Element = document.selectHead(".govuk-error-summary")
       errorSummary.selectHead("h2").text mustBe "There is a problem"
@@ -81,6 +105,8 @@ trait ViewSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
         errorLink.attr("href") mustBe s"#$errorKey"
       }
     }
+
+    document.selectHead(".hmrc-report-technical-issue").attr("href") mustBe s"http://localhost:9250/contact/report-technical-problem?service=MTDIT&referrerUrl=${URLEncoder.encode(testCall.url, "UTF-8")}&useServiceNavigation"
 
   }
 

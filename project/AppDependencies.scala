@@ -6,8 +6,8 @@ object AppDependencies {
 
   val appName = "income-tax-subscription-self-employed-frontend"
 
-  private val bootstrapVersion = "10.7.0"
-  private val playHmrcFrontendVersion = "13.5.0"
+  private val bootstrapVersion = "10.8.0"
+  private val playHmrcFrontendVersion = "13.11.0"
   private val catsVersion = "2.13.0"
   private val cryptoJsonVersion = "8.4.0"
 
@@ -20,7 +20,7 @@ object AppDependencies {
 
   val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion % Test,
-    "org.jsoup" % "jsoup" % "1.21.2" % Test
+    "org.jsoup" % "jsoup" % "1.23.1" % Test
   )
 
 }
