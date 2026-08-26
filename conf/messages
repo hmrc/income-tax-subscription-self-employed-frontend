@@ -30,7 +30,7 @@ base.agent.service-name                                         = Sign up your c
 
 #Start Date Before Limit
 individual.start-date-before-limit.heading                      = Did the business start before 6 April {0}?
-individual.error.start-date-before-limit.empty                  = Select if the business started before {0}
+individual.error.start-date-before-limit.empty                  = Select if the business started before 6 April {0}
 
 # Business start date
 business.start-date.title                                       = Sole trader
