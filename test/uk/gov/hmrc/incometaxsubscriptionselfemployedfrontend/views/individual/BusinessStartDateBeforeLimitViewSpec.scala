@@ -62,7 +62,7 @@ class BusinessStartDateBeforeLimitViewSpec extends ViewSpec {
         isAgent = false,
         hasSignOutLink = true,
         errors = Some(Seq(
-          BusinessStartDateBeforeLimitForm.startDateBeforeLimit -> s"Select if the business started before ${AccountingPeriodUtil.getStartDateLimit.getYear}"
+          BusinessStartDateBeforeLimitForm.startDateBeforeLimit -> s"Select if the business started before 6 April ${AccountingPeriodUtil.getStartDateLimit.getYear}"
         ))
       )
     }
