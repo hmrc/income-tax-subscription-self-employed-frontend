@@ -54,7 +54,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
       answers,
       testCall,
       isGlobalEdit = isGlobalEdit
-    )(FakeRequest(), implicitly)
+    )(fakeTestRequest, implicitly)
   }
 
   def document(answers: SelfEmploymentsCYAModel = fullSelfEmploymentsCYAModel, isGlobalEdit: Boolean = false): Document = {
@@ -68,7 +68,7 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
         answers = fullSelfEmploymentsCYAModel,
         postAction = testCall,
         isGlobalEdit = true
-      )(FakeRequest(), implicitly),
+      )(fakeTestRequest, implicitly),
       title = CheckYourAnswersMessages.title,
       hasSignOutLink = true
     )

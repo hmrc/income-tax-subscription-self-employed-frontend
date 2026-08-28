@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+@import uk.gov.hmrc.hmrcfrontend.config.ContactFrontendConfig
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcTimeoutDialogHelper}
@@ -35,6 +36,8 @@
         hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
         hmrcStandardPage: HmrcStandardPage
+)(
+    implicit contactFrontendConfig: ContactFrontendConfig
 )
 
 @(title: String, serviceName: String, serviceUrl: String, optForm: Option[Form[_]] = None, showSignOutLink: Boolean = true, timeoutUrl: Option[String])(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
@@ -75,7 +78,7 @@
       signOutUrl = if(showSignOutLink) Some(uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.routes.SignOutController.signOut.url) else None,
     ),
     banners = Banners(
-      phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl)),
+      phaseBanner = Some(standardBetaBanner()),
       userResearchBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl))
     ),
     templateOverrides = TemplateOverrides(
