@@ -46,7 +46,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messages: MessagesApi,
         "includeHMRCBranding" -> false,
         "continueUrl" -> continueUrl,
         "showBackButtons" -> true,
-        "serviceHref" -> Some(serviceUrl(isAgent)),
+        "serviceHref" -> serviceUrl(isAgent),
         "ukMode" -> isUk,
         "selectPageConfig" -> Json.obj(
           "proposalListLimit" -> 50,
@@ -62,6 +62,7 @@ class AddressLookupConfig @Inject()(appConfig: AppConfig, messages: MessagesApi,
           "timeoutAmount" -> 900,
           "timeoutUrl" -> s"${appConfig.incomeTaxSubscriptionFrontendBaseUrl}/session-timeout"
         ),
+        "pageHeadingStyle" -> "govuk-heading-l",
         "accessibilityFooterUrl" -> accessibilityStatementConfig.url
       ),
       "labels" -> Json.obj(
