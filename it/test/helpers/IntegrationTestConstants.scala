@@ -134,6 +134,7 @@ object IntegrationTestConstants {
        |      "timeoutAmount": 900,
        |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    },
+       |    "pageHeadingStyle": "govuk-heading-l",
        |    "accessibilityFooterUrl": "$accessibilityFooterUrl"
        |  },
        |  "labels": {
@@ -158,7 +159,7 @@ object IntegrationTestConstants {
        |        "line2Label": "Address line 2",
        |        "line3Label": "Address line 3",
        |        "townLabel": "Town or city",
-       |        "postcodeLabel": "Postcode or zipcode",
+       |        "postcodeLabel": "Postcode",
        |        "countryLabel": "Country or territory"
        |      },
        |      "international": {
@@ -169,7 +170,7 @@ object IntegrationTestConstants {
        |          "line2Label": "Address line 2",
        |          "line3Label": "Address line 3",
        |          "townLabel": "Town or city",
-       |          "postcodeLabel": "Postcode or zipcode",
+       |          "postcodeLabel": "Postcode",
        |          "countryLabel": "Country or territory"
        |        }
        |      },
@@ -208,7 +209,7 @@ object IntegrationTestConstants {
        |        "line2Label": "Cyfeiriad – llinell 2",
        |        "line3Label": "Cyfeiriad – llinell 3",
        |        "townLabel": "Tref neu ddinas",
-       |        "postcodeLabel": "Cod post neu god zip",
+       |        "postcodeLabel": "Cod post",
        |        "countryLabel": "Gwlad neu diriogaeth"
        |      },
        |      "international": {
@@ -219,7 +220,7 @@ object IntegrationTestConstants {
        |          "line2Label": "Cyfeiriad – llinell 2",
        |          "line3Label": "Cyfeiriad – llinell 3",
        |          "townLabel": "Tref neu ddinas",
-       |          "postcodeLabel": "Cod post neu god zip",
+       |          "postcodeLabel": "Cod post",
        |          "countryLabel": "Gwlad neu diriogaeth"
        |        }
        |      },
@@ -282,6 +283,7 @@ object IntegrationTestConstants {
        |      "timeoutAmount": 900,
        |      "timeoutUrl": "http://localhost:9561/report-quarterly/income-and-expenses/sign-up/session-timeout"
        |    },
+       |    "pageHeadingStyle": "govuk-heading-l",
        |    "accessibilityFooterUrl": "$accessibilityFooterUrl"
        |  },
        |  "labels": {
@@ -306,7 +308,7 @@ object IntegrationTestConstants {
        |        "line2Label": "Address line 2",
        |        "line3Label": "Address line 3",
        |        "townLabel": "Town or city",
-       |        "postcodeLabel": "Postcode or zipcode",
+       |        "postcodeLabel": "Postcode",
        |        "countryLabel": "Country or territory"
        |      },
        |      "international": {
@@ -317,7 +319,7 @@ object IntegrationTestConstants {
        |          "line2Label": "Address line 2",
        |          "line3Label": "Address line 3",
        |          "townLabel": "Town or city",
-       |          "postcodeLabel": "Postcode or zipcode",
+       |          "postcodeLabel": "Postcode",
        |          "countryLabel": "Country or territory"
        |        }
        |      },
@@ -356,7 +358,7 @@ object IntegrationTestConstants {
        |        "line2Label": "Cyfeiriad – llinell 2",
        |        "line3Label": "Cyfeiriad – llinell 3",
        |        "townLabel": "Tref neu ddinas",
-       |        "postcodeLabel": "Cod post neu god zip",
+       |        "postcodeLabel": "Cod post",
        |        "countryLabel": "Gwlad neu diriogaeth"
        |      },
        |      "international": {
@@ -367,7 +369,7 @@ object IntegrationTestConstants {
        |          "line2Label": "Cyfeiriad – llinell 2",
        |          "line3Label": "Cyfeiriad – llinell 3",
        |          "townLabel": "Tref neu ddinas",
-       |          "postcodeLabel": "Cod post neu god zip",
+       |          "postcodeLabel": "Cod post",
        |          "countryLabel": "Gwlad neu diriogaeth"
        |        }
        |      },
