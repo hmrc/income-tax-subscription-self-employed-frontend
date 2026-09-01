@@ -93,7 +93,7 @@ individual.business-trade-name.title                            = Beth yw masnac
 individual.business-trade-name.heading                          = Beth yw masnach eich busnes?
 individual.business-trade-name.caption                          = Unig fasnachwr
 individual.business-trade-name.para-one                         = Masnach eich business yw’r nwyddau neu’r gwasanaethau mae eich busnes yn eu darparu.
-individual.business-trade-name.heading-two                      = {0}
+individual.business-trade-name.heading-two                      = Beth yw masnach eich busnes?
 individual.business-trade-name.para-two                         = Er enghraifft: plymio, gwaith trydanol, ymgynghori, gwaith ffotograffiaeth, hyfforddiant personol, trin gwallt.
 
 #Self Employed Business Name page

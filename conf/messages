@@ -92,7 +92,7 @@ individual.business-trade-name.title                            = What is the tr
 individual.business-trade-name.heading                          = What is the trade of your business?
 individual.business-trade-name.caption                          = Sole trader
 individual.business-trade-name.para-one                         = The trade of your business is the goods or services that your business provides.
-individual.business-trade-name.heading-two                      = {0}
+individual.business-trade-name.heading-two                      = What is the trade of your business?
 individual.business-trade-name.para-two                         = For example plumbing, electrical work, consulting, hairdressing, personal training, photography work.
 
 #Self Employed Business Name page

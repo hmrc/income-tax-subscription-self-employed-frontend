@@ -104,7 +104,7 @@ class BusinessTradeNameViewSpec extends ViewSpec {
     val title = "What is the trade of your business?"
     val caption = "Sole trader"
     val paragraph = "The trade of your business is the goods or services that your business provides."
-    val businessTradeNameLabel = "{0}"
+    val businessTradeNameLabel = "What is the trade of your business?"
     val businessTradeNameHint = "For example plumbing, electrical work, consulting, hairdressing, personal training, photography work."
 
     object Buttons {
