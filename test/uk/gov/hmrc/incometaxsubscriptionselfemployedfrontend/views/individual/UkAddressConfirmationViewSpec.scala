@@ -82,14 +82,6 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
       )
     }
 
-    "have the correct heading and caption" in {
-      document().mainContent.mustHaveHeadingAndCaption(
-        heading = UkAddressConfirmationMessages.heading,
-        caption = UkAddressConfirmationMessages.caption,
-        isSection = true
-      )
-    }
-
     "have a form" which {
       def form: Element = document().mainContent.getForm
 
@@ -104,8 +96,8 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
         )(
           name = fieldName,
           legend = UkAddressConfirmationMessages.heading,
-          isHeading = false,
-          isLegendHidden = true,
+          isHeading = true,
+          isLegendHidden = false,
           hint = None,
           errorMessage = None,
           radioContents = Seq(

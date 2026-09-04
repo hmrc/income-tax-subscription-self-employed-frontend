@@ -84,12 +84,8 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
       )
     }
 
-    "have the correct heading and caption" in {
-      document().mainContent.mustHaveHeadingAndCaption(
-        heading = UkAddressConfirmationMessages.heading,
-        caption = UkAddressConfirmationMessages.caption,
-        isSection = false
-      )
+    "have the correct caption" in {
+      document().mainContent.selectHead(".govuk-caption-l").text mustBe UkAddressConfirmationMessages.caption
     }
 
     "have a form" which {
@@ -106,8 +102,8 @@ class UkAddressConfirmationViewSpec extends ViewSpec {
         )(
           name = fieldName,
           legend = UkAddressConfirmationMessages.heading,
-          isHeading = false,
-          isLegendHidden = true,
+          isHeading = true,
+          isLegendHidden = false,
           hint = None,
           errorMessage = None,
           radioContents = Seq(
