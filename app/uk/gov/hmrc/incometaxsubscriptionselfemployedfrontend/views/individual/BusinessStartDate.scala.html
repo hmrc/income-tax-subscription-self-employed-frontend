@@ -20,11 +20,12 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected._
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.FormWithCSRFAndNoAutoComplete
 
 @this(
         mainTemplate: PrincipalMainTemplate,
         dateHelper: DateHelper,
-        form: FormWithCSRF,
+        form: FormWithCSRFAndNoAutoComplete,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
 @(businessStartDateForm: Form[DateModel], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)

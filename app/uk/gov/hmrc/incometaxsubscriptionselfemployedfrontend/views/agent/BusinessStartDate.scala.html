@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.FormWithCSRFAndNoAutoComplete
 
 @this(
         mainTemplate: AgentMainTemplate,
@@ -28,7 +29,7 @@
         buttonHelper: ButtonHelper,
         dateHelper: DateHelper,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-        form: FormWithCSRF,
+        form: FormWithCSRFAndNoAutoComplete,
         pageHeadingHelper: PageHeadingHelper,
 )
 @(businessStartDateForm: Form[DateModel], postAction: Call, clientDetails: ClientDetails, businessTrade: String)(implicit request: Request[_], messages: Messages)
