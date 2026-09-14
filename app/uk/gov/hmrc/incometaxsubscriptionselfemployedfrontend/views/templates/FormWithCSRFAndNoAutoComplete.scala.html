@@ -20,4 +20,3 @@
 
 @(action: Call)(block: Html)(implicit request: Request[_], messages: Messages)
     @form(action = action, args = (Symbol("autocomplete"), "off"))(block)
-
