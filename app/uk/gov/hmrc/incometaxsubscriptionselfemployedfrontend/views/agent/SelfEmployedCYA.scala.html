@@ -23,10 +23,11 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.PageHeadingHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.FormWithCSRFAndNoAutoComplete
 
 @this(
         mainTemplate: AgentMainTemplate,
-        form: FormWithCSRF,
+        form: FormWithCSRFAndNoAutoComplete,
         govukSummaryList: GovukSummaryList,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
         implicitDateFormatter: ImplicitDateFormatterImpl,

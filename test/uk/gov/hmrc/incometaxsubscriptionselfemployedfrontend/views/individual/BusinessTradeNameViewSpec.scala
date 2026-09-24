@@ -85,7 +85,7 @@ class BusinessTradeNameViewSpec extends ViewSpec {
           isLabelHidden = true,
           isPageHeading = false,
           hint = Some(businessTradeNameHint),
-          autoComplete = Some("organization")
+          autoComplete = Some("organization-trade")
         )
       }
 
