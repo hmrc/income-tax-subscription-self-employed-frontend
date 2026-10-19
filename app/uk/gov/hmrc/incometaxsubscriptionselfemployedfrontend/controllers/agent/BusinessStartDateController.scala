@@ -18,21 +18,21 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel, SoleTraderBusiness}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,7 +59,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
     multipleSelfEmploymentsService.fetchBusiness(request.reference, id) flatMap {
-      case Right(Some(SoleTraderBusiness(_, _, _, maybeStartDate, _, Some(trade), _))) =>
+      case Right(Some(SoleTraderBusiness(_, _, _, maybeStartDate, _, _, Some(trade), _))) =>
         Future.successful(Ok(view(
           businessStartDateForm = form.fill(maybeStartDate),
           id = id,
@@ -79,7 +79,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     form.bindFromRequest().fold(
       formWithErrors =>
         multipleSelfEmploymentsService.fetchBusiness(request.reference, id) flatMap {
-          case Right(Some(SoleTraderBusiness(_, _, _, _, _, Some(trade), _))) =>
+          case Right(Some(SoleTraderBusiness(_, _, _, _, _, _, Some(trade), _))) =>
             Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit, request.clientDetails, trade)))
           case Right(_) =>
             Future.successful(Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
