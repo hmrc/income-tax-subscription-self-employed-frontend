@@ -17,7 +17,7 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.crypto.Sensitive.SensitiveString
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
@@ -27,6 +27,7 @@ case class SoleTraderBusiness(id: String,
                               startDateBeforeLimit: Option[Boolean] = None,
                               startDate: Option[DateModel] = None,
                               name: Option[String] = None,
+                              displayName: Option[String] = None,
                               trade: Option[String] = None,
                               address: Option[Address] = None) {
   def hasUkAddress: Option[Boolean] = address map { address =>
@@ -48,11 +49,12 @@ object SoleTraderBusiness {
         (__ \ "startDateBeforeLimit").readNullable[Boolean] and
         (__ \ "startDate").readNullable[DateModel] and
         (__ \ "name").readNullable[SensitiveString] and
+        (__ \ "displayName").readNullable[SensitiveString] and
         (__ \ "trade").readNullable[String] and
         (__ \ "address").readNullable[Address]
       )(
-      (id, confirmed, startDateBeforeLimit, startDate, name, trade, address) =>
-        SoleTraderBusiness.apply(id, confirmed, startDateBeforeLimit, startDate, name.map(_.decryptedValue), trade, address)
+      (id, confirmed, startDateBeforeLimit, startDate, name, displayName, trade, address) =>
+        SoleTraderBusiness.apply(id, confirmed, startDateBeforeLimit, startDate, name.map(_.decryptedValue), displayName.map(_.decryptedValue), trade, address)
     )
 
     val writes: OWrites[SoleTraderBusiness] = (
@@ -61,6 +63,7 @@ object SoleTraderBusiness {
         (__ \ "startDateBeforeLimit").writeNullable[Boolean] and
         (__ \ "startDate").writeNullable[DateModel] and
         (__ \ "name").writeNullable[SensitiveString] and
+        (__ \ "displayName").writeNullable[SensitiveString] and
         (__ \ "trade").writeNullable[String] and
         (__ \ "address").writeNullable[Address]
       )(
@@ -71,6 +74,7 @@ object SoleTraderBusiness {
           soleTraderBusiness.startDateBeforeLimit,
           soleTraderBusiness.startDate,
           soleTraderBusiness.name.map(SensitiveString.apply),
+          soleTraderBusiness.displayName.map(SensitiveString.apply),
           soleTraderBusiness.trade,
           soleTraderBusiness.address
         )

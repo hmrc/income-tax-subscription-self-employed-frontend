@@ -22,20 +22,19 @@ import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.UkAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.{ClientDetailsRetrieval, MultipleSelfEmploymentsService}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponents,
-                                                clientDetailsRetrieval: ClientDetailsRetrieval,
                                                 multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                                 ukAddressConfirmation: UkAddressConfirmation)
                                                (identify: IdentifierAction)

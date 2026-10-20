@@ -26,18 +26,18 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.UkAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusiness}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 import scala.concurrent.Future
 
 class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
-  with MockClientDetailsRetrieval with MockMultipleSelfEmploymentsService with MockIdentifierAction  {
+  with MockClientDetailsRetrieval with MockMultipleSelfEmploymentsService with MockIdentifierAction {
 
   val id: String = "testId"
   val name: String = "FirstName LastName"
@@ -54,7 +54,6 @@ class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
 
   object TestUkAddressConfirmationController extends UkAddressConfirmationController(
     mockMessagesControllerComponents,
-    mockClientDetailsRetrieval,
     mockMultipleSelfEmploymentsService,
     mock[UkAddressConfirmation]
   )(
@@ -72,7 +71,6 @@ class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
 
     val controller: UkAddressConfirmationController = new UkAddressConfirmationController(
       mockMessagesControllerComponents,
-      mockClientDetailsRetrieval,
       mockMultipleSelfEmploymentsService,
       mockUkAddressConfirmation
     )(
@@ -146,7 +144,7 @@ class UkAddressConfirmationControllerSpec extends ControllerBaseSpec
         redirectLocation(response) mustBe Some(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, true).url)
       }
     }
-    
+
     "return BAD_REQUEST with the page content" when {
       "the user does not select an option" in new Setup {
         mockAuthSuccess()

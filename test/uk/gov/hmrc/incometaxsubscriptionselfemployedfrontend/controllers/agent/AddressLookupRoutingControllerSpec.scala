@@ -55,7 +55,6 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   
   object TestUkAddressConfirmationController extends UkAddressConfirmationController(
     mockMessagesControllerComponents,
-    mockClientDetailsRetrieval,
     mockMultipleSelfEmploymentsService,
     mock[UkAddressConfirmation]
   )(
