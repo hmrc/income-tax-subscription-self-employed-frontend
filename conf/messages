@@ -75,6 +75,11 @@ individual.error.full-income-source.business-name.min-length              = Busi
 individual.error.full-income-source.business-name.invalid                 = The business name can only include upper case or lower case letters, full stops, commas, digits, &,’,/,\,-.
 individual.error.full-income-source.start-date-before-limit.empty         = Select ‘Yes’ if this business started before 6 April {0}
 individual.error.duplicate-business                                       = You cannot enter the same trade and same business name
+individual.error.display-name.business-display-name.empty                = Enter a display label
+individual.error.display-name.business-display-name.max-length           = The display label must be 35 characters or less
+individual.error.display-name.business-display-name.min-length           = The display label must have at least 2 letters
+individual.error.display-name.business-display-name.invalid              = The display label can only include letters, numbers and permitted punctuation
+individual.error.display-name.duplicate                                  = The business name display labels cannot be the same
 
 #Self Employed CYA
 self-employed-cya.trading-start-date                            = Start date
@@ -102,6 +107,18 @@ individual.business-name.caption                                = Sole trader
 individual.business-name.para-one                               = This is the business name you used to register for Self Assessment. If your business does not have a name, enter your own first and last name.
 individual.business-name.heading-two                            = What is your business name?
 individual.business-name.para-two                               = The business name you enter can only include upper case or lower case letters, full stops, commas, digits, &, ’, /, \, -.
+
+#Self Employed Business Display Name page
+individual.business-display-name.title                          = Create display labels for your income sources
+individual.business-display-name.heading                        = Create display labels for your income sources
+individual.business-display-name.para-one                       = As you have more than one business with the same name, you need to add a display label to make it easier to tell them apart in your software.
+individual.business-display-name.para-two                       = The label is for your reference only and does not need to match your actual business name.
+individual.business-display-name.warning                        = Make a note of the label you choose, as it will affect how your business is identified across HMRC services and in your software.
+individual.business-display-name.sub-heading                    = Sole trader business {0}
+individual.business-display-name.trade                          = Trade
+individual.business-display-name.business-name                  = Business name
+individual.business-display-name.question                       = What label do you want to give to sole trader business {0}?
+individual.business-display-name.hint                           = Enter something that will help you tell this income source apart from others.
 
 # Agent Business start date
 business.agent.start-date.title                                 = Sole trader

@@ -158,6 +158,10 @@ class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCry
                       (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] =
     saveData(reference, businessId, _.copy(name = Some(name), confirmed = false))
 
+   def saveDisplayName(reference: String, businessId: String, displayName: String)
+                      (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] =
+    saveData(reference, businessId, _.copy(name = Some(displayName), confirmed = false))
+
   def saveAddress(reference: String, businessId: String, address: Address)
                  (implicit hc: HeaderCarrier): Future[Either[SaveSelfEmploymentDataFailure.type, PostSubscriptionDetailsSuccess]] = {
     saveData(reference, businessId, _.copy(address = Some(address), confirmed = false))
