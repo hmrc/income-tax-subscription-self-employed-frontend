@@ -21,6 +21,9 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.DisplayName
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessTradeNameForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
@@ -36,9 +39,9 @@ class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTrade
                                             mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                             identify: IdentifierAction)
-                                           (val languageUtils: LanguageUtils)
+                                           (val languageUtils: LanguageUtils, val appConfig: AppConfig)
                                            (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with FeatureSwitching {
 
   def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
     populateFormFromSavedDetails(request.reference, id) map { form =>
@@ -56,7 +59,7 @@ class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTrade
       formWithErrors =>
         Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit))),
       trade =>
-        multipleSelfEmploymentsService.isDuplicateBusinessTrade(request.reference, id, trade) flatMap {
+        multipleSelfEmploymentsService.isDuplicateBusinessTrade(request.reference, id, trade).map(_ && isDisabled(DisplayName)) flatMap {
           case true =>
             Future.successful(BadRequest(view(
               BusinessTradeNameForm.businessTradeNameForm
