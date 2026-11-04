@@ -16,21 +16,23 @@
 
 package controllers.agent
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.*
 import connectors.stubs.SessionDataConnectorStub.{stubGetSessionData, stubSaveSessionData}
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
+import helpers.IntegrationTestConstants.*
 import helpers.servicemocks.AuthStub
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.DisplayName
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.{FullIncomeSourceController, routes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, SoleTraderBusiness, SoleTraderBusinesses}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
-class FullIncomeSourceControllerISpec extends ComponentSpecBase {
+class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwitching {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   lazy val fullIncomeSourceController: FullIncomeSourceController = app.injector.instanceOf[FullIncomeSourceController]
@@ -41,6 +43,11 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
     trade = "test duplicate trade",
     startDateBeforeLimit = true
   )
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(DisplayName)
+  }
 
   s"GET ${routes.FullIncomeSourceController.show(id)}" when {
     "the user is unauthorised" should {
@@ -443,7 +450,110 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase {
         )
       }
     }
+
+    "the feature switch 'DisplayName' is enabled" when {
+      "the user submits duplicate business details" when {
+        "the user submits valid data with a start date before limit set to true" should {
+            "save the result as a sole trader business and continue to the address lookup router" in {
+              enable(DisplayName)
+
+              AuthStub.stubAuthSuccess()
+              stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+                responseStatus = OK,
+                responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+                  id = s"$id-two",
+                  startDateBeforeLimit = Some(true),
+                  name = Some("test duplicate name"),
+                  trade = Some("test duplicate trade")
+                ))))
+              )
+              stubSaveSubscriptionData(
+                reference = reference,
+                id = soleTraderBusinessesKey,
+                body = Json.toJson(SoleTraderBusinesses(Seq(
+                  SoleTraderBusiness(
+                    id = s"$id-two",
+                    startDateBeforeLimit = Some(true),
+                    name = Some("test duplicate name"),
+                    trade = Some("test duplicate trade")
+                  ),
+                  SoleTraderBusiness(
+                    id = id,
+                    startDateBeforeLimit = Some(true),
+                    name = Some("test duplicate name"),
+                    trade = Some("test duplicate trade")
+                  )
+                )))
+              )(OK)
+              stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+              stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+              val result = submitClientFullIncomeSource(
+                trade = Some("test duplicate trade"),
+                name = Some("test duplicate name"),
+                startDateBeforeLimit = Some(true),
+                id = id,
+                isEditMode = false,
+                isGlobalEdit = false
+              )
+
+              result must have(
+                httpStatus(SEE_OTHER),
+                redirectURI(routes.AddressLookupRoutingController.checkAddressLookupJourney(id).url)
+              )
+            }
+        }
+        "the user submits valid data with a start date before limit set to false" should {
+          "save the result as a sole trader business and continue to the business start date page" in {
+            enable(DisplayName)
+
+            AuthStub.stubAuthSuccess()
+            stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+              responseStatus = OK,
+              responseBody = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+                id = s"$id-two",
+                startDateBeforeLimit = Some(false),
+                name = Some("test duplicate name"),
+                trade = Some("test duplicate trade")
+              ))))
+            )
+            stubSaveSubscriptionData(
+              reference = reference,
+              id = soleTraderBusinessesKey,
+              body = Json.toJson(SoleTraderBusinesses(Seq(
+                SoleTraderBusiness(
+                  id = s"$id-two",
+                  startDateBeforeLimit = Some(false),
+                  name = Some("test duplicate name"),
+                  trade = Some("test duplicate trade")
+                ),
+                SoleTraderBusiness(
+                  id = id,
+                  startDateBeforeLimit = Some(false),
+                  name = Some("test duplicate name"),
+                  trade = Some("test duplicate trade")
+                )
+              )))
+            )(OK)
+            stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+            stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+            val result = submitClientFullIncomeSource(
+              trade = Some("test duplicate trade"),
+              name = Some("test duplicate name"),
+              startDateBeforeLimit = Some(false),
+              id = id,
+              isEditMode = false,
+              isGlobalEdit = false
+            )
+
+            result must have(
+              httpStatus(SEE_OTHER),
+              redirectURI(routes.BusinessStartDateController.show(id).url)
+            )
+          }
+        }
+      }
+    }
   }
-
 }
-

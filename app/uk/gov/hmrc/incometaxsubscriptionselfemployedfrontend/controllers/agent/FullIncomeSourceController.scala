@@ -21,6 +21,9 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.DisplayName
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
@@ -38,9 +41,9 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
                                            mcc: MessagesControllerComponents,
                                            multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
                                            sessionDataService: SessionDataService)
-                                          (implicit val ec: ExecutionContext)
+                                          (implicit val ec: ExecutionContext, val appConfig: AppConfig)
 
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with FeatureSwitching {
 
   def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
     populateFormFromSavedDetails(request.reference, id) map { form =>
@@ -59,7 +62,7 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
         Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit)))
       }, {
         case (trade, name, startDateBeforeLimit) =>
-          isDuplicateBusiness(reference = request.reference, id = id, name = name, trade = trade) flatMap {
+          isDuplicateBusiness(reference = request.reference, id = id, name = name, trade = trade).map(_ && isDisabled(DisplayName)) flatMap  {
             case true =>
               saveDuplicateDetailsAndContinue(
                 id = id,
@@ -88,6 +91,7 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
                 isEditMode = isEditMode,
                 isGlobalEdit = isGlobalEdit
               )
+
           }
       }
     )
