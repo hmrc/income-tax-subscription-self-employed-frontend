@@ -16,17 +16,29 @@
 
 package controllers.individual
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.*
+import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
+import helpers.IntegrationTestConstants.*
 import helpers.servicemocks.AuthStub
-import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.http.Status.*
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitch.DisplayName
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{SoleTraderBusiness, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
-class BusinessTradeNameControllerISpec extends ComponentSpecBase {
+class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwitching {
+
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    disable(DisplayName)
+  }
 
   s"GET ${routes.BusinessTradeNameController.show(id)}" when {
     "the user is unauthorised" should {
@@ -189,6 +201,41 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase {
           httpStatus(BAD_REQUEST),
           pageTitle("Error: " + messages("individual.business-trade-name.title") + titleSuffix)
         )
+      }
+    }
+
+    "the feature switch 'DisplayName' is enabled" when {
+      "the user submits a duplicate business trade name" should {
+        "save the trade name and redirect to the next page" in {
+          enable(DisplayName)
+
+          AuthStub.stubAuthSuccess()
+          stubGetSubscriptionData(reference, soleTraderBusinessesKey)(
+            responseStatus = OK,
+            responseBody = Json.toJson(SoleTraderBusinesses(Seq(
+              SoleTraderBusiness(id = s"$id-two", trade = Some("Plumbing"), name = Some("test name")),
+              SoleTraderBusiness(id = id, name = Some("test name"))
+            )))
+          )
+
+          stubSaveSubscriptionData(
+            reference = reference,
+            id = soleTraderBusinessesKey,
+            body = Json.toJson(SoleTraderBusinesses(Seq(
+              SoleTraderBusiness(id = s"$id-two", trade = Some("Plumbing"), name = Some("test name")),
+              SoleTraderBusiness(id = id, trade = Some("Plumbing"), name = Some("test name"))
+            )))
+          )(OK)
+          stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
+          stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+
+          val result = submitBusinessTradeName(trade = Some("Plumbing"), id = id)
+
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectURI(routes.BusinessNameController.show(id).url)
+          )
+        }
       }
     }
   }
