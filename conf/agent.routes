@@ -17,10 +17,10 @@ GET         /details/error/duplicate-details             uk.gov.hmrc.incometaxsu
 
 #Address Lookup routing
 GET         /address-lookup-check/:businessId            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.checkAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
-GET         /address-lookup-initialise/:businessId/:isUk uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-GET         /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET         /address-lookup-initialise/:businessId/:isUk uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isGlobalEdit: Boolean ?= false)
+GET         /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isGlobalEdit: Boolean ?= false)
 
-GET         /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit:Boolean ?= false)
+GET         /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.show(id: String, isGlobalEdit:Boolean ?= false)
 POST        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.SelfEmployedCYAController.submit(id: String, isGlobalEdit:Boolean ?= false)
 
 GET         /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.BusinessAddressConfirmationController.show(id: String)

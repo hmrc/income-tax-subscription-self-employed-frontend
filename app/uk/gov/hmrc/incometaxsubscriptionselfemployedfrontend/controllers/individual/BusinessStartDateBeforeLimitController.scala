@@ -111,7 +111,7 @@ class BusinessStartDateBeforeLimitController @Inject()(businessStartDateBeforeLi
         if (!startDateBeforeLimit) {
           Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
         } else if (isEditMode || isGlobalEdit) {
-          Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
+          Redirect(routes.SelfEmployedCYAController.show(id, isGlobalEdit))
         } else {
           Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode))
         }
@@ -127,8 +127,7 @@ class BusinessStartDateBeforeLimitController @Inject()(businessStartDateBeforeLi
 
     businessStartDateBeforeLimit(
       businessStartDateBeforeLimitForm = businessStartDateBeforeLimitForm,
-      postAction = routes.BusinessStartDateBeforeLimitController.submit(id, isEditMode, isGlobalEdit),
-      isEditMode = isEditMode || isGlobalEdit
+      postAction = routes.BusinessStartDateBeforeLimitController.submit(id, isEditMode, isGlobalEdit)
     )
   }
 }

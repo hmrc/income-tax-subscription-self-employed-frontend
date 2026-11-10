@@ -25,9 +25,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.UkAddressConfirmationForm.ukAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, ClientDetails, Country}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessAddressConfirmation, UkAddressConfirmation}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
 
 class UkAddressConfirmationViewSpec extends ViewSpec {
 

@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ ClientDetails, DateModel }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ RadioHelper, SaveAndContinueButtonHelper, PageHeadingHelper }
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.AgentMainTemplate
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.{ ContinueButton, TextInputHelper }
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.injected.TextInputHelper
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.FormWithCSRFAndNoAutoComplete
 
 @this(
@@ -28,12 +28,11 @@
     form: FormWithCSRFAndNoAutoComplete,
     textInputHelper: TextInputHelper,
     radioHelper: RadioHelper,
-    continueButton: ContinueButton,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
     pageHeadingHelper: PageHeadingHelper
 )
 
-@(fullIncomeSourceForm: Form[_], postAction: Call, isEditMode: Boolean, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
+@(fullIncomeSourceForm: Form[_], postAction: Call, clientDetails: ClientDetails)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("agent.full-income-source.heading"), optForm = Some(fullIncomeSourceForm)) {
 

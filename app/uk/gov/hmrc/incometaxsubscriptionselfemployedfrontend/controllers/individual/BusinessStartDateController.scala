@@ -52,8 +52,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
           (implicit request: Request[AnyContent]): Html = {
     businessStartDate(
       businessStartDateForm = businessStartDateForm,
-      postAction = routes.BusinessStartDateController.submit(id, isEditMode, isGlobalEdit),
-      isEditMode
+      postAction = routes.BusinessStartDateController.submit(id, isEditMode, isGlobalEdit)
     )
   }
 
@@ -83,14 +82,14 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean) = Redirect(
     if (isEditMode || isGlobalEdit) {
-      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
+      routes.SelfEmployedCYAController.show(id, isGlobalEdit = isGlobalEdit)
     } else {
       routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode)
     }
   )
 
   def form(implicit request: Request[_]): Form[DateModel] = {
-    businessStartDateForm(BusinessStartDateForm.maxStartDate, _.toLongDate())
+    businessStartDateForm(BusinessStartDateForm.maxStartDate, _.toLongDate)
   }
 
 }

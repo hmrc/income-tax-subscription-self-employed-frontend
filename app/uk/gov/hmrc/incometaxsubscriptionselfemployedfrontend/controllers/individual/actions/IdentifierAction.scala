@@ -17,8 +17,8 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions
 
 import play.api.Logging
-import play.api.mvc.{ActionBuilder, ActionFunction, AnyContent, BodyParsers, Request, Result}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.*
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig

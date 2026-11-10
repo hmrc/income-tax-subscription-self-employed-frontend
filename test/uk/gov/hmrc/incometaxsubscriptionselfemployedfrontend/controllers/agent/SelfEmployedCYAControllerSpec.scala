@@ -17,17 +17,17 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
 import play.api.mvc.{Action, AnyContent, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService.SaveSelfEmploymentDataFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.mocks.agent.MockSelfEmployedCYA
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 import scala.concurrent.Future
 
@@ -38,7 +38,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "SelfEmployedCYAController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false),
+    "show" -> TestSelfEmployedCYAController.show(id, isGlobalEdit = false),
     "submit" -> TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)
   )
 
@@ -69,7 +69,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isGlobalEdit = false)(fakeRequest)))
           .message mustBe "[SelfEmployedCYAController][fetchBusinessList] - Failed to retrieve sole trader businesses"
       }
     }
@@ -79,7 +79,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
         mockSelfEmployedCYA()
 
-        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
+        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -91,7 +91,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
         mockSelfEmployedCYA()
 
-        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = true)(fakeRequest)
+        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isGlobalEdit = true)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)

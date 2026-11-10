@@ -39,7 +39,7 @@ class SelfEmployedCYAController @Inject()(checkYourAnswersView: SelfEmployedCYA,
   extends FrontendController(mcc) with I18nSupport with FeatureSwitching {
 
 
-  def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+  def show(id: String, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
     withSelfEmploymentCYAModel(request.reference, id) { selfEmploymentCYAModel =>
       Future.successful(Ok(checkYourAnswersView(
         answers = selfEmploymentCYAModel,

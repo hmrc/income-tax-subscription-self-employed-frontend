@@ -383,7 +383,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
 
           result must have(
             httpStatus(SEE_OTHER),
-            redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+            redirectURI(routes.SelfEmployedCYAController.show(id).url)
           )
         }
       }

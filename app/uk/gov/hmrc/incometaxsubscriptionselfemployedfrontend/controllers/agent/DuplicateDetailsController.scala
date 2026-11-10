@@ -20,7 +20,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.SessionDataService
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{DuplicateDetails => DuplicateDetailsView}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.DuplicateDetails
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext
 class DuplicateDetailsController @Inject()(identify: IdentifierAction,
                                            mcc: MessagesControllerComponents,
                                            sessionDataService: SessionDataService,
-                                           duplicateDetailsView: DuplicateDetailsView)
+                                           duplicateDetailsView: DuplicateDetails)
                                           (implicit val ec: ExecutionContext) extends FrontendController(mcc) with I18nSupport {
 
   def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>

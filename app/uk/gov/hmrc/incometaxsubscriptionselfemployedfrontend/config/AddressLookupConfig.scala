@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config
 
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig
 

@@ -24,8 +24,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, 
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil.getStartDateLimit
 
-import scala.collection.Iterable.single
-
 object BusinessStartDateBeforeLimitForm {
 
   val startDateBeforeLimit: String = "start-date-before-limit"

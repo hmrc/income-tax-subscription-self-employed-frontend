@@ -65,7 +65,7 @@
     }
 }
 
-@simpleSummaryListRow(key: String, value: Option[String], changeHref: String, id: String, htmlValue: Boolean = false, hiddenText: Option[String] = None) = @{
+@simpleSummaryListRow(key: String, value: Option[String], changeHref: String, htmlValue: Boolean = false, hiddenText: Option[String] = None) = @{
     SummaryListRow(
         key = Key(content = Text(key)),
         value = Value(content = if(htmlValue) HtmlContent(value.getOrElse("")) else Text(value.getOrElse(""))),
@@ -85,8 +85,7 @@
     simpleSummaryListRow(
         key = messages("self-employed-cya.business-name"),
         value = businessName,
-        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessNameController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
-        id = businessId
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessNameController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
     )
 }
 
@@ -98,10 +97,9 @@
         value = if(startDateBeforeLimit.contains(true) || businessStartDate.exists(_.toLocalDate.isBefore(AccountingPeriodUtil.getStartDateLimit))) {
             Some(messages("self-employed-cya.start-date-before-limit.label", AccountingPeriodUtil.getStartDateLimit.getYear.toString))
         } else {
-            businessStartDate.map(_.toLocalDate.toLongDate())
+            businessStartDate.map(_.toLocalDate.toLongDate)
         },
-        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessStartDateBeforeLimitController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
-        id = businessId
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessStartDateBeforeLimitController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
     )
 }
 
@@ -109,8 +107,7 @@
     simpleSummaryListRow(
         key = messages("self-employed-cya.business-trade"),
         value = businessTrade,
-        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessTradeNameController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
-        id = businessId
+        changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.BusinessTradeNameController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url
     )
 }
 
@@ -119,7 +116,6 @@
         key = messages("self-employed-cya.business-address"),
         value = businessAddress.map(_.toString),
         changeHref = uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes.UkAddressConfirmationController.show(businessId, isEditMode = true, isGlobalEdit = isGlobalEdit).url,
-        id = businessId,
         htmlValue = true
     )
 }

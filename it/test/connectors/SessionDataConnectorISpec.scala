@@ -16,11 +16,11 @@
 
 package connectors
 
-import connectors.stubs.SessionDataConnectorStub._
+import connectors.stubs.SessionDataConnectorStub.*
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
+import helpers.IntegrationTestConstants.*
 import play.api.libs.json.{JsObject, Json, OFormat}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.SessionDataConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser.{InvalidJson, UnexpectedStatusFailure}

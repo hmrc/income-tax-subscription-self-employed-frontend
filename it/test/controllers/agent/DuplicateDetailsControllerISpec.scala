@@ -18,9 +18,9 @@ package controllers.agent
 
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
-import helpers.servicemocks.AuthStub._
-import play.api.http.Status._
+import helpers.IntegrationTestConstants.*
+import helpers.servicemocks.AuthStub.*
+import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes

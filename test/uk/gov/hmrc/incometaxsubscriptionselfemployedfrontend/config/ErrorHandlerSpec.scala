@@ -31,23 +31,21 @@ class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
 
   private val anAgentPath = "/x/y/client/z"
   private val anIndividualPath = "/x/y/z"
-  private val individualLoginAddress = "http://a.com/b/c"
-  private val agentLoginAddress = "http://a.com/b/c/client"
 
   test("Will redirect agent to agent sign in if session not valid") {
-    withErrorHandler(expected = agentLoginAddress) {
+    withErrorHandler() {
       _.resolveError(getMockHeader(anAgentPath), new InvalidBearerToken)
     }
   }
 
   test("Will redirect individual to individual sign in if session not valid") {
-    withErrorHandler(expected = individualLoginAddress) {
+    withErrorHandler() {
       _.resolveError(getMockHeader(anIndividualPath), new InvalidBearerToken)
     }
   }
 
   test("Will redirect agent to agent sign in if session not exists") {
-    withErrorHandler(expected = agentLoginAddress) {
+    withErrorHandler() {
       _.onClientError(
         getMockHeader(anAgentPath),
         play.mvc.Http.Status.FORBIDDEN,
@@ -56,7 +54,7 @@ class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
   }
 
   test("Will redirect individual to individual sign in if session not exists") {
-    withErrorHandler(expected = individualLoginAddress) {
+    withErrorHandler() {
       _.onClientError(getMockHeader(anIndividualPath),
         play.mvc.Http.Status.FORBIDDEN,
         "Bad Individual, you logged out in another tab")
@@ -64,7 +62,7 @@ class ErrorHandlerSpec extends AnyFunSuite with MockitoSugar {
   }
 
 
-  private def withErrorHandler(expected: String)(testCode: ErrorHandler => Any): Unit = {
+  private def withErrorHandler()(testCode: ErrorHandler => Any): Unit = {
     val view = mock[GenericError]
     when(view(any(), any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
     val config: AppConfig = mock[AppConfig]

@@ -31,8 +31,7 @@ class BusinessTradeNameViewSpec extends ViewSpec {
 
   def view(errors: Boolean = false): HtmlFormat.Appendable = businessTradeNameView(
     businessTradeNameForm = if (errors) form.bind(Map.empty[String, String]) else form,
-    postAction = testCall,
-    isEditMode = false
+    postAction = testCall
   )(fakeTestRequest, implicitly)
 
   val document: Document = Jsoup.parse(view().body)

@@ -16,11 +16,11 @@
 
 package controllers.individual
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
-import helpers.IntegrationTestConstants._
-import helpers.servicemocks.AuthStub._
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.*
+import helpers.IntegrationTestConstants.*
+import helpers.servicemocks.AuthStub.*
 import helpers.{ComponentSpecBase, ViewSpec}
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig

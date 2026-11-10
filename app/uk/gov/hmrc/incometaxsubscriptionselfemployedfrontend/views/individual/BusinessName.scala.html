@@ -28,7 +28,7 @@
     pageHeadingHelper: PageHeadingHelper
 )
 
-@(businessNameForm: Form[String], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
+@(businessNameForm: Form[String], postAction: Call)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("individual.business-name.title"), optForm = Some(businessNameForm)) {
 

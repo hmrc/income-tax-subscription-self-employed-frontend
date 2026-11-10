@@ -38,7 +38,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
   val id: String = "testId"
 
   private val businessStartDate = mock[BusinessStartDate]
-  when(businessStartDate(any(), any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
+  when(businessStartDate(any(), any())(any(), any())).thenReturn(HtmlFormat.empty)
 
   override val controllerName: String = "BusinessStartDateController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
@@ -121,7 +121,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+        redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id).url)
 
       }
     }

@@ -20,9 +20,9 @@ import play.api.mvc.*
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
@@ -40,9 +40,9 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                               (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) {
 
-  private def addressLookupContinueUrl(businessId: String, id: Option[String], isEditMode: Boolean, isGlobalEdit: Boolean): String =
+  private def addressLookupContinueUrl(businessId: String, id: Option[String], isGlobalEdit: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
-      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, id, isEditMode, isGlobalEdit)
+      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, id, isGlobalEdit)
 
   def checkAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = identify.async { implicit request =>
     multipleSelfEmploymentsService.fetchFirstAddress(request.reference) map {
@@ -55,9 +55,10 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+  def initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isGlobalEdit: Boolean): Action[AnyContent] =
+    identify.async { implicit request =>
     addressLookupConnector.initialiseAddressLookup(
-      continueUrl = addressLookupContinueUrl(businessId, None, isEditMode, isGlobalEdit),
+      continueUrl = addressLookupContinueUrl(businessId, None, isGlobalEdit),
       isAgent = false,
       isUk = isUk
     ) map {
@@ -70,14 +71,15 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+  def addressLookupRedirect(businessId: String, addressId: Option[String], isGlobalEdit: Boolean): Action[AnyContent] =
+    identify.async { implicit request =>
     for {
       addressDetails <- fetchAddress(addressId)
       saveResult <- multipleSelfEmploymentsService.saveAddress(request.reference, businessId, addressDetails)
     } yield {
       saveResult match {
         case Right(_) =>
-          Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit))
+          Redirect(routes.SelfEmployedCYAController.show(businessId, isGlobalEdit = isGlobalEdit))
         case Left(_) =>
           throw new InternalServerException("[AddressLookupResultController][addressLookupRedirect] - Could not save business address")
       }

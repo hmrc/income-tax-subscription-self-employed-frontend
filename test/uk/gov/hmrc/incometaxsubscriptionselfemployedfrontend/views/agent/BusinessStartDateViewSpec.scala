@@ -54,7 +54,6 @@ class BusinessStartDateViewSpec extends ViewSpec with FeatureSwitching {
       },
       postAction = testCall,
       clientDetails = ClientDetails("FirstName LastName", "ZZ111111Z"),
-      businessTrade = "test trade"
     )(fakeTestRequest, implicitly)
   }
 

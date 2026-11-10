@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
-import play.api.libs.json._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
@@ -28,7 +29,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import java.net.URL
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 
 @Singleton
 class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
@@ -53,7 +53,7 @@ class IncomeTaxSubscriptionConnector @Inject()(appConfig: AppConfig,
   }
 
   def retrieveReference(utr: String)(implicit hc: HeaderCarrier): Future[RetrieveReferenceResponse] = {
-    http.post(url"${retrieveReferenceUrl}").withBody(Json.toJson(Json.obj("utr" -> utr))).execute[RetrieveReferenceResponse]
+    http.post(url"$retrieveReferenceUrl").withBody(Json.toJson(Json.obj("utr" -> utr))).execute[RetrieveReferenceResponse]
   }
 
   def deleteSubscriptionDetails(reference: String, key: String)

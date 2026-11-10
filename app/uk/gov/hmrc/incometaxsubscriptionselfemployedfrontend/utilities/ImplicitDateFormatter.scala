@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities
 
-import java.time.LocalDate
-
-import javax.inject.{Inject, Singleton}
 import play.api.i18n.Messages
 import uk.gov.hmrc.play.language.LanguageUtils
+
+import java.time.LocalDate
+import javax.inject.{Inject, Singleton}
 
 
 @Singleton
@@ -32,7 +32,7 @@ trait ImplicitDateFormatter {
 
   implicit class LongDate(date: LocalDate)(implicit messages: Messages) {
 
-    def toLongDate(): String = {
+    def toLongDate: String = {
       languageUtils.Dates.formatDate(LocalDate.parse(date.toString))(messages)
     }
 

@@ -24,11 +24,11 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.{PostAddressLookupSuccessResponse, UnexpectedStatusFailure}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, Country}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.{MockClientDetailsRetrieval, MockMultipleSelfEmploymentsService, MockSessionDataService}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.TestModels.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.UkAddressConfirmation
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
   with MockAddressLookupConnector
@@ -126,7 +126,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
             Right(PostAddressLookupSuccessResponse(Some(redirectUrl)))
           )
 
-          val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false, isUk = isUk)(fakeRequest)
+          val result = TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isGlobalEdit = false, isUk = isUk)(fakeRequest)
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(redirectUrl)
@@ -142,7 +142,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           )
 
           val result = intercept[InternalServerException](
-            await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isEditMode = false, isGlobalEdit = false, isUk = isUk)(fakeRequest))
+            await(TestAddressLookupRoutingController.initialiseAddressLookupJourney(businessId, isGlobalEdit = false, isUk = isUk)(fakeRequest))
           )
           result.message mustBe "[AddressLookupRoutingController][initialiseAddressLookupJourney] - Unexpected response, status: 500"
         }
@@ -159,10 +159,10 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
           mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = true, isGlobalEdit = false)(fakeRequest)
+          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isGlobalEdit = false)(fakeRequest)
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(routes.SelfEmployedCYAController.show(businessId, isEditMode = true).url)
+            Some(routes.SelfEmployedCYAController.show(businessId).url)
         }
       }
     }
@@ -174,10 +174,10 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
           mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = true, isGlobalEdit = true)(fakeRequest)
+          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isGlobalEdit = true)(fakeRequest)
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
-            Some(routes.SelfEmployedCYAController.show(businessId, isEditMode = true, isGlobalEdit = true).url)
+            Some(routes.SelfEmployedCYAController.show(businessId, isGlobalEdit = true).url)
         }
       }
     }
@@ -189,7 +189,7 @@ class AddressLookupRoutingControllerSpec extends ControllerBaseSpec
           mockGetAddressDetails(addressId)(Right(Some(testValidBusinessAddressModel)))
           mockSaveBusinessAddress(businessId, testValidBusinessAddressModel)(Right(PostSubscriptionDetailsSuccessResponse))
 
-          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isEditMode = false, isGlobalEdit = false)(fakeRequest)
+          val result = TestAddressLookupRoutingController.addressLookupRedirect(businessId, Some(addressId), isGlobalEdit = false)(fakeRequest)
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe
             Some(routes.SelfEmployedCYAController.show(businessId).url)
