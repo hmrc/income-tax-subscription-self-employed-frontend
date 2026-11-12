@@ -69,13 +69,13 @@ address-lookup.country-page.heading                             = Dewiswch y wla
 individual.error.full-income-source.business-trade.empty                = Ychwanegwch eich masnach unig fasnachwr
 individual.error.full-income-source.business-trade.max-length           = Mae’n rhaid i’r fasnach fod yn 35 o gymeriadau neu lai
 individual.error.full-income-source.business-trade.min-length           = Mae’n rhaid i’r fasnach gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
-individual.error.full-income-source.business-trade.invalid              = Gall masnach y busnes gynnwys llythrennau mawr neu fach,atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
+individual.error.full-income-source.business-trade.invalid              = Gall masnach y busnes gynnwys llythrennau mawr neu fach,atalnodau llawn, comas, digidau, &, ’, /, \, - yn unig.
 individual.error.full-income-source.business-name.empty                 = Ychwanegwch enw’ch busnes
 individual.error.full-income-source.business-name.max-length            = Mae’n rhaid i enw’r busnes fod yn 105 o gymeriadau neu lai
 individual.error.full-income-source.business-name.min-length            = Mae’n rhaid i enw’r busnes gynnwys o leiaf 2 lythyren (llythrennau mawr neu lythrennau bach)
-individual.error.full-income-source.business-name.invalid               = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
+individual.error.full-income-source.business-name.invalid               = Gall enw’r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ’, /, \, - yn unig.
 individual.error.full-income-source.start-date-before-limit.empty       = Dewiswch ‘Iawn’ os oedd y busnes hwn wedi dechrau cyn 6 Ebrill {0}
-individual.error.duplicate-business                                     = Ni allwch nodi'r un peth ar gyfer masnach busnes ac enw'r busnes
+individual.error.duplicate-business                                     = Ni allwch nodi’r un peth ar gyfer masnach busnes ac enw’r busnes
 
 # Self Employed CYA
 self-employed-cya.trading-start-date                            = Dyddiad dechrau
@@ -86,7 +86,7 @@ self-employed-cya.business-address                              = Cyfeiriad
 self-employed-cya.title                                         = Gwiriwch eich atebion - busnes unig fasnachwr
 self-employed-cya.heading                                       = Gwiriwch eich atebion
 self-employed-cya.caption                                       = Unig fasnachwr
-self-employed-cya.para                                          = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu'n anghywir.
+self-employed-cya.para                                          = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu’n anghywir.
 
 #Self Employed Business Trade Name page
 individual.business-trade-name.title                            = Beth yw masnach eich busnes?
@@ -101,8 +101,8 @@ individual.business-name.title                              = Eich busnes fel un
 individual.business-name.heading                            = Enw’r busnes
 individual.business-name.caption                            = Unig fasnachwr
 individual.business-name.para-one                           = Dyma enw’r busnes a ddefnyddioch i gofrestru ar gyfer Hunanasesiad. Os nad oes gan eich busnes enw, nodwch eich enw llawn.
-individual.business-name.heading-two                        = Beth yw enw'r eich busnes?
-individual.business-name.para-two                           = Gall enw'r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ', /, \, - yn unig.
+individual.business-name.heading-two                        = Beth yw enw’r eich busnes?
+individual.business-name.para-two                           = Gall enw’r busnes gnnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &, ’, /, \, - yn unig.
 
 # Agent Business start date
 business.agent.start-date.title                                 = Unig fasnachwr
@@ -156,7 +156,7 @@ agent.self-employed-cya.heading                                 = Gwirio’ch at
 agent.self-employed-cya.caption                                 = Y busnes unig fasnachwr a nodwyd gennych
 agent.self-employed-cya.subheading-one                          = Manylion y busnes
 agent.self-employed-cya.subheading-two                          = Cyfeiriad y busnes
-agent.self-employed-cya.para                                    = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu'n anghywir.
+agent.self-employed-cya.para                                    = Ychwanegu neu newid unrhyw fanylion sydd ar goll neu’n anghywir.
 agent.self-employed-cya.inset                                   = Ni ddylech ychwanegu incwm o bartneriaethau na chwmnïau cyfyngedig.
 
 #Enable AgentStreamline Self Employed CYA
@@ -178,7 +178,7 @@ agent.full-income-source.start-date-before-limit.legend              = A oedd y 
 agent.error.full-income-source.business-trade.empty                  = Nodwch fasnach busnes eich cleient
 agent.error.full-income-source.business-trade.max-length             = Mae‘n rhaid i fasnach y busnes fod yn 35 o gymeriadau neu lai
 agent.error.full-income-source.business-trade.min-length             = Mae’n rhaid i enw masnachu’ch busnes gynnwys o leiaf dwy lythyren (llythrennau mawr neu lythrennau bach)
-agent.error.full-income-source.business-trade.invalid                = Gall enw masnachu eich cleient gynnwys llythrennau mawr neu fach yn unig, ynghyd â dotiau llawn, comâu, digidau a'r nodau &, ’, /, \, a -.
+agent.error.full-income-source.business-trade.invalid                = Gall enw masnachu eich cleient gynnwys llythrennau mawr neu fach yn unig, ynghyd â dotiau llawn, comâu, digidau a’r nodau &, ’, /, \, a -.
 agent.error.full-income-source.business-name.empty                   = Nodwch enw’ch cleient neu enw busnes eich cleient
 agent.error.full-income-source.business-name.max-length              = Rhaid i’r enw busnes fod rhwng 1 a 105 o gymeriadau
 agent.error.full-income-source.business-name.invalid-character       = Gall enw’r busnes gynnwys llythrennau mawr neu fach, atalnodau llawn, comas, digidau, &,’,/,\,- yn unig.

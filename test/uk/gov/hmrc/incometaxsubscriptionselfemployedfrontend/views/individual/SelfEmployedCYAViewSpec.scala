@@ -19,7 +19,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.individual
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.mvc.Call
-import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.routes
@@ -171,8 +170,8 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
     }
   }
 
-  def simpleSummaryRow(key: String, href: Call): (Option[String], Boolean) => SummaryListRowValues = {
-    case (value, globalEditMode) =>
+  def simpleSummaryRow(key: String, href: Call): Option[String] => SummaryListRowValues = {
+    value =>
       SummaryListRowValues(
         key = key,
         value = value,
@@ -187,15 +186,15 @@ class SelfEmployedCYAViewSpec extends ViewSpec with FeatureSwitching {
   }
 
   private def tradeRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessTrade, routes.BusinessTradeNameController.show(testId, true, globalEditMode))(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.businessTrade, routes.BusinessTradeNameController.show(testId, true, globalEditMode))(value)
   }
 
   private def nameRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.businessName, routes.BusinessNameController.show(testId, true, globalEditMode))(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.businessName, routes.BusinessNameController.show(testId, true, globalEditMode))(value)
   }
 
   private def startDateRow(value: Option[String], globalEditMode: Boolean = false) = {
-    simpleSummaryRow(CheckYourAnswersMessages.tradingStartDate, routes.BusinessStartDateBeforeLimitController.show(testId, true, globalEditMode))(value, globalEditMode)
+    simpleSummaryRow(CheckYourAnswersMessages.tradingStartDate, routes.BusinessStartDateBeforeLimitController.show(testId, true, globalEditMode))(value)
   }
 
   private def addressRow(value: Option[String], globalEditMode: Boolean = false) = SummaryListRowValues(

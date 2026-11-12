@@ -17,17 +17,15 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.UkAddressConfirmationForm
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.YesNo
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{ContinueButton, SaveAndContinueButtonHelper, RadioHelper, PageHeadingHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{SaveAndContinueButtonHelper, RadioHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.FormWithCSRFAndNoAutoComplete
 
 @this(
     mainTemplate: PrincipalMainTemplate,
     form: FormWithCSRFAndNoAutoComplete,
-    continueButton: ContinueButton,
     saveAndContinueButtonHelper: SaveAndContinueButtonHelper,
-    radioHelper: RadioHelper,
-    pageHeadingHelper: PageHeadingHelper
+    radioHelper: RadioHelper
 )
 
 @(confirmationForm: Form[YesNo], postAction: Call, name: String)(implicit request: Request[_], messages: Messages)

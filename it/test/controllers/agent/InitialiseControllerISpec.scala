@@ -16,13 +16,13 @@
 
 package controllers.agent
 
-import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
-import play.api.libs.json.JsString
-import helpers.servicemocks.AuthStub.{stubAuthSuccess, stubUnauthorised}
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
+import helpers.ComponentSpecBase
+import helpers.IntegrationTestConstants.*
+import helpers.servicemocks.AuthStub.{stubAuthSuccess, stubUnauthorised}
+import play.api.http.Status.*
+import play.api.libs.json.JsString
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
-import play.api.http.Status._
 
 class InitialiseControllerISpec extends ComponentSpecBase {
 

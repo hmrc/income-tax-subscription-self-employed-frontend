@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.JsSuccess
 import uk.gov.hmrc.http.HttpReads
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address

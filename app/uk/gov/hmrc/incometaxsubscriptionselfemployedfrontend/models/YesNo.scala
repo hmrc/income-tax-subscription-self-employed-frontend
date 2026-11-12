@@ -17,8 +17,8 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 import play.api.i18n.Messages
-import play.api.libs.json.Reads._
-import play.api.libs.json._
+import play.api.libs.json.*
+import play.api.libs.json.Reads.*
 
 
 sealed trait YesNo {

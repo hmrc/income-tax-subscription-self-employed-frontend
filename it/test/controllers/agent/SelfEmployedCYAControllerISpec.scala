@@ -16,17 +16,17 @@
 
 package controllers.agent
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.*
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
-import helpers.servicemocks.AuthStub._
-import play.api.http.Status._
+import helpers.IntegrationTestConstants.*
+import helpers.servicemocks.AuthStub.*
+import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitching {

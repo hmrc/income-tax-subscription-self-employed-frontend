@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 import com.ibm.icu.text.SimpleDateFormat
 import play.api.i18n.Messages
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel.*
 
 import java.time.format.{DateTimeFormatter, ResolverStyle}
 import java.time.{LocalDate, ZoneId}

@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions
 
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.individual.IdentifierRequest
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrievalInj
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{BodyParsers, Request, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrievalInj
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.individual.IdentifierRequest
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -89,7 +89,7 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
     multipleSelfEmploymentsService.saveBusinessName(reference, id, name) map {
       case Right(_) =>
         if (isEditMode || isGlobalEdit) {
-          Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
+          Redirect(routes.SelfEmployedCYAController.show(id, isGlobalEdit))
         } else {
           Redirect(routes.BusinessStartDateBeforeLimitController.show(id, isEditMode, isGlobalEdit))
         }
@@ -101,8 +101,7 @@ class BusinessNameController @Inject()(businessNameView: BusinessName,
                   (implicit request: Request[AnyContent]): Html =
     businessNameView(
       businessNameForm = businessNameForm,
-      postAction = routes.BusinessNameController.submit(id, isEditMode, isGlobalEdit),
-      isEditMode = isEditMode || isGlobalEdit
+      postAction = routes.BusinessNameController.submit(id, isEditMode, isGlobalEdit)
     )
 
 }

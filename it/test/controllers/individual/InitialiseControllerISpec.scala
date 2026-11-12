@@ -20,7 +20,7 @@ import connectors.stubs.IncomeTaxSubscriptionConnectorStub.stubGetSubscriptionDa
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.soleTraderBusinesses
 import helpers.servicemocks.AuthStub.stubAuthSuccess
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.soleTraderBusinessesKey
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig

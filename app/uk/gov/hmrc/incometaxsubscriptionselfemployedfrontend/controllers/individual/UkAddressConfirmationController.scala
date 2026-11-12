@@ -78,7 +78,7 @@ class UkAddressConfirmationController @Inject()(mcc: MessagesControllerComponent
             case _ => throw new InternalServerException("Cannot get business name")
           },
       answer => Future.successful(
-        Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, answer == Yes, isEditMode, isGlobalEdit))
+        Redirect(routes.AddressLookupRoutingController.initialiseAddressLookupJourney(id, answer == Yes, isGlobalEdit))
       )
     )
   }

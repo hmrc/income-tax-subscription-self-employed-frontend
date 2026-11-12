@@ -21,7 +21,7 @@ import org.jsoup.nodes.{Document, Element}
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{DuplicateDetails => DuplicateDetailsView}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.DuplicateDetails as DuplicateDetailsView
 
 class DuplicateDetailsViewSpec extends ViewSpec {
 

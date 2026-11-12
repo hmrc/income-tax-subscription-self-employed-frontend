@@ -17,7 +17,6 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.addresslookup.mocks
 
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.isA
 import org.mockito.Mockito.{reset, when}
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.BeforeAndAfterEach

@@ -18,17 +18,16 @@
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.PrincipalMainTemplate
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.AccountingPeriodUtil
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.submapping.YesNoMapping
-@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{RadioHelper, SaveAndContinueButtonHelper, PageHeadingHelper}
+@import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.helpers.injected.{RadioHelper, SaveAndContinueButtonHelper}
 @import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.templates.FormWithCSRFAndNoAutoComplete
 
 @this(
         mainTemplate: PrincipalMainTemplate,
         form: FormWithCSRFAndNoAutoComplete,
         radioHelper: RadioHelper,
-        pageHeadingHelper: PageHeadingHelper,
         saveAndContinueButtonHelper: SaveAndContinueButtonHelper
 )
-@(businessStartDateBeforeLimitForm: Form[_], postAction: Call, isEditMode: Boolean)(implicit request: Request[_], messages: Messages)
+@(businessStartDateBeforeLimitForm: Form[_], postAction: Call)(implicit request: Request[_], messages: Messages)
 
 @mainTemplate(title = messages("individual.start-date-before-limit.heading", AccountingPeriodUtil.getStartDateLimit.getYear.toString),optForm = Some(businessStartDateBeforeLimitForm)) {
 

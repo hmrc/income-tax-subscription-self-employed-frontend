@@ -16,12 +16,12 @@
 
 package controllers.individual
 
-import connectors.stubs.AddressLookupConnectorStub._
+import connectors.stubs.AddressLookupConnectorStub.*
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.{stubDeleteSubscriptionData, stubGetSubscriptionData, stubSaveSubscriptionData}
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants._
-import helpers.servicemocks.AuthStub._
-import play.api.http.Status._
+import helpers.IntegrationTestConstants.*
+import helpers.servicemocks.AuthStub.*
+import play.api.http.Status.*
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}

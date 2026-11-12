@@ -13,15 +13,15 @@ POST       /business/business-start-date-before-limit   uk.gov.hmrc.incometaxsub
 GET        /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST       /details/business-start-date                 uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessStartDateController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 
-GET        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SelfEmployedCYAController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET        /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SelfEmployedCYAController.show(id: String, isGlobalEdit: Boolean ?= false)
 POST       /details/business-check-your-answers         uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.SelfEmployedCYAController.submit(id: String, isGlobalEdit: Boolean ?= false)
 
 GET        /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAddressConfirmationController.show(id: String)
 POST       /details/confirm-business-address            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessAddressConfirmationController.submit(id: String)
 
 GET        /address-lookup-check/:businessId            uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.checkAddressLookupJourney(businessId: String, isEditMode: Boolean ?= false)
-GET        /address-lookup-initialise/:businessId/:isUk uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
-GET        /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
+GET        /address-lookup-initialise/:businessId/:isUk uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isGlobalEdit: Boolean ?= false)
+GET        /details/address-lookup/:businessId          uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.AddressLookupRoutingController.addressLookupRedirect(businessId: String, id: Option[String] ?= None, isGlobalEdit: Boolean ?= false)
 
 GET        /business/sole-trader-trade                  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessTradeNameController.show(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)
 POST       /business/sole-trader-trade                  uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.BusinessTradeNameController.submit(id: String, isEditMode: Boolean ?= false, isGlobalEdit: Boolean ?= false)

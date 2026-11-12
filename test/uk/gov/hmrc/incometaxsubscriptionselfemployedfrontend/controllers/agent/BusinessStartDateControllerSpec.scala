@@ -29,14 +29,14 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSelfEmploymentsHttpParser.UnexpectedStatusFailure
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.PostSelfEmploymentsHttpParser.PostSubscriptionDetailsSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.ControllerBaseSpec
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusiness}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks.MockMultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ImplicitDateFormatter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 import uk.gov.hmrc.play.language.LanguageUtils
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.mocks.MockIdentifierAction
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -62,12 +62,11 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     reset(businessStartDate)
   }
 
-  def mockBusinessStartDate(trade: String): Unit = {
+  def mockBusinessStartDate(): Unit = {
     when(businessStartDate(
       ArgumentMatchers.any(),
       ArgumentMatchers.any(),
-      ArgumentMatchers.eq(testClientDetails),
-      ArgumentMatchers.eq(trade)
+      ArgumentMatchers.eq(testClientDetails)
     )(any(), any())) thenReturn HtmlFormat.empty
   }
 
@@ -75,7 +74,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
     val filledForm = BusinessStartDateForm.businessStartDateForm(
       minStartDate = BusinessStartDateForm.minStartDate,
       maxStartDate = BusinessStartDateForm.maxStartDate,
-      d => d.toLongDate()
+      d => d.toLongDate
     ).fill(fill)
     bind match {
       case Some(data) => filledForm.bind(data)
@@ -104,9 +103,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           "has a start date and a trade" in {
             mockAuthSuccess()
             mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, startDate = Some(DateModel.dateConvert(LocalDate.now)), trade = Some("test trade")))))
-            mockBusinessStartDate(
-              trade = "test trade"
-            )
+            mockBusinessStartDate()
 
             val result: Future[Result] = TestBusinessStartDateController.show(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
@@ -116,9 +113,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
           "has no start date but has a trade" in {
             mockAuthSuccess()
             mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, trade = Some("test trade")))))
-            mockBusinessStartDate(
-              trade = "test trade"
-            )
+            mockBusinessStartDate()
 
             val result: Future[Result] = TestBusinessStartDateController.show(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
@@ -164,9 +159,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
       "an error is produced in the form" in {
         mockAuthSuccess()
         mockFetchBusiness(id)(Right(Some(SoleTraderBusiness(id = id, startDate = Some(DateModel.dateConvert(LocalDate.now)), trade = Some("test trade")))))
-        mockBusinessStartDate(
-          trade = "test trade"
-        )
+        mockBusinessStartDate()
 
         val result: Future[Result] = TestBusinessStartDateController.submit(id = id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
 
@@ -266,7 +259,7 @@ class BusinessStartDateControllerSpec extends ControllerBaseSpec
         )
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+        redirectLocation(result) mustBe Some(routes.SelfEmployedCYAController.show(id).url)
       }
       "in global edit mode" in {
         val date: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)

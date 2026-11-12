@@ -16,17 +16,17 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent
 
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.AddressLookupConnector
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.GetAddressLookupDetailsHttpParser.InvalidJson
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup.PostAddressLookupHttpParser.PostAddressLookupSuccessResponse
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.addresslookup._
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.Address
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,9 +40,9 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
                                               (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) {
 
-  private def addressLookupContinueUrl(businessId: String, isEditMode: Boolean, isGlobalEdit: Boolean): String =
+  private def addressLookupContinueUrl(businessId: String, isGlobalEdit: Boolean): String =
     appConfig.incomeTaxSubscriptionSelfEmployedFrontendBaseUrl +
-      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, isEditMode = isEditMode, isGlobalEdit = isGlobalEdit)
+      routes.AddressLookupRoutingController.addressLookupRedirect(businessId, isGlobalEdit = isGlobalEdit)
 
   def checkAddressLookupJourney(businessId: String, isEditMode: Boolean): Action[AnyContent] = identify.async { implicit request =>
     multipleSelfEmploymentsService.fetchFirstAddress(request.reference) map {
@@ -55,9 +55,9 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
+  def initialiseAddressLookupJourney(businessId: String, isUk: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
     addressLookupConnector.initialiseAddressLookup(
-      continueUrl = addressLookupContinueUrl(businessId, isEditMode, isGlobalEdit),
+      continueUrl = addressLookupContinueUrl(businessId, isGlobalEdit),
       isAgent = true,
       isUk = isUk
     ) map {
@@ -70,7 +70,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
     }
   }
 
-  def addressLookupRedirect(businessId: String, addressId: Option[String], isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] =
+  def addressLookupRedirect(businessId: String, addressId: Option[String], isGlobalEdit: Boolean): Action[AnyContent] =
     identify.async { implicit request =>
       for {
         addressDetails <- fetchAddress(addressId)
@@ -78,7 +78,7 @@ class AddressLookupRoutingController @Inject()(mcc: MessagesControllerComponents
       } yield {
         saveResult match {
           case Right(_) =>
-            Redirect(routes.SelfEmployedCYAController.show(businessId, isEditMode = isEditMode, isGlobalEdit))
+            Redirect(routes.SelfEmployedCYAController.show(businessId, isGlobalEdit))
           case Left(_) =>
             throw new InternalServerException("[AddressLookupRoutingController][addressLookupRedirect] - Could not save business address")
         }

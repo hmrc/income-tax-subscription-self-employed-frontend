@@ -18,7 +18,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
 import play.api.data.{Form, FormError}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
@@ -55,15 +54,13 @@ class BusinessStartDateViewSpec extends ViewSpec {
   val businessStartDateView: BusinessStartDate = app.injector.instanceOf[BusinessStartDate]
 
   class Setup(
-               isEditMode: Boolean = false,
                form: Form[DateModel] = BusinessStartDateForm.businessStartDateForm(
                  BusinessStartDateForm.maxStartDate, _.toString
                )
              ) {
     val page: HtmlFormat.Appendable = businessStartDateView(
       form,
-      testCall,
-      isEditMode
+      testCall
     )(FakeRequest(), implicitly)
 
     val document: Document = Jsoup.parse(page.body)
@@ -102,7 +99,6 @@ class BusinessStartDateViewSpec extends ViewSpec {
       }
 
       "has a form empty error on page" in new Setup(
-        isEditMode = false,
         form = BusinessStartDateForm.businessStartDateForm(
           BusinessStartDateForm.maxStartDate, _.toString
         ).withError(emptyError)
@@ -123,7 +119,6 @@ class BusinessStartDateViewSpec extends ViewSpec {
       }
 
       "has a max date error on page" in new Setup(
-        isEditMode = false,
         form = BusinessStartDateForm.businessStartDateForm(
           BusinessStartDateForm.maxStartDate, _.toString
         ).withError(startDateBeforeLimitMaxDateError)
@@ -145,7 +140,6 @@ class BusinessStartDateViewSpec extends ViewSpec {
       }
 
       "has a min date error on page" in new Setup(
-        isEditMode = false,
         form = BusinessStartDateForm.businessStartDateForm(
           BusinessStartDateForm.maxStartDate, _.toString
         ).withError(startDateBeforeLimitMinDateError)

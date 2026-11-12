@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation
 
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 import play.api.data.Form
 import play.api.data.validation.Invalid
+
 import scala.language.implicitConversions
 
 package object testutils {
@@ -36,18 +37,7 @@ package object testutils {
       override val form: Form[T] = testForm
       override val fieldName: String = testFieldName
     }
-
-    def isValidFor(data: T): Unit = {
-      val validated = testForm.fillAndValidate(data)
-      validated.hasErrors shouldBe false
-      validated.hasGlobalErrors shouldBe false
-    }
-
-    def isValidFor(data: Map[String, String]): Unit = {
-      val validated = testForm.bind(data)
-      validated.hasErrors shouldBe false
-      validated.hasGlobalErrors shouldBe false
-    }
+    
   }
 
   implicit class InvalidUtil(invalid: Invalid) {

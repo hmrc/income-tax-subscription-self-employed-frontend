@@ -37,7 +37,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
 
   override val controllerName: String = "SelfEmployedCYAController"
   override val authorisedRoutes: Map[String, Action[AnyContent]] = Map(
-    "show" -> TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false),
+    "show" -> TestSelfEmployedCYAController.show(id, isGlobalEdit = false),
     "submit" -> TestSelfEmployedCYAController.submit(id, isGlobalEdit = false)
   )
 
@@ -68,7 +68,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isGlobalEdit = false)(fakeRequest)))
           .message mustBe "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
       }
     }
@@ -78,7 +78,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockFetchSoleTraderBusinesses(Right(Some(soleTraderBusinesses)))
         mockSelfEmployedCYA()
 
-        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)
+        val result: Future[Result] = TestSelfEmployedCYAController.show(id, isGlobalEdit = false)(fakeRequest)
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
@@ -92,7 +92,7 @@ class SelfEmployedCYAControllerSpec extends ControllerBaseSpec
         mockAuthSuccess()
         mockFetchSoleTraderBusinesses(Left(UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
-        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isEditMode = false, isGlobalEdit = false)(fakeRequest)))
+        intercept[InternalServerException](await(TestSelfEmployedCYAController.show(id, isGlobalEdit = false)(fakeRequest)))
           .message mustBe "[SelfEmployedCYAController][fetchSelfEmployments] - Failed to retrieve all self employments"
       }
 

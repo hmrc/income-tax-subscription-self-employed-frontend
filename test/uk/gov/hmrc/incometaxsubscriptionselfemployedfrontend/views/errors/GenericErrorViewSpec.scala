@@ -18,7 +18,6 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.errors
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.matchers.must.Matchers.convertToStringMustWrapperForVerb
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ViewSpec
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.errors.GenericError

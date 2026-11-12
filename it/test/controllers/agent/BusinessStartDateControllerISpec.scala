@@ -16,12 +16,12 @@
 
 package controllers.agent
 
-import connectors.stubs.IncomeTaxSubscriptionConnectorStub._
+import connectors.stubs.IncomeTaxSubscriptionConnectorStub.*
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.{ggSignInURI, id, soleTraderBusinesses}
-import helpers.servicemocks.AuthStub._
-import play.api.http.Status._
+import helpers.servicemocks.AuthStub.*
+import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
@@ -148,7 +148,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Then("Should return a SEE_OTHER with a redirect location of business name")
         res must have(
           httpStatus(SEE_OTHER),
-          redirectURI(routes.SelfEmployedCYAController.show(id, isEditMode = true).url)
+          redirectURI(routes.SelfEmployedCYAController.show(id).url)
         )
       }
     }

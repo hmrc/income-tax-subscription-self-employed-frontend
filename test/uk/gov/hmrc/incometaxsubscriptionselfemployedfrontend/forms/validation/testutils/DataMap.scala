@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.validation.testutils
 
-import play.api.data.validation._
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.formatters.LocalDateMapping
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil._
+import play.api.data.validation.*
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.ConstraintUtil.*
 
 object DataMap {
 

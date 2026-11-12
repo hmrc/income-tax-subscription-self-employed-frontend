@@ -45,10 +45,9 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
       messageKeysWelsh must containOnlyPermittedCharacters
     }
 
-    //TODO: not quite working right, we need to show single quotes in our error message, find way to detect non-escaped single quotes
-//    "not contain single quotes" in {
-//      messageLinesWelsh must containNoSingleQuotes
-//    }
+    "not contain single quotes" in {
+      messageLinesWelsh must containNoSingleQuotes
+    }
   }
 
   "Messages present in English (conf/messages)" should {
@@ -63,10 +62,9 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
     "contain only permitted characters" in {
       messageKeysEnglish must containOnlyPermittedCharacters
     }
-    //TODO: not quite working right, we need to show single quotes in our error message, find way to detect non-escaped single quotes
-//    "not contain single quotes" in {
-//      messageLinesEnglish must containNoSingleQuotes
-//    }
+    "not contain single quotes" in {
+      messageLinesEnglish must containNoSingleQuotes
+    }
   }
 
   private def getMessageKeys(fileName: String) = {
@@ -86,4 +84,3 @@ class MessagesSpec extends PlaySpec with MessagesMatcher {
       .filter(_.nonEmpty)
   }
 }
-

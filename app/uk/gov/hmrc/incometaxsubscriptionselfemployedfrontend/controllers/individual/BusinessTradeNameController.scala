@@ -89,7 +89,7 @@ class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTrade
     multipleSelfEmploymentsService.saveTradeName(reference, id, trade) map {
       case Right(_) =>
         if (isEditMode || isGlobalEdit) {
-          Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
+          Redirect(routes.SelfEmployedCYAController.show(id, isGlobalEdit))
         } else {
           Redirect(routes.BusinessNameController.show(id, isEditMode, isGlobalEdit))
         }
@@ -101,8 +101,7 @@ class BusinessTradeNameController @Inject()(businessTradeNameView: BusinessTrade
                   (implicit request: Request[AnyContent]): Html =
     businessTradeNameView(
       businessTradeNameForm = businessTradeNameForm,
-      postAction = routes.BusinessTradeNameController.submit(id, isEditMode, isGlobalEdit),
-      isEditMode = isEditMode || isGlobalEdit
+      postAction = routes.BusinessTradeNameController.submit(id, isEditMode, isGlobalEdit)
     )
 
 }

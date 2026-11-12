@@ -1,13 +1,12 @@
 
 import sbt.*
-import play.sbt.PlayImport.*
 
 object AppDependencies {
 
   val appName = "income-tax-subscription-self-employed-frontend"
 
   private val bootstrapVersion = "10.8.0"
-  private val playHmrcFrontendVersion = "13.11.0"
+  private val playHmrcFrontendVersion = "13.16.0"
   private val catsVersion = "2.13.0"
   private val cryptoJsonVersion = "8.4.0"
 

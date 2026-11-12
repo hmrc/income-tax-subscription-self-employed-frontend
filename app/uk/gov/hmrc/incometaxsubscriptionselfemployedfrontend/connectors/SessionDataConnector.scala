@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors
 
-import play.api.libs.json._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
@@ -26,7 +27,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httppars
 import java.net.URL
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 
 @Singleton
 class SessionDataConnector @Inject()(appConfig: AppConfig,

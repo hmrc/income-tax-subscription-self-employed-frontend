@@ -145,7 +145,7 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
         if (!startDateBeforeLimit) {
           Redirect(routes.BusinessStartDateController.show(id, isEditMode, isGlobalEdit))
         } else if (isEditMode || isGlobalEdit) {
-          Redirect(routes.SelfEmployedCYAController.show(id, isEditMode, isGlobalEdit))
+          Redirect(routes.SelfEmployedCYAController.show(id, isGlobalEdit))
         } else {
           Redirect(routes.AddressLookupRoutingController.checkAddressLookupJourney(id, isEditMode))
         }
@@ -174,7 +174,6 @@ class FullIncomeSourceController @Inject()(identify: IdentifierAction,
     fullIncomeSource(
       fullIncomeSourceForm = fullIncomeSourceForm,
       postAction = routes.FullIncomeSourceController.submit(id, isEditMode, isGlobalEdit),
-      isEditMode = isEditMode,
       clientDetails = request.clientDetails
     )
   }

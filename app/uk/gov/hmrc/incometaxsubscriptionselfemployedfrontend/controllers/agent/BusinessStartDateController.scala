@@ -27,10 +27,10 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.a
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessStartDateForm.businessStartDateForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.utils.FormUtil.*
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel, SoleTraderBusiness}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{ClientDetails, DateModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.MultipleSelfEmploymentsService
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ImplicitDateFormatter
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.{BusinessStartDate => BusinessStartDateView}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.views.html.agent.BusinessStartDate
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 
@@ -40,33 +40,31 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
                                             multipleSelfEmploymentsService: MultipleSelfEmploymentsService,
-                                            businessStartDate: BusinessStartDateView)
+                                            businessStartDateView: BusinessStartDate)
                                            (identify: IdentifierAction,
                                             val appConfig: AppConfig,
                                             val languageUtils: LanguageUtils)
                                            (implicit val ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with ImplicitDateFormatter with FeatureSwitching {
 
-  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, isGlobalEdit: Boolean, clientDetails: ClientDetails, businessTrade: String)
+  def view(businessStartDateForm: Form[DateModel], id: String, isEditMode: Boolean, isGlobalEdit: Boolean, clientDetails: ClientDetails)
           (implicit request: Request[AnyContent]): Html = {
-    businessStartDate(
+    businessStartDateView(
       businessStartDateForm = businessStartDateForm,
       postAction = routes.BusinessStartDateController.submit(id, isEditMode, isGlobalEdit),
-      clientDetails = clientDetails,
-      businessTrade = businessTrade
+      clientDetails = clientDetails
     )
   }
 
   def show(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Action[AnyContent] = identify.async { implicit request =>
     multipleSelfEmploymentsService.fetchBusiness(request.reference, id) flatMap {
-      case Right(Some(SoleTraderBusiness(_, _, _, maybeStartDate, _, _, Some(trade), _))) =>
+      case Right(Some(business)) if business.trade.isDefined =>
         Future.successful(Ok(view(
-          businessStartDateForm = form.fill(maybeStartDate),
+          businessStartDateForm = form.fill(business.startDate),
           id = id,
           isEditMode = isEditMode,
           isGlobalEdit = isGlobalEdit,
-          clientDetails = request.clientDetails,
-          businessTrade = trade
+          clientDetails = request.clientDetails
         )))
       case Right(_) =>
         Future.successful(Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
@@ -79,8 +77,8 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     form.bindFromRequest().fold(
       formWithErrors =>
         multipleSelfEmploymentsService.fetchBusiness(request.reference, id) flatMap {
-          case Right(Some(SoleTraderBusiness(_, _, _, _, _, _, Some(trade), _))) =>
-            Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit, request.clientDetails, trade)))
+          case Right(Some(business)) if business.trade.isDefined =>
+            Future.successful(BadRequest(view(formWithErrors, id, isEditMode, isGlobalEdit, request.clientDetails)))
           case Right(_) =>
             Future.successful(Redirect(routes.FullIncomeSourceController.show(id, isEditMode, isGlobalEdit)))
           case Left(error) =>
@@ -98,7 +96,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
 
   private def next(id: String, isEditMode: Boolean, isGlobalEdit: Boolean): Result = Redirect(
     if (isEditMode || isGlobalEdit) {
-      routes.SelfEmployedCYAController.show(id, isEditMode = isEditMode, isGlobalEdit)
+      routes.SelfEmployedCYAController.show(id, isGlobalEdit)
     } else {
       routes.AddressLookupRoutingController.checkAddressLookupJourney(id)
     }
@@ -108,7 +106,7 @@ class BusinessStartDateController @Inject()(mcc: MessagesControllerComponents,
     businessStartDateForm(
       minStartDate = BusinessStartDateForm.minStartDate,
       maxStartDate = BusinessStartDateForm.maxStartDate,
-      _.toLongDate()
+      _.toLongDate
     )
   }
 }

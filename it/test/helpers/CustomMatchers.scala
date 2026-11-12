@@ -17,7 +17,7 @@
 package helpers
 
 import org.jsoup.Jsoup
-import org.scalatest.matchers._
+import org.scalatest.matchers.*
 import play.api.libs.json.Reads
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel
