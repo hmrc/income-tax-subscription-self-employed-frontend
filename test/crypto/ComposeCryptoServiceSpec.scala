@@ -25,7 +25,7 @@ import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 class ComposeCryptoServiceSpec extends PlaySpec with Matchers with GuiceOneAppPerSuite {
 
   private val applicationCrypto = app.injector.instanceOf[ApplicationCrypto]
-  private val composeCryptoService = new ComposeCryptoService(app.configuration, applicationCrypto)
+  private val composeCryptoService = app.injector.instanceOf[ComposeCryptoService]
 
   "composedJsonCrypto" should {
     "encrypt with aes-gcm and decrypt the encrypted value" in {

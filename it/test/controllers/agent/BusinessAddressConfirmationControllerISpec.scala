@@ -132,7 +132,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
           stubAuthSuccess()
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(expectedSave))(OK)
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, expectedSave)(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When(s"POST ${routes.BusinessAddressConfirmationController.show("id2").url} is called")

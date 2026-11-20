@@ -20,7 +20,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.crypto.ApplicationCrypto
+import crypto.ComposeCryptoService
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.SaveSessionDataHttpParser.SaveSessionDataSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSessionDataHttpParser, SaveSessionDataHttpParser}
@@ -32,10 +32,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SessionDataServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockSessionDataConnector {
 
-  val applicationCrypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+  val composeCryptoService: ComposeCryptoService = app.injector.instanceOf[ComposeCryptoService]
 
   trait Setup {
-    val service: SessionDataService = new SessionDataService(applicationCrypto, mockSessionDataConnector)
+    val service: SessionDataService = new SessionDataService(composeCryptoService, mockSessionDataConnector)
   }
 
   val testReference: String = "test-reference"
@@ -49,6 +49,12 @@ class SessionDataServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
   )
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
+
+  "jsonCrypto" must {
+    "use the composed crypto for reads and writes" in new Setup {
+      service.jsonCrypto mustBe composeCryptoService.composedJsonCrypto
+    }
+  }
 
   "fetchReference" must {
     "return a reference" when {

@@ -118,10 +118,10 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
         stubSaveSubscriptionData(
           reference = reference,
           id = soleTraderBusinessesKey,
-          body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+          body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
             id = id,
             trade = Some("Plumbing")
-          ))))
+          )))
         )(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -146,10 +146,10 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
         stubSaveSubscriptionData(
           reference = reference,
           id = soleTraderBusinessesKey,
-          body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+          body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
             id = id,
             trade = Some("Plumbing")
-          ))))
+          )))
         )(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -168,10 +168,10 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
         stubSaveSubscriptionData(
           reference = reference,
           id = soleTraderBusinessesKey,
-          body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+          body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
             id = id,
             trade = Some("Plumbing")
-          ))))
+          )))
         )(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -221,10 +221,10 @@ class BusinessTradeNameControllerISpec extends ComponentSpecBase with FeatureSwi
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
-            body = Json.toJson(SoleTraderBusinesses(Seq(
+            body = SoleTraderBusinesses(Seq(
               SoleTraderBusiness(id = s"$id-two", trade = Some("Plumbing"), name = Some("test name")),
               SoleTraderBusiness(id = id, trade = Some("Plumbing"), name = Some("test name"))
-            )))
+            ))
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))

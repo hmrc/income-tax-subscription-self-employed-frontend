@@ -193,12 +193,12 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
         stubSaveSubscriptionData(
           reference = reference,
           id = soleTraderBusinessesKey,
-          body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+          body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
             id = id,
             startDateBeforeLimit = Some(false),
             name = Some("test name"),
             trade = Some("test trade")
-          ))))
+          )))
         )(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
@@ -226,12 +226,12 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
-            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
               id = id,
               startDateBeforeLimit = Some(true),
               name = Some("test name"),
               trade = Some("test trade")
-            ))))
+            )))
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
@@ -267,7 +267,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             stubSaveSubscriptionData(
               reference = reference,
               id = soleTraderBusinessesKey,
-              body = Json.toJson(SoleTraderBusinesses(Seq(
+              body = SoleTraderBusinesses(Seq(
                 SoleTraderBusiness(
                   id = s"$id-two",
                   startDateBeforeLimit = Some(true),
@@ -280,7 +280,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
                   name = Some("test duplicate name"),
                   trade = Some("test new trade")
                 )
-              )))
+              ))
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
             stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
@@ -313,7 +313,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             stubSaveSubscriptionData(
               reference = reference,
               id = soleTraderBusinessesKey,
-              body = Json.toJson(SoleTraderBusinesses(Seq(
+              body = SoleTraderBusinesses(Seq(
                 SoleTraderBusiness(
                   id = s"$id-two",
                   startDateBeforeLimit = Some(true),
@@ -326,7 +326,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
                   name = Some("test new name"),
                   trade = Some("test duplicate trade")
                 )
-              )))
+              ))
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
             stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
@@ -362,12 +362,12 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
-            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
               id = id,
               startDateBeforeLimit = Some(true),
               name = Some("test name"),
               trade = Some("test trade")
-            ))))
+            )))
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
@@ -394,12 +394,12 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
-            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
               id = id,
               startDateBeforeLimit = Some(true),
               name = Some("test name"),
               trade = Some("test trade")
-            ))))
+            )))
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
@@ -470,7 +470,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
               stubSaveSubscriptionData(
                 reference = reference,
                 id = soleTraderBusinessesKey,
-                body = Json.toJson(SoleTraderBusinesses(Seq(
+                body = SoleTraderBusinesses(Seq(
                   SoleTraderBusiness(
                     id = s"$id-two",
                     startDateBeforeLimit = Some(true),
@@ -483,7 +483,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
                     name = Some("test duplicate name"),
                     trade = Some("test duplicate trade")
                   )
-                )))
+                ))
               )(OK)
               stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
               stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
@@ -520,7 +520,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             stubSaveSubscriptionData(
               reference = reference,
               id = soleTraderBusinessesKey,
-              body = Json.toJson(SoleTraderBusinesses(Seq(
+              body = SoleTraderBusinesses(Seq(
                 SoleTraderBusiness(
                   id = s"$id-two",
                   startDateBeforeLimit = Some(false),
@@ -533,7 +533,7 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
                   name = Some("test duplicate name"),
                   trade = Some("test duplicate trade")
                 )
-              )))
+              ))
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
             stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))

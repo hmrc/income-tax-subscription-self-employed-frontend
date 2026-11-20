@@ -18,12 +18,25 @@ package helpers.servicemocks
 
 import com.github.tomakehurst.wiremock.client.MappingBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.matching.UrlPattern
+import com.github.tomakehurst.wiremock.http.Request
+import com.github.tomakehurst.wiremock.matching.{MatchResult, UrlPattern, ValueMatcher}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WiremockHelper
-import play.api.libs.json.Writes
+import play.api.libs.json.{Json, Reads, Writes}
 
 trait WireMockMethods {
+  def whenMatchingJson[T: Reads](method: HTTPMethod, uri: String, expected: T): Mapping = {
+    val matcher = new ValueMatcher[Request] {
+      override def `match`(request: Request): MatchResult =
+        MatchResult.of(
+          request.getUrl.matches(uri) &&
+            request.getBody.nonEmpty &&
+            Json.parse(request.getBodyAsString).validate[T].asOpt.contains(expected)
+        )
+    }
+    new Mapping(method, uri, Map.empty, None, Some(matcher))
+  }
+
   def when[T](method: HTTPMethod, uri: String, body: T)(implicit writes: Writes[T]): Mapping = {
     when(method, uri, Map.empty, body)
   }
@@ -37,9 +50,11 @@ trait WireMockMethods {
     new Mapping(method, uri, headers, Some(stringBody))
   }
 
-  class Mapping(method: HTTPMethod, uri: String, headers: Map[String, String], body: Option[String]) {
+  class Mapping(method: HTTPMethod, uri: String, headers: Map[String, String], body: Option[String],
+                bodyMatcher: Option[ValueMatcher[Request]] = None) {
     private val mapping = {
-      val uriMapping = method.wireMockMapping(urlMatching(uri))
+      val baseMapping = method.wireMockMapping(urlMatching(uri))
+      val uriMapping = bodyMatcher.fold(baseMapping)(baseMapping.andMatching)
 
       val uriMappingWithHeaders = headers.foldLeft(uriMapping) {
         case (m, (key, value)) => m.withHeader(key, equalTo(value))
@@ -77,7 +92,7 @@ trait WireMockMethods {
         }
       }
 
-      stubFor(mapping.willReturn(response))
+      WiremockHelper.wireMockServer.stubFor(mapping.willReturn(response))
     }
   }
 

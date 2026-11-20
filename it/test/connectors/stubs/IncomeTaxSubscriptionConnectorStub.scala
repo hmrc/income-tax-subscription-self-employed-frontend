@@ -18,7 +18,7 @@ package connectors.stubs
 
 
 import helpers.servicemocks.WireMockMethods
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, Reads}
 
 object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
 
@@ -31,12 +31,10 @@ object IncomeTaxSubscriptionConnectorStub extends WireMockMethods {
     ).thenReturn(responseStatus, responseBody)
   }
 
-  def stubSaveSubscriptionData(reference: String, id: String, body: JsValue = Json.obj())(responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
-    when(
-      method = POST,
-      uri = subscriptionDataUri(reference, id),
-      body = body
-    ).thenReturn(responseStatus, responseBody)
+  def stubSaveSubscriptionData[T: Reads](reference: String, id: String, body: T)
+                                      (responseStatus: Int, responseBody: JsValue = Json.obj()): Unit = {
+    whenMatchingJson(POST, subscriptionDataUri(reference, id), body)
+      .thenReturn(responseStatus, responseBody)
   }
 
   def stubDeleteSubscriptionData(reference: String, id: String)(responseStatus: Int): Unit = {
