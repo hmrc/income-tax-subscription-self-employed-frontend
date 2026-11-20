@@ -87,7 +87,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
-          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinesses)(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /business-start-date is called")
@@ -123,7 +123,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase with ViewSpec w
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
-          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinesses)(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /business-start-date is called")

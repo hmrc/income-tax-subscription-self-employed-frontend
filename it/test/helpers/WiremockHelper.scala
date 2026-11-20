@@ -28,6 +28,9 @@ object WiremockHelper extends Eventually with IntegrationPatience {
   val wiremockPort = 11111
   val wiremockHost = "localhost"
 
+  lazy val wmConfig: WireMockConfiguration = wireMockConfig().port(wiremockPort)
+  lazy val wireMockServer = new WireMockServer(wmConfig)
+
   def verifyPost(uri: String, optBody: Option[String] = None): Unit = {
     val uriMapping = postRequestedFor(urlEqualTo(uri))
     val postRequest = optBody match {
@@ -90,9 +93,6 @@ object WiremockHelper extends Eventually with IntegrationPatience {
 trait WiremockHelper {
 
   import WiremockHelper.*
-
-  lazy val wmConfig: WireMockConfiguration = wireMockConfig().port(wiremockPort)
-  lazy val wireMockServer = new WireMockServer(wmConfig)
 
   def startWiremock(): Unit = {
     wireMockServer.start()

@@ -126,10 +126,10 @@ class BusinessStartDateBeforeLimitControllerISpec extends ComponentSpecBase {
         stubSaveSubscriptionData(
           reference = reference,
           id = soleTraderBusinessesKey,
-          body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+          body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
             id = id,
             startDateBeforeLimit = Some(false)
-          ))))
+          )))
         )(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -154,10 +154,10 @@ class BusinessStartDateBeforeLimitControllerISpec extends ComponentSpecBase {
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
-            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
               id = id,
               startDateBeforeLimit = Some(true)
-            ))))
+            )))
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -187,10 +187,10 @@ class BusinessStartDateBeforeLimitControllerISpec extends ComponentSpecBase {
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
-            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
               id = id,
               startDateBeforeLimit = Some(true)
-            ))))
+            )))
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
@@ -214,10 +214,10 @@ class BusinessStartDateBeforeLimitControllerISpec extends ComponentSpecBase {
           stubSaveSubscriptionData(
             reference = reference,
             id = soleTraderBusinessesKey,
-            body = Json.toJson(SoleTraderBusinesses(Seq(SoleTraderBusiness(
+            body = SoleTraderBusinesses(Seq(SoleTraderBusiness(
               id = id,
               startDateBeforeLimit = Some(true)
-            ))))
+            )))
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 

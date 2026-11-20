@@ -78,7 +78,7 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
   "SaveSelfEmployments" should {
     "Return PostSubscriptionDetailsSuccessResponse" in {
       val dummyModel: DummyModel = DummyModel(body = "Test Body")
-      stubSaveSubscriptionData(reference, id, body = Json.toJson(dummyModel))(OK)
+      stubSaveSubscriptionData(reference, id, body = dummyModel)(OK)
 
       val res = connector.saveSubscriptionDetails[DummyModel](reference, id, dummyModel)
 
@@ -87,7 +87,7 @@ class IncomeTaxSubscriptionConnectorISpec extends ComponentSpecBase {
 
     "Return UnexpectedStatusFailure(status)" in {
       val dummyModel: DummyModel = DummyModel(body = "Test Body")
-      stubSaveSubscriptionData(reference, id, body = Json.toJson(dummyModel))(INTERNAL_SERVER_ERROR)
+      stubSaveSubscriptionData(reference, id, body = dummyModel)(INTERNAL_SERVER_ERROR)
 
       val res = connector.saveSubscriptionDetails[DummyModel](reference, id, dummyModel)
 

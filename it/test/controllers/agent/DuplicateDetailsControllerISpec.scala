@@ -22,14 +22,11 @@ import helpers.IntegrationTestConstants.*
 import helpers.servicemocks.AuthStub.*
 import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DuplicateDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class DuplicateDetailsControllerISpec extends ComponentSpecBase {
-
-  implicit val jsonCrypto: Encrypter with Decrypter = app.injector.instanceOf[ApplicationCrypto].JsonCrypto
 
   val testName: String = "test-name"
   val testTrade: String = "test-trade"

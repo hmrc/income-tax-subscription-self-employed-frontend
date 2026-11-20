@@ -78,7 +78,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, completeSoleTraderBusinesses)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("GET /details/business-check-your-answers is called")
@@ -96,7 +96,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(OK)
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, completeSoleTraderBusinesses)(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("POST /details/business-check-your-answers is called")
@@ -145,7 +145,7 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(completeSoleTraderBusinesses))(INTERNAL_SERVER_ERROR)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, completeSoleTraderBusinesses)(INTERNAL_SERVER_ERROR)
 
         When("GET /details/business-check-your-answers is called")
         val res = submitBusinessCheckYourAnswers(id, isGlobalEdit = false)
