@@ -19,7 +19,7 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 import org.scalatestplus.play.PlaySpec
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.crypto.ApplicationCrypto
+import crypto.ComposeCryptoService
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.*
@@ -29,18 +29,24 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.agent.Stream
 
 class MultipleSelfEmploymentsServiceSpec extends PlaySpec with MockIncomeTaxSubscriptionConnector {
 
-  val applicationCrypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+  val composeCryptoService: ComposeCryptoService = app.injector.instanceOf[ComposeCryptoService]
 
   trait Setup {
 
     val service: MultipleSelfEmploymentsService = new MultipleSelfEmploymentsService(
-      applicationCrypto = applicationCrypto,
+      composeCryptoService = composeCryptoService,
       incomeTaxSubscriptionConnector = mockIncomeTaxSubscriptionConnector
     )
 
   }
 
   val testReference: String = "test-reference"
+
+  "jsonCrypto" must {
+    "use the composed crypto for reads and writes" in new Setup {
+      service.jsonCrypto mustBe composeCryptoService.composedJsonCrypto
+    }
+  }
 
   val id: String = "id"
   val date: DateModel = DateModel("1", "1", "1980")

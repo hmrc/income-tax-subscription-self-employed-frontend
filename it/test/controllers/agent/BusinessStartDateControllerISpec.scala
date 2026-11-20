@@ -104,7 +104,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinessesWithStartDate)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/details/business-start-date is called")
@@ -139,7 +139,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinessesWithStartDate)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/business/start-date is called")
@@ -158,7 +158,7 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinessesWithStartDate))(OK)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinessesWithStartDate)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When("POST /client/business/start-date is called")
