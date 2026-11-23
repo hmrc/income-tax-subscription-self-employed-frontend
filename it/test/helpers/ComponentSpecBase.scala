@@ -17,6 +17,7 @@
 package helpers
 
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
+import crypto.ComposeCryptoService
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import org.scalatestplus.play.{PlaySpec, PortNumber}
@@ -30,7 +31,7 @@ import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, Environment, Mode}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
@@ -47,7 +48,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
     .configure(config)
     .build()
 
-  implicit lazy val crypto: Encrypter with Decrypter = app.injector.instanceOf[ApplicationCrypto].JsonCrypto
+  implicit lazy val crypto: Encrypter with Decrypter = app.injector.instanceOf[ComposeCryptoService].composedJsonCrypto
   implicit lazy val soleTraderBusinessesFormat: OFormat[SoleTraderBusinesses] = SoleTraderBusinesses.encryptedFormat
 
   implicit def ws(implicit app: Application): WSClient = app.injector.instanceOf[WSClient]

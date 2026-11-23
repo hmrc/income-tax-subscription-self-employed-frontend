@@ -144,7 +144,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
 
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
           stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
-          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinesses)(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("GET /details/address-lookup/" + id + " is called")
@@ -229,7 +229,7 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
 
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
           stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
-          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+          stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinesses)(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
           When("GET /details/address-lookup/" + id + " is called")

@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
+import crypto.ComposeCryptoService
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.IncomeTaxSubscriptionConnector
@@ -30,11 +31,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MultipleSelfEmploymentsService @Inject()(applicationCrypto: ApplicationCrypto,
+class MultipleSelfEmploymentsService @Inject()(composeCryptoService: ComposeCryptoService,
                                                incomeTaxSubscriptionConnector: IncomeTaxSubscriptionConnector)
                                               (implicit ec: ExecutionContext) {
 
-  implicit val jsonCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  implicit val jsonCrypto: Encrypter with Decrypter = composeCryptoService.composedJsonCrypto
 
   def fetchSoleTraderBusinesses(reference: String)
                                (implicit hc: HeaderCarrier): Future[Either[GetSelfEmploymentsFailure, Option[SoleTraderBusinesses]]] = {

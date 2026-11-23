@@ -16,91 +16,67 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
+import crypto.ComposeCryptoService
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.json.*
-import uk.gov.hmrc.crypto.Sensitive.SensitiveString
-import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, PlainText}
+import uk.gov.hmrc.crypto.SymmetricCryptoFactory.aesGcmCryptoFromConfig
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 
 class AddressModelSpec extends PlaySpec with GuiceOneServerPerSuite {
 
-  implicit val crypto: Encrypter with Decrypter = app.injector.instanceOf[ApplicationCrypto].JsonCrypto
-
-  def jsonSensitiveEncrypter(text: String): JsValue = JsonEncryption
-    .sensitiveEncrypterDecrypter(SensitiveString.apply)
-    .writes(SensitiveString(text))
-
-  "encrypting the same thing twice should result in the same thing" in {
-    crypto.encrypt(PlainText("text")).value mustBe crypto.encrypt(PlainText("text")).value
-  }
+  implicit val crypto: Encrypter with Decrypter = app.injector.instanceOf[ComposeCryptoService].composedJsonCrypto
 
   val fullAddress: Address = Address(lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"), country = Country.UK)
-  val fullJson: JsObject = Json.obj(
-    "lines" -> Json.arr(
-      jsonSensitiveEncrypter("1 Long Road"),
-      jsonSensitiveEncrypter("Lonely Town")
-    ),
-    "postcode" -> jsonSensitiveEncrypter("ZZ1 1ZZ"),
-    "country" -> Json.obj(
-      "code" -> jsonSensitiveEncrypter(Country.UK.code),
-      "name" -> jsonSensitiveEncrypter(Country.UK.name)
-    )
-  )
-
   val minAddress: Address = Address(Seq.empty[String], None, Country.UK)
-  val minJson: JsObject = Json.obj(
-    "lines" -> Json.arr(),
-    "country" -> Json.obj(
-      "code" -> jsonSensitiveEncrypter(Country.UK.code),
-      "name" -> jsonSensitiveEncrypter(Country.UK.name)
-    )
-  )
+  val fullAddressWithUrpn: Address = fullAddress.copy(uprn = Some("1234"))
 
-  val fullAddressWithUrpn: Address = Address(lines = Seq("1 Long Road", "Lonely Town"), postcode = Some("ZZ1 1ZZ"), country = Country.UK, uprn = Some("1234"))
-  val fullJsonWithUrpn: JsObject = Json.obj(
-    "lines" -> Json.arr(
-      jsonSensitiveEncrypter("1 Long Road"),
-      jsonSensitiveEncrypter("Lonely Town")
-    ),
-    "postcode" -> jsonSensitiveEncrypter("ZZ1 1ZZ"),
-    "country" -> Json.obj(
-      "code" -> jsonSensitiveEncrypter(Country.UK.code),
-      "name" -> jsonSensitiveEncrypter(Country.UK.name)
-    ),
-    "uprn" -> jsonSensitiveEncrypter("1234")
-  )
+  "Address reading JSON encrypted with legacy AES using composed crypto" should {
+    val legacyCrypto = app.injector.instanceOf[ApplicationCrypto].JsonCrypto
 
-  "Address" when {
-    "reading from encrypted json" should {
-      "read successfully" when {
-        "all information except uprn is present in json" in {
-          Json.fromJson[Address](fullJson)(Address.encryptedFormat) mustBe JsSuccess(fullAddress)
-        }
-        "all information including uprn is present in json" in {
-          Json.fromJson[Address](fullJsonWithUrpn)(Address.encryptedFormat) mustBe JsSuccess(fullAddressWithUrpn)
-        }
-        "lines is empty and postcode is missing" in {
-          Json.fromJson[Address](minJson)(Address.encryptedFormat) mustBe JsSuccess(minAddress)
-        }
+    "read successfully" when {
+      "all information except uprn is present in json" in {
+        val fullJson = Json.toJsObject(fullAddress)(Address.encryptedFormat(legacyCrypto))
+        Json.fromJson[Address](fullJson)(Address.encryptedFormat) mustBe JsSuccess(fullAddress)
       }
-      "fail to read" when {
-        "lines is missing" in {
-          Json.fromJson[Address](fullJson - "lines")(Address.encryptedFormat) mustBe JsError(__ \ "lines", "error.path.missing")
-        }
+      "all information including uprn is present in json" in {
+        val fullJsonWithUrpn = Json.toJsObject(fullAddressWithUrpn)(Address.encryptedFormat(legacyCrypto))
+        Json.fromJson[Address](fullJsonWithUrpn)(Address.encryptedFormat) mustBe JsSuccess(fullAddressWithUrpn)
+      }
+      "lines is empty and postcode is missing" in {
+        val minJson = Json.toJsObject(minAddress)(Address.encryptedFormat(legacyCrypto))
+        Json.fromJson[Address](minJson)(Address.encryptedFormat) mustBe JsSuccess(minAddress)
       }
     }
-    "writing to encrypted json" should {
-      "write successfully" when {
-        "all information except uprn is present in the model" in {
-          Json.toJson(fullAddress)(Address.encryptedFormat) mustBe fullJson
-        }
-        "all information including uprn is present in the model" in {
-          Json.toJson(fullAddressWithUrpn)(Address.encryptedFormat) mustBe fullJsonWithUrpn
-        }
-        "lines is empty and postcode is missing" in {
-          Json.toJson(minAddress)(Address.encryptedFormat) mustBe minJson
-        }
+    "fail to read" when {
+      "lines is missing" in {
+        val fullJson = Json.toJsObject(fullAddress)(Address.encryptedFormat(legacyCrypto))
+        Json.fromJson[Address](fullJson - "lines")(Address.encryptedFormat) mustBe JsError(__ \ "lines", "error.path.missing")
+      }
+    }
+  }
+
+  "Address reading JSON encrypted with AES-GCM using composed crypto" should {
+    val aesGcmCrypto = aesGcmCryptoFromConfig("json.encryption.gcm", app.configuration.underlying)
+
+    "read successfully" when {
+      "all information except uprn is present in json" in {
+        val fullJson = Json.toJsObject(fullAddress)(Address.encryptedFormat(aesGcmCrypto))
+        Json.fromJson[Address](fullJson)(Address.encryptedFormat) mustBe JsSuccess(fullAddress)
+      }
+      "all information including uprn is present in json" in {
+        val fullJsonWithUrpn = Json.toJsObject(fullAddressWithUrpn)(Address.encryptedFormat(aesGcmCrypto))
+        Json.fromJson[Address](fullJsonWithUrpn)(Address.encryptedFormat) mustBe JsSuccess(fullAddressWithUrpn)
+      }
+      "lines is empty and postcode is missing" in {
+        val minJson = Json.toJsObject(minAddress)(Address.encryptedFormat(aesGcmCrypto))
+        Json.fromJson[Address](minJson)(Address.encryptedFormat) mustBe JsSuccess(minAddress)
+      }
+    }
+    "fail to read" when {
+      "lines is missing" in {
+        val fullJson = Json.toJsObject(fullAddress)(Address.encryptedFormat(aesGcmCrypto))
+        Json.fromJson[Address](fullJson - "lines")(Address.encryptedFormat) mustBe JsError(__ \ "lines", "error.path.missing")
       }
     }
   }

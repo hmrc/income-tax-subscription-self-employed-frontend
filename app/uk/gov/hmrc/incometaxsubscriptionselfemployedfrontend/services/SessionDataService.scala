@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
+import crypto.ComposeCryptoService
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.SessionDataConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser.GetSessionDataResponse
@@ -28,10 +29,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionDataService @Inject()(applicationCrypto: ApplicationCrypto, sessionDataConnector: SessionDataConnector)
+class SessionDataService @Inject()(composeCryptoService: ComposeCryptoService, sessionDataConnector: SessionDataConnector)
                                   (implicit ec: ExecutionContext) {
 
-  implicit val jsonCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  implicit val jsonCrypto: Encrypter with Decrypter = composeCryptoService.composedJsonCrypto
 
   def fetchReference(implicit hc: HeaderCarrier): Future[GetSessionDataResponse[String]] = {
     sessionDataConnector.getSessionData[String](ITSASessionKeys.REFERENCE)

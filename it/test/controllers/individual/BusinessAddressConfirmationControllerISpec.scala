@@ -127,7 +127,7 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
-        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, Json.toJson(soleTraderBusinesses))(OK)
+        stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinesses)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
 
         When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
