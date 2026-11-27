@@ -25,7 +25,6 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.actions.IdentifierAction
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.SessionRetrievals
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
@@ -43,7 +42,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
                                                      (identify: IdentifierAction,
                                                       val appConfig: AppConfig)
                                                      (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with SessionRetrievals with I18nSupport with FeatureSwitching {
+  extends FrontendController(mcc) with I18nSupport with FeatureSwitching {
 
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 

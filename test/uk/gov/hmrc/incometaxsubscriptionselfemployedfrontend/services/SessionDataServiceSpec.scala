@@ -21,16 +21,20 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import crypto.ComposeCryptoService
+import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.SaveSessionDataHttpParser.SaveSessionDataSuccessResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.{GetSessionDataHttpParser, SaveSessionDataHttpParser}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.mocks.MockSessionDataConnector
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DuplicateDetails
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, UserDetailsModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ITSASessionKeys, MockSensitiveStringProvider}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SessionDataServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockSessionDataConnector {
+class SessionDataServiceSpec extends PlaySpec
+  with GuiceOneAppPerSuite
+  with MockSessionDataConnector
+  with MockSensitiveStringProvider {
 
   val composeCryptoService: ComposeCryptoService = app.injector.instanceOf[ComposeCryptoService]
 
@@ -40,6 +44,8 @@ class SessionDataServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
 
   val testReference: String = "test-reference"
   val testNino: String = "test-nino"
+  val testUserDetails: UserDetailsModel = UserDetailsModel(firstName = "FirstName", lastName = "LastName")
+  lazy val fakeRequest = FakeRequest()
 
   def duplicateDetails(id: String): DuplicateDetails = DuplicateDetails(
     id = id,
@@ -100,6 +106,37 @@ class SessionDataServiceSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
         mockGetSessionData(ITSASessionKeys.NINO)(Left(GetSessionDataHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
 
         await(service.fetchNino) mustBe Left(GetSessionDataHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
+      }
+    }
+  }
+
+  "fetchUserDetails" must {
+    "return user details" when {
+      "the connector returns a valid result" in new Setup {
+        mockGetSessionData(ITSASessionKeys.UserDetailsKey)(Right(Some(testUserDetails)))
+
+        await(service.fetchUserDetails
+          (implicitly, UserDetailsModel.encryptedFormat(mockSensitiveStringProvider.sensitiveFormat), fakeRequest)) mustBe
+        Right(Some(testUserDetails))
+      }
+    }
+    "return no user details" when {
+      "the connector returns no data" in new Setup {
+        mockGetSessionData(ITSASessionKeys.UserDetailsKey)(Right(None))
+
+        await(service.fetchUserDetails
+          (implicitly, UserDetailsModel.encryptedFormat(mockSensitiveStringProvider.sensitiveFormat), fakeRequest)) mustBe
+        Right(None)
+      }
+    }
+    "return an error" when {
+      "the connector returns an error" in new Setup {
+        mockGetSessionData(ITSASessionKeys.UserDetailsKey)
+          (Left(GetSessionDataHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR)))
+
+        await(service.fetchUserDetails
+          (implicitly, UserDetailsModel.encryptedFormat(mockSensitiveStringProvider.sensitiveFormat), fakeRequest)) mustBe
+        Left(GetSessionDataHttpParser.UnexpectedStatusFailure(INTERNAL_SERVER_ERROR))
       }
     }
   }

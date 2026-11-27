@@ -27,7 +27,7 @@ import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{Address, SoleTraderBusinesses, UserDetailsModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 import java.net.URLEncoder
@@ -58,6 +58,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         val continueUrl = s"http://localhost:9563$baseUrl$clientOrIndividual/details/address-lookup/" + id
 
         Seq(false, true).foreach { isUk =>
@@ -141,6 +143,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutAddress))
           stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))
@@ -226,6 +230,8 @@ class AddressLookupRoutingControllerISpec extends ComponentSpecBase {
           Given("I setup the Wiremock stubs")
           stubAuthSuccess()
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
           stubGetAddressLookupDetails(addressId)(OK, Json.obj("address" -> Json.toJson(address)(Address.format)))

@@ -29,7 +29,7 @@ import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitc
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.featureswitch.FeatureSwitching
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.{FullIncomeSourceController, routes}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, SoleTraderBusiness, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, SoleTraderBusiness, SoleTraderBusinesses, UserDetailsModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwitching {
@@ -70,6 +70,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
           responseBody = Json.toJson(soleTraderBusinesses)
         )
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
@@ -92,6 +94,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             responseBody = Json.toJson(duplicateDetails)(DuplicateDetails.encryptedFormat)
           )
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
@@ -113,6 +117,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             responseBody = Json.toJson(duplicateDetails.copy(id = "id-two"))(DuplicateDetails.encryptedFormat)
           )
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
@@ -132,6 +138,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
         stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(NO_CONTENT)
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         val result = getClientFullIncomeSource(id, isEditMode = false, isGlobalEdit = false)
 
@@ -170,6 +178,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
       "return a bad request with the page content" in {
         AuthStub.stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         val result = submitClientFullIncomeSource(
           trade = None,
@@ -202,6 +212,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
         )(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         val result = submitClientFullIncomeSource(
           trade = Some("test trade"),
@@ -235,6 +247,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           val result = submitClientFullIncomeSource(
             trade = Some("test trade"),
@@ -284,6 +298,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
             stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+            stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+              (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
             val result = submitClientFullIncomeSource(
               trade = Some("test new trade"),
@@ -330,6 +346,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
             stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+            stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+              (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
             val result = submitClientFullIncomeSource(
               trade = Some("test duplicate trade"),
@@ -371,6 +389,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           val result = submitClientFullIncomeSource(
             trade = Some("test trade"),
@@ -403,6 +423,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
           )(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           val result = submitClientFullIncomeSource(
             trade = Some("test trade"),
@@ -434,6 +456,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
         )
         stubSaveSessionData(ITSASessionKeys.DUPLICATE_DETAILS, duplicateDetails)(OK)(DuplicateDetails.encryptedFormat)
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         val result = submitClientFullIncomeSource(
           trade = Some("test duplicate trade"),
@@ -487,6 +511,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
               )(OK)
               stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
               stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+              stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+                (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
               val result = submitClientFullIncomeSource(
                 trade = Some("test duplicate trade"),
@@ -537,6 +563,8 @@ class FullIncomeSourceControllerISpec extends ComponentSpecBase with FeatureSwit
             )(OK)
             stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
             stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+            stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+              (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
             val result = submitClientFullIncomeSource(
               trade = Some("test duplicate trade"),

@@ -41,14 +41,14 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
     businesses = soleTraderBusinesses.businesses.map(_.copy(confirmed = true))
   )
 
-  val testNino: String = "test-nino"
-
   "GET /report-quarterly/income-and-expenses/sign-up/self-employments/client/details/business-check-your-answers" should {
     "return OK" in {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
       stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
       stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+      stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+        (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
       When("GET /client/details/business-check-your-answers is called")
       val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)
@@ -99,6 +99,8 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, completeSoleTraderBusinesses)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -117,6 +119,8 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(incompleteSoleTraderBusinesses))
 
         When("GET /client/details/business-check-your-answers is called")
@@ -135,6 +139,8 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, completeSoleTraderBusinesses)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -155,6 +161,8 @@ class SelfEmployedCYAControllerISpec extends ComponentSpecBase with FeatureSwitc
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(INTERNAL_SERVER_ERROR)
 
         When("GET /client/details/business-check-your-answers is called")

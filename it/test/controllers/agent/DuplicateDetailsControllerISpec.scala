@@ -23,7 +23,7 @@ import helpers.servicemocks.AuthStub.*
 import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DuplicateDetails
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, UserDetailsModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class DuplicateDetailsControllerISpec extends ComponentSpecBase {
@@ -38,6 +38,8 @@ class DuplicateDetailsControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.REFERENCE)(OK, JsString(reference))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(
           responseStatus = OK,
           responseBody = Json.toJsObject(DuplicateDetails(id, testName, testTrade, testStartDateBeforeLimit))(DuplicateDetails.encryptedFormat)
@@ -61,6 +63,8 @@ class DuplicateDetailsControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.REFERENCE)(OK, JsString(reference))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(responseStatus = NO_CONTENT)
 
         val res = getClientDuplicateDetails(
@@ -79,6 +83,8 @@ class DuplicateDetailsControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.REFERENCE)(OK, JsString(reference))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(
           responseStatus = OK,
           responseBody = Json.toJsObject(DuplicateDetails("other-id", testName, testTrade, testStartDateBeforeLimit))(DuplicateDetails.encryptedFormat)
@@ -115,6 +121,8 @@ class DuplicateDetailsControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.REFERENCE)(OK, JsString(reference))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSessionData(ITSASessionKeys.DUPLICATE_DETAILS)(INTERNAL_SERVER_ERROR)
 
         val res = getClientBusinessCheckYourAnswers(id, isEditMode = false)

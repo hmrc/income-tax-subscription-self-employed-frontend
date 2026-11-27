@@ -19,18 +19,17 @@ package controllers.agent
 import connectors.stubs.IncomeTaxSubscriptionConnectorStub.*
 import connectors.stubs.SessionDataConnectorStub.stubGetSessionData
 import helpers.ComponentSpecBase
-import helpers.IntegrationTestConstants.{ggSignInURI, id, soleTraderBusinesses}
+import helpers.IntegrationTestConstants.{ggSignInURI, id, soleTraderBusinesses, testNino, testUser}
 import helpers.servicemocks.AuthStub.*
 import play.api.http.Status.*
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.SelfEmploymentDataKeys.{incomeSourcesComplete, soleTraderBusinessesKey}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.agent.routes
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusinesses}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DateModel, SoleTraderBusinesses, UserDetailsModel}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{AccountingPeriodUtil, ITSASessionKeys}
 
 class BusinessStartDateControllerISpec extends ComponentSpecBase {
 
-  val testNino: String = "test-nino"
   val date: DateModel = DateModel.dateConvert(AccountingPeriodUtil.getStartDateLimit)
 
   val soleTraderBusinessesWithoutStartDate: SoleTraderBusinesses = soleTraderBusinesses.copy(
@@ -48,6 +47,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(id)
@@ -67,6 +68,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         When("GET /client/details/business-start-date is called")
         val res = getClientBusinessStartDate(id)
@@ -103,6 +106,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinessesWithStartDate)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -122,6 +127,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         When("POST /client/details/business-start-date is called")
         val res = submitClientBusinessStartDate(id, None)
@@ -138,6 +145,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinessesWithStartDate)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -157,6 +166,8 @@ class BusinessStartDateControllerISpec extends ComponentSpecBase {
         Given("I setup the Wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinessesWithoutStartDate))
         stubSaveSubscriptionData(reference, soleTraderBusinessesKey, soleTraderBusinessesWithStartDate)(OK)
         stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)

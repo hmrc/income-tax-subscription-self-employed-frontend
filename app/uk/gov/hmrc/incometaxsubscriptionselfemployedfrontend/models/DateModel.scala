@@ -18,7 +18,9 @@ package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models
 
 import com.ibm.icu.text.SimpleDateFormat
 import play.api.i18n.Messages
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json.{Format, Json, OFormat, Reads, __}
+import uk.gov.hmrc.crypto.Sensitive.SensitiveString
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DateModel.*
 
 import java.time.format.{DateTimeFormatter, ResolverStyle}

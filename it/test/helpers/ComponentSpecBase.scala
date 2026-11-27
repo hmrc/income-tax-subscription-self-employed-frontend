@@ -25,12 +25,14 @@ import play.api.http.HeaderNames
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.crypto.DefaultCookieSigner
-import play.api.libs.json.{JsString, OFormat}
+import play.api.libs.json.{Format, JsString, OFormat}
 import play.api.libs.ws.DefaultBodyWritables.writeableOf_urlEncodedForm
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.crypto.Sensitive.SensitiveString
+import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.agent.StreamlineIncomeSourceForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.*
@@ -50,6 +52,7 @@ trait ComponentSpecBase extends PlaySpec with CustomMatchers with GuiceOneServer
 
   implicit lazy val crypto: Encrypter with Decrypter = app.injector.instanceOf[ComposeCryptoService].composedJsonCrypto
   implicit lazy val soleTraderBusinessesFormat: OFormat[SoleTraderBusinesses] = SoleTraderBusinesses.encryptedFormat
+  implicit lazy val sensitiveFormat: Format[SensitiveString] = JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
 
   implicit def ws(implicit app: Application): WSClient = app.injector.instanceOf[WSClient]
 
