@@ -23,6 +23,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.config.AppConfig
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.ReferenceRetrievalInj
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.ClientDetails
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.ClientDetailsRetrieval
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -47,7 +48,7 @@ class IdentifierAction @Inject()(val authConnector: AuthConnector,
     authorised() {
       referenceRetrieval.getReference flatMap {
         case Some(reference) =>
-          clientDetailsRetrieval.getClientDetails(request, implicitly) flatMap { clientDetails =>
+          clientDetailsRetrieval.getClientDetails(implicitly, request) flatMap { clientDetails =>
             block(IdentifierRequest(request, reference, clientDetails))
           }
         case None =>

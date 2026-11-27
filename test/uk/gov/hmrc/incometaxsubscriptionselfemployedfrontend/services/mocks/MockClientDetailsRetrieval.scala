@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services.mocks
 
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
@@ -42,7 +42,7 @@ trait MockClientDetailsRetrieval extends MockitoSugar with BeforeAndAfterEach {
   }
 
   def mockGetClientDetails(): Unit = {
-    when(mockClientDetailsRetrieval.getClientDetails(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(
+    when(mockClientDetailsRetrieval.getClientDetails(any(), any())).thenReturn(
       Future.successful(clientDetails)
     )
   }

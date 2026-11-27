@@ -20,6 +20,7 @@ object ITSASessionKeys {
 
   val REFERENCE: String = "reference"
   val FullNameSessionKey: String = "FULLNAME"
+  val UserDetailsKey = "User-Details"
   val FirstName = "FirstName"
   val LastName = "LastName"
   val NINO = "NINO"

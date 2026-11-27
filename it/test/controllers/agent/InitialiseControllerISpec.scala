@@ -21,7 +21,8 @@ import helpers.ComponentSpecBase
 import helpers.IntegrationTestConstants.*
 import helpers.servicemocks.AuthStub.{stubAuthSuccess, stubUnauthorised}
 import play.api.http.Status.*
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsString, Json}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.UserDetailsModel
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
 
 class InitialiseControllerISpec extends ComponentSpecBase {
@@ -31,6 +32,8 @@ class InitialiseControllerISpec extends ComponentSpecBase {
       Given("I setup the Wiremock stubs")
       stubAuthSuccess()
       stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+      stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+        (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
       When("GET /details is called")
       val res = getClientInitialise

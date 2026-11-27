@@ -42,7 +42,6 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
     Some("ZZ1 1ZZ"),
     Country.UK
   )
-  val testNino: String = "test-nino"
 
   s"GET ${routes.BusinessAddressConfirmationController.show(id).url}" should {
     "return the page" when {
@@ -51,6 +50,8 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         stubAuthSuccess()
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
         val res = getClientBusinessAddressConfirmation(id)(Map(
@@ -68,6 +69,8 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
         Given("I setup the wiremock stubs")
         stubAuthSuccess()
         stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+        stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+          (UserDetailsModel.encryptedFormat(sensitiveFormat)))
         stubGetSubscriptionData(reference, soleTraderBusinessesKey)(NO_CONTENT)
 
         When(s"GET ${routes.BusinessAddressConfirmationController.show(id).url} is called")
@@ -108,6 +111,8 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
           stubAuthSuccess()
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
 
           When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")
           val res = submitClientBusinessAddressConfirmation(id, None)(Map(
@@ -131,6 +136,8 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
           stubSaveSubscriptionData(reference, soleTraderBusinessesKey, expectedSave)(OK)
           stubDeleteSubscriptionData(reference, incomeSourcesComplete)(OK)
@@ -153,6 +160,8 @@ class BusinessAddressConfirmationControllerISpec extends ComponentSpecBase with 
           Given("I setup the wiremock stubs")
           stubAuthSuccess()
           stubGetSessionData(ITSASessionKeys.NINO)(OK, JsString(testNino))
+          stubGetSessionData(ITSASessionKeys.UserDetailsKey)(OK, Json.toJson(testUser)
+            (UserDetailsModel.encryptedFormat(sensitiveFormat)))
           stubGetSubscriptionData(reference, soleTraderBusinessesKey)(OK, Json.toJson(soleTraderBusinesses))
 
           When(s"POST ${routes.BusinessAddressConfirmationController.show(id).url} is called")

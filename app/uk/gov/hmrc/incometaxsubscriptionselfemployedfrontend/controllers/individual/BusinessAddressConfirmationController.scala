@@ -22,7 +22,6 @@ import play.api.mvc.*
 import play.twirl.api.Html
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.individual.actions.IdentifierAction
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.controllers.utils.SessionRetrievals
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.forms.individual.BusinessAddressConfirmationForm
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.*
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.individual.IdentifierRequest
@@ -39,7 +38,7 @@ class BusinessAddressConfirmationController @Inject()(mcc: MessagesControllerCom
                                                       businessAddressConfirmation: BusinessAddressConfirmation,
                                                       identify: IdentifierAction)
                                                      (implicit val ec: ExecutionContext)
-  extends FrontendController(mcc) with SessionRetrievals with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport {
 
   val confirmationForm: Form[YesNo] = BusinessAddressConfirmationForm.businessAddressConfirmationForm
 

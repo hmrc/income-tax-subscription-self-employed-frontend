@@ -17,13 +17,16 @@
 package uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.services
 
 import crypto.ComposeCryptoService
+import play.api.libs.json.{OFormat, Reads}
+import play.api.mvc.Request
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.SessionDataConnector
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.GetSessionDataHttpParser.GetSessionDataResponse
 import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.connectors.httpparser.SaveSessionDataHttpParser.SaveSessionDataSuccess
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.DuplicateDetails
-import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.ITSASessionKeys
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.requests.agent.IdentifierRequest
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.models.{DuplicateDetails, UserDetailsModel}
+import uk.gov.hmrc.incometaxsubscriptionselfemployedfrontend.utilities.{ITSASessionKeys, SensitiveStringProvider}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,6 +43,23 @@ class SessionDataService @Inject()(composeCryptoService: ComposeCryptoService, s
 
   def fetchNino(implicit hc: HeaderCarrier): Future[GetSessionDataResponse[String]] = {
     sessionDataConnector.getSessionData[String](ITSASessionKeys.NINO)
+  }
+
+  // TODO: Temporary function to accommodate existing users' journeys. Can be removed once complete
+  def fetchUserDetailsCookie(implicit request: Request[_]): Option[UserDetailsModel] = {
+    (request.session.get("FirstName"), request.session.get("LastName")) match {
+      case (Some(f), Some(l)) => Some(UserDetailsModel(firstName = f, lastName = l))
+      case _ => None
+    }
+  }
+
+  def fetchUserDetails(implicit hc: HeaderCarrier,
+                       userDetailsEncryption: Reads[UserDetailsModel],
+                       request: Request[_]): Future[GetSessionDataResponse[UserDetailsModel]] = {
+    sessionDataConnector.getSessionData[UserDetailsModel](ITSASessionKeys.UserDetailsKey) flatMap {
+      case Right(None) => Future.successful(Right(fetchUserDetailsCookie))
+      case sessionDataResponse => Future.successful(sessionDataResponse)
+    }
   }
 
   def getDuplicateDetails(id: String)(implicit hc: HeaderCarrier): Future[Option[DuplicateDetails]] = {

@@ -25,6 +25,7 @@ object IntegrationTestConstants {
 
   val id: String = "test-id"
   val testNino = "test-nino"
+  val testUser: UserDetailsModel = UserDetailsModel("FirstName", "LastName")
   val incomeTaxSubscriptionFrontendBaseUrl = "/report-quarterly/income-and-expenses/sign-up"
   val baseURI = "/report-quarterly/income-and-expenses/sign-up/self-employments"
   val BusinessStartDateUri = s"$baseURI/details/business-start-date"
